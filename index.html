@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sports Betting Guide</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">Sports Betting Guide</div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+
+          <li class="dropdown">
+            <a href="#">NBA</a>
+            <ul class="dropdown-menu">
+              <li><a href="nba-odds.html">Game Odds</a></li>
+              <li><a href="nba-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NHL</a>
+            <ul class="dropdown-menu">
+              <li><a href="nhl-odds.html">Game Odds</a></li>
+              <li><a href="nhl-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">MLB</a>
+            <ul class="dropdown-menu">
+              <li><a href="mlb-odds.html">Game Odds</a></li>
+              <li><a href="mlb-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#disclaimer">Disclaimer</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-content">
+        <h1>Daily Sports Betting Insights Powered by Data</h1>
+        <p>
+          Track today’s NBA and NHL betting opportunities with ranked expected value,
+          model-driven insights, and live sportsbook views across game odds and player props.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="nba-odds.html" class="btn btn-primary">View NBA Odds</a>
+          <a href="nba-props.html" class="btn btn-secondary">View NBA Props</a>
+          <a href="nhl-odds.html" class="btn btn-secondary">View NHL Odds</a>
+          <a href="nhl-props.html" class="btn btn-secondary">View NHL Props</a>
+          <a href="mlb-odds.html" class="btn btn-secondary">View MLB Odds</a>
+          <a href="mlb-props.html" class="btn btn-secondary">View MLB Props</a>
+          <p class="hero-subcta">
+  Looking for deeper access? Explore premium props, expanded rankings, and locked previews below.
+</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="market-hub-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Choose Your Market</h2>
+          <p>Jump directly into the exact board you want to analyze.</p>
+        </div>
+
+        <div class="market-hub-grid">
+          <article class="market-hub-card">
+            <p class="market-hub-label">NBA</p>
+            <h3>Game Odds</h3>
+            <p>
+              View NBA spreads, moneylines, totals, EV rankings, sportsbook comparisons,
+              and the top game opportunities for today.
+            </p>
+            <a href="nba-odds.html" class="card-link">Open NBA Game Odds</a>
+          </article>
+
+          <article class="market-hub-card">
+            <p class="market-hub-label">NBA</p>
+            <h3>Player Props</h3>
+            <p>
+              Explore NBA player props with game filters, prop-type filters, player filters,
+              sportsbook filters, and leaderboard views.
+            </p>
+            <a href="nba-props.html" class="card-link">Open NBA Player Props</a>
+          </article>
+
+          <article class="market-hub-card">
+            <p class="market-hub-label">NHL</p>
+            <h3>Game Odds</h3>
+            <p>
+              Review NHL spreads, moneylines, totals, EV rankings, and sportsbook-specific
+              opportunities across today’s board.
+            </p>
+            <a href="nhl-odds.html" class="card-link">Open NHL Game Odds</a>
+          </article>
+
+          <article class="market-hub-card">
+            <p class="market-hub-label">NHL</p>
+            <h3>Player Props</h3>
+            <p>
+              Browse NHL player props using matchup, prop type, player, sportsbook, and sort
+              filters to isolate the best value.
+            </p>
+            <a href="nhl-props.html" class="card-link">Open NHL Player Props</a>
+          </article>
+
+          <article class="market-hub-card">
+            <p class="market-hub-label">MLB</p>
+            <h3>Game Odds</h3>
+            <p>
+              View MLB moneylines, run lines, totals, EV rankings, sportsbook comparisons,
+              and top opportunities for today.
+            </p>
+            <a href="mlb-odds.html" class="card-link">Open MLB Game Odds</a>
+          </article>
+
+          <article class="market-hub-card">
+            <p class="market-hub-label">MLB</p>
+            <h3>Player Props</h3>
+            <p>
+              Explore MLB player props with matchup, prop-type, player, sportsbook, and
+              sort filters across today’s board.
+            </p>
+            <a href="mlb-props.html" class="card-link">Open MLB Player Props</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="spotlight-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Today’s Spotlight Boards</h2>
+          <p>Quick highlights from today’s live markets.</p>
+        </div>
+
+        <div class="spotlight-grid">
+          <article class="spotlight-card">
+            <div class="spotlight-header">
+              <h3>Top NBA Bet</h3>
+              <a href="nba-odds.html" class="mini-link">See Odds</a>
+            </div>
+            <div id="home-top-nba-bet">
+              <div class="empty-state">
+                <h3>Loading...</h3>
+                <p>Fetching top NBA game odds opportunity.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="spotlight-card">
+            <div class="spotlight-header">
+              <h3>Top NBA Prop</h3>
+              <a href="nba-props.html" class="mini-link">See Props</a>
+            </div>
+            <div id="home-top-nba-prop">
+              <div class="empty-state">
+                <h3>Loading...</h3>
+                <p>Fetching top NBA player prop opportunity.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="spotlight-card">
+            <div class="spotlight-header">
+              <h3>Top NHL Bet</h3>
+              <a href="nhl-odds.html" class="mini-link">See Odds</a>
+            </div>
+            <div id="home-top-nhl-bet">
+              <div class="empty-state">
+                <h3>Loading...</h3>
+                <p>Fetching top NHL game odds opportunity.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="spotlight-card">
+            <div class="spotlight-header">
+              <h3>Top NHL Prop</h3>
+              <a href="nhl-props.html" class="mini-link">See Props</a>
+            </div>
+            <div id="home-top-nhl-prop">
+              <div class="empty-state">
+                <h3>Loading...</h3>
+                <p>Fetching top NHL player prop opportunity.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="spotlight-card">
+            <div class="spotlight-header">
+              <h3>Top MLB Bet</h3>
+              <a href="mlb-odds.html" class="mini-link">See Odds</a>
+            </div>
+            <div id="home-top-mlb-bet">
+              <div class="empty-state">
+                <h3>Loading...</h3>
+                <p>Fetching top MLB game odds opportunity.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="spotlight-card">
+            <div class="spotlight-header">
+              <h3>Top MLB Prop</h3>
+              <a href="mlb-props.html" class="mini-link">See Props</a>
+            </div>
+            <div id="home-top-mlb-prop">
+              <div class="empty-state">
+                <h3>Loading...</h3>
+                <p>Fetching top MLB player prop opportunity.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="premium-preview-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Go Beyond the Free Board</h2>
+      <p>Unlock deeper access to props, rankings, and premium daily views.</p>
+    </div>
+
+    <div class="premium-preview-grid">
+      <article class="premium-preview-card">
+        <p class="market-hub-label">Upgrade Preview</p>
+        <h3>What Paid Members Unlock</h3>
+        <ul class="premium-feature-list">
+          <li>More EV-ranked bets per game</li>
+          <li>NBA, NHL, and MLB player props access</li>
+          <li>Expanded leaderboards</li>
+          <li>Advanced filtering tools</li>
+          <li>Higher-volume daily access across all leagues</li>
+        </ul>
+      </article>
+
+      <article class="premium-preview-card locked-teaser-card">
+        <p class="market-hub-label">Premium Teaser</p>
+        <h3>Locked Premium Board</h3>
+        <div class="locked-teaser-box">
+          <div class="locked-teaser-row">Top 10 NBA / NHL / MLB Props by EV</div>
+          <div class="locked-teaser-row">Best Sportsbook Value Across Leagues</div>
+          <div class="locked-teaser-row">Premium Daily Spotlights</div>
+          <div class="locked-teaser-overlay">
+            <strong>Unlock with All-Star or higher</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="premium-preview-card">
+        <p class="market-hub-label">Stay Updated</p>
+        <h3>Join the Waitlist</h3>
+        <p>
+          Be the first to hear when premium NBA, NHL, and MLB betting tools, deeper analytics,
+          and expanded daily boards go live.
+        </p>
+
+        <form
+          name="waitlist"
+          method="POST"
+          action="/thank-you.html"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          class="waitlist-form"
+        >
+          <input type="hidden" name="form-name" value="waitlist" />
+          <input type="hidden" name="plan" id="selected-plan-input" />
+
+          <p class="hidden-honeypot">
+            <label>
+              Don’t fill this out if you’re human:
+              <input name="bot-field" />
+            </label>
+          </p>
+
+          <input
+            type="text"
+            name="name"
+            class="sportsbook-select"
+            placeholder="Your name"
+          />
+
+          <input
+            type="email"
+            name="email"
+            class="sportsbook-select"
+            placeholder="Enter your email"
+            required
+          />
+
+          <select name="interest" class="sportsbook-select">
+            <option value="">Main interest</option>
+            <option value="nba">NBA</option>
+            <option value="nhl">NHL</option>
+            <option value="mlb">MLB</option>
+            <option value="all">All leagues</option>
+          </select>
+
+          <button type="submit" class="btn btn-primary waitlist-btn">
+            Join Waitlist
+          </button>
+        </form>
+
+        <p class="waitlist-note">
+          Join the waitlist for premium NBA, NHL, and MLB betting tools.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+    <section class="tiers-preview-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Choose Your Access Level</h2>
+          <p>Preview the subscription ladder behind your betting platform.</p>
+        </div>
+
+        <div class="tier-cards-grid">
+          <div class="tier-card">
+            <h3>Rookie</h3>
+            <p class="tier-price">Free</p>
+            <ul class="tier-list">
+                <a href="#" class="card-link">Start free</a>
+              <li>Top 1 bet per game</li>
+              <li>Game odds preview</li>
+              <li>Limited board access</li>
+            </ul>
+          </div>
+
+          <div class="tier-card">
+            <h3>Veteran</h3>
+            <p class="tier-price">$9/month</p>
+            <ul class="tier-list">
+                <a href="#" class="card-link">Choose this tier</a>
+              <li>Top 3 bets per game</li>
+              <li>Expanded game board</li>
+              <li>Sportsbook comparisons</li>
+            </ul>
+          </div>
+
+          <div class="tier-card">
+            <h3>All-Star</h3>
+            <p class="tier-price">$19/month</p>
+            <ul class="tier-list">
+                <a href="#" class="card-link">Choose this tier</a>
+              <li>Full game-odds rankings</li>
+              <li>Player props unlocked</li>
+              <li>Advanced filtering</li>
+            </ul>
+          </div>
+
+          <div class="tier-card">
+            <h3>Hall-of-Famer</h3>
+            <p class="tier-price">$39/month</p>
+            <ul class="tier-list">
+                <a href="#" class="card-link">Choose this tier</a>
+              <li>More props access</li>
+              <li>Top boards expanded</li>
+              <li>Premium view depth</li>
+            </ul>
+          </div>
+
+          <div class="tier-card">
+            <h3>Legend</h3>
+            <p class="tier-price">$79/month</p>
+            <ul class="tier-list">
+                <a href="#" class="card-link">Choose this tier</a>
+              <li>Everything unlocked</li>
+              <li>Highest leaderboard access</li>
+              <li>Full premium experience</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works" id="about">
+      <div class="container">
+        <h2>How This Guide Works</h2>
+        <div class="info-grid">
+          <div class="info-card">
+            <h3>Daily Markets</h3>
+            <p>
+              The platform is focused on the current day’s NBA and NHL opportunities
+              so users can quickly find relevant betting spots.
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Ranked by EV</h3>
+            <p>
+              Markets and props are structured around expected value so the strongest
+              opportunities rise to the top.
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Filter-Driven Workflow</h3>
+            <p>
+              Bettors can narrow the board by game, sportsbook, prop type, player,
+              tier level, and sorting preference.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container cta-box">
+        <h2>Built for Smart Bettors, Powered by a Live Spreadsheet Engine</h2>
+        <p>
+          Your platform is designed to turn structured data into a betting product
+          that users can actually navigate, understand, and pay for.
+        </p>
+        <a href="nba-odds.html" class="btn btn-primary">Start with Today’s Boards</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="disclaimer">
+    <div class="container">
+      <p><strong>Disclaimer:</strong> This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
+      <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    renderHomeSpotlights();
+  </script>
+</body>
+</html>

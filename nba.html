@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NBA Bets | Sports Betting Guide</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">Sports Betting Guide</div>
+<nav>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+
+    <li class="dropdown">
+      <a href="#">NBA</a>
+      <ul class="dropdown-menu">
+        <li><a href="nba-odds.html">Game Odds</a></li>
+        <li><a href="nba-props.html">Player Props</a></li>
+      </ul>
+    </li>
+
+    <li class="dropdown">
+      <a href="#">NHL</a>
+      <ul class="dropdown-menu">
+        <li><a href="nhl-odds.html">Game Odds</a></li>
+        <li><a href="nhl-props.html">Player Props</a></li>
+      </ul>
+    </li>
+
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#disclaimer">Disclaimer</a></li>
+  </ul>
+</nav>
+    </div>
+  </header>
+
+  <main class="league-page">
+    <section class="league-hero">
+      <div class="container">
+        <p class="league-label">NBA DAILY BOARD</p>
+        <h1>Today’s NBA Bets Ranked by Expected Value</h1>
+        <p class="league-description">
+          Review today's NBA game odds, totals, and expected value rankings from your model.
+          Bets are ranked from highest EV to lowest EV for easier decision-making.
+        </p>
+      </div>
+    </section>
+
+    <section class="league-controls">
+      <div class="control-box">
+       <span class="control-label">Sportsbook</span>
+       <select id="nba-sportsbook-filter" class="sportsbook-select">
+       <option value="All">All Sportsbooks</option>
+      </select>
+     </div>
+        <div class="control-box">
+    <span class="control-label">Membership Tier</span>
+    <select id="nba-tier-filter" class="sportsbook-select">
+        <option value="Rookie">Rookie</option>
+        <option value="Veteran">Veteran</option>
+        <option value="All-Star">All-Star</option>
+        <option value="Hall-of-Famer">Hall-of-Famer</option>
+        <option value="Legend">Legend</option>
+    </select>
+    </div>
+        <div class="control-box">
+          <span class="control-label">Filter</span>
+          <strong>Today’s Games Only</strong>
+        </div>
+        <div class="control-box">
+          <span class="control-label">Ranking</span>
+          <strong>Highest EV First</strong>
+        </div>
+        <div id="nba-bets-container" class="bets-grid"></div>
+        <div class="leaderboard-box">
+          <h3>Top EV Bets Today</h3>
+        <div id="nba-leaderboard">
+          <p>Loading leaderboard...</p>
+        </div>
+      </div>
+        <div class="control-box">
+          <span class="control-label">Last Updated</span>
+          <strong id="nba-last-updated">Loading...</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="bets-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Top NBA Opportunities</h2>
+          <p>
+            These cards are structured for your spreadsheet-based data and will later be
+            populated dynamically with JavaScript.
+          </p>
+        </div>
+
+        <div id="nba-bets-container" class="bets-grid">
+          <!-- NBA game cards will be inserted here by JavaScript -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="bets-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>NBA Player Props</h2>
+      <p>
+        Player prop opportunities from today’s NBA board. Access depends on membership tier.
+      </p>
+    </div>
+
+    <div id="nba-props-container" class="bets-grid">
+      <div class="empty-state">
+        <h3>Loading NBA player props...</h3>
+        <p>Please wait while live props data is pulled from Google Sheets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>Disclaimer:</strong> This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
+      <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    renderNBABets();
+    renderNBAProps();
+  </script>
+</body>
+</html>

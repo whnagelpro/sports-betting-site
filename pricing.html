@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing | Sports Betting Guide</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">Sports Betting Guide</div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+
+          <li class="dropdown">
+            <a href="#">NBA</a>
+            <ul class="dropdown-menu">
+              <li><a href="nba-odds.html">Game Odds</a></li>
+              <li><a href="nba-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NHL</a>
+            <ul class="dropdown-menu">
+              <li><a href="nhl-odds.html">Game Odds</a></li>
+              <li><a href="nhl-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">MLB</a>
+            <ul class="dropdown-menu">
+              <li><a href="mlb-odds.html">Game Odds</a></li>
+              <li><a href="mlb-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#disclaimer">Disclaimer</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="league-page">
+    <section class="league-hero">
+      <div class="container">
+        <p class="league-label">PRICING</p>
+        <h1>Choose Your Access Level</h1>
+        <p class="league-description">
+          Start free, or unlock deeper daily boards, player props, and premium filtering tools.
+        </p>
+
+        <div class="billing-toggle-wrap">
+          <span class="billing-label active" id="monthly-label">Monthly</span>
+
+          <label class="billing-switch">
+            <input type="checkbox" id="billing-toggle" />
+            <span class="billing-slider"></span>
+          </label>
+
+          <span class="billing-label" id="annual-label">Annual</span>
+          <span class="billing-save-badge">Save 20%</span>
+        </div>
+
+        <p class="pricing-subtext">
+          Annual plans are the best value for serious bettors.
+        </p>
+      </div>
+    </section>
+
+    <section class="pricing-section">
+      <div class="container">
+        <div class="pricing-grid">
+          <article class="pricing-card">
+            <h3>Rookie</h3>
+            <p class="pricing-tag">Free entry</p>
+
+            <p class="price monthly-price">$0<span>/month</span></p>
+            <p class="price annual-price hidden">$0<span>/year</span></p>
+            <p class="savings">Start free</p>
+
+            <ul class="pricing-list">
+              <li>Top 1 bet per game</li>
+              <li>Game odds preview</li>
+              <li>Limited board access</li>
+              <li>No player props</li>
+            </ul>
+
+            <a href="#" class="btn btn-secondary pricing-btn">Start Free</a>
+          </article>
+
+          <article class="pricing-card">
+            <h3>Veteran</h3>
+            <p class="pricing-tag">Expanded board</p>
+
+            <p class="price monthly-price">$9<span>/month</span></p>
+            <p class="price annual-price hidden">$79<span>/year</span></p>
+            <p class="savings">Save $29 annually</p>
+
+            <ul class="pricing-list">
+              <li>Top 3 bets per game</li>
+              <li>Expanded game odds board</li>
+              <li>Sportsbook comparisons</li>
+              <li>More leaderboard access</li>
+            </ul>
+
+            <a href="index.html#waitlist" class="btn btn-secondary pricing-btn" data-plan="Veteran">Choose Veteran</a>
+          </article>
+
+          <article class="pricing-card featured-pricing-card">
+            <div class="popular-badge">Most Popular</div>
+            <h3>All-Star</h3>
+            <p class="pricing-tag">Best value tier</p>
+
+            <p class="price monthly-price">$19<span>/month</span></p>
+            <p class="price annual-price hidden">$179<span>/year</span></p>
+            <p class="savings">Save $49 annually</p>
+
+            <ul class="pricing-list">
+              <li>All game odds unlocked</li>
+              <li>Player props unlocked</li>
+              <li>Advanced filters</li>
+              <li>Expanded leaderboards</li>
+            </ul>
+
+            <a href="index.html#waitlist" class="btn btn-primary pricing-btn" data-plan="All-Star">Choose All-Star</a>
+          </article>
+
+          <article class="pricing-card">
+            <h3>Hall-of-Famer</h3>
+            <p class="pricing-tag">Premium access</p>
+
+            <p class="price monthly-price">$39<span>/month</span></p>
+            <p class="price annual-price hidden">$349<span>/year</span></p>
+            <p class="savings">Save $119 annually</p>
+
+            <ul class="pricing-list">
+              <li>More props shown daily</li>
+              <li>Premium leaderboard depth</li>
+              <li>Top bet visibility</li>
+              <li>Stronger daily workflow</li>
+            </ul>
+
+            <a href="index.html#waitlist" class="btn btn-secondary pricing-btn" data-plan="Hall-of-Famer">Choose Hall-of-Famer</a>
+          </article>
+
+          <article class="pricing-card">
+            <h3>Legend</h3>
+            <p class="pricing-tag">Full premium experience</p>
+
+            <p class="price monthly-price">$79<span>/month</span></p>
+            <p class="price annual-price hidden">$749<span>/year</span></p>
+            <p class="savings">Save $199 annually</p>
+
+            <ul class="pricing-list">
+              <li>Everything unlocked</li>
+              <li>Highest leaderboard access</li>
+              <li>Maximum prop visibility</li>
+              <li>Best premium value stack</li>
+            </ul>
+
+            <a href="index.html#waitlist" class="btn btn-secondary pricing-btn" data-plan="Hall-of-Famer">Choose Hall-of-Famer</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <div class="container">
+        <h2>Which Plan Is Best for You?</h2>
+        <div class="info-grid">
+          <div class="info-card">
+            <h3>Rookie / Veteran</h3>
+            <p>
+              Best for casual bettors who want a lower-cost view of today’s strongest game odds.
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>All-Star</h3>
+            <p>
+              Best for most users. This is the tier where player props unlock and the product becomes much more powerful.
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>Hall-of-Famer / Legend</h3>
+            <p>
+              Best for serious daily users who want more prop volume, larger leaderboards, and deeper premium access.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container cta-box">
+        <h2>Ready to Upgrade Your Betting Workflow?</h2>
+        <p>
+          Compare plans, choose your level, and unlock the tools that fit how seriously you want to attack the board.
+        </p>
+        <a href="#" class="btn btn-primary">Join the Waitlist</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="disclaimer">
+    <div class="container">
+      <p><strong>Disclaimer:</strong> This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
+      <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    const billingToggle = document.getElementById("billing-toggle");
+    const monthlyLabel = document.getElementById("monthly-label");
+    const annualLabel = document.getElementById("annual-label");
+
+    if (billingToggle) {
+      billingToggle.addEventListener("change", () => {
+        document.querySelectorAll(".monthly-price").forEach((el) => {
+          el.classList.toggle("hidden");
+        });
+
+        document.querySelectorAll(".annual-price").forEach((el) => {
+          el.classList.toggle("hidden");
+        });
+
+        monthlyLabel.classList.toggle("active", !billingToggle.checked);
+        annualLabel.classList.toggle("active", billingToggle.checked);
+      });
+    }
+  </script>
+
+  <script>
+    document.querySelectorAll(".pricing-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const plan = button.getAttribute("data-plan");
+        localStorage.setItem("selectedPlan", plan);
+      });
+    });
+  </script>
+</body>
+</html>

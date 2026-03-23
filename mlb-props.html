@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MLB Player Props | Sports Betting Guide</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">Sports Betting Guide</div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+
+          <li class="dropdown">
+            <a href="#">NBA</a>
+            <ul class="dropdown-menu">
+              <li><a href="nba-odds.html">Game Odds</a></li>
+              <li><a href="nba-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NHL</a>
+            <ul class="dropdown-menu">
+              <li><a href="nhl-odds.html">Game Odds</a></li>
+              <li><a href="nhl-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">MLB</a>
+            <ul class="dropdown-menu">
+              <li><a href="mlb-odds.html">Game Odds</a></li>
+              <li><a href="mlb-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#disclaimer">Disclaimer</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="league-page">
+    <section class="league-hero">
+      <div class="container">
+        <p class="league-label">MLB PLAYER PROPS</p>
+        <h1>Today’s MLB Player Props</h1>
+        <p class="league-description">
+          Review today’s MLB player prop opportunities from your live board, organized by membership tier.
+        </p>
+
+        <div class="page-switcher">
+          <button id="mlb-see-props-btn" class="page-switch-btn active">See Props</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="league-controls">
+      <div class="container controls-row">
+        <div class="control-box">
+          <span class="control-label">League</span>
+          <strong>MLB</strong>
+        </div>
+
+        <div class="control-box">
+          <span class="control-label">Market</span>
+          <strong>Player Props</strong>
+        </div>
+
+        <div class="control-box">
+          <span class="control-label">Filter</span>
+          <strong>Today’s Props Only</strong>
+        </div>
+
+        <div class="control-box">
+  <span class="control-label">Membership Tier</span>
+  <select id="mlb-tier-filter" class="sportsbook-select">
+    <option value="Rookie">Rookie</option>
+    <option value="Veteran">Veteran</option>
+    <option value="All-Star">All-Star</option>
+    <option value="Hall-of-Famer">Hall-of-Famer</option>
+    <option value="Legend">Legend</option>
+  </select>
+</div>
+
+<div class="control-box">
+  <span class="control-label">Game</span>
+  <select id="mlb-props-game-filter" class="sportsbook-select">
+    <option value="All">All Games</option>
+  </select>
+</div>
+
+<div class="control-box">
+  <span class="control-label">Prop Type</span>
+  <select id="mlb-prop-type-filter" class="sportsbook-select">
+    <option value="All">All Prop Types</option>
+  </select>
+</div>
+
+<div class="control-box">
+  <span class="control-label">Player</span>
+  <select id="mlb-player-filter" class="sportsbook-select">
+    <option value="All">All Players</option>
+  </select>
+</div>
+
+<div class="control-box">
+  <span class="control-label">Sort By</span>
+  <select id="mlb-props-sort-filter" class="sportsbook-select">
+    <option value="ev-desc">Highest EV</option>
+    <option value="ev-asc">Lowest EV</option>
+    <option value="prob-desc">Highest Probability</option>
+    <option value="odds-desc">Highest Odds</option>
+    <option value="odds-asc">Lowest Odds</option>
+  </select>
+</div>
+
+<div class="control-box">
+  <span class="control-label">Sportsbook</span>
+  <select id="mlb-props-sportsbook-filter" class="sportsbook-select">
+    <option value="All">All Sportsbooks</option>
+  </select>
+</div>
+
+<div class="control-box">
+  <span class="control-label">Actions</span>
+  <button id="mlb-props-reset-filters" class="filter-reset-btn">Reset Filters</button>
+</div>
+
+    <section class="filter-summary-section">
+      <div class="container">
+        <div id="mlb-props-filter-summary" class="filter-summary-box"></div>
+      </div>
+    </section>
+
+    <section class="bets-section">
+      <div class="container">
+        <div class="leaderboard-box">
+          <h3>Top MLB Props</h3>
+          <div id="mlb-props-leaderboard">
+            <p>Loading leaderboard...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bets-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>MLB Player Props</h2>
+          <p>Live player props from today’s MLB board.</p>
+        </div>
+
+        <div id="mlb-props-container" class="bets-grid">
+          <div class="empty-state">
+            <h3>Loading MLB player props...</h3>
+            <p>Please wait while live props data is pulled from Google Sheets.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>Disclaimer:</strong> This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
+      <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    renderMLBProps();
+  </script>
+</body>
+</html>
