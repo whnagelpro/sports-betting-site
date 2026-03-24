@@ -264,33 +264,63 @@
       </article>
 
       <article class="premium-preview-card">
-        <p class="market-hub-label">Stay Updated</p>
-        <h3>Join the Waitlist</h3>
-        <p>
-          Be the first to hear when premium NBA, NHL, and MLB betting tools, deeper analytics,
-          and expanded daily boards go live.
-        </p>
+  <p class="market-hub-label">Stay Updated</p>
+  <h3>Join the Waitlist</h3>
+  <p>
+    Be the first to hear when premium NBA, NHL, and MLB betting tools, deeper analytics,
+    and expanded daily boards go live.
+  </p>
 
-        <form
-          name="waitlist"
-          method="POST"
-          action="/thank-you.html"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-        >
-        <input type="hidden" name="form-name" value="waitlist" />
+  <form
+    name="waitlist"
+    method="POST"
+    action="/thank-you.html"
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    class="waitlist-form"
+  >
+    <input type="hidden" name="form-name" value="waitlist" />
+    <input type="hidden" name="plan" id="selected-plan-input" />
 
-        <p style="display:none;">
-            <label>Don’t fill this out: <input name="bot-field" /></label>
-        </p>
+    <p class="hidden-honeypot">
+      <label>
+        Don’t fill this out if you’re human:
+        <input name="bot-field" />
+      </label>
+    </p>
 
-        <input type="text" name="name" />
-        <input type="email" name="email" required />
-        <select name="interest"></select>
+    <input
+      type="text"
+      name="name"
+      class="sportsbook-select"
+      placeholder="Your name"
+    />
 
-        <button type="submit">Join Waitlist</button>
-        </form>
-      </article>
+    <input
+      type="email"
+      name="email"
+      class="sportsbook-select"
+      placeholder="Enter your email"
+      required
+    />
+
+    <select name="interest" class="sportsbook-select">
+      <option value="">Main interest</option>
+      <option value="nba">NBA</option>
+      <option value="nhl">NHL</option>
+      <option value="mlb">MLB</option>
+      <option value="all">All leagues</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary waitlist-btn">
+      Join Waitlist
+    </button>
+  </form>
+
+  <p class="waitlist-note">
+    Join the waitlist for premium NBA, NHL, and MLB betting tools.
+  </p>
+</article>
     </div>
   </div>
 </section>
