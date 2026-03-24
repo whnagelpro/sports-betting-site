@@ -277,49 +277,19 @@
           action="/thank-you.html"
           data-netlify="true"
           netlify-honeypot="bot-field"
-          class="waitlist-form"
         >
-          <input type="hidden" name="form-name" value="waitlist" />
-          <input type="hidden" name="plan" id="selected-plan-input" />
+        <input type="hidden" name="form-name" value="waitlist" />
 
-          <p class="hidden-honeypot">
-            <label>
-              Don’t fill this out if you’re human:
-              <input name="bot-field" />
-            </label>
-          </p>
-
-          <input
-            type="text"
-            name="name"
-            class="sportsbook-select"
-            placeholder="Your name"
-          />
-
-          <input
-            type="email"
-            name="email"
-            class="sportsbook-select"
-            placeholder="Enter your email"
-            required
-          />
-
-          <select name="interest" class="sportsbook-select">
-            <option value="">Main interest</option>
-            <option value="nba">NBA</option>
-            <option value="nhl">NHL</option>
-            <option value="mlb">MLB</option>
-            <option value="all">All leagues</option>
-          </select>
-
-          <button type="submit" class="btn btn-primary waitlist-btn">
-            Join Waitlist
-          </button>
-        </form>
-
-        <p class="waitlist-note">
-          Join the waitlist for premium NBA, NHL, and MLB betting tools.
+        <p style="display:none;">
+            <label>Don’t fill this out: <input name="bot-field" /></label>
         </p>
+
+        <input type="text" name="name" />
+        <input type="email" name="email" required />
+        <select name="interest"></select>
+
+        <button type="submit">Join Waitlist</button>
+        </form>
       </article>
     </div>
   </div>
