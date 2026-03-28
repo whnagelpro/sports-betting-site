@@ -47,74 +47,57 @@
 
   <main class="league-page">
     <section class="league-hero">
-      <div class="container">
-        <p class="league-label">NBA GAME ODDS</p>
-        <h1>Today’s NBA Game Odds Ranked by Expected Value</h1>
-        <p class="league-description">
-          Review today’s NBA spreads, moneylines, totals, and EV rankings from your live board.
-        </p>
-        <div class="page-switcher">
-            <button id="nba-see-odds-btn" class="page-switch-btn active">See Odds</button>
-        </div>
-      </div>
-    </section>
+      <div class="page-top-layout">
+  <div class="page-top-left">
+    <p class="league-label">NBA GAME ODDS</p>
+    <h1>Today’s NBA Game Odds Ranked by Expected Value</h1>
+    <p class="league-description">
+      Review today’s NBA spreads, moneylines, totals, and EV rankings from your live board.
+    </p>
 
-    <section class="league-controls">
-      <div class="container controls-row">
-        <div class="control-box">
-          <span class="control-label">League</span>
-          <strong>NBA</strong>
-        </div>
+    <div class="filters-block">
+      <p><strong>League</strong> NBA</p>
+      <p><strong>Market</strong> Game Odds</p>
+      <p><strong>Filter</strong> Today’s Games Only</p>
+      <p><strong>Ranking</strong> Highest EV First</p>
 
-        <div class="control-box">
-          <span class="control-label">Market</span>
-          <strong>Game Odds</strong>
-        </div>
+      <label>Membership Tier
+        <select id="nba-tier-filter">
+          <option value="Rookie">Rookie</option>
+          <option value="Veteran">Veteran</option>
+          <option value="All-Star">All-Star</option>
+          <option value="Hall-of-Famer">Hall-of-Famer</option>
+          <option value="Legend">Legend</option>
+        </select>
+      </label>
 
-        <div class="control-box">
-          <span class="control-label">Filter</span>
-          <strong>Today’s Games Only</strong>
-        </div>
+      <label>Game
+        <select id="nba-game-filter">
+          <option value="All">All Games</option>
+        </select>
+      </label>
 
-        <div class="control-box">
-          <span class="control-label">Ranking</span>
-          <strong>Highest EV First</strong>
-        </div>
+      <label>Sportsbook
+        <select id="nba-sportsbook-filter">
+          <option value="All">All Sportsbooks</option>
+        </select>
+      </label>
 
-        <div class="control-box">
-          <span class="control-label">Membership Tier</span>
-          <select id="nba-tier-filter" class="sportsbook-select">
-            <option value="Rookie">Rookie</option>
-            <option value="Veteran">Veteran</option>
-            <option value="All-Star">All-Star</option>
-            <option value="Hall-of-Famer">Hall-of-Famer</option>
-            <option value="Legend">Legend</option>
-          </select>
-        </div>
+      <p class="last-updated-text">
+        Last Updated: <span id="nba-last-updated">--:--</span>
+      </p>
 
-        <div class="control-box">
-          <span class="control-label">Game</span>
-          <select id="nba-game-filter" class="sportsbook-select">
-           <option value="All">All Games</option>
-          </select>
-        </div>
+      <p>Actions</p>
+      <button id="nba-odds-reset-filters" class="reset-filters-btn">Reset Filters</button>
+    </div>
+  </div>
 
-        <div class="control-box">
-          <span class="control-label">Sportsbook</span>
-          <select id="nba-sportsbook-filter" class="sportsbook-select">
-            <option value="All">All Sportsbooks</option>
-          </select>
-        </div>
-
-        <p class="last-updated-text">
-          Last Updated: <span id="nba-last-updated">--:--</span>
-        </p>
-
-        <div class="control-box">
-          <span class="control-label">Actions</span>
-          <button id="nba-odds-reset-filters" class="filter-reset-btn">Reset Filters</button>
-        </div>
-      </div>
+  <div class="page-top-right">
+    <button id="nba-see-odds-btn" class="btn btn-primary side-action-btn">
+      See Odds
+    </button>
+  </div>
+</div>
     </section>
 
     <section class="filter-summary-section">
