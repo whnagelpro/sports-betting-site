@@ -105,6 +105,7 @@ const PROPS_PAGE_CONFIG = {
     tierFilterId: "nba-tier-filter",
     resetButtonId: "nba-props-reset-filters",
     seeButtonId: "nba-see-props-btn",
+    lastUpdatedId: "nba-props-last-updated",
     emptyLabel: "NBA"
   },
   nhl: {
@@ -120,6 +121,7 @@ const PROPS_PAGE_CONFIG = {
     tierFilterId: "nhl-tier-filter",
     resetButtonId: "nhl-props-reset-filters",
     seeButtonId: "nhl-see-props-btn",
+    lastUpdatedId: "nhl-props-last-updated",
     emptyLabel: "NHL"
   },
   mlb: {
@@ -135,6 +137,7 @@ const PROPS_PAGE_CONFIG = {
     tierFilterId: "mlb-tier-filter",
     resetButtonId: "mlb-props-reset-filters",
     seeButtonId: "mlb-see-props-btn",
+    lastUpdatedId: "mlb-props-last-updated",
     emptyLabel: "MLB"
   }
 };
@@ -905,6 +908,7 @@ async function renderPropsPage(pageKey) {
 
   try {
     const props = await fetchLeagueProps(config.csvUrl);
+    updateLastUpdated(config.lastUpdatedId);
 
     const renderPage = () => {
       const currentTier = getSelectedTier(config.tierFilterId);
