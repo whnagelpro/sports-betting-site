@@ -1410,3 +1410,45 @@ input.sportsbook-select {
 .leaderboard-box h3 {
   margin-bottom: 20px;
 }
+
+/* ===== WHY SECTION ===== */
+.why-section {
+  padding: 60px 0 80px;
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 30px;
+}
+
+.why-card {
+  padding: 22px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.15s ease, border 0.15s ease;
+}
+
+.why-card h3 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.why-card p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #cfcfcf;
+}
+
+.why-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 900px) {
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
+}
