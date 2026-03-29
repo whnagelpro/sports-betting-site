@@ -1478,6 +1478,14 @@ input.sportsbook-select {
 
 .hero-cta {
   display: flex;
-  gap: 12px;
+  justify-content: center;   /* centers horizontally */
+  align-items: center;
+  gap: 14px;
   flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.hero-content {
+  text-align: center;
+  align-items: center;
 }
