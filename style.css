@@ -1359,6 +1359,10 @@ input.sportsbook-select {
   margin-bottom: 16px;
 }
 
+.top-props-section {
+  padding: 40px 0 70px;
+}
+
 /* ===== FILTER SPACING (works with current reverted layout) ===== */
 .league-controls p,
 .league-hero p,

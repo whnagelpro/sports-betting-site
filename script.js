@@ -1156,6 +1156,57 @@ async function renderHomeSpotlights() {
   }
 }
 
+async function renderHomeTopProps() {
+  const container = document.getElementById("home-top-props");
+  if (!container) return;
+
+  try {
+    const [nbaProps, nhlProps, mlbProps] = await Promise.all([
+      fetchLeagueProps(NBA_PROPS_CSV_URL).catch(() => []),
+      fetchLeagueProps(NHL_PROPS_CSV_URL).catch(() => []),
+      fetchLeagueProps(MLB_PROPS_CSV_URL).catch(() => [])
+    ]);
+
+    const allProps = [...nbaProps, ...nhlProps, ...mlbProps].sort((a, b) => b.ev - a.ev);
+
+    const visibleProps = allProps.slice(0, 5);
+
+    if (visibleProps.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No props available right now.</h3>
+          <p>Please check back once today’s props are live.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = visibleProps
+      .map((prop, index) => {
+        const fullName = getPropFullName(prop);
+        const probabilityText = formatProbability(prop.poissonProbOver);
+
+        return `
+          <div class="leaderboard-item">
+            <strong>#${index + 1} ${fullName} — ${formatPropTypeLabel(prop.propType)}</strong>
+            <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
+            <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
+            <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
+          </div>
+        `;
+      })
+      .join("");
+  } catch (error) {
+    console.error("Home top props render error:", error);
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load top props right now.</h3>
+        <p>Please try again later.</p>
+      </div>
+    `;
+  }
+}
+
 async function renderTopBetOfTheDay() {
   const container = document.getElementById("top-bet-container");
   if (!container) return;
