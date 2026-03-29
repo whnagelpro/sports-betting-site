@@ -1489,3 +1489,7 @@ input.sportsbook-select {
   text-align: center;
   align-items: center;
 }
+
+html {
+  scroll-behavior: smooth;
+}
