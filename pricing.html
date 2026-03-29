@@ -110,7 +110,9 @@
               <li>More leaderboard access</li>
             </ul>
 
-            <a href="index.html#waitlist" class="btn btn-secondary pricing-btn" data-plan="Veteran">Choose Veteran</a>
+            <a href="index.html#early-access" class="btn btn-secondary pricing-btn" data-plan="Veteran">
+              Choose Veteran
+            </a>
           </article>
 
           <article class="pricing-card featured-pricing-card">
@@ -129,7 +131,9 @@
               <li>Expanded leaderboards</li>
             </ul>
 
-            <a href="index.html#waitlist" class="btn btn-primary pricing-btn" data-plan="All-Star">Choose All-Star</a>
+            <a href="index.html#early-access" class="btn btn-primary pricing-btn" data-plan="All-Star">
+              Choose All-Star
+            </a>
           </article>
 
           <article class="pricing-card">
@@ -147,7 +151,9 @@
               <li>Stronger daily workflow</li>
             </ul>
 
-            <a href="index.html#waitlist" class="btn btn-secondary pricing-btn" data-plan="Hall-of-Famer">Choose Hall-of-Famer</a>
+            <a href="index.html#early-access" class="btn btn-secondary pricing-btn" data-plan="Hall-of-Famer">
+              Choose Hall-of-Famer
+            </a>
           </article>
 
           <article class="pricing-card">
@@ -165,7 +171,9 @@
               <li>Best premium value stack</li>
             </ul>
 
-            <a href="index.html#waitlist" class="btn btn-secondary pricing-btn" data-plan="Legend">Choose Legend</a>
+            <a href="index.html#early-access" class="btn btn-secondary pricing-btn" data-plan="Legend">
+              Choose Legend
+            </a>
           </article>
         </div>
       </div>
@@ -246,5 +254,16 @@
       });
     });
   </script>
+
+  <script>
+  document.querySelectorAll(".pricing-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const plan = button.getAttribute("data-plan");
+      if (plan) {
+        localStorage.setItem("selectedPlan", plan);
+      }
+    });
+  });
+</script>
 </body>
 </html>

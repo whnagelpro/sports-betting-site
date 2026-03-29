@@ -323,7 +323,7 @@
       </div>
     </section>
 
-    <section class="premium-preview-section">
+    <section id="early-access" class="premium-preview-section">
   <div class="container">
     <div class="section-header">
       <h2>Unlock the Full Betting Dashboard</h2>
@@ -446,5 +446,21 @@
     renderHomeSpotlights();
     renderHomeTopProps();
   </script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedPlan = localStorage.getItem("selectedPlan");
+    const input = document.getElementById("selected-plan-input");
+    const note = document.querySelector(".waitlist-note");
+
+    if (savedPlan && input) {
+      input.value = savedPlan;
+    }
+
+    if (savedPlan && note) {
+      note.innerHTML = `You're joining early access for <strong>${savedPlan}</strong>.`;
+    }
+  });
+</script>
 </body>
 </html>
