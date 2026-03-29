@@ -1493,3 +1493,12 @@ input.sportsbook-select {
 html {
   scroll-behavior: smooth;
 }
+
+.hero-subcta {
+  margin-top: 18px; /* increase spacing */
+  display: block;
+}
+
+.top-prop-item {
+  margin-bottom: 24px;
+}
