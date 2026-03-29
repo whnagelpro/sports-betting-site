@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact | Sports Betting Guide</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <div class="logo">Sports Betting Guide</div>
+
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="disclaimer.html">Disclaimer</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="league-page">
+
+  <section class="league-hero">
+    <div class="container">
+      <p class="league-label">SUPPORT</p>
+      <h1>Contact & Support</h1>
+      <p class="league-description">
+        Have a question, issue, or feedback? We’d love to hear from you.
+      </p>
+
+      <div class="page-switcher">
+        <a href="index.html" class="page-switch-btn">Back Home</a>
+        <a href="pricing.html" class="page-switch-btn">View Plans</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bets-section">
+    <div class="container">
+
+      <!-- Contact Info -->
+      <div class="bet-card">
+        <h2>Contact Information</h2>
+        <p>
+          You can reach us directly at:
+        </p>
+
+        <p style="margin-top: 14px;">
+          <strong>Email:</strong> your-email@example.com
+        </p>
+
+        <p style="margin-top: 10px;">
+          We typically respond within 24–48 hours.
+        </p>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="bet-card">
+        <h2>Send Us a Message</h2>
+
+        <form
+          name="contact"
+          method="POST"
+          action="/thank-you.html"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          class="waitlist-form"
+        >
+          <input type="hidden" name="form-name" value="contact" />
+
+          <!-- Honeypot -->
+          <p style="display:none;">
+            <label>Don’t fill this out if you're human:
+              <input name="bot-field" />
+            </label>
+          </p>
+
+          <input
+            type="text"
+            name="name"
+            class="sportsbook-select"
+            placeholder="Your name"
+            required
+          />
+
+          <input
+            type="email"
+            name="email"
+            class="sportsbook-select"
+            placeholder="Your email"
+            required
+          />
+
+          <select name="topic" class="sportsbook-select">
+            <option value="">Select topic</option>
+            <option value="general">General Question</option>
+            <option value="pricing">Pricing</option>
+            <option value="bug">Bug / Issue</option>
+            <option value="feature">Feature Request</option>
+          </select>
+
+          <textarea
+            name="message"
+            class="sportsbook-select"
+            placeholder="Your message"
+            rows="5"
+            required
+          ></textarea>
+
+          <button type="submit" class="btn btn-primary">
+            Send Message
+          </button>
+        </form>
+      </div>
+
+      <!-- FAQ Style Section -->
+      <div class="bet-card">
+        <h2>Common Questions</h2>
+
+        <div class="rank-list">
+          <div class="rank-item">
+            <span><strong>When will premium features launch?</strong></span>
+            <span>We are rolling out features in phases — join the waitlist to stay updated.</span>
+          </div>
+
+          <div class="rank-item">
+            <span><strong>How are rankings calculated?</strong></span>
+            <span>We use expected value (EV) models and probability estimates based on available data.</span>
+          </div>
+
+          <div class="rank-item">
+            <span><strong>Do you guarantee winning bets?</strong></span>
+            <span>No — all betting involves risk. We provide tools, not guarantees.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="disclaimer.html">Disclaimer</a>
+      <a href="contact.html">Contact</a>
+    </div>
+
+    <p class="footer-disclaimer">
+      This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.
+    </p>
+
+    <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
+
+  </div>
+</footer>
+
+</body>
+</html>
