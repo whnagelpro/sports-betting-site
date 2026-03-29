@@ -979,6 +979,11 @@ async function renderPropsPage(pageKey) {
 
       const visibleProps = filteredProps.slice(0, currentRules.maxPropsToShow);
 
+      const hiddenPropsCount = Math.max(filteredProps.length - visibleProps.length, 0);
+
+      setPropsFiltersDisabled(config, true);
+      setPropsFiltersDisabled(config, false);
+
       if (visibleProps.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
@@ -988,6 +993,23 @@ async function renderPropsPage(pageKey) {
         `;
         return;
       }
+
+      container.innerHTML = `
+  ${visibleProps.map(createPropCard).join("")}
+  ${
+    hiddenPropsCount > 0
+      ? `
+        <div class="locked-overlay">
+          <h4>Unlock More Props</h4>
+          <p>
+            You’re viewing ${visibleProps.length} of ${filteredProps.length} props for this tier.
+            Upgrade for deeper access.
+          </p>
+        </div>
+      `
+      : ""
+  }
+`;
 
       container.innerHTML = visibleProps.map(createPropCard).join("");
     };
@@ -1042,6 +1064,19 @@ function renderHomeSpotlightCard(containerId, data) {
       <div class="home-spotlight-meta">${data.subtext}</div>
     </div>
   `;
+}
+
+function setPropsFiltersDisabled(config, isDisabled) {
+  [
+    config.gameFilterId,
+    config.propTypeFilterId,
+    config.playerFilterId,
+    config.sportsbookFilterId,
+    config.sortFilterId
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = isDisabled;
+  });
 }
 
 async function renderHomeSpotlights() {
