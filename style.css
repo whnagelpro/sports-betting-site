@@ -1452,3 +1452,32 @@ input.sportsbook-select {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== HERO IMPROVEMENTS ===== */
+
+.hero-label {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.hero-title {
+  font-size: 2.4rem;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.hero-subtitle {
+  font-size: 1.05rem;
+  color: #cfcfcf;
+  max-width: 600px;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
