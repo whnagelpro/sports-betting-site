@@ -254,37 +254,42 @@
     const monthlyLabel = document.getElementById("monthly-label");
     const annualLabel = document.getElementById("annual-label");
 
-    if (billingToggle) {
-      billingToggle.addEventListener("change", () => {
-        document.querySelectorAll(".monthly-price").forEach((el) => {
-          el.classList.toggle("hidden");
-        });
+  if (billingToggle) {
+    billingToggle.addEventListener("change", () => {
+      document.querySelectorAll(".monthly-price").forEach((el) => {
+        el.classList.toggle("hidden");
+      });
 
-        document.querySelectorAll(".annual-price").forEach((el) => {
-          el.classList.toggle("hidden");
-        });
+      document.querySelectorAll(".annual-price").forEach((el) => {
+        el.classList.toggle("hidden");
+      });
 
+      if (monthlyLabel) {
         monthlyLabel.classList.toggle("active", !billingToggle.checked);
+      }
+
+      if (annualLabel) {
         annualLabel.classList.toggle("active", billingToggle.checked);
-      });
-    }
-  </script>
-
-  <script>
-    document.querySelectorAll(".pricing-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        const plan = button.getAttribute("data-plan");
-        localStorage.setItem("selectedPlan", plan);
-      });
+      }
     });
-  </script>
+  }
 
-  <script>
   document.querySelectorAll(".pricing-btn").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+
       const plan = button.getAttribute("data-plan");
       if (plan) {
         localStorage.setItem("selectedPlan", plan);
+      }
+
+      const isAnnual = billingToggle && billingToggle.checked;
+      const targetUrl = isAnnual
+        ? button.getAttribute("data-annual-url")
+        : button.getAttribute("data-monthly-url");
+
+      if (targetUrl) {
+        window.location.href = targetUrl;
       }
     });
   });
