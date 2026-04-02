@@ -7,7 +7,8 @@ const NBA_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjb
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
 
-const NBA_PROPS_CSV_URL = "/.netlify/functions/nba-props-premium";
+const NBA_PROPS_PREMIUM_URL = "/.netlify/functions/nba-props-premium";
+const NBA_PROPS_TEASER_URL = "/.netlify/functions/nba-props-teaser";
 const NHL_PROPS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1839953184&single=true&output=csv";
 const MLB_PROPS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1502960090&single=true&output=csv";
 
@@ -93,7 +94,7 @@ const ODDS_PAGE_CONFIG = {
 
 const PROPS_PAGE_CONFIG = {
   nba: {
-    csvUrl: NBA_PROPS_CSV_URL,
+    csvUrl: NBA_PROPS_PREMIUM_URL,
     containerId: "nba-props-container",
     leaderboardId: "nba-props-leaderboard",
     summaryId: "nba-props-filter-summary",
@@ -1081,7 +1082,7 @@ async function renderHomeSpotlights() {
       fetchLeagueGames(NBA_CSV_URL).catch(() => []),
       fetchLeagueGames(NHL_CSV_URL).catch(() => []),
       fetchLeagueGames(MLB_CSV_URL).catch(() => []),
-      fetchLeagueProps(NBA_PROPS_CSV_URL).catch(() => []),
+      fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
       fetchLeagueProps(NHL_PROPS_CSV_URL).catch(() => []),
       fetchLeagueProps(MLB_PROPS_CSV_URL).catch(() => [])
     ]);
@@ -1178,6 +1179,7 @@ async function renderHomeSpotlights() {
     }
   } catch (error) {
     console.error("Home spotlight render error:", error);
+
     renderHomeSpotlightCard("home-top-nba-bet", null);
     renderHomeSpotlightCard("home-top-nba-prop", null);
     renderHomeSpotlightCard("home-top-nhl-bet", null);
@@ -1193,7 +1195,7 @@ async function renderHomeTopProps() {
 
   try {
     const [nbaProps, nhlProps, mlbProps] = await Promise.all([
-      fetchLeagueProps(NBA_PROPS_CSV_URL).catch(() => []),
+      fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
       fetchLeagueProps(NHL_PROPS_CSV_URL).catch(() => []),
       fetchLeagueProps(MLB_PROPS_CSV_URL).catch(() => [])
     ]);
@@ -1289,6 +1291,21 @@ async function renderTopBetOfTheDay() {
       </div>
     `;
   }
+}
+
+async function fetchTeaserPropsJson(endpointUrl) {
+  if (DATA_CACHE.props[endpointUrl]) return DATA_CACHE.props[endpointUrl];
+
+  const response = await fetch(endpointUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch teaser props: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  const props = Array.isArray(payload.props) ? payload.props : [];
+
+  DATA_CACHE.props[endpointUrl] = props;
+  return props;
 }
 
 function renderNBABets() { return renderOddsPage("nba"); }
