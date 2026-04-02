@@ -7,7 +7,7 @@ const NBA_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjb
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
 
-const NBA_PROPS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=590324617&single=true&output=csv";
+const NBA_PROPS_CSV_URL = "/.netlify/functions/nba-props";
 const NHL_PROPS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1839953184&single=true&output=csv";
 const MLB_PROPS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1502960090&single=true&output=csv";
 
@@ -978,23 +978,21 @@ async function renderPropsPage(pageKey) {
       );
 
       const visibleProps = filteredProps.slice(0, currentRules.maxPropsToShow);
+const hiddenPropsCount = Math.max(filteredProps.length - visibleProps.length, 0);
 
-      const hiddenPropsCount = Math.max(filteredProps.length - visibleProps.length, 0);
+setPropsFiltersDisabled(config, !currentRules.showPlayerProps);
 
-      setPropsFiltersDisabled(config, true);
-      setPropsFiltersDisabled(config, false);
+if (visibleProps.length === 0) {
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>No ${config.emptyLabel} props found for this filter.</h3>
+      <p>Try changing the game, prop type, player, sportsbook, or sort settings.</p>
+    </div>
+  `;
+  return;
+}
 
-      if (visibleProps.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <h3>No ${config.emptyLabel} props found for this filter.</h3>
-            <p>Try changing the game, prop type, player, sportsbook, or sort settings.</p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = `
+container.innerHTML = `
   ${visibleProps.map(createPropCard).join("")}
   ${
     hiddenPropsCount > 0
@@ -1010,8 +1008,6 @@ async function renderPropsPage(pageKey) {
       : ""
   }
 `;
-
-      container.innerHTML = visibleProps.map(createPropCard).join("");
     };
 
     bindSelectChange(config.tierFilterId, renderPage);
