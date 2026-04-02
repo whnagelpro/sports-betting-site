@@ -254,24 +254,29 @@
     const monthlyLabel = document.getElementById("monthly-label");
     const annualLabel = document.getElementById("annual-label");
 
-  if (billingToggle) {
-    billingToggle.addEventListener("change", () => {
-      document.querySelectorAll(".monthly-price").forEach((el) => {
-        el.classList.toggle("hidden");
-      });
+  function updateBillingView() {
+    const isAnnual = billingToggle && billingToggle.checked;
 
-      document.querySelectorAll(".annual-price").forEach((el) => {
-        el.classList.toggle("hidden");
-      });
-
-      if (monthlyLabel) {
-        monthlyLabel.classList.toggle("active", !billingToggle.checked);
-      }
-
-      if (annualLabel) {
-        annualLabel.classList.toggle("active", billingToggle.checked);
-      }
+    document.querySelectorAll(".monthly-price").forEach((el) => {
+      el.classList.toggle("hidden", isAnnual);
     });
+
+    document.querySelectorAll(".annual-price").forEach((el) => {
+      el.classList.toggle("hidden", !isAnnual);
+    });
+
+    if (monthlyLabel) {
+      monthlyLabel.classList.toggle("active", !isAnnual);
+    }
+
+    if (annualLabel) {
+      annualLabel.classList.toggle("active", isAnnual);
+    }
+  }
+
+  if (billingToggle) {
+    billingToggle.addEventListener("change", updateBillingView);
+    updateBillingView();
   }
 
   document.querySelectorAll(".pricing-btn").forEach((button) => {
