@@ -946,19 +946,8 @@ async function renderPropsPage(pageKey) {
   const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
 
   if (!currentRules.showPlayerProps) {
-    renderPropsLeaderboard(config.leaderboardId, [], 5);
-    renderFilterSummary(config.summaryId, [
-      { label: "Tier", value: currentTier !== "Rookie" ? currentTier : "All" }
-    ]);
-
-    container.innerHTML = `
-      <div class="props-locked-box">
-        <h3>Player Props Locked</h3>
-        <p>Upgrade to All-Star or higher to unlock ${config.emptyLabel} player props.</p>
-      </div>
-    `;
-    return;
-  }
+  console.log("User does not have access, but still fetching for backend test...");
+}
 
       populateGameFilter(config.gameFilterId, props.filter((prop) => prop.gameLabel), (prop) => prop.gameLabel, renderPage);
       populatePropTypeFilter(config.propTypeFilterId, props, renderPage);
