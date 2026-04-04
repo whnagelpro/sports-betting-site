@@ -1316,12 +1316,15 @@ async function fetchTeaserPropsJson(endpointUrl) {
 
 async function updateSessionStatus() {
   const statusEl = document.getElementById("session-status");
+  const tierEl = document.getElementById("tier-status");
+
   if (!statusEl || !supabaseClient) return;
 
   const { data, error } = await supabaseClient.auth.getSession();
 
   if (error) {
     statusEl.textContent = "Unable to check session.";
+    if (tierEl) tierEl.textContent = "Tier: --";
     return;
   }
 
@@ -1329,8 +1332,17 @@ async function updateSessionStatus() {
 
   if (session?.user) {
     statusEl.textContent = `Logged in as ${session.user.email}`;
+
+    const profile = await fetchCurrentUserProfile();
+
+    if (tierEl) {
+      tierEl.textContent = profile?.tier
+        ? `Tier: ${profile.tier}`
+        : "Tier: unavailable";
+    }
   } else {
     statusEl.textContent = "Not currently logged in.";
+    if (tierEl) tierEl.textContent = "Tier: --";
   }
 }
 
@@ -1383,7 +1395,6 @@ function initAuthPage() {
         loginMessage.textContent = error.message;
       } else {
         loginMessage.textContent = "Login successful.";
-        window.location.href = "index.html";
       }
 
       updateSessionStatus();
@@ -1398,6 +1409,29 @@ function initAuthPage() {
   }
 
   updateSessionStatus();
+}
+
+async function fetchCurrentUserProfile() {
+  const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+
+  if (sessionError || !sessionData.session?.user) {
+    return null;
+  }
+
+  const user = sessionData.session.user;
+
+  const { data: profile, error: profileError } = await supabaseClient
+    .from("profiles")
+    .select("id, email, tier, created_at")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError) {
+    console.error("Profile fetch error:", profileError.message);
+    return null;
+  }
+
+  return profile;
 }
 
 function renderNBABets() { return renderOddsPage("nba"); }
