@@ -2,7 +2,10 @@ const SUPABASE_URL = "https://mbnptpnxmbeccqqfbtnd.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ibnB0cG54bWJlY2NxcWZidG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxODE4MTcsImV4cCI6MjA5MDc1NzgxN30.deQoUkejk1NtRGxCY-CtJSX65qREdXqYpPwxLjpI7b4";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-console.log("Supabase connected:", supabaseClient);
+
+let CURRENT_USER = null;
+let CURRENT_USER_PROFILE = null;
+let CURRENT_USER_TIER = "Rookie";
 
 const DATA_CACHE = {
   games: {},
@@ -1323,6 +1326,10 @@ async function updateSessionStatus() {
   const { data, error } = await supabaseClient.auth.getSession();
 
   if (error) {
+    CURRENT_USER = null;
+    CURRENT_USER_PROFILE = null;
+    CURRENT_USER_TIER = "Rookie";
+
     statusEl.textContent = "Unable to check session.";
     if (tierEl) tierEl.textContent = "Tier: --";
     return;
@@ -1331,16 +1338,21 @@ async function updateSessionStatus() {
   const session = data.session;
 
   if (session?.user) {
+    CURRENT_USER = session.user;
     statusEl.textContent = `Logged in as ${session.user.email}`;
 
     const profile = await fetchCurrentUserProfile();
+    CURRENT_USER_PROFILE = profile;
+    CURRENT_USER_TIER = profile?.tier || "Rookie";
 
     if (tierEl) {
-      tierEl.textContent = profile?.tier
-        ? `Tier: ${profile.tier}`
-        : "Tier: unavailable";
+      tierEl.textContent = `Tier: ${CURRENT_USER_TIER}`;
     }
   } else {
+    CURRENT_USER = null;
+    CURRENT_USER_PROFILE = null;
+    CURRENT_USER_TIER = "Rookie";
+
     statusEl.textContent = "Not currently logged in.";
     if (tierEl) tierEl.textContent = "Tier: --";
   }
