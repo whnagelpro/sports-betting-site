@@ -1355,6 +1355,8 @@ async function updateSessionStatus() {
     CURRENT_USER_TIER = "Rookie";
 
     updateTierDisplay("nba-tier-display");
+    updateTierDisplay("nhl-tier-display");
+    updateTierDisplay("mlb-tier-display");
 
     if (statusEl) statusEl.textContent = "Unable to check session.";
     if (tierEl) tierEl.textContent = "Tier: --";
@@ -1371,6 +1373,8 @@ async function updateSessionStatus() {
     CURRENT_USER_TIER = profile?.tier || "Rookie";
 
     updateTierDisplay("nba-tier-display");
+    updateTierDisplay("nhl-tier-display");
+    updateTierDisplay("mlb-tier-display");
 
     console.log("updateSessionStatus profile:", profile);
     console.log("updateSessionStatus CURRENT_USER_TIER:", CURRENT_USER_TIER);
@@ -1388,6 +1392,8 @@ async function updateSessionStatus() {
     CURRENT_USER_TIER = "Rookie";
 
     updateTierDisplay("nba-tier-display");
+    updateTierDisplay("nhl-tier-display");
+    updateTierDisplay("mlb-tier-display");
 
     if (statusEl) statusEl.textContent = "Not currently logged in.";
     if (tierEl) tierEl.textContent = "Tier: --";
