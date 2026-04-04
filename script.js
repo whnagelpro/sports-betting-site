@@ -722,13 +722,17 @@ async function fetchLeagueProps(csvUrl) {
     const { data, error } = await supabaseClient.auth.getSession();
 
     if (error) {
-      throw new Error("Unable to get session for protected props request.");
+      const sessionError = new Error("Unable to get session for protected props request.");
+      sessionError.status = 401;
+      throw sessionError;
     }
 
     const accessToken = data.session?.access_token;
 
     if (!accessToken) {
-      throw new Error("No access token available for protected props request.");
+      const tokenError = new Error("No access token available for protected props request.");
+      tokenError.status = 401;
+      throw tokenError;
     }
 
     headers.Authorization = `Bearer ${accessToken}`;
@@ -737,7 +741,24 @@ async function fetchLeagueProps(csvUrl) {
   const response = await fetch(csvUrl, { headers });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch props CSV: ${response.status}`);
+    let payload = null;
+
+    try {
+      payload = await response.json();
+    } catch (jsonError) {
+      payload = null;
+    }
+
+    const fetchError = new Error(
+      payload?.message ||
+      payload?.error ||
+      `Failed to fetch props CSV: ${response.status}`
+    );
+
+    fetchError.status = response.status;
+    fetchError.payload = payload;
+
+    throw fetchError;
   }
 
   const text = await response.text();
@@ -745,9 +766,18 @@ async function fetchLeagueProps(csvUrl) {
   const props = buildPropsFromRows(rows);
   const today = getTodayDateString();
 
+  console.log("fetchLeagueProps csvUrl:", csvUrl);
+  console.log("Today string:", today);
+  console.log("Parsed rows count:", rows.length);
+  console.log("Built props count:", props.length);
+  console.log("First 5 props before date filter:", props.slice(0, 5));
+
   const todaysProps = props
     .filter((prop) => prop.gameDate === today)
     .sort((a, b) => b.ev - a.ev);
+
+  console.log("Today props count:", todaysProps.length);
+  console.log("First 5 today props:", todaysProps.slice(0, 5));
 
   DATA_CACHE.props[csvUrl] = todaysProps;
   return todaysProps;
@@ -1050,21 +1080,33 @@ container.innerHTML = `
     bindButton(config.seeButtonId, renderPage);
     renderPage();
   } catch (error) {
-    console.error(`${config.emptyLabel} props render error:`, error);
-    renderPropsLeaderboard(config.leaderboardId, [], 5);
+  console.error(`${config.emptyLabel} props render error:`, error);
 
-    const summary = document.getElementById(config.summaryId);
-    if (summary) {
-      summary.innerHTML = `<div class="filter-summary-empty">Unable to build filter summary right now.</div>`;
-    }
+  const currentTier = CURRENT_USER_TIER || "Rookie";
 
-    container.innerHTML = `
-      <div class="empty-state">
-        <h3>Unable to load ${config.emptyLabel} props right now.</h3>
-        <p>Please check your published ${config.emptyLabel} Player Props CSV and current JS filters.</p>
-      </div>
-    `;
+  if (error.status === 401) {
+    renderPropsLoginRequiredState(config, container);
+    return;
   }
+
+  if (error.status === 403) {
+    renderPropsUpgradeRequiredState(config, container, currentTier);
+    return;
+  }
+
+  renderPropsLeaderboard(config.leaderboardId, [], 5);
+
+  const summary = document.getElementById(config.summaryId);
+  if (summary) {
+    summary.innerHTML = `<div class="filter-summary-empty">Unable to build filter summary right now.</div>`;
+  }
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Unable to load ${config.emptyLabel} props right now.</h3>
+      <p>Please check your published ${config.emptyLabel} Player Props CSV and current JS filters.</p>
+    </div>
+  `;
 }
 
 function renderHomeSpotlightCard(containerId, data) {
@@ -1483,6 +1525,45 @@ function renderPropsLockedState(config, container, currentTier) {
   `;
 }
 
+function renderPropsLoginRequiredState(config, container) {
+  renderPropsLeaderboard(config.leaderboardId, [], 5);
+  renderFilterSummary(config.summaryId, [
+    { label: "Tier", value: "Not Logged In" }
+  ]);
+
+  setPropsFiltersDisabled(config, true);
+
+  container.innerHTML = `
+    <div class="props-locked-box">
+      <h3>Login Required</h3>
+      <p>Please log in to access ${config.emptyLabel} player props.</p>
+      <div style="margin-top: 16px;">
+        <a href="auth.html" class="btn btn-primary">Log In</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderPropsUpgradeRequiredState(config, container, currentTier) {
+  renderPropsLeaderboard(config.leaderboardId, [], 5);
+  renderFilterSummary(config.summaryId, [
+    { label: "Tier", value: currentTier || "Rookie" }
+  ]);
+
+  setPropsFiltersDisabled(config, true);
+
+  container.innerHTML = `
+    <div class="props-locked-box">
+      <h3>Player Props Locked</h3>
+      <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
+      <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${config.emptyLabel} player props.</p>
+      <div style="margin-top: 16px;">
+        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+      </div>
+    </div>
+  `;
+}
+
 async function fetchCurrentUserProfile() {
   const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
 
@@ -1520,4 +1601,4 @@ async function initNBAPropsPage() {
 }
 document.addEventListener("DOMContentLoaded", () => {
   initAuthPage();
-});
+});}
