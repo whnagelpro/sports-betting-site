@@ -714,8 +714,29 @@ async function fetchLeagueGames(csvUrl) {
 async function fetchLeagueProps(csvUrl) {
   if (DATA_CACHE.props[csvUrl]) return DATA_CACHE.props[csvUrl];
 
-  const response = await fetch(csvUrl);
-  if (!response.ok) throw new Error(`Failed to fetch props CSV: ${response.status}`);
+  const headers = {};
+
+  if (csvUrl.includes("/.netlify/functions/")) {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      throw new Error("Unable to get session for protected props request.");
+    }
+
+    const accessToken = data.session?.access_token;
+
+    if (!accessToken) {
+      throw new Error("No access token available for protected props request.");
+    }
+
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  const response = await fetch(csvUrl, { headers });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch props CSV: ${response.status}`);
+  }
 
   const text = await response.text();
   const rows = parseCSV(text);
