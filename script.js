@@ -3,6 +3,8 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+console.log("SCRIPT VERSION TEST - 7:50 AM");
+
 let CURRENT_USER = null;
 let CURRENT_USER_PROFILE = null;
 let CURRENT_USER_TIER = "Rookie";
@@ -945,6 +947,9 @@ async function renderPropsPage(pageKey) {
   const currentTier = CURRENT_USER_TIER || "Rookie";
   const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
 
+  console.log("renderPropsPage currentTier:", currentTier);
+  console.log("renderPropsPage currentRules:", currentRules);
+
   if (!currentRules.showPlayerProps) {
   renderPropsLeaderboard(config.leaderboardId, [], 5);
   renderFilterSummary(config.summaryId, [
@@ -1357,12 +1362,15 @@ async function updateSessionStatus() {
   const session = data.session;
 
   if (session?.user) {
-    CURRENT_USER = session.user;
-    statusEl.textContent = `Logged in as ${session.user.email}`;
+  CURRENT_USER = session.user;
+  statusEl.textContent = `Logged in as ${session.user.email}`;
 
-    const profile = await fetchCurrentUserProfile();
-    CURRENT_USER_PROFILE = profile;
-    CURRENT_USER_TIER = profile?.tier || "Rookie";
+  const profile = await fetchCurrentUserProfile();
+  console.log("updateSessionStatus profile:", profile);
+
+  CURRENT_USER_PROFILE = profile;
+  CURRENT_USER_TIER = profile?.tier || "Rookie";
+  console.log("updateSessionStatus CURRENT_USER_TIER:", CURRENT_USER_TIER);
 
     if (tierEl) {
       tierEl.textContent = `Tier: ${CURRENT_USER_TIER}`;
