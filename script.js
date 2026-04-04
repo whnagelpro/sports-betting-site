@@ -951,17 +951,7 @@ async function renderPropsPage(pageKey) {
   console.log("renderPropsPage currentRules:", currentRules);
 
   if (!currentRules.showPlayerProps) {
-  renderPropsLeaderboard(config.leaderboardId, [], 5);
-  renderFilterSummary(config.summaryId, [
-    { label: "Tier", value: currentTier !== "Rookie" ? currentTier : "All" }
-  ]);
-
-  container.innerHTML = `
-    <div class="props-locked-box">
-      <h3>Player Props Locked</h3>
-      <p>Upgrade to All-Star or higher to unlock ${config.emptyLabel} player props.</p>
-    </div>
-  `;
+  renderPropsLockedState(config, container, currentTier);
   return;
 }
 
@@ -1470,6 +1460,27 @@ function updateTierDisplay(elementId) {
   if (!element) return;
 
   element.textContent = CURRENT_USER_TIER || "Rookie";
+}
+
+function renderPropsLockedState(config, container, currentTier) {
+  renderPropsLeaderboard(config.leaderboardId, [], 5);
+
+  renderFilterSummary(config.summaryId, [
+    { label: "Tier", value: currentTier !== "Rookie" ? currentTier : "Rookie" }
+  ]);
+
+  setPropsFiltersDisabled(config, true);
+
+  container.innerHTML = `
+    <div class="props-locked-box">
+      <h3>Player Props Locked</h3>
+      <p>Your current plan is <strong>${currentTier}</strong>.</p>
+      <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${config.emptyLabel} player props.</p>
+      <div style="margin-top: 16px;">
+        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+      </div>
+    </div>
+  `;
 }
 
 async function fetchCurrentUserProfile() {
