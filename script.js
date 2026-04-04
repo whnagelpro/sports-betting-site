@@ -1345,7 +1345,7 @@ async function updateSessionStatus() {
   const statusEl = document.getElementById("session-status");
   const tierEl = document.getElementById("tier-status");
 
-  if (!statusEl || !supabaseClient) return;
+  if (!supabaseClient) return;
 
   const { data, error } = await supabaseClient.auth.getSession();
 
@@ -1354,7 +1354,7 @@ async function updateSessionStatus() {
     CURRENT_USER_PROFILE = null;
     CURRENT_USER_TIER = "Rookie";
 
-    statusEl.textContent = "Unable to check session.";
+    if (statusEl) statusEl.textContent = "Unable to check session.";
     if (tierEl) tierEl.textContent = "Tier: --";
     return;
   }
@@ -1362,15 +1362,18 @@ async function updateSessionStatus() {
   const session = data.session;
 
   if (session?.user) {
-  CURRENT_USER = session.user;
-  statusEl.textContent = `Logged in as ${session.user.email}`;
+    CURRENT_USER = session.user;
 
-  const profile = await fetchCurrentUserProfile();
-  console.log("updateSessionStatus profile:", profile);
+    const profile = await fetchCurrentUserProfile();
+    CURRENT_USER_PROFILE = profile;
+    CURRENT_USER_TIER = profile?.tier || "Rookie";
 
-  CURRENT_USER_PROFILE = profile;
-  CURRENT_USER_TIER = profile?.tier || "Rookie";
-  console.log("updateSessionStatus CURRENT_USER_TIER:", CURRENT_USER_TIER);
+    console.log("updateSessionStatus profile:", profile);
+    console.log("updateSessionStatus CURRENT_USER_TIER:", CURRENT_USER_TIER);
+
+    if (statusEl) {
+      statusEl.textContent = `Logged in as ${session.user.email}`;
+    }
 
     if (tierEl) {
       tierEl.textContent = `Tier: ${CURRENT_USER_TIER}`;
@@ -1380,7 +1383,7 @@ async function updateSessionStatus() {
     CURRENT_USER_PROFILE = null;
     CURRENT_USER_TIER = "Rookie";
 
-    statusEl.textContent = "Not currently logged in.";
+    if (statusEl) statusEl.textContent = "Not currently logged in.";
     if (tierEl) tierEl.textContent = "Tier: --";
   }
 }
