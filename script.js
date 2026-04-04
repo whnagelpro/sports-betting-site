@@ -969,6 +969,13 @@ async function renderPropsPage(pageKey) {
   const container = document.getElementById(config.containerId);
   if (!container) return;
 
+  container.innerHTML = `
+  <div class="empty-state">
+    <h3>Loading ${config.emptyLabel} props...</h3>
+    <p>Please wait while live player props are pulled in.</p>
+  </div>
+`;
+
   try {
     const props = await fetchLeagueProps(config.csvUrl);
     updateLastUpdated(config.lastUpdatedId);
@@ -1104,7 +1111,7 @@ container.innerHTML = `
   container.innerHTML = `
     <div class="empty-state">
       <h3>Unable to load ${config.emptyLabel} props right now.</h3>
-      <p>Please check your published ${config.emptyLabel} Player Props CSV and current JS filters.</p>
+      <p>Please try again in a moment or check your data source.</p>
     </div>
   `;
 }
@@ -1407,9 +1414,6 @@ async function updateSessionStatus() {
     updateTierDisplay("nba-tier-display");
     updateTierDisplay("nhl-tier-display");
     updateTierDisplay("mlb-tier-display");
-
-    console.log("updateSessionStatus profile:", profile);
-    console.log("updateSessionStatus CURRENT_USER_TIER:", CURRENT_USER_TIER);
 
     if (statusEl) {
       statusEl.textContent = `Logged in as ${session.user.email}`;
