@@ -1115,6 +1115,7 @@ container.innerHTML = `
     </div>
   `;
 }
+}
 
 function renderHomeSpotlightCard(containerId, data) {
   const container = document.getElementById(containerId);
@@ -1603,6 +1604,17 @@ async function initNBAPropsPage() {
   await updateSessionStatus();
   await renderNBAProps();
 }
+
+async function initNHLPropsPage() {
+  await updateSessionStatus();
+  await renderNHLProps();
+}
+
+async function initMLBPropsPage() {
+  await updateSessionStatus();
+  await renderMLBProps();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initAuthPage();
-});}
+});

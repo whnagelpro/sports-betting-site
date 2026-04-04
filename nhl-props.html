@@ -175,17 +175,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
   <script>
-  renderNHLProps();
-
-  const nhlTierSelect = document.getElementById("nhl-tier-filter");
-  if (nhlTierSelect) {
-    nhlTierSelect.onchange = renderNHLProps;
-  }
-
-  const nhlSortFilter = document.getElementById("nhl-props-sort-filter");
-  if (nhlSortFilter) {
-    nhlSortFilter.onchange = renderNHLProps;
-  }
-</script>
+    initNHLPropsPage();
+  </script>
 </body>
 </html>
