@@ -1354,6 +1354,8 @@ async function updateSessionStatus() {
     CURRENT_USER_PROFILE = null;
     CURRENT_USER_TIER = "Rookie";
 
+    updateTierDisplay("nba-tier-display");
+
     if (statusEl) statusEl.textContent = "Unable to check session.";
     if (tierEl) tierEl.textContent = "Tier: --";
     return;
@@ -1367,6 +1369,8 @@ async function updateSessionStatus() {
     const profile = await fetchCurrentUserProfile();
     CURRENT_USER_PROFILE = profile;
     CURRENT_USER_TIER = profile?.tier || "Rookie";
+
+    updateTierDisplay("nba-tier-display");
 
     console.log("updateSessionStatus profile:", profile);
     console.log("updateSessionStatus CURRENT_USER_TIER:", CURRENT_USER_TIER);
@@ -1382,6 +1386,8 @@ async function updateSessionStatus() {
     CURRENT_USER = null;
     CURRENT_USER_PROFILE = null;
     CURRENT_USER_TIER = "Rookie";
+
+    updateTierDisplay("nba-tier-display");
 
     if (statusEl) statusEl.textContent = "Not currently logged in.";
     if (tierEl) tierEl.textContent = "Tier: --";
@@ -1451,6 +1457,13 @@ function initAuthPage() {
   }
 
   updateSessionStatus();
+}
+
+function updateTierDisplay(elementId) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
+  element.textContent = CURRENT_USER_TIER || "Rookie";
 }
 
 async function fetchCurrentUserProfile() {
