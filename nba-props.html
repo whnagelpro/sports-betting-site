@@ -179,13 +179,8 @@
   </footer>
 
   <script src="script.js"></script>
-  <script>
-  renderNBAProps();
-
-  const nbaTierSelect = document.getElementById("nba-tier-filter");
-  if (nbaTierSelect) {
-    nbaTierSelect.onchange = renderNBAProps;
-  }
+<script>
+  initNBAPropsPage();
 
   const nbaSortFilter = document.getElementById("nba-props-sort-filter");
   if (nbaSortFilter) {

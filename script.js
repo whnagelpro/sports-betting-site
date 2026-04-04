@@ -1452,6 +1452,10 @@ function renderNBAProps() { return renderPropsPage("nba"); }
 function renderNHLProps() { return renderPropsPage("nhl"); }
 function renderMLBProps() { return renderPropsPage("mlb"); }
 
+async function initNBAPropsPage() {
+  await updateSessionStatus();
+  await renderNBAProps();
+}
 document.addEventListener("DOMContentLoaded", () => {
   initAuthPage();
 });
