@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Sports Betting Guide</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">Sports Betting Guide</div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="auth.html">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="league-page">
+    <section class="league-hero">
+      <div class="container">
+        <p class="league-label">ACCOUNT ACCESS</p>
+        <h1>Login or Create an Account</h1>
+        <p class="league-description">
+          Sign in to manage your account and unlock tier-based access.
+        </p>
+      </div>
+    </section>
+
+    <section class="bets-section">
+      <div class="container" style="max-width: 700px;">
+        <div class="bet-card">
+          <h2>Create Account</h2>
+          <form id="signup-form" class="waitlist-form">
+            <input
+              type="email"
+              id="signup-email"
+              class="sportsbook-select"
+              placeholder="Email"
+              required
+            />
+            <input
+              type="password"
+              id="signup-password"
+              class="sportsbook-select"
+              placeholder="Password"
+              required
+            />
+            <button type="submit" class="btn btn-primary">Create Account</button>
+          </form>
+          <p id="signup-message" style="margin-top: 12px;"></p>
+        </div>
+
+        <div class="bet-card">
+          <h2>Login</h2>
+          <form id="login-form" class="waitlist-form">
+            <input
+              type="email"
+              id="login-email"
+              class="sportsbook-select"
+              placeholder="Email"
+              required
+            />
+            <input
+              type="password"
+              id="login-password"
+              class="sportsbook-select"
+              placeholder="Password"
+              required
+            />
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+          <p id="login-message" style="margin-top: 12px;"></p>
+        </div>
+
+        <div class="bet-card">
+          <h2>Current Session</h2>
+          <p id="session-status">Checking session...</p>
+          <button id="logout-btn" class="btn btn-secondary" type="button">Logout</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>

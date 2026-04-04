@@ -1314,6 +1314,92 @@ async function fetchTeaserPropsJson(endpointUrl) {
   return props;
 }
 
+async function updateSessionStatus() {
+  const statusEl = document.getElementById("session-status");
+  if (!statusEl || !supabaseClient) return;
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    statusEl.textContent = "Unable to check session.";
+    return;
+  }
+
+  const session = data.session;
+
+  if (session?.user) {
+    statusEl.textContent = `Logged in as ${session.user.email}`;
+  } else {
+    statusEl.textContent = "Not currently logged in.";
+  }
+}
+
+function initAuthPage() {
+  const signupForm = document.getElementById("signup-form");
+  const loginForm = document.getElementById("login-form");
+  const logoutBtn = document.getElementById("logout-btn");
+  const signupMessage = document.getElementById("signup-message");
+  const loginMessage = document.getElementById("login-message");
+
+  if (signupForm) {
+    signupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById("signup-email")?.value.trim();
+      const password = document.getElementById("signup-password")?.value;
+
+      signupMessage.textContent = "Creating account...";
+
+      const { error } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        signupMessage.textContent = error.message;
+      } else {
+        signupMessage.textContent = "Account created successfully. You can now log in.";
+      }
+
+      updateSessionStatus();
+    });
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById("login-email")?.value.trim();
+      const password = document.getElementById("login-password")?.value;
+
+      loginMessage.textContent = "Logging in...";
+
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        loginMessage.textContent = error.message;
+      } else {
+        loginMessage.textContent = "Login successful.";
+        window.location.href = "index.html";
+      }
+
+      updateSessionStatus();
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      await supabaseClient.auth.signOut();
+      await updateSessionStatus();
+    });
+  }
+
+  updateSessionStatus();
+}
+
 function renderNBABets() { return renderOddsPage("nba"); }
 function renderNHLBets() { return renderOddsPage("nhl"); }
 function renderMLBBets() { return renderOddsPage("mlb"); }
@@ -1321,3 +1407,7 @@ function renderMLBBets() { return renderOddsPage("mlb"); }
 function renderNBAProps() { return renderPropsPage("nba"); }
 function renderNHLProps() { return renderPropsPage("nhl"); }
 function renderMLBProps() { return renderPropsPage("mlb"); }
+
+document.addEventListener("DOMContentLoaded", () => {
+  initAuthPage();
+});
