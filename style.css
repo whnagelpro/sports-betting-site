@@ -1562,3 +1562,21 @@ select:disabled {
   opacity: 0.5;
   filter: blur(2px);
 }
+
+.hero-proof {
+  margin-top: 10px;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.cta-subtext {
+  margin-top: 10px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.waitlist-urgency {
+  color: #bbb;
+  font-size: 13px;
+  margin-top: 8px;
+}
