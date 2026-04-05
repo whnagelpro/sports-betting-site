@@ -41,7 +41,15 @@
 
           <li><a href="pricing.html">Pricing</a></li>
           <li><a href="#about">About</a></li>
-          <li><a href="#disclaimer">Disclaimer</a></li>
+          <li class="dropdown">
+          <a href="#">Legal</a>
+            <ul class="dropdown-menu">
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
+                <li><a href="disclaimer.html">Disclaimer</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </li>
           <li><a href="auth.html">Login</a></li>
         </ul>
       </nav>
@@ -234,7 +242,7 @@
           <div class="info-card">
             <h3>Daily Markets</h3>
             <p>
-              The platform is focused on the current day’s NBA and NHL opportunities
+              The platform is focused on the current day’s NBA, NHL, and MLB opportunities
               so users can quickly find relevant betting spots.
             </p>
           </div>
@@ -482,14 +490,9 @@
   document.addEventListener("DOMContentLoaded", () => {
     const savedPlan = localStorage.getItem("selectedPlan");
     const input = document.getElementById("selected-plan-input");
-    const note = document.querySelector(".waitlist-note");
 
     if (savedPlan && input) {
       input.value = savedPlan;
-    }
-
-    if (savedPlan && note) {
-      note.innerHTML = `You're joining early access for <strong>${savedPlan}</strong>.`;
     }
   });
 </script>

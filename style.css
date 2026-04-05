@@ -1580,3 +1580,27 @@ select:disabled {
   font-size: 13px;
   margin-top: 8px;
 }
+
+.footer-links a,
+.footer-links a:visited {
+  color: #4da3ff;
+  text-decoration: none;
+}
+
+.footer-links a:hover,
+.footer-links a:focus {
+  color: #6bb8ff;
+  text-decoration: underline;
+}
+
+.nav-links a:visited {
+  color: inherit;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
