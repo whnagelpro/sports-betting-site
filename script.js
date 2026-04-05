@@ -896,6 +896,13 @@ function bindSelectChange(selectId, handler) {
   if (select) select.onchange = handler;
 }
 
+function updateHomeLastUpdated() {
+  const element = document.getElementById("home-last-updated");
+  if (!element) return;
+
+  element.textContent = `Last Updated: ${getLastUpdatedTime()}`;
+}
+
 async function renderOddsPage(pageKey) {
   const config = ODDS_PAGE_CONFIG[pageKey];
   const container = document.getElementById(config.containerId);
@@ -1188,7 +1195,7 @@ async function renderHomeSpotlights() {
       const bestRank = [...topNBAGame.rankings].sort((a, b) => b.ev - a.ev)[0];
       renderHomeSpotlightCard("home-top-nba-bet", {
         title: `${topNBAGame.awayTeam} at ${topNBAGame.homeTeam}`,
-        meta: `${topNBAGame.vendor} | ${topNBAGame.gameDate}`,
+        meta: `Featured High-EV Play | ${topNBAGame.vendor} | ${topNBAGame.gameDate}`,
         ev: bestRank.ev,
         subtext: `Top Bet: ${bestRank.bet}`
       });
@@ -1200,7 +1207,7 @@ async function renderHomeSpotlights() {
       const bestRank = [...topNHLGame.rankings].sort((a, b) => b.ev - a.ev)[0];
       renderHomeSpotlightCard("home-top-nhl-bet", {
         title: `${topNHLGame.awayTeam} at ${topNHLGame.homeTeam}`,
-        meta: `${topNHLGame.vendor} | ${topNHLGame.gameDate}`,
+        meta: `Featured High-EV Play | ${topNHLGame.vendor} | ${topNHLGame.gameDate}`,
         ev: bestRank.ev,
         subtext: `Top Bet: ${bestRank.bet}`
       });
@@ -1212,7 +1219,7 @@ async function renderHomeSpotlights() {
       const bestRank = [...topMLBGame.rankings].sort((a, b) => b.ev - a.ev)[0];
       renderHomeSpotlightCard("home-top-mlb-bet", {
         title: `${topMLBGame.awayTeam} at ${topMLBGame.homeTeam}`,
-        meta: `${topMLBGame.vendor} | ${topMLBGame.gameDate}`,
+        meta: `Featured High-EV Play | ${topMLBGame.vendor} | ${topMLBGame.gameDate}`,
         ev: bestRank.ev,
         subtext: `Top Bet: ${bestRank.bet}`
       });
@@ -1223,7 +1230,7 @@ async function renderHomeSpotlights() {
     if (topNBAProp) {
       renderHomeSpotlightCard("home-top-nba-prop", {
         title: `${getPropFullName(topNBAProp)} — ${formatPropTypeLabel(topNBAProp.propType)}`,
-        meta: `${topNBAProp.vendor} | ${topNBAProp.gameDate || "Today"}`,
+        meta: `Top Free Props Today | ${topNBAProp.vendor} | ${topNBAProp.gameDate || "Today"}`,
         ev: topNBAProp.ev,
         subtext: `Bet: ${topNBAProp.betType} ${formatLineValue(topNBAProp.lineValue)}`
       });
@@ -1234,7 +1241,7 @@ async function renderHomeSpotlights() {
     if (topNHLProp) {
       renderHomeSpotlightCard("home-top-nhl-prop", {
         title: `${getPropFullName(topNHLProp)} — ${formatPropTypeLabel(topNHLProp.propType)}`,
-        meta: `${topNHLProp.vendor} | ${topNHLProp.gameDate || "Today"}`,
+        meta: `Top Free Props Today | ${topNHLProp.vendor} | ${topNHLProp.gameDate || "Today"}`,
         ev: topNHLProp.ev,
         subtext: `Bet: ${topNHLProp.betType} ${formatLineValue(topNHLProp.lineValue)}`
       });
@@ -1245,13 +1252,15 @@ async function renderHomeSpotlights() {
     if (topMLBProp) {
       renderHomeSpotlightCard("home-top-mlb-prop", {
         title: `${getPropFullName(topMLBProp)} — ${formatPropTypeLabel(topMLBProp.propType)}`,
-        meta: `${topMLBProp.vendor} | ${topMLBProp.gameDate || "Today"}`,
+        meta: `Top Free Props Today | ${topMLBProp.vendor} | ${topMLBProp.gameDate || "Today"}`,
         ev: topMLBProp.ev,
         subtext: `Bet: ${topMLBProp.betType} ${formatLineValue(topMLBProp.lineValue)}`
       });
     } else {
       renderHomeSpotlightCard("home-top-mlb-prop", null);
     }
+
+    updateHomeLastUpdated();
   } catch (error) {
     console.error("Home spotlight render error:", error);
 
@@ -1261,12 +1270,16 @@ async function renderHomeSpotlights() {
     renderHomeSpotlightCard("home-top-nhl-prop", null);
     renderHomeSpotlightCard("home-top-mlb-bet", null);
     renderHomeSpotlightCard("home-top-mlb-prop", null);
+
+    updateHomeLastUpdated();
   }
 }
 
 async function renderHomeTopProps() {
   const container = document.getElementById("home-top-props");
   if (!container) return;
+
+  const currentTier = CURRENT_USER_TIER || "Rookie";
 
   try {
     const [nbaProps, nhlProps, mlbProps] = await Promise.all([
@@ -1282,28 +1295,41 @@ async function renderHomeTopProps() {
     if (visibleProps.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <h3>No props available right now.</h3>
+          <h3>No free props available right now.</h3>
           <p>Please check back once today’s props are live.</p>
         </div>
       `;
+      updateHomeLastUpdated();
       return;
     }
 
-    container.innerHTML = visibleProps
-      .map((prop, index) => {
-        const fullName = getPropFullName(prop);
-        const probabilityText = formatProbability(prop.poissonProbOver);
+    container.innerHTML =
+      visibleProps
+        .map((prop, index) => {
+          const fullName = getPropFullName(prop);
+          const probabilityText = formatProbability(prop.poissonProbOver);
+          const isLockedPreview = index >= 3;
 
-        return `
-          <div class="leaderboard-item">
-            <strong>#${index + 1} ${fullName} — ${formatPropTypeLabel(prop.propType)}</strong>
-            <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
-            <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
-            <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
-          </div>
-        `;
-      })
-      .join("");
+          return `
+            <div class="leaderboard-item ${isLockedPreview ? "blurred" : ""}">
+              <strong>#${index + 1} ${fullName} — ${formatPropTypeLabel(prop.propType)}</strong>
+              <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
+              <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
+              <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
+              <div class="prop-upgrade-hint">🔒 Unlock full prop board with All-Star</div>
+            </div>
+          `;
+        })
+        .join("") +
+      `
+        <div class="upgrade-cta-box">
+          <h3>${currentTier === "Rookie" ? "Upgrade to Unlock More Props" : "You're Seeing Limited Results"}</h3>
+          <p>Unlock the full board, advanced filters, and top EV plays.</p>
+          <a href="pricing.html" class="btn btn-primary">Upgrade to All-Star</a>
+        </div>
+      `;
+
+    updateHomeLastUpdated();
   } catch (error) {
     console.error("Home top props render error:", error);
     container.innerHTML = `
@@ -1312,6 +1338,7 @@ async function renderHomeTopProps() {
         <p>Please try again later.</p>
       </div>
     `;
+    updateHomeLastUpdated();
   }
 }
 
