@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thank You | Sports Betting Guide</title>
+  <title>Welcome | Sports Betting Guide</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -61,14 +61,14 @@
   <main>
     <section class="cta-section" style="padding-top: 120px; padding-bottom: 120px;">
       <div class="container cta-box">
-        <h1>Thanks for Joining Early Access</h1>
+        <h1>Congratulations!</h1>
 
-        <p>
-          You're on the list for premium NBA, NHL, and MLB betting tools.
+        <p id="success-message">
+          Your subscription is now active.
         </p>
 
         <p class="cta-subtext">
-          We’ll keep you updated on premium access, new features, and major product releases.
+          You can now access your upgraded betting dashboard and premium tools.
         </p>
 
         <div style="margin-top: 24px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
@@ -98,6 +98,13 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      const savedPlan = localStorage.getItem("selectedPlan");
+      const successMessage = document.getElementById("success-message");
+
+      if (savedPlan && successMessage) {
+        successMessage.innerHTML = `You are now a <strong>${savedPlan}</strong>.`;
+      }
+
       localStorage.removeItem("selectedPlan");
     });
   </script>
