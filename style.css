@@ -1581,6 +1581,14 @@ select:disabled {
   margin-top: 8px;
 }
 
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
 .footer-links a,
 .footer-links a:visited {
   color: #4da3ff;
@@ -1595,12 +1603,4 @@ select:disabled {
 
 .nav-links a:visited {
   color: inherit;
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
 }

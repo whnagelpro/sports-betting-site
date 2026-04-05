@@ -3,27 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thank You</title>
+  <title>Thank You | Sports Betting Guide</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="league-page">
-    <section class="league-hero">
-      <div class="container">
-        <p class="league-label">WAITLIST</p>
-        <h1>Thank You for Joining</h1>
-        <p class="league-description">
-          You’re on the list. We’ll let you know when premium features and expanded betting tools go live.
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">Sports Betting Guide</div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+
+          <li class="dropdown">
+            <a href="#">NBA</a>
+            <ul class="dropdown-menu">
+              <li><a href="nba-odds.html">Game Odds</a></li>
+              <li><a href="nba-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NHL</a>
+            <ul class="dropdown-menu">
+              <li><a href="nhl-odds.html">Game Odds</a></li>
+              <li><a href="nhl-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">MLB</a>
+            <ul class="dropdown-menu">
+              <li><a href="mlb-odds.html">Game Odds</a></li>
+              <li><a href="mlb-props.html">Player Props</a></li>
+            </ul>
+          </li>
+
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="index.html#about">About</a></li>
+
+          <li class="dropdown">
+            <a href="#">Legal</a>
+            <ul class="dropdown-menu">
+              <li><a href="privacy.html">Privacy Policy</a></li>
+              <li><a href="terms.html">Terms of Service</a></li>
+              <li><a href="disclaimer.html">Disclaimer</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </li>
+
+          <li><a href="auth.html">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="cta-section" style="padding-top: 120px; padding-bottom: 120px;">
+      <div class="container cta-box">
+        <h1>Thanks for Joining Early Access</h1>
+
+        <p id="thank-you-message">
+          You're on the list for premium NBA, NHL, and MLB betting tools.
         </p>
-        <div class="page-switcher">
-          <a href="index.html" class="page-switch-btn active">Back Home</a>
+
+        <p class="cta-subtext">
+          We’ll keep you updated on premium access, new features, and major product releases.
+        </p>
+
+        <div style="margin-top: 24px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+          <a href="index.html" class="btn btn-secondary">Back to Home</a>
+          <a href="pricing.html" class="btn btn-primary">View Plans</a>
         </div>
       </div>
     </section>
   </main>
 
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="disclaimer.html">Disclaimer</a>
+        <a href="contact.html">Contact</a>
+      </div>
+
+      <p class="footer-disclaimer">
+        This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.
+      </p>
+
+      <p>&copy; 2026 Sports Betting Guide. Built for serious bettors.</p>
+    </div>
+  </footer>
+
   <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedPlan = localStorage.getItem("selectedPlan");
+    const thankYouMessage = document.getElementById("thank-you-message");
+
+    if (savedPlan && thankYouMessage) {
+      thankYouMessage.innerHTML = `
+        You're on the early access list for <strong>${savedPlan}</strong>.
+      `;
+    }
+
     localStorage.removeItem("selectedPlan");
-  </script>
+  });
+</script>
 </body>
 </html>
