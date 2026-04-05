@@ -1156,8 +1156,8 @@ async function renderHomeSpotlights() {
       fetchLeagueGames(NHL_CSV_URL).catch(() => []),
       fetchLeagueGames(MLB_CSV_URL).catch(() => []),
       fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
-      fetchLeagueProps(NHL_PROPS_CSV_URL).catch(() => []),
-      fetchLeagueProps(MLB_PROPS_CSV_URL).catch(() => [])
+      fetchLeagueProps(NHL_PROPS_PREMIUM_URL).catch(() => []),
+      fetchLeagueProps(MLB_PROPS_PREMIUM_URL).catch(() => [])
     ]);
 
     const topNBAGame = [...nbaGames].sort((a, b) => {
@@ -1269,8 +1269,8 @@ async function renderHomeTopProps() {
   try {
     const [nbaProps, nhlProps, mlbProps] = await Promise.all([
       fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
-      fetchLeagueProps(NHL_PROPS_CSV_URL).catch(() => []),
-      fetchLeagueProps(MLB_PROPS_CSV_URL).catch(() => [])
+      fetchLeagueProps(NHL_PROPS_PREMIUM_URL).catch(() => []),
+      fetchLeagueProps(MLB_PROPS_PREMIUM_URL).catch(() => [])
     ]);
 
     const allProps = [...nbaProps, ...nhlProps, ...mlbProps].sort((a, b) => b.ev - a.ev);
