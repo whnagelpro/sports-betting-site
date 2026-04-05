@@ -21,7 +21,9 @@ const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA
 const NBA_PROPS_PREMIUM_URL = "/.netlify/functions/nba-props-premium";
 const NBA_PROPS_TEASER_URL = "/.netlify/functions/nba-props-teaser";
 const NHL_PROPS_PREMIUM_URL = "/.netlify/functions/nhl-props-premium";
+const NHL_PROPS_TEASER_URL = "/.netlify/functions/nhl-props-teaser";
 const MLB_PROPS_PREMIUM_URL = "/.netlify/functions/mlb-props-premium";
+const MLB_PROPS_TEASER_URL = "/.netlify/functions/mlb-props-teaser";
 
 const TIER_RULES = {
   Rookie: {
@@ -1156,8 +1158,8 @@ async function renderHomeSpotlights() {
       fetchLeagueGames(NHL_CSV_URL).catch(() => []),
       fetchLeagueGames(MLB_CSV_URL).catch(() => []),
       fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
-      fetchLeagueProps(NHL_PROPS_PREMIUM_URL).catch(() => []),
-      fetchLeagueProps(MLB_PROPS_PREMIUM_URL).catch(() => [])
+      fetchTeaserPropsJson(NHL_PROPS_TEASER_URL).catch(() => []),
+      fetchTeaserPropsJson(MLB_PROPS_TEASER_URL).catch(() => [])
     ]);
 
     const topNBAGame = [...nbaGames].sort((a, b) => {
@@ -1269,8 +1271,8 @@ async function renderHomeTopProps() {
   try {
     const [nbaProps, nhlProps, mlbProps] = await Promise.all([
       fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
-      fetchLeagueProps(NHL_PROPS_PREMIUM_URL).catch(() => []),
-      fetchLeagueProps(MLB_PROPS_PREMIUM_URL).catch(() => [])
+      fetchTeaserPropsJson(NHL_PROPS_TEASER_URL).catch(() => []),
+      fetchTeaserPropsJson(MLB_PROPS_TEASER_URL).catch(() => [])
     ]);
 
     const allProps = [...nbaProps, ...nhlProps, ...mlbProps].sort((a, b) => b.ev - a.ev);
