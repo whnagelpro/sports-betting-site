@@ -62,7 +62,7 @@ const TIER_RULES = {
     maxRankingsPerGame: 99,
     showPlayerProps: true,
     showGameOdds: true,
-    maxPropsToShow: 999,
+    maxPropsToShow: 99999,
     showTopBet: true,
     showLeaderboardCount: 20
   }
@@ -702,7 +702,7 @@ function setOddsFiltersDisabled(config, isDisabled) {
 }
 
 function renderOddsLockedState(config, container, currentTier) {
-  renderLeaderboard(config.leaderboardId, [], 5);
+  renderLeaderboard(config.leaderboardId, [], "Rookie");
 
   renderFilterSummary(config.summaryId, [
     { label: "Tier", value: currentTier || "Rookie" }
@@ -714,7 +714,7 @@ function renderOddsLockedState(config, container, currentTier) {
     <div class="props-locked-box">
       <h3>Game Odds Locked</h3>
       <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
-      <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${config.emptyLabel} game odds.</p>
+      <p>Upgrade to <strong>Veteran</strong> or higher to unlock ${config.emptyLabel} game odds.</p>
       <div style="margin-top: 16px;">
         <a href="pricing.html" class="btn btn-primary">View Plans</a>
       </div>
@@ -995,11 +995,7 @@ async function renderOddsPage(pageKey) {
         { label: "Tier", value: currentTier }
       ]);
 
-      renderLeaderboard(
-        config.leaderboardId,
-        filteredGames,
-        Math.min(currentRules.showLeaderboardCount || 5, 10)
-      );
+      renderLeaderboard(config.leaderboardId, filteredGames, currentTier);
 
       setOddsFiltersDisabled(config, false);
 
@@ -1013,26 +1009,8 @@ async function renderOddsPage(pageKey) {
         return;
       }
 
-      const visibleGames = filteredGames.map((game) => {
-        const visibleRankings = (game.rankings || []).slice(
-          0,
-          currentRules.maxRankingsPerGame || 1
-        );
-
-        const hiddenRankingsCount = Math.max(
-          (game.rankings || []).length - visibleRankings.length,
-          0
-        );
-
-        return {
-          ...game,
-          rankings: visibleRankings,
-          hiddenRankingsCount
-        };
-      });
-
-      container.innerHTML = visibleGames
-        .map((game) => createGameCard(game, currentRules))
+      container.innerHTML = filteredGames
+        .map((game) => createBetCard(game, currentTier))
         .join("");
     };
 
@@ -1046,9 +1024,15 @@ async function renderOddsPage(pageKey) {
   } catch (error) {
     console.error(`${config.emptyLabel} odds render error:`, error);
 
-    const currentTier = CURRENT_USER_TIER || "Rookie";
+    renderLeaderboard(config.leaderboardId, [], "Rookie");
+    renderFilterSummary(config.summaryId, []);
 
-    renderOddsLockedState(config, container, currentTier);
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load ${config.emptyLabel} odds right now.</h3>
+        <p>Please try again in a moment or check your data source.</p>
+      </div>
+    `;
   }
 }
 
