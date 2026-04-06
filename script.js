@@ -1466,6 +1466,39 @@ async function updateSessionStatus() {
   }
 }
 
+async function updateNavAuthState() {
+  const loginItem = document.getElementById("nav-login-item");
+  const accountItem = document.getElementById("nav-account-item");
+  const logoutItem = document.getElementById("nav-logout-item");
+  const logoutLink = document.getElementById("nav-logout-link");
+
+  if (!supabaseClient) return;
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error || !data.session?.user) {
+    if (loginItem) loginItem.style.display = "";
+    if (accountItem) accountItem.style.display = "none";
+    if (logoutItem) logoutItem.style.display = "none";
+    return;
+  }
+
+  if (loginItem) loginItem.style.display = "none";
+  if (accountItem) accountItem.style.display = "";
+  if (logoutItem) logoutItem.style.display = "";
+
+  if (logoutLink && !logoutLink.dataset.bound) {
+    logoutLink.addEventListener("click", async (event) => {
+      event.preventDefault();
+
+      await supabaseClient.auth.signOut();
+      window.location.href = "index.html";
+    });
+
+    logoutLink.dataset.bound = "true";
+  }
+}
+
 function initAuthPage() {
   const signupForm = document.getElementById("signup-form");
   const loginForm = document.getElementById("login-form");
@@ -1493,7 +1526,8 @@ function initAuthPage() {
         signupMessage.textContent = "Account created successfully. You can now log in.";
       }
 
-      updateSessionStatus();
+      await updateSessionStatus();
+      await updateNavAuthState();
     });
   }
 
@@ -1525,6 +1559,7 @@ function initAuthPage() {
     logoutBtn.addEventListener("click", async () => {
       await supabaseClient.auth.signOut();
       await updateSessionStatus();
+      await updateNavAuthState();
     });
   }
 
@@ -1645,5 +1680,6 @@ async function initMLBPropsPage() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  updateNavAuthState();
   initAuthPage();
 });
