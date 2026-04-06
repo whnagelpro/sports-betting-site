@@ -29,6 +29,7 @@ const TIER_RULES = {
   Rookie: {
     maxRankingsPerGame: 1,
     showPlayerProps: false,
+    showGameOdds: false,
     maxPropsToShow: 0,
     showTopBet: false,
     showLeaderboardCount: 3
@@ -36,6 +37,7 @@ const TIER_RULES = {
   Veteran: {
     maxRankingsPerGame: 3,
     showPlayerProps: false,
+    showGameOdds: true,
     maxPropsToShow: 0,
     showTopBet: false,
     showLeaderboardCount: 5
@@ -43,6 +45,7 @@ const TIER_RULES = {
   "All-Star": {
     maxRankingsPerGame: 99,
     showPlayerProps: true,
+    showGameOdds: true,
     maxPropsToShow: 5,
     showTopBet: false,
     showLeaderboardCount: 7
@@ -50,6 +53,7 @@ const TIER_RULES = {
   "Hall-of-Famer": {
     maxRankingsPerGame: 99,
     showPlayerProps: true,
+    showGameOdds: true,
     maxPropsToShow: 10,
     showTopBet: true,
     showLeaderboardCount: 10
@@ -57,6 +61,7 @@ const TIER_RULES = {
   Legend: {
     maxRankingsPerGame: 99,
     showPlayerProps: true,
+    showGameOdds: true,
     maxPropsToShow: 999,
     showTopBet: true,
     showLeaderboardCount: 15
@@ -692,6 +697,37 @@ function createPropCard(prop) {
   `;
 }
 
+function setOddsFiltersDisabled(config, isDisabled) {
+  [
+    config.gameFilterId,
+    config.sportsbookFilterId
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = isDisabled;
+  });
+}
+
+function renderOddsLockedState(config, container, currentTier) {
+  renderLeaderboard(config.leaderboardId, [], 5);
+
+  renderFilterSummary(config.summaryId, [
+    { label: "Tier", value: currentTier || "Rookie" }
+  ]);
+
+  setOddsFiltersDisabled(config, true);
+
+  container.innerHTML = `
+    <div class="props-locked-box">
+      <h3>Game Odds Locked</h3>
+      <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
+      <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${config.emptyLabel} game odds.</p>
+      <div style="margin-top: 16px;">
+        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+      </div>
+    </div>
+  `;
+}
+
 async function fetchLeagueGames(csvUrl) {
   if (DATA_CACHE.games[csvUrl]) return DATA_CACHE.games[csvUrl];
 
@@ -910,8 +946,8 @@ async function renderOddsPage(pageKey) {
 
   container.innerHTML = `
     <div class="empty-state">
-      <h3>Loading ${config.emptyLabel} bets...</h3>
-      <p>Please wait while live data is pulled from Google Sheets.</p>
+      <h3>Loading ${config.emptyLabel} odds...</h3>
+      <p>Please wait while live game odds are pulled in.</p>
     </div>
   `;
 
@@ -920,56 +956,105 @@ async function renderOddsPage(pageKey) {
     updateLastUpdated(config.lastUpdatedId);
 
     const renderPage = () => {
-      const selectedVendor = document.getElementById(config.sportsbookFilterId)?.value || "All";
-      const selectedGame = document.getElementById(config.gameFilterId)?.value || "All";
-      const selectedTier = getSelectedTier(config.tierFilterId);
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+      console.log("renderOddsPage currentTier:", currentTier);
+      console.log("renderOddsPage currentRules:", currentRules);
+
+      if (!currentRules.showGameOdds) {
+        renderOddsLockedState(config, container, currentTier);
+        return;
+      }
+
+      populateGameFilter(
+        config.gameFilterId,
+        games.filter((game) => game.awayTeam && game.homeTeam),
+        (game) => `${game.awayTeam} at ${game.homeTeam}`,
+        renderPage
+      );
+
+      populateSportsbookFilter(config.sportsbookFilterId, games, renderPage);
+
+      const selectedGame =
+        document.getElementById(config.gameFilterId)?.value || "All";
+      const selectedSportsbook =
+        document.getElementById(config.sportsbookFilterId)?.value || "All";
 
       let filteredGames = games;
 
-      if (selectedVendor !== "All") {
-        filteredGames = filteredGames.filter((game) => game.vendor === selectedVendor);
+      if (selectedGame !== "All") {
+        filteredGames = filteredGames.filter(
+          (game) => `${game.awayTeam} at ${game.homeTeam}` === selectedGame
+        );
       }
 
-      if (selectedGame !== "All") {
-        filteredGames = filteredGames.filter((game) => getGameLabel(game) === selectedGame);
+      if (selectedSportsbook !== "All") {
+        filteredGames = filteredGames.filter(
+          (game) => game.vendor === selectedSportsbook
+        );
       }
 
       renderFilterSummary(config.summaryId, [
         { label: "Game", value: selectedGame },
-        { label: "Sportsbook", value: selectedVendor },
-        { label: "Tier", value: selectedTier !== "Rookie" ? selectedTier : "All" }
+        { label: "Sportsbook", value: selectedSportsbook },
+        { label: "Tier", value: currentTier }
       ]);
 
-      renderLeaderboard(config.leaderboardId, filteredGames, selectedTier);
+      renderLeaderboard(
+        config.leaderboardId,
+        filteredGames,
+        Math.min(currentRules.showLeaderboardCount || 5, 10)
+      );
+
+      setOddsFiltersDisabled(config, false);
 
       if (filteredGames.length === 0) {
-        renderEmptyState(container, `No ${config.emptyLabel} games found for this filter combination.`);
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No ${config.emptyLabel} odds found for this filter.</h3>
+            <p>Try changing the game or sportsbook filters.</p>
+          </div>
+        `;
         return;
       }
 
-      container.innerHTML = filteredGames
-        .map((game) => createBetCard(game, selectedTier))
+      const visibleGames = filteredGames.map((game) => {
+        const visibleRankings = (game.rankings || []).slice(
+          0,
+          currentRules.maxRankingsPerGame || 1
+        );
+
+        const hiddenRankingsCount = Math.max(
+          (game.rankings || []).length - visibleRankings.length,
+          0
+        );
+
+        return {
+          ...game,
+          rankings: visibleRankings,
+          hiddenRankingsCount
+        };
+      });
+
+      container.innerHTML = visibleGames
+        .map((game) => createGameCard(game, currentRules))
         .join("");
     };
 
-    populateSportsbookFilter(config.sportsbookFilterId, games, renderPage);
-    populateGameFilter(config.gameFilterId, games, getGameLabel, renderPage);
-    bindSelectChange(config.tierFilterId, renderPage);
-
     bindButton(config.resetButtonId, () => {
-      resetSelectToAll(config.sportsbookFilterId);
       resetSelectToAll(config.gameFilterId);
-      resetSelectToValue(config.tierFilterId, "Rookie");
+      resetSelectToAll(config.sportsbookFilterId);
       renderPage();
     });
 
-    bindButton(config.seeButtonId, renderPage);
     renderPage();
   } catch (error) {
-    console.error(`${config.emptyLabel} render error:`, error);
-    renderLeaderboard(config.leaderboardId, [], "Rookie");
-    renderFilterSummary(config.summaryId, []);
-    renderEmptyState(container, `Unable to load ${config.emptyLabel} data right now.`);
+    console.error(`${config.emptyLabel} odds render error:`, error);
+
+    const currentTier = CURRENT_USER_TIER || "Rookie";
+
+    renderOddsLockedState(config, container, currentTier);
   }
 }
 
@@ -1050,7 +1135,7 @@ async function renderPropsPage(pageKey) {
       );
 
       const visibleProps = filteredProps.slice(0, currentRules.maxPropsToShow);
-const hiddenPropsCount = Math.max(filteredProps.length - visibleProps.length, 0);
+      const hiddenPropsCount = Math.max(filteredProps.length - visibleProps.length, 0);
 
 setPropsFiltersDisabled(config, !currentRules.showPlayerProps);
 
@@ -1093,7 +1178,6 @@ container.innerHTML = `
       renderPage();
     });
 
-    bindButton(config.seeButtonId, renderPage);
     renderPage();
   } catch (error) {
   console.error(`${config.emptyLabel} props render error:`, error);
