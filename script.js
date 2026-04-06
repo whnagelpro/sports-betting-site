@@ -27,7 +27,7 @@ const MLB_PROPS_TEASER_URL = "/.netlify/functions/mlb-props-teaser";
 
 const TIER_RULES = {
   Rookie: {
-    maxRankingsPerGame: 1,
+    maxRankingsPerGame: 0,
     showPlayerProps: false,
     showGameOdds: false,
     maxPropsToShow: 0,
@@ -35,7 +35,7 @@ const TIER_RULES = {
     showLeaderboardCount: 3
   },
   Veteran: {
-    maxRankingsPerGame: 3,
+    maxRankingsPerGame: 5,
     showPlayerProps: false,
     showGameOdds: true,
     maxPropsToShow: 0,
@@ -46,7 +46,7 @@ const TIER_RULES = {
     maxRankingsPerGame: 99,
     showPlayerProps: true,
     showGameOdds: true,
-    maxPropsToShow: 5,
+    maxPropsToShow: 10,
     showTopBet: false,
     showLeaderboardCount: 7
   },
@@ -54,9 +54,9 @@ const TIER_RULES = {
     maxRankingsPerGame: 99,
     showPlayerProps: true,
     showGameOdds: true,
-    maxPropsToShow: 10,
+    maxPropsToShow: 25,
     showTopBet: true,
-    showLeaderboardCount: 10
+    showLeaderboardCount: 12
   },
   Legend: {
     maxRankingsPerGame: 99,
@@ -64,7 +64,7 @@ const TIER_RULES = {
     showGameOdds: true,
     maxPropsToShow: 999,
     showTopBet: true,
-    showLeaderboardCount: 15
+    showLeaderboardCount: 20
   }
 };
 
@@ -121,9 +121,7 @@ const PROPS_PAGE_CONFIG = {
     playerFilterId: "nba-player-filter",
     sportsbookFilterId: "nba-props-sportsbook-filter",
     sortFilterId: "nba-props-sort-filter",
-    tierFilterId: "nba-tier-filter",
     resetButtonId: "nba-props-reset-filters",
-    seeButtonId: "nba-see-props-btn",
     lastUpdatedId: "nba-props-last-updated",
     emptyLabel: "NBA"
   },
@@ -137,9 +135,7 @@ const PROPS_PAGE_CONFIG = {
     playerFilterId: "nhl-player-filter",
     sportsbookFilterId: "nhl-props-sportsbook-filter",
     sortFilterId: "nhl-props-sort-filter",
-    tierFilterId: "nhl-tier-filter",
     resetButtonId: "nhl-props-reset-filters",
-    seeButtonId: "nhl-see-props-btn",
     lastUpdatedId: "nhl-props-last-updated",
     emptyLabel: "NHL"
   },
@@ -153,9 +149,7 @@ const PROPS_PAGE_CONFIG = {
     playerFilterId: "mlb-player-filter",
     sportsbookFilterId: "mlb-props-sportsbook-filter",
     sortFilterId: "mlb-props-sort-filter",
-    tierFilterId: "mlb-tier-filter",
     resetButtonId: "mlb-props-reset-filters",
-    seeButtonId: "mlb-see-props-btn",
     lastUpdatedId: "mlb-props-last-updated",
     emptyLabel: "MLB"
   }
