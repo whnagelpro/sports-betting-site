@@ -1675,3 +1675,8 @@ select:disabled {
 .model-intel-line strong {
   color: #ffffff;
 }
+
+.leaderboard-meta-line {
+  white-space: nowrap;
+  font-size: 0.9rem;
+}

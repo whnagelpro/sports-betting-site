@@ -459,10 +459,10 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
             Edge: ${formatEV(edgeValue)}
           </div>
 
-          <div>
-            <strong>Model Score:</strong> ${formatMetric(scoreValue, 2)} |
-            <strong>Risk:</strong> ${safeText(prop.riskTier, "N/A")} |
-            <strong>Confidence:</strong> ${safeText(prop.modelConfidence, "N/A")}
+          <div class="leaderboard-meta-line">
+            Model Score: ${formatMetric(scoreValue, 2)} |
+            Risk: ${safeText(prop.riskTier, "N/A")} |
+            Confidence: ${safeText(prop.modelConfidence, "N/A")}
           </div>
 
           <div>
@@ -971,8 +971,13 @@ function sortProps(props, sortValue) {
       });
     case "edge-desc":
       return sorted.sort((a, b) => {
-        const edgeA = Number.isNaN(a.bestPriceEdge) ? -Infinity : a.bestPriceEdge;
-        const edgeB = Number.isNaN(b.bestPriceEdge) ? -Infinity : b.bestPriceEdge;
+        const edgeA = (!a.bestPriceEdge && a.bestPriceEdge !== 0) || a.bestPriceEdge === 0
+          ? -Infinity
+          : a.bestPriceEdge;
+
+        const edgeB = (!b.bestPriceEdge && b.bestPriceEdge !== 0) || b.bestPriceEdge === 0
+          ? -Infinity
+          : b.bestPriceEdge;
         return edgeB - edgeA;
       });
     case "ev-desc":
