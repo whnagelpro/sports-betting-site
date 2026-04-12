@@ -428,28 +428,52 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
     return;
   }
 
-  const rankedProps = [...props].sort((a, b) => {
-    const aScore = Number.isNaN(a.modelScore) ? a.ev : a.modelScore;
-    const bScore = Number.isNaN(b.modelScore) ? b.ev : b.modelScore;
-    return bScore - aScore;
-  });
+  // Sort by Best Price Edge (primary), Model Score (secondary)
+  const topProps = [...props]
+    .sort((a, b) => {
+      const edgeA = Number.isNaN(a.bestPriceEdge) ? -Infinity : a.bestPriceEdge;
+      const edgeB = Number.isNaN(b.bestPriceEdge) ? -Infinity : b.bestPriceEdge;
 
-  const topProps = rankedProps.slice(0, limit);
+      if (edgeB !== edgeA) return edgeB - edgeA;
+
+      const scoreA = Number.isNaN(a.modelScore) ? -Infinity : a.modelScore;
+      const scoreB = Number.isNaN(b.modelScore) ? -Infinity : b.modelScore;
+
+      return scoreB - scoreA;
+    })
+    .slice(0, limit);
 
   container.innerHTML = topProps
     .map((prop, index) => {
       const fullName = getPropFullName(prop);
       const probabilityText = formatProbability(prop.poissonProbOver);
+
       const edgeValue = Number.isNaN(prop.bestPriceEdge) ? prop.ev : prop.bestPriceEdge;
       const scoreValue = Number.isNaN(prop.modelScore) ? 0 : prop.modelScore;
 
       return `
         <div class="leaderboard-item">
           <strong>#${index + 1} ${fullName} — ${formatPropTypeLabel(prop.propType)}</strong>
-          <div class="${getEVClass(edgeValue)}">Edge: ${formatEV(edgeValue)}</div>
-          <div>Score: ${formatMetric(scoreValue, 2)} | ${safeText(prop.riskTier, "N/A")} | ${safeText(prop.modelConfidence, "N/A")}</div>
-          <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
-          <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
+
+          <div class="${getEVClass(edgeValue)}">
+            Edge: ${formatEV(edgeValue)}
+          </div>
+
+          <div>
+            <strong>Model Score:</strong> ${formatMetric(scoreValue, 2)} |
+            <strong>Risk:</strong> ${safeText(prop.riskTier, "N/A")} |
+            <strong>Confidence:</strong> ${safeText(prop.modelConfidence, "N/A")}
+          </div>
+
+          <div>
+            ${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}
+          </div>
+
+          <div>
+            Line: ${formatLineValue(prop.lineValue)} |
+            Bet: ${prop.betType} |
+            Probability: ${probabilityText}
+          </div>
         </div>
       `;
     })
