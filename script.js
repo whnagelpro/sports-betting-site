@@ -1826,7 +1826,7 @@ function initAuthPage() {
       const email = document.getElementById("reset-email")?.value.trim();
       resetRequestMessage.textContent = "Sending reset link...";
 
-      const redirectTo = `${window.location.origin}${window.location.pathname}?view=update-password`;
+      const redirectTo = `https://sports-betting-guide-app.netlify.app/auth.html?view=update-password`;
 
       const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo
