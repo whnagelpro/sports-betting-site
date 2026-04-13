@@ -446,7 +446,12 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
   container.innerHTML = topProps
     .map((prop, index) => {
       const fullName = getPropFullName(prop);
-      const probabilityText = formatProbability(prop.poissonProbOver);
+      const probabilityValue =
+        prop.poissonProbOver && prop.poissonProbOver > 0
+          ? prop.poissonProbOver
+          : prop.poissonProbExact;
+
+      const probabilityText = formatProbability(probabilityValue);
 
       const edgeValue = Number.isNaN(prop.bestPriceEdge) ? prop.ev : prop.bestPriceEdge;
       const scoreValue = Number.isNaN(prop.modelScore) ? 0 : prop.modelScore;
@@ -699,7 +704,12 @@ function createBetCard(game, tierName = "Rookie") {
 }
 
 function createPropCard(prop) {
-  const probabilityText = formatProbability(prop.poissonProbOver);
+  const probabilityValue =
+    prop.poissonProbOver && prop.poissonProbOver > 0
+      ? prop.poissonProbOver
+      : prop.poissonProbExact;
+
+  const probabilityText = formatProbability(probabilityValue);
   const betTypeLower = (prop.betType || "").toLowerCase();
 
   let oddsToShow = "N/A";
@@ -1482,7 +1492,12 @@ async function renderHomeTopProps() {
       visibleProps
         .map((prop, index) => {
           const fullName = getPropFullName(prop);
-          const probabilityText = formatProbability(prop.poissonProbOver);
+          const probabilityValue =
+            prop.poissonProbOver && prop.poissonProbOver > 0
+              ? prop.poissonProbOver
+              : prop.poissonProbExact;
+
+          const probabilityText = formatProbability(probabilityValue);
           const isLockedPreview = index >= 3;
 
           return `
