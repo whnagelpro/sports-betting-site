@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login | Sports Betting Guide</title>
+  <title>Account | Sports Betting Guide</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -24,38 +24,18 @@
     <section class="league-hero">
       <div class="container">
         <p class="league-label">ACCOUNT ACCESS</p>
-        <h1>Login or Create an Account</h1>
-        <p class="league-description">
+        <h1 id="auth-page-title">Login</h1>
+        <p class="league-description" id="auth-page-description">
           Sign in to manage your account and unlock tier-based access.
         </p>
       </div>
     </section>
 
     <section class="bets-section">
-      <div class="container" style="max-width: 700px;">
-        <div class="bet-card">
-          <h2>Create Account</h2>
-          <form id="signup-form" class="waitlist-form">
-            <input
-              type="email"
-              id="signup-email"
-              class="sportsbook-select"
-              placeholder="Email"
-              required
-            />
-            <input
-              type="password"
-              id="signup-password"
-              class="sportsbook-select"
-              placeholder="Password"
-              required
-            />
-            <button type="submit" class="btn btn-primary">Create Account</button>
-          </form>
-          <p id="signup-message" style="margin-top: 12px;"></p>
-        </div>
+      <div class="container auth-container">
 
-        <div class="bet-card">
+        <!-- LOGIN VIEW -->
+        <div class="bet-card auth-view" id="login-view">
           <h2>Login</h2>
           <form id="login-form" class="waitlist-form">
             <input
@@ -74,15 +54,105 @@
             />
             <button type="submit" class="btn btn-primary">Login</button>
           </form>
-          <p id="login-message" style="margin-top: 12px;"></p>
+          <p id="login-message" class="auth-message"></p>
+
+          <div class="auth-links-block">
+            <p class="auth-helper-text">
+              New user?
+              <a href="auth.html?view=signup" class="auth-inline-link">Create Account</a>
+            </p>
+
+            <p class="auth-helper-text">
+              Forgot password?
+              <a href="auth.html?view=reset" class="auth-inline-link">Reset Password</a>
+            </p>
+          </div>
         </div>
 
-        <div class="bet-card">
+        <!-- SIGNUP VIEW -->
+        <div class="bet-card auth-view" id="signup-view" style="display: none;">
+          <h2>Create Account</h2>
+          <form id="signup-form" class="waitlist-form">
+            <input
+              type="email"
+              id="signup-email"
+              class="sportsbook-select"
+              placeholder="Email"
+              required
+            />
+            <input
+              type="password"
+              id="signup-password"
+              class="sportsbook-select"
+              placeholder="Password"
+              required
+            />
+            <button type="submit" class="btn btn-primary">Create Account</button>
+          </form>
+          <p id="signup-message" class="auth-message"></p>
+
+          <div class="auth-links-block">
+            <p class="auth-helper-text">
+              Already have an account?
+              <a href="auth.html?view=login" class="auth-inline-link">Login</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- RESET PASSWORD REQUEST VIEW -->
+        <div class="bet-card auth-view" id="reset-request-view" style="display: none;">
+          <h2>Reset Password</h2>
+          <form id="reset-request-form" class="waitlist-form">
+            <input
+              type="email"
+              id="reset-email"
+              class="sportsbook-select"
+              placeholder="Email"
+              required
+            />
+            <button type="submit" class="btn btn-primary">Send Reset Link</button>
+          </form>
+          <p id="reset-request-message" class="auth-message"></p>
+
+          <div class="auth-links-block">
+            <p class="auth-helper-text">
+              Remembered your password?
+              <a href="auth.html?view=login" class="auth-inline-link">Back to Login</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- RESET PASSWORD UPDATE VIEW -->
+        <div class="bet-card auth-view" id="reset-update-view" style="display: none;">
+          <h2>Create New Password</h2>
+          <form id="reset-update-form" class="waitlist-form">
+            <input
+              type="password"
+              id="new-password"
+              class="sportsbook-select"
+              placeholder="Enter New Password"
+              required
+            />
+            <input
+              type="password"
+              id="confirm-password"
+              class="sportsbook-select"
+              placeholder="Confirm New Password"
+              required
+            />
+            <button type="submit" class="btn btn-primary">Update Password</button>
+          </form>
+          <p id="reset-update-message" class="auth-message"></p>
+        </div>
+
+        <!-- SESSION VIEW -->
+        <div class="bet-card" id="session-card">
           <h2>Current Session</h2>
           <p id="session-status">Checking session...</p>
           <p id="tier-status">Tier: --</p>
           <button id="logout-btn" class="btn btn-secondary" type="button">Logout</button>
         </div>
+
       </div>
     </section>
   </main>

@@ -1680,3 +1680,32 @@ select:disabled {
   white-space: nowrap;
   font-size: 0.9rem;
 }
+
+.auth-container {
+  max-width: 700px;
+}
+
+.auth-message {
+  margin-top: 12px;
+  color: #c7d2e3;
+}
+
+.auth-links-block {
+  margin-top: 18px;
+}
+
+.auth-helper-text {
+  margin-top: 10px;
+  color: #c7d2e3;
+  font-size: 0.95rem;
+}
+
+.auth-inline-link {
+  color: #7dd3fc;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-inline-link:hover {
+  text-decoration: underline;
+}

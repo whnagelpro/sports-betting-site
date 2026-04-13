@@ -1690,11 +1690,84 @@ async function updateNavAuthState() {
 }
 
 function initAuthPage() {
+  const loginView = document.getElementById("login-view");
+  const signupView = document.getElementById("signup-view");
+  const resetRequestView = document.getElementById("reset-request-view");
+  const resetUpdateView = document.getElementById("reset-update-view");
+
+  const pageTitle = document.getElementById("auth-page-title");
+  const pageDescription = document.getElementById("auth-page-description");
+
   const signupForm = document.getElementById("signup-form");
   const loginForm = document.getElementById("login-form");
   const logoutBtn = document.getElementById("logout-btn");
+  const resetRequestForm = document.getElementById("reset-request-form");
+  const resetUpdateForm = document.getElementById("reset-update-form");
+
   const signupMessage = document.getElementById("signup-message");
   const loginMessage = document.getElementById("login-message");
+  const resetRequestMessage = document.getElementById("reset-request-message");
+  const resetUpdateMessage = document.getElementById("reset-update-message");
+
+  if (!loginView && !signupView && !resetRequestView && !resetUpdateView) {
+    return;
+  }
+
+  function showAuthView(viewName) {
+    if (loginView) loginView.style.display = "none";
+    if (signupView) signupView.style.display = "none";
+    if (resetRequestView) resetRequestView.style.display = "none";
+    if (resetUpdateView) resetUpdateView.style.display = "none";
+
+    if (viewName === "signup" && signupView) {
+      signupView.style.display = "";
+      if (pageTitle) pageTitle.textContent = "Create Account";
+      if (pageDescription) pageDescription.textContent = "Create your account to unlock tier-based access.";
+      return;
+    }
+
+    if (viewName === "reset" && resetRequestView) {
+      resetRequestView.style.display = "";
+      if (pageTitle) pageTitle.textContent = "Reset Password";
+      if (pageDescription) pageDescription.textContent = "Enter your email and we’ll send you a password reset link.";
+      return;
+    }
+
+    if (viewName === "update-password" && resetUpdateView) {
+      resetUpdateView.style.display = "";
+      if (pageTitle) pageTitle.textContent = "Create New Password";
+      if (pageDescription) pageDescription.textContent = "Enter and confirm your new password below.";
+      return;
+    }
+
+    if (loginView) loginView.style.display = "";
+    if (pageTitle) pageTitle.textContent = "Login";
+    if (pageDescription) pageDescription.textContent = "Sign in to manage your account and unlock tier-based access.";
+  }
+
+  function getAuthViewFromUrl() {
+    const url = new URL(window.location.href);
+    return url.searchParams.get("view") || "login";
+  }
+
+  async function detectPasswordRecoveryState() {
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+
+    const recoveryInHash = hash.includes("type=recovery");
+    const recoveryInSearch = search.includes("type=recovery");
+
+    return recoveryInHash || recoveryInSearch;
+  }
+
+  (async () => {
+    const isRecovery = await detectPasswordRecoveryState();
+    if (isRecovery) {
+      showAuthView("update-password");
+    } else {
+      showAuthView(getAuthViewFromUrl());
+    }
+  })();
 
   if (signupForm) {
     signupForm.addEventListener("submit", async (event) => {
@@ -1713,7 +1786,7 @@ function initAuthPage() {
       if (error) {
         signupMessage.textContent = error.message;
       } else {
-        signupMessage.textContent = "Account created successfully. You can now log in.";
+        signupMessage.textContent = "Account created successfully. Check your email if confirmation is required, then log in.";
       }
 
       await updateSessionStatus();
@@ -1741,7 +1814,57 @@ function initAuthPage() {
         loginMessage.textContent = "Login successful.";
       }
 
-      updateSessionStatus();
+      await updateSessionStatus();
+      await updateNavAuthState();
+    });
+  }
+
+  if (resetRequestForm) {
+    resetRequestForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById("reset-email")?.value.trim();
+      resetRequestMessage.textContent = "Sending reset link...";
+
+      const redirectTo = `${window.location.origin}${window.location.pathname}?view=update-password`;
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo
+      });
+
+      if (error) {
+        resetRequestMessage.textContent = error.message;
+      } else {
+        resetRequestMessage.textContent = "Reset link sent. Please check your email.";
+      }
+    });
+  }
+
+  if (resetUpdateForm) {
+    resetUpdateForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const newPassword = document.getElementById("new-password")?.value;
+      const confirmPassword = document.getElementById("confirm-password")?.value;
+
+      if (newPassword !== confirmPassword) {
+        resetUpdateMessage.textContent = "Passwords do not match.";
+        return;
+      }
+
+      resetUpdateMessage.textContent = "Updating password...";
+
+      const { error } = await supabaseClient.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        resetUpdateMessage.textContent = error.message;
+      } else {
+        resetUpdateMessage.textContent = "Password updated successfully. You can now log in.";
+        window.history.replaceState({}, document.title, "auth.html?view=login");
+        showAuthView("login");
+      }
     });
   }
 
