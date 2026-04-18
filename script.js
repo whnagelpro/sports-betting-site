@@ -17,6 +17,7 @@ const DATA_CACHE = {
 const NBA_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1553479471&single=true&output=csv";
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
+const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1641406263&single=true&output=csv";
 
 const NBA_PROPS_PREMIUM_URL = "/.netlify/functions/nba-props-premium";
 const NBA_PROPS_TEASER_URL = "/.netlify/functions/nba-props-teaser";
@@ -1978,6 +1979,134 @@ async function fetchCurrentUserProfile() {
   }
 
   return profile;
+}
+
+async function fetchLeagueTrends(csvUrl) {
+  if (DATA_CACHE[csvUrl]) return DATA_CACHE[csvUrl];
+
+  const response = await fetch(csvUrl);
+  if (!response.ok) throw new Error(`Failed to fetch trends CSV: ${response.status}`);
+
+  const text = await response.text();
+  const rows = parseCSV(text);
+
+  DATA_CACHE[csvUrl] = rows;
+  return rows;
+}
+
+function formatTrendLabel(statKey) {
+  const labelMap = {
+    hits_last5: "Hits",
+    home_runs_last5: "Home Runs",
+    rbis_last5: "RBIs",
+    runs_scored_last5: "Runs Scored",
+    stolen_bases_last5: "Stolen Bases",
+    total_bases_last5: "Total Bases",
+    strikeouts_last5: "Batter Strikeouts",
+    pitcher_strikeouts_last5: "Pitcher Strikeouts",
+    pitcher_outs_last5: "Pitcher Outs",
+    pitcher_earned_runs_last5: "Pitcher Earned Runs",
+    pitcher_hits_allowed_last5: "Pitcher Hits Allowed",
+    pitcher_walks_last5: "Pitcher Walks Allowed"
+  };
+
+  return labelMap[statKey] || statKey;
+}
+
+function createTrendCard(player, statKey) {
+  const statValue = Number(player[statKey]);
+  const gamesUsed = player.games_used_last5 || "N/A";
+
+  return `
+    <div class="leaderboard-item">
+      <strong>${player["Player Name"] || "Unknown Player"}</strong>
+      <div>${formatTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
+      <div>Games Used: ${gamesUsed}</div>
+    </div>
+  `;
+}
+
+async function renderMLBTrends() {
+  const container = document.getElementById("mlb-trends-container");
+  if (!container) return;
+
+  updateTierDisplay("mlb-tier-display");
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Loading MLB trends...</h3>
+      <p>Please wait while recent trend data is pulled in.</p>
+    </div>
+  `;
+
+  try {
+    const rows = await fetchLeagueTrends(MLB_TRENDS_CSV_URL);
+    updateLastUpdated("mlb-trends-last-updated");
+
+    const renderPage = () => {
+      const selectedStat =
+        document.getElementById("mlb-trends-stat-filter")?.value || "hits_last5";
+      const selectedSort =
+        document.getElementById("mlb-trends-sort-filter")?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Player Name"])
+        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+
+      filteredRows.sort((a, b) => {
+        const aVal = Number(a[selectedStat]);
+        const bVal = Number(b[selectedStat]);
+        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
+      });
+
+      renderFilterSummary("mlb-trends-filter-summary", [
+        { label: "Trend", value: formatTrendLabel(selectedStat) },
+        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Tier", value: CURRENT_USER_TIER || "Rookie" }
+      ]);
+
+      if (filteredRows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No MLB trends found for this category.</h3>
+            <p>Try changing the trend category or sort order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const visibleRows = filteredRows.slice(0, 25);
+
+      container.innerHTML = visibleRows
+        .map((row) => createTrendCard(row, selectedStat))
+        .join("");
+    };
+
+    bindSelectChange("mlb-trends-stat-filter", renderPage);
+    bindSelectChange("mlb-trends-sort-filter", renderPage);
+
+    bindButton("mlb-trends-reset-filters", () => {
+      resetSelectToValue("mlb-trends-stat-filter", "hits_last5");
+      resetSelectToValue("mlb-trends-sort-filter", "desc");
+      renderPage();
+    });
+
+    renderPage();
+  } catch (error) {
+    console.error("MLB trends render error:", error);
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load MLB trends right now.</h3>
+        <p>Please check your published MLB Trends CSV.</p>
+      </div>
+    `;
+  }
+}
+
+async function initMLBTrendsPage() {
+  await updateSessionStatus();
+  await renderMLBTrends();
 }
 
 function renderNBABets() { return renderOddsPage("nba"); }

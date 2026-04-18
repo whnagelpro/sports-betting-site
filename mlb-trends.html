@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NBA Game Odds | Sports Betting Guide</title>
+  <title>MLB Trends | Sports Betting Guide</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="container nav">
       <div class="logo">Sports Betting Guide</div>
+
       <nav>
         <ul class="nav-links">
           <li><a href="index.html">Home</a></li>
@@ -40,7 +41,7 @@
           </li>
 
           <li><a href="index.html#about">About</a></li>
-          
+
           <li class="dropdown">
             <a href="#">Legal</a>
             <ul class="dropdown-menu">
@@ -62,10 +63,10 @@
   <main class="league-page">
     <section class="league-hero">
       <div class="container">
-        <p class="league-label">NBA GAME ODDS</p>
-        <h1>Today’s NBA Game Odds Ranked by Expected Value</h1>
+        <p class="league-label">MLB TRENDS</p>
+        <h1>Today’s MLB Player Trends</h1>
         <p class="league-description">
-          Review today’s NBA spreads, moneylines, totals, and EV rankings from your live board.
+          Review recent player form across key MLB betting stats using the latest trend data.
         </p>
       </div>
     </section>
@@ -73,64 +74,72 @@
     <section class="league-controls">
       <div class="container controls-row">
         <div class="control-box">
-          <span class="control-label">Ranking</span>
-          <strong>Highest EV First</strong>
+          <span class="control-label">View</span>
+          <strong>Last 5 Games</strong>
         </div>
 
         <div class="control-box">
           <span class="control-label">Membership Tier</span>
-          <strong id="nba-tier-display">Loading...</strong>
+          <strong id="mlb-tier-display">Loading...</strong>
         </div>
 
         <div class="control-box">
-          <span class="control-label">Game</span>
-          <select id="nba-game-filter" class="sportsbook-select">
-           <option value="All">All Games</option>
+          <span class="control-label">Trend Category</span>
+          <select id="mlb-trends-stat-filter" class="sportsbook-select">
+            <option value="hits_last5">Hits</option>
+            <option value="home_runs_last5">Home Runs</option>
+            <option value="rbis_last5">RBIs</option>
+            <option value="runs_scored_last5">Runs Scored</option>
+            <option value="stolen_bases_last5">Stolen Bases</option>
+            <option value="total_bases_last5">Total Bases</option>
+            <option value="strikeouts_last5">Batter Strikeouts</option>
+            <option value="pitcher_strikeouts_last5">Pitcher Strikeouts</option>
+            <option value="pitcher_outs_last5">Pitcher Outs</option>
+            <option value="pitcher_earned_runs_last5">Pitcher Earned Runs</option>
+            <option value="pitcher_hits_allowed_last5">Pitcher Hits Allowed</option>
+            <option value="pitcher_walks_last5">Pitcher Walks Allowed</option>
           </select>
         </div>
 
         <div class="control-box">
-          <span class="control-label">Sportsbook</span>
-          <select id="nba-sportsbook-filter" class="sportsbook-select">
-            <option value="All">All Sportsbooks</option>
+          <span class="control-label">Sort</span>
+          <select id="mlb-trends-sort-filter" class="sportsbook-select">
+            <option value="desc">Highest First</option>
+            <option value="asc">Lowest First</option>
           </select>
         </div>
 
         <p class="last-updated-text">
-          Last Updated: <span id="nba-last-updated">--:--</span>
+          Last Updated: <span id="mlb-trends-last-updated">--:--</span>
         </p>
 
         <div class="control-box">
           <span class="control-label">Actions</span>
-          <button id="nba-odds-reset-filters" class="filter-reset-btn">Reset Filters</button>
+          <button id="mlb-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
         </div>
       </div>
     </section>
 
     <section class="filter-summary-section">
-        <div class="container">
-            <div id="nba-odds-filter-summary" class="filter-summary-box"></div>
-        </div>
+      <div class="container">
+        <div id="mlb-trends-filter-summary" class="filter-summary-box"></div>
+      </div>
     </section>
 
     <section class="bets-section">
       <div class="container">
         <div class="section-header">
-          <h2>Top NBA Opportunities</h2>
-          <p>Live game odds and EV-ranked opportunities for today’s NBA slate.</p>
+          <h2>Top MLB Trends</h2>
+          <p>See which players are trending strongest across recent MLB stat categories.</p>
         </div>
 
         <div class="leaderboard-box">
-          <h3>Top EV Bets Today</h3>
-          <div id="nba-leaderboard">
-            <p>Loading leaderboard...</p>
-          </div>
-        </div>
-
-        <div id="nba-bets-container" class="bets-grid">
-          <div class="empty-state">
-            <h3>Loading NBA game odds...</h3>
-            <p>Please wait while live data is pulled from Google Sheets.</p>
+          <h3>Trend Leaders</h3>
+          <div id="mlb-trends-container">
+            <div class="empty-state">
+              <h3>Loading MLB trends...</h3>
+              <p>Please wait while recent trend data is pulled in.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -147,7 +156,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
   <script>
-    initNBABetsPage();
+    initMLBTrendsPage();
   </script>
 </body>
 </html>
