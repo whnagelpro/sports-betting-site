@@ -1989,6 +1989,22 @@ function createTrendCard(player, statKey) {
   `;
 }
 
+function populateTrendsPlayerFilter(selectId, rows, onChange) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  const currentValue = select.value || "All";
+
+  const players = [...new Set(
+    rows
+      .map((row) => (row["Player Name"] || "").trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
+
+  populateSelectOptions(selectId, players, "All Players", currentValue);
+  select.onchange = () => onChange();
+}
+
 function setTrendsFiltersDisabled(filterIds, isDisabled) {
   filterIds.forEach((id) => {
     const el = document.getElementById(id);
@@ -2033,8 +2049,11 @@ async function renderNBATrends() {
     const renderPage = () => {
       const currentTier = CURRENT_USER_TIER || "Rookie";
       const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
-
-      const filterIds = ["nba-trends-stat-filter", "nba-trends-sort-filter"];
+      const filterIds = [
+        "nba-trends-stat-filter",
+        "nba-trends-sort-filter",
+        "nba-trends-player-filter"
+      ];
 
       if (!currentRules.showPlayerProps) {
         setTrendsFiltersDisabled(filterIds, true);
@@ -2058,6 +2077,17 @@ async function renderNBATrends() {
         .filter((row) => row["Player Name"])
         .filter((row) => !Number.isNaN(Number(row[selectedStat])));
 
+      populateTrendsPlayerFilter("nba-trends-player-filter", filteredRows, renderPage);
+
+      const selectedPlayer =
+        document.getElementById("nba-trends-player-filter")?.value || "All";
+
+      if (selectedPlayer !== "All") {
+        filteredRows = filteredRows.filter(
+          (row) => (row["Player Name"] || "").trim() === selectedPlayer
+        );
+      }
+
       filteredRows.sort((a, b) => {
         const aVal = Number(a[selectedStat]);
         const bVal = Number(b[selectedStat]);
@@ -2066,6 +2096,7 @@ async function renderNBATrends() {
 
       renderFilterSummary("nba-trends-filter-summary", [
         { label: "Trend", value: formatNBATrendLabel(selectedStat) },
+        { label: "Player", value: selectedPlayer },
         { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
         { label: "Tier", value: currentTier }
       ]);
@@ -2073,14 +2104,14 @@ async function renderNBATrends() {
       if (filteredRows.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>No NBA trends found for this category.</h3>
-            <p>Try changing the trend category or sort order.</p>
+            <h3>No NBA trends found for this filter.</h3>
+            <p>Try changing the trend category, player, or sort order.</p>
           </div>
         `;
         return;
       }
 
-      const visibleRows = filteredRows.slice(0, 25);
+      const visibleRows = filteredRows;
 
       container.innerHTML = visibleRows
         .map((row) => createNBATrendCard(row, selectedStat))
@@ -2093,6 +2124,7 @@ async function renderNBATrends() {
     bindButton("nba-trends-reset-filters", () => {
       resetSelectToValue("nba-trends-stat-filter", "points_last5");
       resetSelectToValue("nba-trends-sort-filter", "desc");
+      resetSelectToAll("nba-trends-player-filter");
       renderPage();
     });
 
@@ -2160,8 +2192,11 @@ async function renderNHLTrends() {
     const renderPage = () => {
       const currentTier = CURRENT_USER_TIER || "Rookie";
       const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
-
-      const filterIds = ["nhl-trends-stat-filter", "nhl-trends-sort-filter"];
+      const filterIds = [
+        "nhl-trends-stat-filter",
+        "nhl-trends-sort-filter",
+        "nhl-trends-player-filter"
+      ];
 
       if (!currentRules.showPlayerProps) {
         setTrendsFiltersDisabled(filterIds, true);
@@ -2185,6 +2220,17 @@ async function renderNHLTrends() {
         .filter((row) => row["Player Name"])
         .filter((row) => !Number.isNaN(Number(row[selectedStat])));
 
+      populateTrendsPlayerFilter("nhl-trends-player-filter", filteredRows, renderPage);
+
+      const selectedPlayer =
+        document.getElementById("nhl-trends-player-filter")?.value || "All";
+
+      if (selectedPlayer !== "All") {
+        filteredRows = filteredRows.filter(
+          (row) => (row["Player Name"] || "").trim() === selectedPlayer
+        );
+      }
+
       filteredRows.sort((a, b) => {
         const aVal = Number(a[selectedStat]);
         const bVal = Number(b[selectedStat]);
@@ -2193,6 +2239,7 @@ async function renderNHLTrends() {
 
       renderFilterSummary("nhl-trends-filter-summary", [
         { label: "Trend", value: formatNHLTrendLabel(selectedStat) },
+        { label: "Player", value: selectedPlayer },
         { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
         { label: "Tier", value: currentTier }
       ]);
@@ -2200,14 +2247,14 @@ async function renderNHLTrends() {
       if (filteredRows.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>No NHL trends found for this category today.</h3>
-            <p>Please check back when NHL trend data is available.</p>
+            <h3>No NHL trends found for this filter.</h3>
+            <p>Try changing the trend category, player, or sort order.</p>
           </div>
         `;
         return;
       }
 
-      const visibleRows = filteredRows.slice(0, 25);
+      const visibleRows = filteredRows;
 
       container.innerHTML = visibleRows
         .map((row) => createNHLTrendCard(row, selectedStat))
@@ -2220,6 +2267,7 @@ async function renderNHLTrends() {
     bindButton("nhl-trends-reset-filters", () => {
       resetSelectToValue("nhl-trends-stat-filter", "shots_last5");
       resetSelectToValue("nhl-trends-sort-filter", "desc");
+      resetSelectToAll("nhl-trends-player-filter");
       renderPage();
     });
 
@@ -2261,8 +2309,11 @@ async function renderMLBTrends() {
     const renderPage = () => {
       const currentTier = CURRENT_USER_TIER || "Rookie";
       const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
-
-      const filterIds = ["mlb-trends-stat-filter", "mlb-trends-sort-filter"];
+      const filterIds = [
+        "mlb-trends-stat-filter",
+        "mlb-trends-sort-filter",
+        "mlb-trends-player-filter"
+      ];
 
       if (!currentRules.showPlayerProps) {
         setTrendsFiltersDisabled(filterIds, true);
@@ -2286,6 +2337,17 @@ async function renderMLBTrends() {
         .filter((row) => row["Player Name"])
         .filter((row) => !Number.isNaN(Number(row[selectedStat])));
 
+      populateTrendsPlayerFilter("mlb-trends-player-filter", filteredRows, renderPage);
+
+      const selectedPlayer =
+        document.getElementById("mlb-trends-player-filter")?.value || "All";
+
+      if (selectedPlayer !== "All") {
+        filteredRows = filteredRows.filter(
+          (row) => (row["Player Name"] || "").trim() === selectedPlayer
+        );
+      }
+
       filteredRows.sort((a, b) => {
         const aVal = Number(a[selectedStat]);
         const bVal = Number(b[selectedStat]);
@@ -2294,6 +2356,7 @@ async function renderMLBTrends() {
 
       renderFilterSummary("mlb-trends-filter-summary", [
         { label: "Trend", value: formatTrendLabel(selectedStat) },
+        { label: "Player", value: selectedPlayer },
         { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
         { label: "Tier", value: currentTier }
       ]);
@@ -2301,14 +2364,14 @@ async function renderMLBTrends() {
       if (filteredRows.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>No MLB trends found for this category.</h3>
-            <p>Try changing the trend category or sort order.</p>
+            <h3>No MLB trends found for this filter.</h3>
+            <p>Try changing the trend category, player, or sort order.</p>
           </div>
         `;
         return;
       }
 
-      const visibleRows = filteredRows.slice(0, 25);
+      const visibleRows = filteredRows;
 
       container.innerHTML = visibleRows
         .map((row) => createTrendCard(row, selectedStat))
@@ -2321,6 +2384,7 @@ async function renderMLBTrends() {
     bindButton("mlb-trends-reset-filters", () => {
       resetSelectToValue("mlb-trends-stat-filter", "hits_last5");
       resetSelectToValue("mlb-trends-sort-filter", "desc");
+      resetSelectToAll("mlb-trends-player-filter");
       renderPage();
     });
 
