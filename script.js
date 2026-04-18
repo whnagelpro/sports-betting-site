@@ -1041,6 +1041,8 @@ async function renderOddsPage(pageKey) {
   const container = document.getElementById(config.containerId);
   if (!container) return;
 
+  initializeOddsTierDisplay(pageKey);
+
   container.innerHTML = `
     <div class="empty-state">
       <h3>Loading ${config.emptyLabel} odds...</h3>
@@ -1944,6 +1946,15 @@ function renderPropsUpgradeRequiredState(config, container, currentTier) {
       </div>
     </div>
   `;
+}
+
+function initializeOddsTierDisplay(pageKey) {
+  const config = ODDS_PAGE_CONFIG[pageKey];
+  if (!config) return;
+
+  const currentTier = CURRENT_USER_TIER || "Rookie";
+  const tierDisplayId = `${pageKey}-tier-display`;
+  updateTierDisplay(tierDisplayId);
 }
 
 async function fetchCurrentUserProfile() {
