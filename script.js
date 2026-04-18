@@ -1988,6 +1988,21 @@ function renderNBAProps() { return renderPropsPage("nba"); }
 function renderNHLProps() { return renderPropsPage("nhl"); }
 function renderMLBProps() { return renderPropsPage("mlb"); }
 
+async function initNBABetsPage() {
+  await updateSessionStatus();
+  await renderNBABets();
+}
+
+async function initNHLBetsPage() {
+  await updateSessionStatus();
+  await renderNHLBets();
+}
+
+async function initMLBBetsPage() {
+  await updateSessionStatus();
+  await renderMLBBets();
+}
+
 async function initNBAPropsPage() {
   await updateSessionStatus();
   await renderNBAProps();
