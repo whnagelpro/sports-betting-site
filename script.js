@@ -17,6 +17,7 @@ const DATA_CACHE = {
 const NBA_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1553479471&single=true&output=csv";
 const NBA_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1073686927&single=true&output=csv";
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
+const NHL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=124295671&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
 const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1641406263&single=true&output=csv";
 
@@ -2141,6 +2142,115 @@ async function renderNBATrends() {
 async function initNBATrendsPage() {
   await updateSessionStatus();
   await renderNBATrends();
+}
+
+function formatNHLTrendLabel(statKey) {
+  const labelMap = {
+    shots_last5: "Shots",
+    shots_on_goal_last5: "Shots on Goal",
+    goals_last5: "Goals",
+    assists_last5: "Assists",
+    points_last5: "Points",
+    saves_last5: "Saves"
+  };
+
+  return labelMap[statKey] || statKey;
+}
+
+function createNHLTrendCard(player, statKey) {
+  const statValue = Number(player[statKey]);
+  const gamesUsed = player.games_used_last5 || "N/A";
+
+  return `
+    <div class="leaderboard-item">
+      <strong>${player["Player Name"] || "Unknown Player"}</strong>
+      <div>${formatNHLTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
+      <div>Games Used: ${gamesUsed}</div>
+    </div>
+  `;
+}
+
+async function renderNHLTrends() {
+  const container = document.getElementById("nhl-trends-container");
+  if (!container) return;
+
+  updateTierDisplay("nhl-tier-display");
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Loading NHL trends...</h3>
+      <p>Please wait while recent trend data is pulled in.</p>
+    </div>
+  `;
+
+  try {
+    const rows = await fetchLeagueTrends(NHL_TRENDS_CSV_URL);
+    updateLastUpdated("nhl-trends-last-updated");
+
+    const renderPage = () => {
+      const selectedStat =
+        document.getElementById("nhl-trends-stat-filter")?.value || "shots_last5";
+      const selectedSort =
+        document.getElementById("nhl-trends-sort-filter")?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Player Name"])
+        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+
+      filteredRows.sort((a, b) => {
+        const aVal = Number(a[selectedStat]);
+        const bVal = Number(b[selectedStat]);
+        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
+      });
+
+      renderFilterSummary("nhl-trends-filter-summary", [
+        { label: "Trend", value: formatNHLTrendLabel(selectedStat) },
+        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Tier", value: CURRENT_USER_TIER || "Rookie" }
+      ]);
+
+      if (filteredRows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NHL trends found for this category today.</h3>
+            <p>Please check back when NHL trend data is available.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const visibleRows = filteredRows.slice(0, 25);
+
+      container.innerHTML = visibleRows
+        .map((row) => createNHLTrendCard(row, selectedStat))
+        .join("");
+    };
+
+    bindSelectChange("nhl-trends-stat-filter", renderPage);
+    bindSelectChange("nhl-trends-sort-filter", renderPage);
+
+    bindButton("nhl-trends-reset-filters", () => {
+      resetSelectToValue("nhl-trends-stat-filter", "shots_last5");
+      resetSelectToValue("nhl-trends-sort-filter", "desc");
+      renderPage();
+    });
+
+    renderPage();
+  } catch (error) {
+    console.error("NHL trends render error:", error);
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>No NHL trends available right now.</h3>
+        <p>Please check back when NHL games and trend data are live.</p>
+      </div>
+    `;
+  }
+}
+
+async function initNHLTrendsPage() {
+  await updateSessionStatus();
+  await renderNHLTrends();
 }
 
 async function renderMLBTrends() {

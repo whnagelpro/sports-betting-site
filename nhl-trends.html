@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NBA Trends | Sports Betting Guide</title>
+  <title>NHL Trends | Sports Betting Guide</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -65,10 +65,10 @@
   <main class="league-page">
     <section class="league-hero">
       <div class="container">
-        <p class="league-label">NBA TRENDS</p>
-        <h1>Today’s NBA Player Trends</h1>
+        <p class="league-label">NHL TRENDS</p>
+        <h1>Today’s NHL Player Trends</h1>
         <p class="league-description">
-          Review recent player form across key NBA betting stats using the latest trend data.
+          Review recent NHL player form across key trend categories when daily trend data is available.
         </p>
       </div>
     </section>
@@ -82,65 +82,58 @@
 
         <div class="control-box">
           <span class="control-label">Membership Tier</span>
-          <strong id="nba-tier-display">Loading...</strong>
+          <strong id="nhl-tier-display">Loading...</strong>
         </div>
 
         <div class="control-box">
           <span class="control-label">Trend Category</span>
-          <select id="nba-trends-stat-filter" class="sportsbook-select">
-            <option value="points_last5">Points</option>
-            <option value="rebounds_last5">Rebounds</option>
+          <select id="nhl-trends-stat-filter" class="sportsbook-select">
+            <option value="shots_last5">Shots</option>
+            <option value="shots_on_goal_last5">Shots on Goal</option>
+            <option value="goals_last5">Goals</option>
             <option value="assists_last5">Assists</option>
-            <option value="threes_last5">3-Pointers</option>
-            <option value="steals_last5">Steals</option>
-            <option value="blocks_last5">Blocks</option>
-            <option value="points_assists_last5">Points + Assists</option>
-            <option value="points_rebounds_last5">Points + Rebounds</option>
-            <option value="points_rebounds_assists_last5">PRA</option>
-            <option value="rebounds_assists_last5">Rebounds + Assists</option>
-            <option value="points_1q_last5">1Q Points</option>
-            <option value="rebounds_1q_last5">1Q Rebounds</option>
-            <option value="assists_1q_last5">1Q Assists</option>
+            <option value="points_last5">Points</option>
+            <option value="saves_last5">Saves</option>
           </select>
         </div>
 
         <div class="control-box">
           <span class="control-label">Sort</span>
-          <select id="nba-trends-sort-filter" class="sportsbook-select">
+          <select id="nhl-trends-sort-filter" class="sportsbook-select">
             <option value="desc">Highest First</option>
             <option value="asc">Lowest First</option>
           </select>
         </div>
 
         <p class="last-updated-text">
-          Last Updated: <span id="nba-trends-last-updated">--:--</span>
+          Last Updated: <span id="nhl-trends-last-updated">--:--</span>
         </p>
 
         <div class="control-box">
           <span class="control-label">Actions</span>
-          <button id="nba-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
+          <button id="nhl-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
         </div>
       </div>
     </section>
 
     <section class="filter-summary-section">
       <div class="container">
-        <div id="nba-trends-filter-summary" class="filter-summary-box"></div>
+        <div id="nhl-trends-filter-summary" class="filter-summary-box"></div>
       </div>
     </section>
 
     <section class="bets-section">
       <div class="container">
         <div class="section-header">
-          <h2>Top NBA Trends</h2>
-          <p>See which players are trending strongest across recent NBA stat categories.</p>
+          <h2>Top NHL Trends</h2>
+          <p>See which players are trending strongest across recent NHL stat categories.</p>
         </div>
 
         <div class="leaderboard-box">
           <h3>Trend Leaders</h3>
-          <div id="nba-trends-container">
+          <div id="nhl-trends-container">
             <div class="empty-state">
-              <h3>Loading NBA trends...</h3>
+              <h3>Loading NHL trends...</h3>
               <p>Please wait while recent trend data is pulled in.</p>
             </div>
           </div>
@@ -159,7 +152,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
   <script>
-    initNBATrendsPage();
+    initNHLTrendsPage();
   </script>
 </body>
 </html>
