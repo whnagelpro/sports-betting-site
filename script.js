@@ -551,9 +551,11 @@ function buildPropsFromRows(rows) {
   return rows
     .map((row) => {
       const gameDate = normalizeDate(row["Game Date"]);
-      const playerName = safeText(row["Player Name"], "");
+
       const playerFirstName = safeText(row["Player First Name"], "");
       const playerLastName = safeText(row["Player Last Name"], "");
+      const playerName = `${playerFirstName} ${playerLastName}`.trim();
+
       const vendor = safeText(row["Vendor"], "");
       const propType = safeText(row["Prop Type"], "");
       const lineValue = safeText(row["Line Value"], "");
@@ -562,19 +564,16 @@ function buildPropsFromRows(rows) {
       const underOdds = safeText(row["Under Odds"], "");
       const genericOdds = safeText(row["Odds"], "");
 
-      const poissonProbOver = toNumber(row["Poisson Prob Over"]);
-      const poissonProbExact = toNumber(row["Poisson Prob Milestone"]);
-      const ev = toNumber(row["EV (Over/Milestone Side)"]);
+      const poissonProbOver = toNumber(row["Poisson Over"]);
+      const poissonProbExact = toNumber(row["Poisson Milestone"]);
+      const ev = toNumber(row["EV Over/Milestone ($1 Bet)"]);
 
       const awayTeam = safeText(row["Away Team"], "");
       const homeTeam = safeText(row["Home Team"], "");
-      const matchup = safeText(row["Matchup"], "");
 
       let gameLabel = "";
       if (awayTeam && homeTeam) {
         gameLabel = `${awayTeam} at ${homeTeam}`;
-      } else if (matchup) {
-        gameLabel = matchup;
       }
 
       return {
