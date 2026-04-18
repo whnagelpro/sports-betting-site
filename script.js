@@ -9,6 +9,12 @@ let CURRENT_USER = null;
 let CURRENT_USER_PROFILE = null;
 let CURRENT_USER_TIER = "Rookie";
 
+let TRENDS_DATA = {
+  NBA: {},
+  MLB: {},
+  NHL: {}
+};
+
 const DATA_CACHE = {
   games: {},
   props: {}
@@ -688,6 +694,8 @@ function createPropCard(prop) {
   }
 
   const fullName = getPropFullName(prop);
+  const league = prop.league || "MLB"; // fallback
+  const trend = getTrendData(prop, "MLB"); // for MLB page
 
   return `
     <article class="prop-card">
@@ -701,6 +709,12 @@ function createPropCard(prop) {
 
       <div class="prop-lines">
         <div class="prop-line">
+        ${trend ? `
+          <div class="trend-box ${getTrendColor(trend.diff)}">
+            Last 5 Avg: ${trend.avg.toFixed(2)}<br>
+            vs Line: ${trend.diff > 0 ? "+" : ""}${trend.diff.toFixed(2)}
+          </div>
+`       : ""}
           <div><strong>Bet Type:</strong> ${prop.betType}</div>
           <div><strong>Line:</strong> ${formatLineValue(prop.lineValue)}</div>
           <div><strong>Odds:</strong> ${oddsToShow}</div>
@@ -1911,6 +1925,21 @@ async function fetchCurrentUserProfile() {
   return profile;
 }
 
+async function loadTrendsData(league, csvUrl) {
+  const rows = await fetchLeagueTrends(csvUrl);
+
+  const map = {};
+
+  rows.forEach(row => {
+    const playerName = row["Player Name"]?.trim();
+    if (!playerName) return;
+
+    map[playerName] = row;
+  });
+
+  TRENDS_DATA[league] = map;
+}
+
 async function fetchLeagueTrends(csvUrl) {
   if (DATA_CACHE[csvUrl]) return DATA_CACHE[csvUrl];
 
@@ -2096,6 +2125,66 @@ function createNHLTrendCard(player, statKey) {
       <div>Games Used: ${gamesUsed}</div>
     </div>
   `;
+}
+
+function getTrendKey(propType) {
+  const map = {
+    // NBA
+    "Points": "points_last5",
+    "Rebounds": "rebounds_last5",
+    "Assists": "assists_last5",
+    "3-Pointers": "threes_last5",
+    "Points Assists": "points_assists_last5",
+    "Points Rebounds": "points_rebounds_last5",
+    "Points Rebounds Assists": "points_rebounds_assists_last5",
+    "Rebounds Assists": "rebounds_assists_last5",
+
+    // MLB
+    "Hits": "hits_last5",
+    "Home Runs": "home_runs_last5",
+    "RBIs": "rbis_last5",
+    "Runs Scored": "runs_scored_last5",
+    "Total Bases": "total_bases_last5",
+    "Stolen Bases": "stolen_bases_last5",
+    "Strikeouts": "pitcher_strikeouts_last5",
+
+    // NHL
+    "Shots on Goal": "shots_on_goal_last5",
+    "Goals": "goals_last5",
+    "Assists": "assists_last5",
+    "Points": "points_last5",
+    "Saves": "saves_last5"
+  };
+
+  return map[propType] || null;
+}
+
+function getTrendData(prop, league) {
+  const trends = TRENDS_DATA[league];
+  if (!trends) return null;
+
+  const player = trends[prop.playerName];
+  if (!player) return null;
+
+  const trendKey = getTrendKey(prop.propType);
+  if (!trendKey) return null;
+
+  const avg = Number(player[trendKey]);
+  const line = Number(prop.lineValue);
+
+  if (isNaN(avg) || isNaN(line)) return null;
+
+  const diff = avg - line;
+
+  return { avg, diff };
+}
+
+function getTrendColor(diff) {
+  if (diff >= 2) return "trend-strong";
+  if (diff >= 0.5) return "trend-positive";
+  if (diff <= -2) return "trend-negative";
+  if (diff <= -0.5) return "trend-negative";
+  return "trend-neutral";
 }
 
 async function renderNHLTrends() {
@@ -2290,16 +2379,19 @@ async function initMLBBetsPage() {
 async function initNBAPropsPage() {
   await updateSessionStatus();
   await renderNBAProps();
+  await loadTrendsData("NBA", NBA_TRENDS_CSV_URL);
 }
 
 async function initNHLPropsPage() {
   await updateSessionStatus();
   await renderNHLProps();
+  await loadTrendsData("NHL", NHL_TRENDS_CSV_URL);
 }
 
 async function initMLBPropsPage() {
   await updateSessionStatus();
   await renderMLBProps();
+  await loadTrendsData("MLB", MLB_TRENDS_CSV_URL);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

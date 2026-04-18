@@ -1715,3 +1715,30 @@ select:disabled {
   grid-template-columns: 1fr;
   gap: 18px;
 }
+
+.trend-box {
+  margin-top: 8px;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.trend-strong {
+  background: rgba(0,255,100,0.2);
+  color: #00ff88;
+}
+
+.trend-positive {
+  background: rgba(0,200,255,0.2);
+  color: #00c8ff;
+}
+
+.trend-neutral {
+  background: rgba(255,255,255,0.1);
+  color: #ccc;
+}
+
+.trend-negative {
+  background: rgba(255,80,80,0.2);
+  color: #ff5050;
+}
