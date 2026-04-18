@@ -73,41 +73,94 @@
     </section>
 
     <section class="league-controls">
-      <div class="container controls-row">
-        <div class="control-box">
-          <span class="control-label">Ranking</span>
-          <strong>Highest EV First</strong>
-        </div>
+  <div class="container controls-layout">
+    <div class="controls-left">
+      <div class="control-box">
+        <span class="control-label">Ranking</span>
+        <strong>Highest EV First</strong>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Membership Tier</span>
-          <strong id="nhl-tier-display">Loading...</strong>
-        </div>
+      <div class="control-box">
+        <span class="control-label">Membership Tier</span>
+        <strong id="nhl-tier-display">Loading...</strong>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Game</span>
-          <select id="nhl-game-filter" class="sportsbook-select">
-            <option value="All">All Games</option>
-          </select>
-        </div>
+      <div class="control-box">
+        <span class="control-label">Game</span>
+        <select id="nhl-game-filter" class="sportsbook-select">
+          <option value="All">All Games</option>
+        </select>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Sportsbook</span>
-          <select id="nhl-sportsbook-filter" class="sportsbook-select">
-            <option value="All">All Sportsbooks</option>
-          </select>
-        </div>
+      <div class="control-box">
+        <span class="control-label">Sportsbook</span>
+        <select id="nhl-sportsbook-filter" class="sportsbook-select">
+          <option value="All">All Sportsbooks</option>
+        </select>
+      </div>
 
-        <p class="last-updated-text">
-          Last Updated: <span id="nhl-last-updated">--:--</span>
+      <p class="last-updated-text">
+        Last Updated: <span id="nhl-last-updated">--:--</span>
+      </p>
+
+      <div class="control-box">
+        <span class="control-label">Actions</span>
+        <button id="nhl-odds-reset-filters" class="filter-reset-btn">Reset Filters</button>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <div class="guide-panel">
+        <h3 class="guide-panel-title">How to Read Game Odds</h3>
+        <p class="guide-panel-text">
+          Hover over any term below for a quick explanation in plain English.
         </p>
 
-        <div class="control-box">
-          <span class="control-label">Actions</span>
-          <button id="nhl-odds-reset-filters" class="filter-reset-btn">Reset Filters</button>
+        <div class="guide-panel-links">
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">EV</span>
+            <div class="hover-guide-tooltip">
+              <strong>EV (Expected Value)</strong><br>
+              A quick way to measure whether a bet looks worth taking. Positive EV means the model thinks the price may be better than it should be.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Model Probability</span>
+            <div class="hover-guide-tooltip">
+              <strong>Model Probability</strong><br>
+              The model’s estimate of how often a bet should win.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Spread</span>
+            <div class="hover-guide-tooltip">
+              <strong>Spread</strong><br>
+              The margin a team must cover. Favorites usually have a negative number and underdogs usually have a positive number.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Moneyline</span>
+            <div class="hover-guide-tooltip">
+              <strong>Moneyline</strong><br>
+              A bet on which team will win the game outright.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Total</span>
+            <div class="hover-guide-tooltip">
+              <strong>Total</strong><br>
+              A bet on whether the combined score will go over or under the sportsbook’s number.
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
     <section class="filter-summary-section">
         <div class="container">

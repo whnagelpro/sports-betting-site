@@ -73,64 +73,114 @@
     </section>
 
     <section class="league-controls">
-      <div class="container controls-row">
-
-        <div class="control-box">
-          <span class="control-label">Membership Tier</span>
-          <strong id="nhl-tier-display">Loading...</strong>
-        </div>
-
-        <div class="control-box">
-          <span class="control-label">Game</span>
-          <select id="nhl-props-game-filter" class="sportsbook-select">
-            <option value="All">All Games</option>
-          </select>
-        </div>
-
-        <div class="control-box">
-          <span class="control-label">Prop Type</span>
-          <select id="nhl-prop-type-filter" class="sportsbook-select">
-            <option value="All">All Prop Types</option>
-          </select>
-        </div>
-
-        <div class="control-box">
-          <span class="control-label">Player</span>
-          <select id="nhl-player-filter" class="sportsbook-select">
-            <option value="All">All Players</option>
-          </select>
-        </div>
-
-<div class="control-box">
-  <span class="control-label">Sort By</span>
-  <select id="nhl-props-sort-filter" class="sportsbook-select">
-    <option value="model-score-desc">Best Model Score</option>
-    <option value="edge-desc">Best Best Price Edge</option>
-    <option value="ev-desc">Highest EV</option>
-    <option value="ev-asc">Lowest EV</option>
-    <option value="prob-desc">Highest Probability</option>
-    <option value="odds-desc">Highest Odds</option>
-    <option value="odds-asc">Lowest Odds</option>
-  </select>
-</div>
-
-<div class="control-box">
-  <span class="control-label">Sportsbook</span>
-  <select id="nhl-props-sportsbook-filter" class="sportsbook-select">
-    <option value="All">All Sportsbooks</option>
-  </select>
-</div>
-
-<p class="last-updated-text">
-  Last Updated: <span id="nhl-props-last-updated">--:--</span>
-</p>
-
-<div class="control-box">
-  <span class="control-label">Actions</span>
-  <button id="nhl-props-reset-filters" class="filter-reset-btn">Reset Filters</button>
-</div>
+  <div class="container controls-layout">
+    <div class="controls-left">
+      <div class="control-box">
+        <span class="control-label">Membership Tier</span>
+        <strong id="nhl-tier-display">Loading...</strong>
       </div>
-    </section>
+
+      <div class="control-box">
+        <span class="control-label">Game</span>
+        <select id="nhl-props-game-filter" class="sportsbook-select">
+          <option value="All">All Games</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Prop Type</span>
+        <select id="nhl-prop-type-filter" class="sportsbook-select">
+          <option value="All">All Prop Types</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Player</span>
+        <select id="nhl-player-filter" class="sportsbook-select">
+          <option value="All">All Players</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Sort By</span>
+        <select id="nhl-props-sort-filter" class="sportsbook-select">
+          <option value="ev-desc">Highest EV</option>
+          <option value="ev-asc">Lowest EV</option>
+          <option value="prob-desc">Highest Probability</option>
+          <option value="odds-desc">Highest Odds</option>
+          <option value="odds-asc">Lowest Odds</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Sportsbook</span>
+        <select id="nhl-props-sportsbook-filter" class="sportsbook-select">
+          <option value="All">All Sportsbooks</option>
+        </select>
+      </div>
+
+      <p class="last-updated-text">
+        Last Updated: <span id="nhl-props-last-updated">--:--</span>
+      </p>
+
+      <div class="control-box">
+        <span class="control-label">Actions</span>
+        <button id="nhl-props-reset-filters" class="filter-reset-btn">Reset Filters</button>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <div class="guide-panel">
+        <h3 class="guide-panel-title">How to Read Props</h3>
+        <p class="guide-panel-text">
+          Hover over any term below for a quick explanation in plain English.
+        </p>
+
+        <div class="guide-panel-links">
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">EV</span>
+            <div class="hover-guide-tooltip">
+              <strong>EV (Expected Value)</strong><br>
+              A quick way to measure whether a bet looks worth taking. Positive EV means the model thinks the price may be better than it should be.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Model Probability</span>
+            <div class="hover-guide-tooltip">
+              <strong>Model Probability</strong><br>
+              The model’s estimate of how often this prop should hit.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Line</span>
+            <div class="hover-guide-tooltip">
+              <strong>Line</strong><br>
+              The number set by the sportsbook. Your bet depends on whether the player finishes over or under this number.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Odds</span>
+            <div class="hover-guide-tooltip">
+              <strong>Odds</strong><br>
+              The payout price for the bet. Bigger plus-money odds pay more, but usually hit less often.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Bet Type</span>
+            <div class="hover-guide-tooltip">
+              <strong>Bet Type</strong><br>
+              Shows whether the prop is an over, under, or milestone-style bet.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
     <section class="filter-summary-section">
         <div class="container">

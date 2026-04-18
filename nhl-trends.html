@@ -74,54 +74,107 @@
     </section>
 
     <section class="league-controls">
-      <div class="container controls-row">
-        <div class="control-box">
-          <span class="control-label">View</span>
-          <strong>Last 5 Games</strong>
-        </div>
+  <div class="container controls-layout">
+    <div class="controls-left">
+      <div class="control-box">
+        <span class="control-label">View</span>
+        <strong>Last 5 Games</strong>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Membership Tier</span>
-          <strong id="nhl-tier-display">Loading...</strong>
-        </div>
+      <div class="control-box">
+        <span class="control-label">Membership Tier</span>
+        <strong id="nhl-tier-display">Loading...</strong>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Player</span>
-          <select id="nhl-trends-player-filter" class="sportsbook-select">
-            <option value="All">All Players</option>
-          </select>
-        </div>
+      <div class="control-box">
+        <span class="control-label">Player</span>
+        <select id="nhl-trends-player-filter" class="sportsbook-select">
+          <option value="All">All Players</option>
+        </select>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Trend Category</span>
-          <select id="nhl-trends-stat-filter" class="sportsbook-select">
-            <option value="shots_last5">Shots</option>
-            <option value="shots_on_goal_last5">Shots on Goal</option>
-            <option value="goals_last5">Goals</option>
-            <option value="assists_last5">Assists</option>
-            <option value="points_last5">Points</option>
-            <option value="saves_last5">Saves</option>
-          </select>
-        </div>
+      <div class="control-box">
+        <span class="control-label">Trend Category</span>
+        <select id="nhl-trends-stat-filter" class="sportsbook-select">
+          <option value="shots_last5">Shots</option>
+          <option value="shots_on_goal_last5">Shots on Goal</option>
+          <option value="goals_last5">Goals</option>
+          <option value="assists_last5">Assists</option>
+          <option value="points_last5">Points</option>
+          <option value="saves_last5">Saves</option>
+        </select>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Sort</span>
-          <select id="nhl-trends-sort-filter" class="sportsbook-select">
-            <option value="desc">Highest First</option>
-            <option value="asc">Lowest First</option>
-          </select>
-        </div>
+      <div class="control-box">
+        <span class="control-label">Sort</span>
+        <select id="nhl-trends-sort-filter" class="sportsbook-select">
+          <option value="desc">Highest First</option>
+          <option value="asc">Lowest First</option>
+        </select>
+      </div>
 
-        <p class="last-updated-text">
-          Last Updated: <span id="nhl-trends-last-updated">--:--</span>
+      <p class="last-updated-text">
+        Last Updated: <span id="nhl-trends-last-updated">--:--</span>
+      </p>
+
+      <div class="control-box">
+        <span class="control-label">Actions</span>
+        <button id="nhl-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <div class="guide-panel">
+        <h3 class="guide-panel-title">How to Read Trends</h3>
+        <p class="guide-panel-text">
+          Hover over any term below for a quick explanation in plain English.
         </p>
 
-        <div class="control-box">
-          <span class="control-label">Actions</span>
-          <button id="nhl-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
+        <div class="guide-panel-links">
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Last 5 Games</span>
+            <div class="hover-guide-tooltip">
+              <strong>Last 5 Games</strong><br>
+              These trend numbers are based on the player’s most recent five games.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Trend Category</span>
+            <div class="hover-guide-tooltip">
+              <strong>Trend Category</strong><br>
+              The stat you’re sorting by, like Shots on Goal, Goals, or Saves.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Sort</span>
+            <div class="hover-guide-tooltip">
+              <strong>Sort</strong><br>
+              Highest First shows the biggest recent averages at the top. Lowest First flips that order.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Games Used</span>
+            <div class="hover-guide-tooltip">
+              <strong>Games Used</strong><br>
+              Shows how many recent games were included in the trend calculation.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Why Trends Matter</span>
+            <div class="hover-guide-tooltip">
+              <strong>Why Trends Matter</strong><br>
+              Trends help show recent form, which can be useful alongside props and odds.
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
     <section class="filter-summary-section">
       <div class="container">
