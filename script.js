@@ -427,61 +427,33 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
   if (!container) return;
 
   if (!props || props.length === 0) {
-    container.innerHTML = `<div class="filter-summary-empty">No props available for the current filters.</div>`;
+    container.innerHTML = `
+      <div class="filter-summary-empty">No props available for the current filters.</div>
+    `;
     return;
   }
 
-  // Sort by Best Price Edge (primary), Model Score (secondary)
   const topProps = [...props]
-    .sort((a, b) => {
-      const edgeA = Number.isNaN(a.bestPriceEdge) ? -Infinity : a.bestPriceEdge;
-      const edgeB = Number.isNaN(b.bestPriceEdge) ? -Infinity : b.bestPriceEdge;
-
-      if (edgeB !== edgeA) return edgeB - edgeA;
-
-      const scoreA = Number.isNaN(a.modelScore) ? -Infinity : a.modelScore;
-      const scoreB = Number.isNaN(b.modelScore) ? -Infinity : b.modelScore;
-
-      return scoreB - scoreA;
-    })
+    .sort((a, b) => b.ev - a.ev)
     .slice(0, limit);
 
   container.innerHTML = topProps
     .map((prop, index) => {
       const fullName = getPropFullName(prop);
+
       const probabilityValue =
-        prop.poissonProbOver && prop.poissonProbOver > 0
+        !Number.isNaN(prop.poissonProbOver) && prop.poissonProbOver > 0
           ? prop.poissonProbOver
           : prop.poissonProbExact;
 
       const probabilityText = formatProbability(probabilityValue);
 
-      const edgeValue = Number.isNaN(prop.bestPriceEdge) ? prop.ev : prop.bestPriceEdge;
-      const scoreValue = Number.isNaN(prop.modelScore) ? 0 : prop.modelScore;
-
       return `
         <div class="leaderboard-item">
           <strong>#${index + 1} ${fullName} — ${formatPropTypeLabel(prop.propType)}</strong>
-
-          <div class="${getEVClass(edgeValue)}">
-            Edge: ${formatEV(edgeValue)}
-          </div>
-
-          <div class="leaderboard-meta-line">
-            Model Score: ${formatMetric(scoreValue, 2)} |
-            Risk: ${safeText(prop.riskTier, "N/A")} |
-            Confidence: ${safeText(prop.modelConfidence, "N/A")}
-          </div>
-
-          <div>
-            ${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}
-          </div>
-
-          <div>
-            Line: ${formatLineValue(prop.lineValue)} |
-            Bet: ${prop.betType} |
-            Probability: ${probabilityText}
-          </div>
+          <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
+          <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
+          <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
         </div>
       `;
     })
@@ -591,6 +563,7 @@ function buildPropsFromRows(rows) {
       const genericOdds = safeText(row["Odds"], "");
 
       const poissonProbOver = toNumber(row["Poisson Prob Over"]);
+      const poissonProbExact = toNumber(row["Poisson Prob Milestone"]);
       const ev = toNumber(row["EV (Over/Milestone Side)"]);
 
       const awayTeam = safeText(row["Away Team"], "");
@@ -617,22 +590,11 @@ function buildPropsFromRows(rows) {
         underOdds,
         genericOdds,
         poissonProbOver,
+        poissonProbExact,
         ev,
         awayTeam,
         homeTeam,
-        gameLabel,
-
-        // New model fields
-        projectedStat: toNumber(row["Projected Stat"]),
-        playerBaseline: toNumber(row["Player Baseline"]),
-        modelConfidence: safeText(row["Model Confidence"], ""),
-        surfaceEligibility: safeText(row["Surface Eligibility"], ""),
-        modelScore: toNumber(row["Model Score"]),
-        riskTier: safeText(row["Risk Tier"], ""),
-        bestPriceEdge: toNumber(row["Best Price Edge"]),
-        propStabilityWeight: toNumber(row["Prop Stability Weight"]),
-        trendMultiplier: toNumber(row["Trend Multiplier"]),
-        recentTrendValue: toNumber(row["Recent Trend Value"])
+        gameLabel
       };
     })
     .filter((prop) =>
@@ -640,7 +602,8 @@ function buildPropsFromRows(rows) {
       (prop.playerName || prop.playerFirstName || prop.playerLastName) &&
       prop.vendor &&
       prop.propType &&
-      prop.lineValue
+      prop.lineValue &&
+      !Number.isNaN(prop.ev)
     );
 }
 
@@ -708,7 +671,7 @@ function createBetCard(game, tierName = "Rookie") {
 
 function createPropCard(prop) {
   const probabilityValue =
-    prop.poissonProbOver && prop.poissonProbOver > 0
+    !Number.isNaN(prop.poissonProbOver) && prop.poissonProbOver > 0
       ? prop.poissonProbOver
       : prop.poissonProbExact;
 
@@ -716,6 +679,7 @@ function createPropCard(prop) {
   const betTypeLower = (prop.betType || "").toLowerCase();
 
   let oddsToShow = "N/A";
+
   if (betTypeLower.includes("over")) {
     oddsToShow = formatAmericanOdds(prop.overOdds);
   } else if (betTypeLower.includes("under")) {
@@ -725,8 +689,6 @@ function createPropCard(prop) {
   }
 
   const fullName = getPropFullName(prop);
-  const edgeValue = Number.isNaN(prop.bestPriceEdge) ? prop.ev : prop.bestPriceEdge;
-  const scoreValue = Number.isNaN(prop.modelScore) ? 0 : prop.modelScore;
 
   return `
     <article class="prop-card">
@@ -735,10 +697,7 @@ function createPropCard(prop) {
           <h3>${fullName} — ${formatPropTypeLabel(prop.propType)}</h3>
           <p class="prop-meta">${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}</p>
         </div>
-        <div>
-          <div class="ev-badge ${getEVClass(edgeValue)}">Edge: ${formatEV(edgeValue)}</div>
-          <div class="mini-score-badge">Score: ${formatMetric(scoreValue, 2)}</div>
-        </div>
+        <div class="ev-badge ${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
       </div>
 
       <div class="prop-lines">
@@ -747,20 +706,6 @@ function createPropCard(prop) {
           <div><strong>Line:</strong> ${formatLineValue(prop.lineValue)}</div>
           <div><strong>Odds:</strong> ${oddsToShow}</div>
           <div><strong>Model Probability:</strong> ${probabilityText}</div>
-        </div>
-
-        <div class="prop-line">
-          <div><strong>Projected Stat:</strong> ${formatMetric(prop.projectedStat)}</div>
-          <div><strong>Baseline:</strong> ${formatMetric(prop.playerBaseline)}</div>
-          <div><strong>Recent Trend:</strong> ${formatMetric(prop.recentTrendValue)}</div>
-          <div><strong>Trend Multiplier:</strong> ${formatMetric(prop.trendMultiplier)}</div>
-        </div>
-
-        <div class="prop-line model-intel-line">
-          <div><strong>Confidence:</strong> <span class="${getConfidenceClass(prop.modelConfidence)}">${safeText(prop.modelConfidence, "N/A")}</span></div>
-          <div><strong>Risk Tier:</strong> <span class="${getRiskClass(prop.riskTier)}">${safeText(prop.riskTier, "N/A")}</span></div>
-          <div><strong>Surface Eligibility:</strong> ${safeText(prop.surfaceEligibility, "N/A")}</div>
-          <div><strong>Stability Weight:</strong> ${formatMetric(prop.propStabilityWeight)}</div>
         </div>
       </div>
     </article>
@@ -970,45 +915,21 @@ function sortProps(props, sortValue) {
   switch (sortValue) {
     case "ev-asc":
       return sorted.sort((a, b) => a.ev - b.ev);
+
     case "prob-desc":
-      return sorted.sort((a, b) => getPropProbabilityValue(b) - getPropProbabilityValue(a));
+      return sorted.sort(
+        (a, b) => getPropProbabilityValue(b) - getPropProbabilityValue(a)
+      );
+
     case "odds-desc":
       return sorted.sort((a, b) => getPropDisplayOdds(b) - getPropDisplayOdds(a));
+
     case "odds-asc":
       return sorted.sort((a, b) => getPropDisplayOdds(a) - getPropDisplayOdds(b));
-    case "model-score-desc":
-      return sorted.sort((a, b) => {
-        const scoreA = Number.isNaN(a.modelScore) ? -Infinity : a.modelScore;
-        const scoreB = Number.isNaN(b.modelScore) ? -Infinity : b.modelScore;
-        return scoreB - scoreA;
-      });
-    case "edge-desc":
-      return sorted.sort((a, b) => {
-        const edgeA = (!a.bestPriceEdge && a.bestPriceEdge !== 0) || a.bestPriceEdge === 0
-          ? -Infinity
-          : a.bestPriceEdge;
 
-        const edgeB = (!b.bestPriceEdge && b.bestPriceEdge !== 0) || b.bestPriceEdge === 0
-          ? -Infinity
-          : b.bestPriceEdge;
-        return edgeB - edgeA;
-      });
     case "ev-desc":
     default:
       return sorted.sort((a, b) => b.ev - a.ev);
-      case "score-desc":
-  return sorted.sort((a, b) => {
-    const aScore = Number.isNaN(a.modelScore) ? -Infinity : a.modelScore;
-    const bScore = Number.isNaN(b.modelScore) ? -Infinity : b.modelScore;
-    return bScore - aScore;
-  });
-
-case "edge-desc":
-  return sorted.sort((a, b) => {
-    const aEdge = Number.isNaN(a.bestPriceEdge) ? -Infinity : a.bestPriceEdge;
-    const bEdge = Number.isNaN(b.bestPriceEdge) ? -Infinity : b.bestPriceEdge;
-    return bEdge - aEdge;
-  });
   }
 }
 
