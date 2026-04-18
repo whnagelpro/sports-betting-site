@@ -20,6 +20,7 @@ const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGU
 const NHL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=124295671&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
 const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1641406263&single=true&output=csv";
+const MLB_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=2103952049&single=true&output=csv";
 
 const NBA_PROPS_PREMIUM_URL = "/.netlify/functions/nba-props-premium";
 const NBA_PROPS_TEASER_URL = "/.netlify/functions/nba-props-teaser";
@@ -2286,6 +2287,168 @@ async function renderNHLTrends() {
 async function initNHLTrendsPage() {
   await updateSessionStatus();
   await renderNHLTrends();
+}
+
+function formatMLBTeamTrendLabel(statKey) {
+  const labelMap = {
+    runs_scored_last5: "Runs Scored",
+    runs_allowed_last5: "Runs Allowed",
+    hits_last5: "Hits",
+    home_runs_last5: "Home Runs",
+    total_bases_last5: "Total Bases",
+    team_strikeouts_last5: "Team Strikeouts",
+    overs_last5: "Overs",
+    unders_last5: "Unders"
+  };
+
+  return labelMap[statKey] || statKey;
+}
+
+function createMLBTeamTrendCard(teamRow, statKey) {
+  const statValue = Number(teamRow[statKey]);
+  const gamesUsed = teamRow.games_used_last5 || "N/A";
+
+  return `
+    <div class="leaderboard-item">
+      <strong>${teamRow["Team"] || "Unknown Team"}</strong>
+      <div>${formatMLBTeamTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
+      <div>Games Used: ${gamesUsed}</div>
+    </div>
+  `;
+}
+
+function populateTeamFilter(selectId, rows, onChange) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  const currentValue = select.value || "All";
+
+  const teams = [...new Set(
+    rows
+      .map((row) => (row["Team"] || "").trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
+
+  populateSelectOptions(selectId, teams, "All Teams", currentValue);
+  select.onchange = () => onChange();
+}
+
+async function renderMLBTeamTrends() {
+  const container = document.getElementById("mlb-team-trends-container");
+  if (!container) return;
+
+  updateTierDisplay("mlb-tier-display");
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Loading MLB team trends...</h3>
+      <p>Please wait while recent team trend data is pulled in.</p>
+    </div>
+  `;
+
+  try {
+    const rows = await fetchLeagueTrends(MLB_TEAM_TRENDS_CSV_URL);
+    updateLastUpdated("mlb-team-trends-last-updated");
+
+    const renderPage = () => {
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+      const filterIds = [
+        "mlb-team-trends-team-filter",
+        "mlb-team-trends-stat-filter",
+        "mlb-team-trends-sort-filter"
+      ];
+
+      if (currentTier === "Rookie") {
+        setTrendsFiltersDisabled(filterIds, true);
+        renderTrendsLockedState(
+          container,
+          "mlb-team-trends-filter-summary",
+          currentTier,
+          "MLB Team"
+        );
+        return;
+      }
+
+      setTrendsFiltersDisabled(filterIds, false);
+
+      const selectedStat =
+        document.getElementById("mlb-team-trends-stat-filter")?.value || "runs_scored_last5";
+      const selectedSort =
+        document.getElementById("mlb-team-trends-sort-filter")?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Team"])
+        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+
+      populateTeamFilter("mlb-team-trends-team-filter", filteredRows, renderPage);
+
+      const selectedTeam =
+        document.getElementById("mlb-team-trends-team-filter")?.value || "All";
+
+      if (selectedTeam !== "All") {
+        filteredRows = filteredRows.filter(
+          (row) => (row["Team"] || "").trim() === selectedTeam
+        );
+      }
+
+      filteredRows.sort((a, b) => {
+        const aVal = Number(a[selectedStat]);
+        const bVal = Number(b[selectedStat]);
+        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
+      });
+
+      renderFilterSummary("mlb-team-trends-filter-summary", [
+        { label: "Team", value: selectedTeam },
+        { label: "Trend", value: formatMLBTeamTrendLabel(selectedStat) },
+        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Tier", value: currentTier }
+      ]);
+
+      if (filteredRows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No MLB team trends found for this filter.</h3>
+            <p>Try changing the team, trend category, or sort order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const visibleRows = filteredRows;
+
+      container.innerHTML = visibleRows
+        .map((row) => createMLBTeamTrendCard(row, selectedStat))
+        .join("");
+    };
+
+    bindSelectChange("mlb-team-trends-stat-filter", renderPage);
+    bindSelectChange("mlb-team-trends-sort-filter", renderPage);
+
+    bindButton("mlb-team-trends-reset-filters", () => {
+      resetSelectToAll("mlb-team-trends-team-filter");
+      resetSelectToValue("mlb-team-trends-stat-filter", "runs_scored_last5");
+      resetSelectToValue("mlb-team-trends-sort-filter", "desc");
+      renderPage();
+    });
+
+    renderPage();
+  } catch (error) {
+    console.error("MLB team trends render error:", error);
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load MLB team trends right now.</h3>
+        <p>Please check your published MLB Team Trends CSV.</p>
+      </div>
+    `;
+  }
+}
+
+async function initMLBTeamTrendsPage() {
+  await updateSessionStatus();
+  await renderMLBTeamTrends();
 }
 
 async function renderMLBTrends() {
