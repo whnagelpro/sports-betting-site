@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NHL Player Props | Sports Betting Guide</title>
+  <title>NBA Trends | Sports Betting Guide</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="container nav">
       <div class="logo">Sports Betting Guide</div>
+
       <nav>
         <ul class="nav-links">
           <li><a href="index.html">Home</a></li>
@@ -41,7 +42,7 @@
           </li>
 
           <li><a href="index.html#about">About</a></li>
-          
+
           <li class="dropdown">
             <a href="#">Legal</a>
             <ul class="dropdown-menu">
@@ -63,102 +64,84 @@
   <main class="league-page">
     <section class="league-hero">
       <div class="container">
-        <p class="league-label">NHL PLAYER PROPS</p>
-        <h1>Today’s NHL Player Props</h1>
+        <p class="league-label">NBA TRENDS</p>
+        <h1>Today’s NBA Player Trends</h1>
         <p class="league-description">
-          Review today’s NHL player prop opportunities from your live board, organized by membership tier.
-        </p>      
+          Review recent player form across key NBA betting stats using the latest trend data.
+        </p>
       </div>
     </section>
 
     <section class="league-controls">
       <div class="container controls-row">
+        <div class="control-box">
+          <span class="control-label">View</span>
+          <strong>Last 5 Games</strong>
+        </div>
 
         <div class="control-box">
           <span class="control-label">Membership Tier</span>
-          <strong id="nhl-tier-display">Loading...</strong>
+          <strong id="nba-tier-display">Loading...</strong>
         </div>
 
         <div class="control-box">
-          <span class="control-label">Game</span>
-          <select id="nhl-props-game-filter" class="sportsbook-select">
-            <option value="All">All Games</option>
+          <span class="control-label">Trend Category</span>
+          <select id="nba-trends-stat-filter" class="sportsbook-select">
+            <option value="points_last5">Points</option>
+            <option value="rebounds_last5">Rebounds</option>
+            <option value="assists_last5">Assists</option>
+            <option value="threes_last5">3-Pointers</option>
+            <option value="steals_last5">Steals</option>
+            <option value="blocks_last5">Blocks</option>
+            <option value="points_assists_last5">Points + Assists</option>
+            <option value="points_rebounds_last5">Points + Rebounds</option>
+            <option value="points_rebounds_assists_last5">PRA</option>
+            <option value="rebounds_assists_last5">Rebounds + Assists</option>
+            <option value="points_1q_last5">1Q Points</option>
+            <option value="rebounds_1q_last5">1Q Rebounds</option>
+            <option value="assists_1q_last5">1Q Assists</option>
           </select>
         </div>
 
         <div class="control-box">
-          <span class="control-label">Prop Type</span>
-          <select id="nhl-prop-type-filter" class="sportsbook-select">
-            <option value="All">All Prop Types</option>
+          <span class="control-label">Sort</span>
+          <select id="nba-trends-sort-filter" class="sportsbook-select">
+            <option value="desc">Highest First</option>
+            <option value="asc">Lowest First</option>
           </select>
         </div>
+
+        <p class="last-updated-text">
+          Last Updated: <span id="nba-trends-last-updated">--:--</span>
+        </p>
 
         <div class="control-box">
-          <span class="control-label">Player</span>
-          <select id="nhl-player-filter" class="sportsbook-select">
-            <option value="All">All Players</option>
-          </select>
+          <span class="control-label">Actions</span>
+          <button id="nba-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
         </div>
-
-<div class="control-box">
-  <span class="control-label">Sort By</span>
-  <select id="nhl-props-sort-filter" class="sportsbook-select">
-    <option value="model-score-desc">Best Model Score</option>
-    <option value="edge-desc">Best Best Price Edge</option>
-    <option value="ev-desc">Highest EV</option>
-    <option value="ev-asc">Lowest EV</option>
-    <option value="prob-desc">Highest Probability</option>
-    <option value="odds-desc">Highest Odds</option>
-    <option value="odds-asc">Lowest Odds</option>
-  </select>
-</div>
-
-<div class="control-box">
-  <span class="control-label">Sportsbook</span>
-  <select id="nhl-props-sportsbook-filter" class="sportsbook-select">
-    <option value="All">All Sportsbooks</option>
-  </select>
-</div>
-
-<p class="last-updated-text">
-  Last Updated: <span id="nhl-props-last-updated">--:--</span>
-</p>
-
-<div class="control-box">
-  <span class="control-label">Actions</span>
-  <button id="nhl-props-reset-filters" class="filter-reset-btn">Reset Filters</button>
-</div>
       </div>
     </section>
 
     <section class="filter-summary-section">
-        <div class="container">
-            <div id="nhl-props-filter-summary" class="filter-summary-box"></div>
-        </div>
-    </section>
-
-    <section class="bets-section">
-        <div class="container">
-            <div class="leaderboard-box">
-                <h3>Top NHL Props</h3>
-            <div id="nhl-props-leaderboard">
-                <p>Loading leaderboard...</p>
-            </div>
-            </div>
-        </div>
+      <div class="container">
+        <div id="nba-trends-filter-summary" class="filter-summary-box"></div>
+      </div>
     </section>
 
     <section class="bets-section">
       <div class="container">
         <div class="section-header">
-          <h2>NHL Player Props</h2>
-          <p>Live player props from today’s NHL board.</p>
+          <h2>Top NBA Trends</h2>
+          <p>See which players are trending strongest across recent NBA stat categories.</p>
         </div>
 
-        <div id="nhl-props-container" class="bets-grid">
-          <div class="empty-state">
-            <h3>Loading NHL player props...</h3>
-            <p>Please wait while live props data is pulled from Google Sheets.</p>
+        <div class="leaderboard-box">
+          <h3>Trend Leaders</h3>
+          <div id="nba-trends-container">
+            <div class="empty-state">
+              <h3>Loading NBA trends...</h3>
+              <p>Please wait while recent trend data is pulled in.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -175,7 +158,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
   <script>
-    initNHLPropsPage();
+    initNBATrendsPage();
   </script>
 </body>
 </html>

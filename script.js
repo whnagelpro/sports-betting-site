@@ -15,6 +15,7 @@ const DATA_CACHE = {
 };
 
 const NBA_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1553479471&single=true&output=csv";
+const NBA_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1073686927&single=true&output=csv";
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
 const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1641406263&single=true&output=csv";
@@ -2013,6 +2014,39 @@ function formatTrendLabel(statKey) {
   return labelMap[statKey] || statKey;
 }
 
+function formatNBATrendLabel(statKey) {
+  const labelMap = {
+    points_last5: "Points",
+    rebounds_last5: "Rebounds",
+    assists_last5: "Assists",
+    threes_last5: "3-Pointers",
+    steals_last5: "Steals",
+    blocks_last5: "Blocks",
+    points_assists_last5: "Points + Assists",
+    points_rebounds_last5: "Points + Rebounds",
+    points_rebounds_assists_last5: "PRA",
+    rebounds_assists_last5: "Rebounds + Assists",
+    points_1q_last5: "1Q Points",
+    rebounds_1q_last5: "1Q Rebounds",
+    assists_1q_last5: "1Q Assists"
+  };
+
+  return labelMap[statKey] || statKey;
+}
+
+function createNBATrendCard(player, statKey) {
+  const statValue = Number(player[statKey]);
+  const gamesUsed = player.games_used_last5 || "N/A";
+
+  return `
+    <div class="leaderboard-item">
+      <strong>${player["Player Name"] || "Unknown Player"}</strong>
+      <div>${formatNBATrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
+      <div>Games Used: ${gamesUsed}</div>
+    </div>
+  `;
+}
+
 function createTrendCard(player, statKey) {
   const statValue = Number(player[statKey]);
   const gamesUsed = player.games_used_last5 || "N/A";
@@ -2024,6 +2058,89 @@ function createTrendCard(player, statKey) {
       <div>Games Used: ${gamesUsed}</div>
     </div>
   `;
+}
+
+async function renderNBATrends() {
+  const container = document.getElementById("nba-trends-container");
+  if (!container) return;
+
+  updateTierDisplay("nba-tier-display");
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Loading NBA trends...</h3>
+      <p>Please wait while recent trend data is pulled in.</p>
+    </div>
+  `;
+
+  try {
+    const rows = await fetchLeagueTrends(NBA_TRENDS_CSV_URL);
+    updateLastUpdated("nba-trends-last-updated");
+
+    const renderPage = () => {
+      const selectedStat =
+        document.getElementById("nba-trends-stat-filter")?.value || "points_last5";
+      const selectedSort =
+        document.getElementById("nba-trends-sort-filter")?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Player Name"])
+        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+
+      filteredRows.sort((a, b) => {
+        const aVal = Number(a[selectedStat]);
+        const bVal = Number(b[selectedStat]);
+        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
+      });
+
+      renderFilterSummary("nba-trends-filter-summary", [
+        { label: "Trend", value: formatNBATrendLabel(selectedStat) },
+        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Tier", value: CURRENT_USER_TIER || "Rookie" }
+      ]);
+
+      if (filteredRows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NBA trends found for this category.</h3>
+            <p>Try changing the trend category or sort order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const visibleRows = filteredRows.slice(0, 25);
+
+      container.innerHTML = visibleRows
+        .map((row) => createNBATrendCard(row, selectedStat))
+        .join("");
+    };
+
+    bindSelectChange("nba-trends-stat-filter", renderPage);
+    bindSelectChange("nba-trends-sort-filter", renderPage);
+
+    bindButton("nba-trends-reset-filters", () => {
+      resetSelectToValue("nba-trends-stat-filter", "points_last5");
+      resetSelectToValue("nba-trends-sort-filter", "desc");
+      renderPage();
+    });
+
+    renderPage();
+  } catch (error) {
+    console.error("NBA trends render error:", error);
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load NBA trends right now.</h3>
+        <p>Please check your published NBA Trends CSV.</p>
+      </div>
+    `;
+  }
+}
+
+async function initNBATrendsPage() {
+  await updateSessionStatus();
+  await renderNBATrends();
 }
 
 async function renderMLBTrends() {
