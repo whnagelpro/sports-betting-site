@@ -1717,28 +1717,29 @@ select:disabled {
 }
 
 .trend-box {
-  margin-top: 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
   font-size: 13px;
-  padding: 6px 10px;
-  border-radius: 6px;
+  line-height: 1.5;
 }
 
 .trend-strong {
-  background: rgba(0,255,100,0.2);
-  color: #00ff88;
+  background: rgba(0, 255, 120, 0.18);
+  color: #6dff9c;
 }
 
 .trend-positive {
-  background: rgba(0,200,255,0.2);
-  color: #00c8ff;
+  background: rgba(0, 200, 255, 0.16);
+  color: #7fdcff;
 }
 
 .trend-neutral {
-  background: rgba(255,255,255,0.1);
-  color: #ccc;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d6d6d6;
 }
 
 .trend-negative {
-  background: rgba(255,80,80,0.2);
-  color: #ff5050;
+  background: rgba(255, 80, 80, 0.18);
+  color: #ff8a8a;
 }

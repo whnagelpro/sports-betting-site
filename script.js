@@ -10,8 +10,8 @@ let CURRENT_USER_PROFILE = null;
 let CURRENT_USER_TIER = "Rookie";
 
 let TRENDS_DATA = {
-  NBA: {},
   MLB: {},
+  NBA: {},
   NHL: {}
 };
 
@@ -694,8 +694,9 @@ function createPropCard(prop) {
   }
 
   const fullName = getPropFullName(prop);
-  const league = prop.league || "MLB"; // fallback
-  const trend = getTrendData(prop, "MLB"); // for MLB page
+
+  // MLB first
+  const trend = getTrendData(prop, "MLB");
 
   return `
     <article class="prop-card">
@@ -709,17 +710,18 @@ function createPropCard(prop) {
 
       <div class="prop-lines">
         <div class="prop-line">
-        ${trend ? `
-          <div class="trend-box ${getTrendColor(trend.diff)}">
-            Last 5 Avg: ${trend.avg.toFixed(2)}<br>
-            vs Line: ${trend.diff > 0 ? "+" : ""}${trend.diff.toFixed(2)}
-          </div>
-`       : ""}
           <div><strong>Bet Type:</strong> ${prop.betType}</div>
           <div><strong>Line:</strong> ${formatLineValue(prop.lineValue)}</div>
           <div><strong>Odds:</strong> ${oddsToShow}</div>
           <div><strong>Model Probability:</strong> ${probabilityText}</div>
         </div>
+
+        ${trend ? `
+          <div class="trend-box ${getTrendColor(trend.diff)}">
+            <strong>Last 5 Avg:</strong> ${trend.avg.toFixed(2)}<br>
+            <strong>vs Line:</strong> ${trend.diff > 0 ? "+" : ""}${trend.diff.toFixed(2)}
+          </div>
+        ` : ""}
       </div>
     </article>
   `;
@@ -1925,21 +1927,6 @@ async function fetchCurrentUserProfile() {
   return profile;
 }
 
-async function loadTrendsData(league, csvUrl) {
-  const rows = await fetchLeagueTrends(csvUrl);
-
-  const map = {};
-
-  rows.forEach(row => {
-    const playerName = row["Player Name"]?.trim();
-    if (!playerName) return;
-
-    map[playerName] = row;
-  });
-
-  TRENDS_DATA[league] = map;
-}
-
 async function fetchLeagueTrends(csvUrl) {
   if (DATA_CACHE[csvUrl]) return DATA_CACHE[csvUrl];
 
@@ -2127,6 +2114,26 @@ function createNHLTrendCard(player, statKey) {
   `;
 }
 
+function normalizeName(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z]/g, "");
+}
+
+async function loadTrendsData(league, csvUrl) {
+  const rows = await fetchLeagueTrends(csvUrl);
+  const map = {};
+
+  rows.forEach((row) => {
+    const rawName = row["Player Name"] || "";
+    const key = normalizeName(rawName);
+    if (!key) return;
+    map[key] = row;
+  });
+
+  TRENDS_DATA[league] = map;
+}
+
 function getTrendKey(propType) {
   const map = {
     // NBA
@@ -2146,7 +2153,17 @@ function getTrendKey(propType) {
     "Runs Scored": "runs_scored_last5",
     "Total Bases": "total_bases_last5",
     "Stolen Bases": "stolen_bases_last5",
-    "Strikeouts": "pitcher_strikeouts_last5",
+    "Strikeouts": "strikeouts_last5",
+    "Pitcher Strikeouts": "pitcher_strikeouts_last5",
+    "Pitcher Outs": "pitcher_outs_last5",
+    "Pitcher Walks": "pitcher_walks_last5",
+    "Pitcher Hits Allowed": "pitcher_hits_allowed_last5",
+    "Pitcher Earned Runs": "pitcher_earned_runs_last5",
+    "Walks": "walks_last5",
+    "Hits Runs Rbis": "hits_runs_rbis_last5",
+    "Singles": "singles_last5",
+    "Doubles": "doubles_last5",
+    "Triples": "triples_last5",
 
     // NHL
     "Shots on Goal": "shots_on_goal_last5",
@@ -2163,7 +2180,8 @@ function getTrendData(prop, league) {
   const trends = TRENDS_DATA[league];
   if (!trends) return null;
 
-  const player = trends[prop.playerName];
+  const key = normalizeName(prop.playerName || `${prop.playerFirstName || ""} ${prop.playerLastName || ""}`);
+  const player = trends[key];
   if (!player) return null;
 
   const trendKey = getTrendKey(prop.propType);
@@ -2172,11 +2190,12 @@ function getTrendData(prop, league) {
   const avg = Number(player[trendKey]);
   const line = Number(prop.lineValue);
 
-  if (isNaN(avg) || isNaN(line)) return null;
+  if (Number.isNaN(avg) || Number.isNaN(line)) return null;
 
-  const diff = avg - line;
-
-  return { avg, diff };
+  return {
+    avg,
+    diff: avg - line
+  };
 }
 
 function getTrendColor(diff) {
@@ -2390,8 +2409,8 @@ async function initNHLPropsPage() {
 
 async function initMLBPropsPage() {
   await updateSessionStatus();
-  await renderMLBProps();
   await loadTrendsData("MLB", MLB_TRENDS_CSV_URL);
+  await renderMLBProps();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
