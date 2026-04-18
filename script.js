@@ -2148,7 +2148,6 @@ async function initNBATrendsPage() {
 
 function formatNHLTrendLabel(statKey) {
   const labelMap = {
-    shots_last5: "Shots",
     shots_on_goal_last5: "Shots on Goal",
     goals_last5: "Goals",
     assists_last5: "Assists",
