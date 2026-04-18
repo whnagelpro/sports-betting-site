@@ -1721,33 +1721,73 @@ select:disabled {
   position: relative;
 }
 
-.hover-guide-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  margin-top: 4px;
+.controls-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) minmax(320px, 1fr);
+  gap: 28px;
+  align-items: start;
 }
 
-.hover-guide-item {
+.controls-left {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.controls-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+}
+
+.guide-panel {
+  width: min(100%, 540px);
+  padding: 24px 28px;
+  border: 1px solid rgba(78, 163, 255, 0.35);
+  border-radius: 16px;
+  background: rgba(9, 22, 48, 0.55);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+.guide-panel-title {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.guide-panel-text {
+  margin: 0 0 16px 0;
+  color: #c8d4ea;
+  line-height: 1.5;
+}
+
+.guide-panel-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+.guide-panel .hover-guide-item {
   position: relative;
   display: inline-block;
 }
 
-.hover-guide-term {
+.guide-panel .hover-guide-term {
   color: #4ea3ff;
   font-weight: 700;
-  cursor: default;
   text-decoration: underline;
   text-underline-offset: 2px;
+  cursor: default;
 }
 
-.hover-guide-tooltip {
+.guide-panel .hover-guide-tooltip {
   display: none;
   position: absolute;
-  top: 24px;
+  top: 28px;
   left: 0;
   z-index: 50;
-  width: 260px;
+  width: 280px;
   padding: 10px 12px;
   border-radius: 10px;
   background: #102033;
@@ -1758,6 +1798,21 @@ select:disabled {
   border: 1px solid rgba(78, 163, 255, 0.25);
 }
 
-.hover-guide-item:hover .hover-guide-tooltip {
+.guide-panel .hover-guide-item:hover .hover-guide-tooltip {
   display: block;
+}
+
+@media (max-width: 980px) {
+  .controls-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .controls-right {
+    min-height: unset;
+    justify-content: flex-start;
+  }
+
+  .guide-panel {
+    width: 100%;
+  }
 }

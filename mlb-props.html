@@ -74,111 +74,206 @@
     </section>
 
     <section class="league-controls">
-      <div class="container controls-row">
+  <div class="container controls-layout">
+    <div class="controls-left">
+      <div class="control-box">
+        <span class="control-label">Membership Tier</span>
+        <strong id="mlb-tier-display">Loading...</strong>
+      </div>
 
-        <div class="control-box">
-          <span class="control-label">Membership Tier</span>
-          <strong id="mlb-tier-display">Loading...</strong>
+      <div class="control-box">
+        <span class="control-label">Game</span>
+        <select id="mlb-props-game-filter" class="sportsbook-select">
+          <option value="All">All Games</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Prop Type</span>
+        <select id="mlb-prop-type-filter" class="sportsbook-select">
+          <option value="All">All Prop Types</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Player</span>
+        <select id="mlb-player-filter" class="sportsbook-select">
+          <option value="All">All Players</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Sort By</span>
+        <select id="mlb-props-sort-filter" class="sportsbook-select">
+          <option value="model-score-desc">Best Model Score</option>
+          <option value="edge-desc">Best Price Edge</option>
+          <option value="ev-desc">Highest EV</option>
+          <option value="ev-asc">Lowest EV</option>
+          <option value="prob-desc">Highest Probability</option>
+          <option value="odds-desc">Highest Odds</option>
+          <option value="odds-asc">Lowest Odds</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Sportsbook</span>
+        <select id="mlb-props-sportsbook-filter" class="sportsbook-select">
+          <option value="All">All Sportsbooks</option>
+        </select>
+      </div>
+
+      <p class="last-updated-text">
+        Last Updated: <span id="mlb-props-last-updated">--:--</span>
+      </p>
+
+      <div class="control-box">
+        <span class="control-label">Actions</span>
+        <button id="mlb-props-reset-filters" class="filter-reset-btn">Reset Filters</button>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <div class="guide-panel">
+        <h3 class="guide-panel-title">How to Read Props</h3>
+        <p class="guide-panel-text">
+          Hover over any term below for a quick explanation in plain English.
+        </p>
+
+        <div class="guide-panel-links">
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">EV</span>
+            <div class="hover-guide-tooltip">
+              <strong>EV (Expected Value)</strong><br>
+              A quick way to measure whether a bet looks worth taking. Positive EV means the model thinks the price may be better than it should be.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Model Probability</span>
+            <div class="hover-guide-tooltip">
+              <strong>Model Probability</strong><br>
+              The model’s estimate of how often this prop should hit.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Line</span>
+            <div class="hover-guide-tooltip">
+              <strong>Line</strong><br>
+              The number set by the sportsbook. Your bet usually depends on whether the player finishes over or under this number.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Odds</span>
+            <div class="hover-guide-tooltip">
+              <strong>Odds</strong><br>
+              The payout price for the bet. Bigger plus-money odds pay more, but usually hit less often.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Bet Type</span>
+            <div class="hover-guide-tooltip">
+              <strong>Bet Type</strong><br>
+              Shows whether the prop is an over, under, or milestone-style bet.
+            </div>
+          </div>
         </div>
-
-<div class="control-box">
-  <span class="control-label">Game</span>
-  <select id="mlb-props-game-filter" class="sportsbook-select">
-    <option value="All">All Games</option>
-  </select>
-</div>
-
-<div class="control-box">
-  <span class="control-label">Prop Type</span>
-  <select id="mlb-prop-type-filter" class="sportsbook-select">
-    <option value="All">All Prop Types</option>
-  </select>
-</div>
-
-<div class="control-box">
-  <span class="control-label">Player</span>
-  <select id="mlb-player-filter" class="sportsbook-select">
-    <option value="All">All Players</option>
-  </select>
-</div>
-
-<div class="control-box">
-  <span class="control-label">Sort By</span>
-  <select id="mlb-props-sort-filter" class="sportsbook-select">
-    <option value="model-score-desc">Best Model Score</option>
-    <option value="edge-desc">Best Price Edge</option>
-    <option value="ev-desc">Highest EV</option>
-    <option value="ev-asc">Lowest EV</option>
-    <option value="prob-desc">Highest Probability</option>
-    <option value="odds-desc">Highest Odds</option>
-    <option value="odds-asc">Lowest Odds</option>
-  </select>
-</div>
-
-<div class="control-box">
-  <span class="control-label">Sportsbook</span>
-  <select id="mlb-props-sportsbook-filter" class="sportsbook-select">
-    <option value="All">All Sportsbooks</option>
-  </select>
-</div>
-
-<p class="last-updated-text">
-  Last Updated: <span id="mlb-props-last-updated">--:--</span>
-</p>
-
-<div class="control-box guide-box">
-  <span class="control-label">Quick Guide</span>
-
-  <div class="hover-guide-links">
-    <div class="hover-guide-item">
-      <span class="hover-guide-term">EV</span>
-      <div class="hover-guide-tooltip">
-        <strong>EV (Expected Value)</strong><br>
-        A quick way to measure whether a bet looks worth taking. Positive EV means the model thinks the price may be better than it should be.
-      </div>
-    </div>
-
-    <div class="hover-guide-item">
-      <span class="hover-guide-term">Model Probability</span>
-      <div class="hover-guide-tooltip">
-        <strong>Model Probability</strong><br>
-        The model’s estimate of how often this prop should hit.
-      </div>
-    </div>
-
-    <div class="hover-guide-item">
-      <span class="hover-guide-term">Line</span>
-      <div class="hover-guide-tooltip">
-        <strong>Line</strong><br>
-        The number set by the sportsbook. Your bet usually depends on whether the player finishes over or under this number.
-      </div>
-    </div>
-
-    <div class="hover-guide-item">
-      <span class="hover-guide-term">Odds</span>
-      <div class="hover-guide-tooltip">
-        <strong>Odds</strong><br>
-        The payout price for the bet. Bigger plus-money odds pay more, but usually hit less often.
-      </div>
-    </div>
-
-    <div class="hover-guide-item">
-      <span class="hover-guide-term">Bet Type</span>
-      <div class="hover-guide-tooltip">
-        <strong>Bet Type</strong><br>
-        Shows whether the prop is an over, under, or milestone-style bet.
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<div class="control-box">
-  <span class="control-label">Actions</span>
-  <button id="mlb-props-reset-filters" class="filter-reset-btn">Reset Filters</button>
-</div>
-
+<section class="league-controls">
+  <div class="container controls-layout">
+    <div class="controls-left">
+      <div class="control-box">
+        <span class="control-label">Ranking</span>
+        <strong>Highest EV First</strong>
       </div>
-    </section>
+
+      <div class="control-box">
+        <span class="control-label">Membership Tier</span>
+        <strong id="mlb-tier-display">Loading...</strong>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Game</span>
+        <select id="mlb-game-filter" class="sportsbook-select">
+          <option value="All">All Games</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="control-label">Sportsbook</span>
+        <select id="mlb-sportsbook-filter" class="sportsbook-select">
+          <option value="All">All Sportsbooks</option>
+        </select>
+      </div>
+
+      <p class="last-updated-text">
+        Last Updated: <span id="mlb-last-updated">--:--</span>
+      </p>
+
+      <div class="control-box">
+        <span class="control-label">Actions</span>
+        <button id="mlb-odds-reset-filters" class="filter-reset-btn">Reset Filters</button>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <div class="guide-panel">
+        <h3 class="guide-panel-title">How to Read Game Odds</h3>
+        <p class="guide-panel-text">
+          Hover over any term below for a quick explanation in plain English.
+        </p>
+
+        <div class="guide-panel-links">
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">EV</span>
+            <div class="hover-guide-tooltip">
+              <strong>EV (Expected Value)</strong><br>
+              A quick way to measure whether a bet looks worth taking. Positive EV means the model thinks the price may be better than it should be.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Model Probability</span>
+            <div class="hover-guide-tooltip">
+              <strong>Model Probability</strong><br>
+              The model’s estimate of how often a bet should win.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Spread</span>
+            <div class="hover-guide-tooltip">
+              <strong>Spread</strong><br>
+              The margin a team must cover. Favorites usually have a negative number and underdogs usually have a positive number.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Moneyline</span>
+            <div class="hover-guide-tooltip">
+              <strong>Moneyline</strong><br>
+              A bet on which team will win the game outright.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Total</span>
+            <div class="hover-guide-tooltip">
+              <strong>Total</strong><br>
+              A bet on whether the combined score will go over or under the sportsbook’s number.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
     <section class="filter-summary-section">
       <div class="container">
