@@ -906,7 +906,15 @@ function getPropDisplayOdds(prop) {
 }
 
 function getPropProbabilityValue(prop) {
-  return Number.isNaN(prop.poissonProbOver) ? -Infinity : prop.poissonProbOver;
+  if (!Number.isNaN(prop.poissonProbOver) && prop.poissonProbOver > 0) {
+    return prop.poissonProbOver;
+  }
+
+  if (!Number.isNaN(prop.poissonProbExact) && prop.poissonProbExact > 0) {
+    return prop.poissonProbExact;
+  }
+
+  return -Infinity;
 }
 
 function sortProps(props, sortValue) {
