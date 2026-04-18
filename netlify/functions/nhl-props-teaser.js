@@ -46,6 +46,16 @@ function parseCSV(text) {
   });
 }
 
+function toNumber(value) {
+  if (value === null || value === undefined || value === "") return NaN;
+  const cleaned = String(value).replace(/[^0-9.-]/g, "");
+  return Number(cleaned);
+}
+
+function safeText(value, fallback = "") {
+  return value && String(value).trim() !== "" ? String(value).trim() : fallback;
+}
+
 function normalizeDate(value) {
   if (!value) return "";
 
@@ -72,66 +82,6 @@ function normalizeDate(value) {
   return raw;
 }
 
-function toNumber(value) {
-  if (value === null || value === undefined || value === "") return NaN;
-  const cleaned = String(value).replace(/[^0-9.-]/g, "");
-  return Number(cleaned);
-}
-
-function safeText(value, fallback = "") {
-  return value && String(value).trim() !== "" ? String(value).trim() : fallback;
-}
-
-function buildPropsFromRows(rows) {
-  return rows
-    .map((row) => {
-      const gameDate = normalizeDate(row["Game Date"]);
-      const playerName = safeText(row["Player Name"], "");
-      const playerFirstName = safeText(row["Player First Name"], "");
-      const playerLastName = safeText(row["Player Last Name"], "");
-      const vendor = safeText(row["Vendor"], "");
-      const propType = safeText(row["Prop Type"], "");
-      const lineValue = safeText(row["Line Value"], "");
-      const betType = safeText(row["Type"], "");
-      const overOdds = safeText(row["Over Odds"], "");
-      const underOdds = safeText(row["Under Odds"], "");
-      const genericOdds = safeText(row["Odds"], "");
-      const poissonProbOver = toNumber(row["Poisson Prob Over"]);
-      const ev = toNumber(row["EV (Over/Milestone Side)"]);
-      const awayTeam = safeText(row["Away Team"], "");
-      const homeTeam = safeText(row["Home Team"], "");
-
-      const gameLabel = awayTeam && homeTeam ? `${awayTeam} at ${homeTeam}` : "";
-
-      return {
-        gameDate,
-        playerName,
-        playerFirstName,
-        playerLastName,
-        vendor,
-        propType,
-        lineValue,
-        betType,
-        overOdds,
-        underOdds,
-        genericOdds,
-        poissonProbOver,
-        ev,
-        awayTeam,
-        homeTeam,
-        gameLabel
-      };
-    })
-    .filter((prop) =>
-      prop.gameDate &&
-      (prop.playerName || prop.playerFirstName || prop.playerLastName) &&
-      prop.vendor &&
-      prop.propType &&
-      prop.lineValue &&
-      !Number.isNaN(prop.ev)
-    );
-}
-
 function getTodayDateString() {
   const today = new Date();
   const year = today.getFullYear();
@@ -141,15 +91,13 @@ function getTodayDateString() {
 }
 
 exports.handler = async function () {
-  const sourceUrl = process.env.NHL_PROPS_TEASER_SOURCE_URL;
+  const sourceUrl = process.env.NHL_PROPS_SOURCE_URL;
 
   if (!sourceUrl) {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        error: "Missing NHL_PROPS_TEASER_SOURCE_URL environment variable"
-      })
+      body: JSON.stringify({ error: "Missing NHL_PROPS_SOURCE_URL environment variable" })
     };
   }
 
@@ -160,36 +108,75 @@ exports.handler = async function () {
       return {
         statusCode: response.status,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          error: `Failed to fetch NHL teaser props CSV: ${response.status}`
-        })
+        body: JSON.stringify({ error: `Failed to fetch NHL props CSV: ${response.status}` })
       };
     }
 
-    const text = await response.text();
-    const rows = parseCSV(text);
-    const props = buildPropsFromRows(rows);
+    const csvText = await response.text();
+    const rows = parseCSV(csvText);
     const today = getTodayDateString();
 
-    const teaserProps = props
-      .filter((prop) => prop.gameDate === today)
+    const todaysRows = rows
+      .map((row) => {
+        const gameDate = normalizeDate(row["Game Date"]);
+        const playerFirstName = safeText(row["Player First Name"]);
+        const playerLastName = safeText(row["Player Last Name"]);
+        const playerName = `${playerFirstName} ${playerLastName}`.trim();
+
+        const awayTeam = safeText(row["Away Team"]);
+        const homeTeam = safeText(row["Home Team"]);
+        const gameLabel = awayTeam && homeTeam ? `${awayTeam} at ${homeTeam}` : "";
+
+        return {
+          gameDate,
+          playerName,
+          playerFirstName,
+          playerLastName,
+          vendor: safeText(row["Vendor"]),
+          propType: safeText(row["Prop Type"]),
+          lineValue: safeText(row["Line Value"]),
+          betType: safeText(row["Type"]),
+          overOdds: safeText(row["Over Odds"]),
+          underOdds: safeText(row["Under Odds"]),
+          genericOdds: safeText(row["Odds"]),
+          poissonProbOver: toNumber(row["Poisson Over"]),
+          poissonProbExact: toNumber(row["Poisson Milestone"]),
+          ev: toNumber(row["EV Over/Milestone ($1 Bet)"]),
+          awayTeam,
+          homeTeam,
+          gameLabel
+        };
+      })
+      .filter((row) =>
+        row.gameDate === today &&
+        row.playerName &&
+        row.vendor &&
+        row.propType &&
+        row.lineValue &&
+        !Number.isNaN(row.ev)
+      )
       .sort((a, b) => b.ev - a.ev)
       .slice(0, 5);
 
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json; charset=utf-8",
         "Cache-Control": "no-store"
       },
-      body: JSON.stringify({ props: teaserProps })
+      body: JSON.stringify({
+        access: "public_teaser",
+        league: "NHL",
+        count: todaysRows.length,
+        props: todaysRows
+      })
     };
   } catch (error) {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        error: "Server error while fetching NHL teaser props",
+        error: "Server error while fetching NHL props teaser",
         details: error.message
       })
     };

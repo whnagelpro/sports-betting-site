@@ -61,9 +61,7 @@ function normalizeDate(value) {
 
   const raw = String(value).trim();
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-    return raw;
-  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
 
   const mmddyyyyMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (mmddyyyyMatch) {
@@ -98,12 +96,8 @@ exports.handler = async function () {
   if (!sourceUrl) {
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        error: "Missing NBA_PROPS_SOURCE_URL environment variable"
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Missing NBA_PROPS_SOURCE_URL environment variable" })
     };
   }
 
@@ -113,12 +107,8 @@ exports.handler = async function () {
     if (!response.ok) {
       return {
         statusCode: response.status,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          error: `Failed to fetch NBA props CSV: ${response.status}`
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: `Failed to fetch NBA props CSV: ${response.status}` })
       };
     }
 
@@ -127,27 +117,44 @@ exports.handler = async function () {
     const today = getTodayDateString();
 
     const todaysRows = rows
-      .filter((row) => normalizeDate(row["Game Date"]) === today)
-      .map((row) => ({
-        gameDate: normalizeDate(row["Game Date"]),
-        gameLabel:
-          safeText(row["Away Team"]) && safeText(row["Home Team"])
-            ? `${safeText(row["Away Team"])} at ${safeText(row["Home Team"])}`
-            : safeText(row["Matchup"], ""),
-        playerName: safeText(row["Player Name"]),
-        playerFirstName: safeText(row["Player First Name"]),
-        playerLastName: safeText(row["Player Last Name"]),
-        vendor: safeText(row["Vendor"]),
-        propType: safeText(row["Prop Type"]),
-        lineValue: safeText(row["Line Value"]),
-        betType: safeText(row["Type"]),
-        overOdds: safeText(row["Over Odds"]),
-        underOdds: safeText(row["Under Odds"]),
-        genericOdds: safeText(row["Odds"]),
-        poissonProbOver: toNumber(row["Poisson Prob Over"]),
-        ev: toNumber(row["EV (Over/Milestone Side)"])
-      }))
-      .filter((row) => !Number.isNaN(row.ev))
+      .map((row) => {
+        const gameDate = normalizeDate(row["Game Date"]);
+        const playerFirstName = safeText(row["Player First Name"]);
+        const playerLastName = safeText(row["Player Last Name"]);
+        const playerName = `${playerFirstName} ${playerLastName}`.trim();
+
+        const awayTeam = safeText(row["Away Team"]);
+        const homeTeam = safeText(row["Home Team"]);
+        const gameLabel = awayTeam && homeTeam ? `${awayTeam} at ${homeTeam}` : "";
+
+        return {
+          gameDate,
+          playerName,
+          playerFirstName,
+          playerLastName,
+          vendor: safeText(row["Vendor"]),
+          propType: safeText(row["Prop Type"]),
+          lineValue: safeText(row["Line Value"]),
+          betType: safeText(row["Type"]),
+          overOdds: safeText(row["Over Odds"]),
+          underOdds: safeText(row["Under Odds"]),
+          genericOdds: safeText(row["Odds"]),
+          poissonProbOver: toNumber(row["Poisson Over"]),
+          poissonProbExact: toNumber(row["Poisson Milestone"]),
+          ev: toNumber(row["EV Over/Milestone ($1 Bet)"]),
+          awayTeam,
+          homeTeam,
+          gameLabel
+        };
+      })
+      .filter((row) =>
+        row.gameDate === today &&
+        row.playerName &&
+        row.vendor &&
+        row.propType &&
+        row.lineValue &&
+        !Number.isNaN(row.ev)
+      )
       .sort((a, b) => b.ev - a.ev)
       .slice(0, 5);
 
@@ -167,9 +174,7 @@ exports.handler = async function () {
   } catch (error) {
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         error: "Server error while fetching NBA props teaser",
         details: error.message
