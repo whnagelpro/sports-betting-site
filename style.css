@@ -1715,3 +1715,49 @@ select:disabled {
   grid-template-columns: 1fr;
   gap: 18px;
 }
+
+.guide-box {
+  min-width: 220px;
+  position: relative;
+}
+
+.hover-guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 4px;
+}
+
+.hover-guide-item {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-guide-term {
+  color: #4ea3ff;
+  font-weight: 700;
+  cursor: default;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.hover-guide-tooltip {
+  display: none;
+  position: absolute;
+  top: 24px;
+  left: 0;
+  z-index: 50;
+  width: 260px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #102033;
+  color: #eaf3ff;
+  font-size: 13px;
+  line-height: 1.45;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(78, 163, 255, 0.25);
+}
+
+.hover-guide-item:hover .hover-guide-tooltip {
+  display: block;
+}
