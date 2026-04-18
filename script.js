@@ -9,12 +9,6 @@ let CURRENT_USER = null;
 let CURRENT_USER_PROFILE = null;
 let CURRENT_USER_TIER = "Rookie";
 
-let TRENDS_DATA = {
-  MLB: {},
-  NBA: {},
-  NHL: {}
-};
-
 const DATA_CACHE = {
   games: {},
   props: {}
@@ -695,9 +689,6 @@ function createPropCard(prop) {
 
   const fullName = getPropFullName(prop);
 
-  // MLB first
-  const trend = getTrendData(prop, "MLB");
-
   return `
     <article class="prop-card">
       <div class="prop-card-header">
@@ -715,13 +706,6 @@ function createPropCard(prop) {
           <div><strong>Odds:</strong> ${oddsToShow}</div>
           <div><strong>Model Probability:</strong> ${probabilityText}</div>
         </div>
-
-        ${trend ? `
-          <div class="trend-box ${getTrendColor(trend.diff)}">
-            <strong>Last 5 Avg:</strong> ${trend.avg.toFixed(2)}<br>
-            <strong>vs Line:</strong> ${trend.diff > 0 ? "+" : ""}${trend.diff.toFixed(2)}
-          </div>
-        ` : ""}
       </div>
     </article>
   `;
@@ -2005,6 +1989,30 @@ function createTrendCard(player, statKey) {
   `;
 }
 
+function setTrendsFiltersDisabled(filterIds, isDisabled) {
+  filterIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = isDisabled;
+  });
+}
+
+function renderTrendsLockedState(container, summaryId, currentTier, leagueLabel) {
+  renderFilterSummary(summaryId, [
+    { label: "Tier", value: currentTier || "Rookie" }
+  ]);
+
+  container.innerHTML = `
+    <div class="props-locked-box">
+      <h3>${leagueLabel} Trends Locked</h3>
+      <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
+      <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${leagueLabel} trends.</p>
+      <div style="margin-top: 16px;">
+        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+      </div>
+    </div>
+  `;
+}
+
 async function renderNBATrends() {
   const container = document.getElementById("nba-trends-container");
   if (!container) return;
@@ -2023,6 +2031,24 @@ async function renderNBATrends() {
     updateLastUpdated("nba-trends-last-updated");
 
     const renderPage = () => {
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+      const filterIds = ["nba-trends-stat-filter", "nba-trends-sort-filter"];
+
+      if (!currentRules.showPlayerProps) {
+        setTrendsFiltersDisabled(filterIds, true);
+        renderTrendsLockedState(
+          container,
+          "nba-trends-filter-summary",
+          currentTier,
+          "NBA"
+        );
+        return;
+      }
+
+      setTrendsFiltersDisabled(filterIds, false);
+
       const selectedStat =
         document.getElementById("nba-trends-stat-filter")?.value || "points_last5";
       const selectedSort =
@@ -2041,7 +2067,7 @@ async function renderNBATrends() {
       renderFilterSummary("nba-trends-filter-summary", [
         { label: "Trend", value: formatNBATrendLabel(selectedStat) },
         { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
-        { label: "Tier", value: CURRENT_USER_TIER || "Rookie" }
+        { label: "Tier", value: currentTier }
       ]);
 
       if (filteredRows.length === 0) {
@@ -2114,98 +2140,6 @@ function createNHLTrendCard(player, statKey) {
   `;
 }
 
-function normalizeName(name) {
-  return String(name || "")
-    .toLowerCase()
-    .replace(/[^a-z]/g, "");
-}
-
-async function loadTrendsData(league, csvUrl) {
-  const rows = await fetchLeagueTrends(csvUrl);
-  const map = {};
-
-  rows.forEach((row) => {
-    const rawName = row["Player Name"] || "";
-    const key = normalizeName(rawName);
-    if (!key) return;
-    map[key] = row;
-  });
-
-  TRENDS_DATA[league] = map;
-}
-
-function getTrendKey(propType) {
-  const map = {
-    // NBA
-    "Points": "points_last5",
-    "Rebounds": "rebounds_last5",
-    "Assists": "assists_last5",
-    "3-Pointers": "threes_last5",
-    "Points Assists": "points_assists_last5",
-    "Points Rebounds": "points_rebounds_last5",
-    "Points Rebounds Assists": "points_rebounds_assists_last5",
-    "Rebounds Assists": "rebounds_assists_last5",
-
-    // MLB
-    "Hits": "hits_last5",
-    "Home Runs": "home_runs_last5",
-    "RBIs": "rbis_last5",
-    "Runs Scored": "runs_scored_last5",
-    "Total Bases": "total_bases_last5",
-    "Stolen Bases": "stolen_bases_last5",
-    "Strikeouts": "strikeouts_last5",
-    "Pitcher Strikeouts": "pitcher_strikeouts_last5",
-    "Pitcher Outs": "pitcher_outs_last5",
-    "Pitcher Walks": "pitcher_walks_last5",
-    "Pitcher Hits Allowed": "pitcher_hits_allowed_last5",
-    "Pitcher Earned Runs": "pitcher_earned_runs_last5",
-    "Walks": "walks_last5",
-    "Hits Runs Rbis": "hits_runs_rbis_last5",
-    "Singles": "singles_last5",
-    "Doubles": "doubles_last5",
-    "Triples": "triples_last5",
-
-    // NHL
-    "Shots on Goal": "shots_on_goal_last5",
-    "Goals": "goals_last5",
-    "Assists": "assists_last5",
-    "Points": "points_last5",
-    "Saves": "saves_last5"
-  };
-
-  return map[propType] || null;
-}
-
-function getTrendData(prop, league) {
-  const trends = TRENDS_DATA[league];
-  if (!trends) return null;
-
-  const key = normalizeName(prop.playerName || `${prop.playerFirstName || ""} ${prop.playerLastName || ""}`);
-  const player = trends[key];
-  if (!player) return null;
-
-  const trendKey = getTrendKey(prop.propType);
-  if (!trendKey) return null;
-
-  const avg = Number(player[trendKey]);
-  const line = Number(prop.lineValue);
-
-  if (Number.isNaN(avg) || Number.isNaN(line)) return null;
-
-  return {
-    avg,
-    diff: avg - line
-  };
-}
-
-function getTrendColor(diff) {
-  if (diff >= 2) return "trend-strong";
-  if (diff >= 0.5) return "trend-positive";
-  if (diff <= -2) return "trend-negative";
-  if (diff <= -0.5) return "trend-negative";
-  return "trend-neutral";
-}
-
 async function renderNHLTrends() {
   const container = document.getElementById("nhl-trends-container");
   if (!container) return;
@@ -2224,6 +2158,24 @@ async function renderNHLTrends() {
     updateLastUpdated("nhl-trends-last-updated");
 
     const renderPage = () => {
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+      const filterIds = ["nhl-trends-stat-filter", "nhl-trends-sort-filter"];
+
+      if (!currentRules.showPlayerProps) {
+        setTrendsFiltersDisabled(filterIds, true);
+        renderTrendsLockedState(
+          container,
+          "nhl-trends-filter-summary",
+          currentTier,
+          "NHL"
+        );
+        return;
+      }
+
+      setTrendsFiltersDisabled(filterIds, false);
+
       const selectedStat =
         document.getElementById("nhl-trends-stat-filter")?.value || "shots_last5";
       const selectedSort =
@@ -2242,7 +2194,7 @@ async function renderNHLTrends() {
       renderFilterSummary("nhl-trends-filter-summary", [
         { label: "Trend", value: formatNHLTrendLabel(selectedStat) },
         { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
-        { label: "Tier", value: CURRENT_USER_TIER || "Rookie" }
+        { label: "Tier", value: currentTier }
       ]);
 
       if (filteredRows.length === 0) {
@@ -2307,6 +2259,24 @@ async function renderMLBTrends() {
     updateLastUpdated("mlb-trends-last-updated");
 
     const renderPage = () => {
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+      const filterIds = ["mlb-trends-stat-filter", "mlb-trends-sort-filter"];
+
+      if (!currentRules.showPlayerProps) {
+        setTrendsFiltersDisabled(filterIds, true);
+        renderTrendsLockedState(
+          container,
+          "mlb-trends-filter-summary",
+          currentTier,
+          "MLB"
+        );
+        return;
+      }
+
+      setTrendsFiltersDisabled(filterIds, false);
+
       const selectedStat =
         document.getElementById("mlb-trends-stat-filter")?.value || "hits_last5";
       const selectedSort =
@@ -2325,7 +2295,7 @@ async function renderMLBTrends() {
       renderFilterSummary("mlb-trends-filter-summary", [
         { label: "Trend", value: formatTrendLabel(selectedStat) },
         { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
-        { label: "Tier", value: CURRENT_USER_TIER || "Rookie" }
+        { label: "Tier", value: currentTier }
       ]);
 
       if (filteredRows.length === 0) {
@@ -2398,18 +2368,15 @@ async function initMLBBetsPage() {
 async function initNBAPropsPage() {
   await updateSessionStatus();
   await renderNBAProps();
-  await loadTrendsData("NBA", NBA_TRENDS_CSV_URL);
 }
 
 async function initNHLPropsPage() {
   await updateSessionStatus();
   await renderNHLProps();
-  await loadTrendsData("NHL", NHL_TRENDS_CSV_URL);
 }
 
 async function initMLBPropsPage() {
   await updateSessionStatus();
-  await loadTrendsData("MLB", MLB_TRENDS_CSV_URL);
   await renderMLBProps();
 }
 
