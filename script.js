@@ -2347,7 +2347,7 @@ async function renderNBATrends() {
           container,
           "nba-trends-filter-summary",
           currentTier,
-          "NBA"
+          "NBA Player"
         );
         return;
       }
@@ -2489,7 +2489,7 @@ async function renderNHLTrends() {
           container,
           "nhl-trends-filter-summary",
           currentTier,
-          "NHL"
+          "NHL Player"
         );
         return;
       }
@@ -2769,7 +2769,7 @@ async function renderMLBTrends() {
           container,
           "mlb-trends-filter-summary",
           currentTier,
-          "MLB"
+          "MLB Player"
         );
         return;
       }
