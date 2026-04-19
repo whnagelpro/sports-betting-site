@@ -16,8 +16,10 @@ const DATA_CACHE = {
 
 const NBA_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1553479471&single=true&output=csv";
 const NBA_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1073686927&single=true&output=csv";
+const NBA_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=133740316&single=true&output=csv";
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
 const NHL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=124295671&single=true&output=csv";
+const NHL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=482198043&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
 const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1641406263&single=true&output=csv";
 const MLB_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=2103952049&single=true&output=csv";
@@ -1910,6 +1912,287 @@ async function fetchCurrentUserProfile() {
   }
 
   return profile;
+}
+
+function formatNBATeamTrendLabel(statKey) {
+  const labelMap = {
+    points_scored_last5: "Points Scored",
+    points_allowed_last5: "Points Allowed",
+    rebounds_last5: "Rebounds",
+    assists_last5: "Assists",
+    threes_last5: "3-Pointers",
+    turnovers_last5: "Turnovers"
+  };
+
+  return labelMap[statKey] || statKey;
+}
+
+function createNBATeamTrendCard(teamRow, statKey) {
+  const statValue = Number(teamRow[statKey]);
+  const gamesUsed = teamRow.games_used_last5 || "N/A";
+
+  return `
+    <div class="leaderboard-item">
+      <strong>${teamRow["Team"] || "Unknown Team"}</strong>
+      <div>${formatNBATeamTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
+      <div>Games Used: ${gamesUsed}</div>
+    </div>
+  `;
+}
+
+async function renderNBATeamTrends() {
+  const container = document.getElementById("nba-team-trends-container");
+  if (!container) return;
+
+  updateTierDisplay("nba-tier-display");
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Loading NBA team trends...</h3>
+      <p>Please wait while recent team trend data is pulled in.</p>
+    </div>
+  `;
+
+  try {
+    const rows = await fetchLeagueTrends(NBA_TEAM_TRENDS_CSV_URL);
+    updateLastUpdated("nba-team-trends-last-updated");
+
+    const renderPage = () => {
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+
+      const filterIds = [
+        "nba-team-trends-team-filter",
+        "nba-team-trends-stat-filter",
+        "nba-team-trends-sort-filter"
+      ];
+
+      if (currentTier === "Rookie") {
+        setTrendsFiltersDisabled(filterIds, true);
+        renderTrendsLockedState(
+          container,
+          "nba-team-trends-filter-summary",
+          currentTier,
+          "NBA Team"
+        );
+        return;
+      }
+
+      setTrendsFiltersDisabled(filterIds, false);
+
+      const selectedStat =
+        document.getElementById("nba-team-trends-stat-filter")?.value || "points_scored_last5";
+      const selectedSort =
+        document.getElementById("nba-team-trends-sort-filter")?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Team"])
+        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+
+      populateTeamFilter("nba-team-trends-team-filter", filteredRows, renderPage);
+
+      const selectedTeam =
+        document.getElementById("nba-team-trends-team-filter")?.value || "All";
+
+      if (selectedTeam !== "All") {
+        filteredRows = filteredRows.filter(
+          (row) => (row["Team"] || "").trim() === selectedTeam
+        );
+      }
+
+      filteredRows.sort((a, b) => {
+        const aVal = Number(a[selectedStat]);
+        const bVal = Number(b[selectedStat]);
+        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
+      });
+
+      renderFilterSummary("nba-team-trends-filter-summary", [
+        { label: "Team", value: selectedTeam },
+        { label: "Trend", value: formatNBATeamTrendLabel(selectedStat) },
+        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Tier", value: currentTier }
+      ]);
+
+      if (filteredRows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NBA team trends found for this filter.</h3>
+            <p>Try changing the team, trend category, or sort order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredRows
+        .map((row) => createNBATeamTrendCard(row, selectedStat))
+        .join("");
+    };
+
+    bindSelectChange("nba-team-trends-stat-filter", renderPage);
+    bindSelectChange("nba-team-trends-sort-filter", renderPage);
+
+    bindButton("nba-team-trends-reset-filters", () => {
+      resetSelectToAll("nba-team-trends-team-filter");
+      resetSelectToValue("nba-team-trends-stat-filter", "points_scored_last5");
+      resetSelectToValue("nba-team-trends-sort-filter", "desc");
+      renderPage();
+    });
+
+    renderPage();
+  } catch (error) {
+    console.error("NBA team trends render error:", error);
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load NBA team trends right now.</h3>
+        <p>Please check your published NBA Team Trends CSV.</p>
+      </div>
+    `;
+  }
+}
+
+async function initNBATeamTrendsPage() {
+  await updateSessionStatus();
+  await renderNBATeamTrends();
+}
+
+function formatNHLTeamTrendLabel(statKey) {
+  const labelMap = {
+    goals_scored_last5: "Goals Scored",
+    goals_allowed_last5: "Goals Allowed",
+    shots_on_goal_last5: "Shots on Goal",
+    assists_last5: "Assists",
+    points_last5: "Points"
+  };
+
+  return labelMap[statKey] || statKey;
+}
+
+function createNHLTeamTrendCard(teamRow, statKey) {
+  const statValue = Number(teamRow[statKey]);
+  const gamesUsed = teamRow.games_used_last5 || "N/A";
+
+  return `
+    <div class="leaderboard-item">
+      <strong>${teamRow["Team"] || "Unknown Team"}</strong>
+      <div>${formatNHLTeamTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
+      <div>Games Used: ${gamesUsed}</div>
+    </div>
+  `;
+}
+
+async function renderNHLTeamTrends() {
+  const container = document.getElementById("nhl-team-trends-container");
+  if (!container) return;
+
+  updateTierDisplay("nhl-tier-display");
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Loading NHL team trends...</h3>
+      <p>Please wait while recent team trend data is pulled in.</p>
+    </div>
+  `;
+
+  try {
+    const rows = await fetchLeagueTrends(NHL_TEAM_TRENDS_CSV_URL);
+    updateLastUpdated("nhl-team-trends-last-updated");
+
+    const renderPage = () => {
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+
+      const filterIds = [
+        "nhl-team-trends-team-filter",
+        "nhl-team-trends-stat-filter",
+        "nhl-team-trends-sort-filter"
+      ];
+
+      if (currentTier === "Rookie") {
+        setTrendsFiltersDisabled(filterIds, true);
+        renderTrendsLockedState(
+          container,
+          "nhl-team-trends-filter-summary",
+          currentTier,
+          "NHL Team"
+        );
+        return;
+      }
+
+      setTrendsFiltersDisabled(filterIds, false);
+
+      const selectedStat =
+        document.getElementById("nhl-team-trends-stat-filter")?.value || "goals_scored_last5";
+      const selectedSort =
+        document.getElementById("nhl-team-trends-sort-filter")?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Team"])
+        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+
+      populateTeamFilter("nhl-team-trends-team-filter", filteredRows, renderPage);
+
+      const selectedTeam =
+        document.getElementById("nhl-team-trends-team-filter")?.value || "All";
+
+      if (selectedTeam !== "All") {
+        filteredRows = filteredRows.filter(
+          (row) => (row["Team"] || "").trim() === selectedTeam
+        );
+      }
+
+      filteredRows.sort((a, b) => {
+        const aVal = Number(a[selectedStat]);
+        const bVal = Number(b[selectedStat]);
+        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
+      });
+
+      renderFilterSummary("nhl-team-trends-filter-summary", [
+        { label: "Team", value: selectedTeam },
+        { label: "Trend", value: formatNHLTeamTrendLabel(selectedStat) },
+        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Tier", value: currentTier }
+      ]);
+
+      if (filteredRows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NHL team trends found for this filter.</h3>
+            <p>Try changing the team, trend category, or sort order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredRows
+        .map((row) => createNHLTeamTrendCard(row, selectedStat))
+        .join("");
+    };
+
+    bindSelectChange("nhl-team-trends-stat-filter", renderPage);
+    bindSelectChange("nhl-team-trends-sort-filter", renderPage);
+
+    bindButton("nhl-team-trends-reset-filters", () => {
+      resetSelectToAll("nhl-team-trends-team-filter");
+      resetSelectToValue("nhl-team-trends-stat-filter", "goals_scored_last5");
+      resetSelectToValue("nhl-team-trends-sort-filter", "desc");
+      renderPage();
+    });
+
+    renderPage();
+  } catch (error) {
+    console.error("NHL team trends render error:", error);
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load NHL team trends right now.</h3>
+        <p>Please check your published NHL Team Trends CSV.</p>
+      </div>
+    `;
+  }
+}
+
+async function initNHLTeamTrendsPage() {
+  await updateSessionStatus();
+  await renderNHLTeamTrends();
 }
 
 async function fetchLeagueTrends(csvUrl) {

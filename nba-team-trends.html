@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MLB Team Trends | Sports Betting Guide</title>
+  <title>NBA Team Trends | Sports Betting Guide</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -20,7 +20,7 @@
             <ul class="dropdown-menu">
               <li><a href="nba-odds.html">Game Odds</a></li>
               <li><a href="nba-props.html">Player Props</a></li>
-              <li><a href="nba-trends.html">Trends</a></li>
+              <li><a href="nba-trends.html">Player Trends</a></li>
               <li><a href="nba-team-trends.html">Team Trends</a></li>
             </ul>
           </li>
@@ -30,7 +30,7 @@
             <ul class="dropdown-menu">
               <li><a href="nhl-odds.html">Game Odds</a></li>
               <li><a href="nhl-props.html">Player Props</a></li>
-              <li><a href="nhl-trends.html">Trends</a></li>
+              <li><a href="nhl-trends.html">Player Trends</a></li>
               <li><a href="nhl-team-trends.html">Team Trends</a></li>
             </ul>
           </li>
@@ -68,10 +68,10 @@
   <main class="league-page">
     <section class="league-hero">
       <div class="container">
-        <p class="league-label">MLB TEAM TRENDS</p>
-        <h1>Today’s MLB Team Trends</h1>
+        <p class="league-label">NBA TEAM TRENDS</p>
+        <h1>Today’s NBA Team Trends</h1>
         <p class="league-description">
-          Review recent MLB team form across scoring, hitting, power, and totals trends.
+          Review recent NBA team form across scoring, shooting, and ball-movement trends.
         </p>
       </div>
     </section>
@@ -86,45 +86,43 @@
 
           <div class="control-box">
             <span class="control-label">Membership Tier</span>
-            <strong id="mlb-tier-display">Loading...</strong>
+            <strong id="nba-tier-display">Loading...</strong>
           </div>
 
           <div class="control-box">
             <span class="control-label">Team</span>
-            <select id="mlb-team-trends-team-filter" class="sportsbook-select">
+            <select id="nba-team-trends-team-filter" class="sportsbook-select">
               <option value="All">All Teams</option>
             </select>
           </div>
 
           <div class="control-box">
             <span class="control-label">Trend Category</span>
-            <select id="mlb-team-trends-stat-filter" class="sportsbook-select">
-              <option value="runs_scored_last5">Runs Scored</option>
-              <option value="runs_allowed_last5">Runs Allowed</option>
-              <option value="hits_last5">Hits</option>
-              <option value="home_runs_last5">Home Runs</option>
-              <option value="total_bases_last5">Total Bases</option>
-              <option value="team_strikeouts_last5">Team Strikeouts</option>
-              <option value="overs_last5">Overs</option>
-              <option value="unders_last5">Unders</option>
+            <select id="nba-team-trends-stat-filter" class="sportsbook-select">
+              <option value="points_scored_last5">Points Scored</option>
+              <option value="points_allowed_last5">Points Allowed</option>
+              <option value="rebounds_last5">Rebounds</option>
+              <option value="assists_last5">Assists</option>
+              <option value="threes_last5">3-Pointers</option>
+              <option value="turnovers_last5">Turnovers</option>
             </select>
           </div>
 
           <div class="control-box">
             <span class="control-label">Sort</span>
-            <select id="mlb-team-trends-sort-filter" class="sportsbook-select">
+            <select id="nba-team-trends-sort-filter" class="sportsbook-select">
               <option value="desc">Highest First</option>
               <option value="asc">Lowest First</option>
             </select>
           </div>
 
           <p class="last-updated-text">
-            Last Updated: <span id="mlb-team-trends-last-updated">--:--</span>
+            Last Updated: <span id="nba-team-trends-last-updated">--:--</span>
           </p>
 
           <div class="control-box">
             <span class="control-label">Actions</span>
-            <button id="mlb-team-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
+            <button id="nba-team-trends-reset-filters" class="filter-reset-btn">Reset Filters</button>
           </div>
         </div>
 
@@ -148,7 +146,7 @@
                 <span class="hover-guide-term">Trend Category</span>
                 <div class="hover-guide-tooltip">
                   <strong>Trend Category</strong><br>
-                  The stat you’re sorting by, like Runs Scored, Hits, or Overs.
+                  The stat you’re sorting by, like Points Scored, Assists, or 3-Pointers.
                 </div>
               </div>
 
@@ -172,7 +170,7 @@
                 <span class="hover-guide-term">Why Team Trends Matter</span>
                 <div class="hover-guide-tooltip">
                   <strong>Why Team Trends Matter</strong><br>
-                  Team trends help show recent scoring and game-environment patterns that can support totals and matchup analysis.
+                  Team trends help show recent team form that can support game odds analysis.
                 </div>
               </div>
             </div>
@@ -183,22 +181,22 @@
 
     <section class="filter-summary-section">
       <div class="container">
-        <div id="mlb-team-trends-filter-summary" class="filter-summary-box"></div>
+        <div id="nba-team-trends-filter-summary" class="filter-summary-box"></div>
       </div>
     </section>
 
     <section class="bets-section">
       <div class="container">
         <div class="section-header">
-          <h2>Top MLB Team Trends</h2>
-          <p>See which MLB teams are trending strongest across recent team-level categories.</p>
+          <h2>Top NBA Team Trends</h2>
+          <p>See which NBA teams are trending strongest across recent team-level categories.</p>
         </div>
 
         <div class="leaderboard-box">
           <h3>Team Trend Leaders</h3>
-          <div id="mlb-team-trends-container">
+          <div id="nba-team-trends-container">
             <div class="empty-state">
-              <h3>Loading MLB team trends...</h3>
+              <h3>Loading NBA team trends...</h3>
               <p>Please wait while recent team trend data is pulled in.</p>
             </div>
           </div>
@@ -217,7 +215,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
   <script>
-    initMLBTeamTrendsPage();
+    initNBATeamTrendsPage();
   </script>
 </body>
 </html>
