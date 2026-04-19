@@ -33,9 +33,9 @@ const MLB_PROPS_TEASER_URL = "/.netlify/functions/mlb-props-teaser";
 
 const TIER_RULES = {
   Rookie: {
-    maxRankingsPerGame: 0,
+    maxRankingsPerGame: 5,
     showPlayerProps: false,
-    showGameOdds: false,
+    showGameOdds: true,
     maxPropsToShow: 0,
     showTopBet: false,
     showLeaderboardCount: 3
@@ -1972,7 +1972,8 @@ async function renderNBATeamTrends() {
           container,
           "nba-team-trends-filter-summary",
           currentTier,
-          "NBA Team"
+          "NBA Team",
+          "Veteran"
         );
         return;
       }
@@ -2112,7 +2113,8 @@ async function renderNHLTeamTrends() {
           container,
           "nhl-team-trends-filter-summary",
           currentTier,
-          "NHL Team"
+          "NHL Team",
+          "Veteran"
         );
         return;
       }
@@ -2296,7 +2298,7 @@ function setTrendsFiltersDisabled(filterIds, isDisabled) {
   });
 }
 
-function renderTrendsLockedState(container, summaryId, currentTier, leagueLabel) {
+function renderTrendsLockedState(container, summaryId, currentTier, leagueLabel, requiredTier = "All-Star") {
   renderFilterSummary(summaryId, [
     { label: "Tier", value: currentTier || "Rookie" }
   ]);
@@ -2305,7 +2307,7 @@ function renderTrendsLockedState(container, summaryId, currentTier, leagueLabel)
     <div class="props-locked-box">
       <h3>${leagueLabel} Trends Locked</h3>
       <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
-      <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${leagueLabel} trends.</p>
+      <p>Upgrade to <strong>${requiredTier}</strong> or higher to unlock ${leagueLabel} trends.</p>
       <div style="margin-top: 16px;">
         <a href="pricing.html" class="btn btn-primary">View Plans</a>
       </div>
@@ -2649,7 +2651,8 @@ async function renderMLBTeamTrends() {
           container,
           "mlb-team-trends-filter-summary",
           currentTier,
-          "MLB Team"
+          "MLB Team",
+          "Veteran"
         );
         return;
       }

@@ -1816,3 +1816,44 @@ select:disabled {
     width: 100%;
   }
 }
+
+.trends-promo-section {
+  margin: 40px 0;
+}
+
+.trends-promo-box {
+  background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.trends-promo-content h2 {
+  font-size: 26px;
+  margin-bottom: 12px;
+}
+
+.trends-promo-content p {
+  font-size: 16px;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.trends-promo-perks {
+  margin-bottom: 20px;
+}
+
+.perk-badge {
+  display: inline-block;
+  background: #3a3a5a;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  margin: 4px;
+}
+
+.trends-promo-actions .btn {
+  margin: 6px;
+}
