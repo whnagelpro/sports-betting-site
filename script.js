@@ -443,13 +443,7 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
   container.innerHTML = topProps
     .map((prop, index) => {
       const fullName = getPropFullName(prop);
-
-      const probabilityValue =
-        !Number.isNaN(prop.poissonProbOver) && prop.poissonProbOver > 0
-          ? prop.poissonProbOver
-          : prop.poissonProbExact;
-
-      const probabilityText = formatProbability(probabilityValue);
+      const probabilityText = formatProbability(prop.impliedProbability);
 
       return `
         <div class="leaderboard-item">
@@ -471,8 +465,6 @@ function buildRankingsFromRow(row) {
 
   const overEV = toNumber(row["EV Total Over ($1 bet)"]);
   const underEV = toNumber(row["EV Total Under ($1 bet)"]);
-  const overProb = toNumber(row["Poisson Prob Total Over"]);
-  const underProb = toNumber(row["Poisson Prob Total Under"]);
   const awayML = toNumber(row["EV Away ML ($1 bet)"]);
   const homeML = toNumber(row["EV Home ML ($1 bet)"]);
   const awaySpreadEV = toNumber(row["EV Away Spread ($1 bet)"]);
@@ -481,40 +473,42 @@ function buildRankingsFromRow(row) {
   if (!Number.isNaN(overEV) && totalValue) {
     rankings.push({
       bet: `Over ${totalValue}`,
-      ev: overEV,
-      probability: !Number.isNaN(overProb) ? `${Math.round(overProb * 100)}%` : "N/A"
+      ev: overEV
     });
   }
 
   if (!Number.isNaN(underEV) && totalValue) {
     rankings.push({
       bet: `Under ${totalValue}`,
-      ev: underEV,
-      probability: !Number.isNaN(underProb) ? `${Math.round(underProb * 100)}%` : "N/A"
+      ev: underEV
     });
   }
 
   if (!Number.isNaN(awayML)) {
-    rankings.push({ bet: `${awayTeam} ML`, ev: awayML, probability: "N/A" });
+    rankings.push({
+      bet: `${awayTeam} ML`,
+      ev: awayML
+    });
   }
 
   if (!Number.isNaN(homeML)) {
-    rankings.push({ bet: `${homeTeam} ML`, ev: homeML, probability: "N/A" });
+    rankings.push({
+      bet: `${homeTeam} ML`,
+      ev: homeML
+    });
   }
 
   if (!Number.isNaN(awaySpreadEV)) {
     rankings.push({
       bet: `${awayTeam} ${safeText(row["Spread Away Value"], "")}`,
-      ev: awaySpreadEV,
-      probability: "N/A"
+      ev: awaySpreadEV
     });
   }
 
   if (!Number.isNaN(homeSpreadEV)) {
     rankings.push({
       bet: `${homeTeam} ${safeText(row["Spread Home Value"], "")}`,
-      ev: homeSpreadEV,
-      probability: "N/A"
+      ev: homeSpreadEV
     });
   }
 
@@ -545,6 +539,15 @@ function transformRowsToGames(rows) {
       totalValue: safeText(row["Total Value"]),
       totalOverOdds: safeText(row["Total Over Odds"]),
       totalUnderOdds: safeText(row["Total Under Odds"]),
+
+      impliedProbAwayML: toNumber(row["Implied Prob Away ML"]),
+      impliedProbHomeML: toNumber(row["Implied Prob Home ML"]),
+      vigFreeProbAwayML: toNumber(row["Vig-Free Prob Away ML"]),
+      vigFreeProbHomeML: toNumber(row["Vig-Free Prob Home ML"]),
+      moneylineEdgeAway: toNumber(row["Moneyline Edge Away"]),
+      moneylineEdgeHome: toNumber(row["Moneyline Edge Home"]),
+      bestMLEdge: toNumber(row["Best ML Edge"]),
+
       rankings: buildRankingsFromRow(row)
     }))
     .filter((game) => game.rankings.length > 0);
@@ -567,8 +570,12 @@ function buildPropsFromRows(rows) {
       const underOdds = safeText(row["Under Odds"], "");
       const genericOdds = safeText(row["Odds"], "");
 
-      const poissonProbOver = toNumber(row["Poisson Over"]);
-      const poissonProbExact = toNumber(row["Poisson Milestone"]);
+      const impliedProbability = toNumber(
+        row["Implied Probability"] ||
+        row["Implied Prob"] ||
+        row["Implied Probability (%)"]
+      );
+
       const ev = toNumber(row["EV Over/Milestone ($1 Bet)"]);
 
       const awayTeam = safeText(row["Away Team"], "");
@@ -591,8 +598,7 @@ function buildPropsFromRows(rows) {
         overOdds,
         underOdds,
         genericOdds,
-        poissonProbOver,
-        poissonProbExact,
+        impliedProbability,
         ev,
         awayTeam,
         homeTeam,
@@ -620,7 +626,6 @@ function createBetCard(game, tierName = "Rookie") {
       <div class="rank-item">
         <span><strong>#${index + 1} ${item.bet}</strong></span>
         <span class="${getEVClass(item.ev)}">EV: ${formatEV(item.ev)}</span>
-        <span>Model Probability: ${item.probability}</span>
       </div>
     `)
     .join("");
@@ -648,6 +653,11 @@ function createBetCard(game, tierName = "Rookie") {
           <h4>Moneyline</h4>
           <p class="market-line">${game.awayTeam} (${formatAmericanOdds(game.moneylineAwayOdds)})</p>
           <p class="market-line">${game.homeTeam} (${formatAmericanOdds(game.moneylineHomeOdds)})</p>
+
+          <div class="market-prob-breakdown" style="margin-top: 10px;">
+            <p class="market-line"><strong>Implied:</strong> ${game.awayTeam} ${formatProbability(game.impliedProbAwayML)} | ${game.homeTeam} ${formatProbability(game.impliedProbHomeML)}</p>
+            <p class="market-line"><strong>Vig-Free:</strong> ${game.awayTeam} ${formatProbability(game.vigFreeProbAwayML)} | ${game.homeTeam} ${formatProbability(game.vigFreeProbHomeML)}</p>
+          </div>
         </div>
 
         <div class="market-box">
@@ -672,12 +682,7 @@ function createBetCard(game, tierName = "Rookie") {
 }
 
 function createPropCard(prop) {
-  const probabilityValue =
-    !Number.isNaN(prop.poissonProbOver) && prop.poissonProbOver > 0
-      ? prop.poissonProbOver
-      : prop.poissonProbExact;
-
-  const probabilityText = formatProbability(probabilityValue);
+  const probabilityText = formatProbability(prop.impliedProbability);
   const betTypeLower = (prop.betType || "").toLowerCase();
 
   let oddsToShow = "N/A";
@@ -908,12 +913,8 @@ function getPropDisplayOdds(prop) {
 }
 
 function getPropProbabilityValue(prop) {
-  if (!Number.isNaN(prop.poissonProbOver) && prop.poissonProbOver > 0) {
-    return prop.poissonProbOver;
-  }
-
-  if (!Number.isNaN(prop.poissonProbExact) && prop.poissonProbExact > 0) {
-    return prop.poissonProbExact;
+  if (!Number.isNaN(prop.impliedProbability) && prop.impliedProbability > 0) {
+    return prop.impliedProbability;
   }
 
   return -Infinity;
