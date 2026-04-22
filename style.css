@@ -816,15 +816,16 @@ body {
 
 @media (max-width: 768px) {
   .dropdown-menu {
+    display: none;
     position: static;
-    display: block;
     margin-top: 8px;
     box-shadow: none;
     border-radius: 8px;
     min-width: unset;
+    width: 100%;
   }
 
-  .dropdown:hover .dropdown-menu {
+  .dropdown.open .dropdown-menu {
     display: block;
   }
 }
@@ -1856,4 +1857,115 @@ select:disabled {
 
 .trends-promo-actions .btn {
   margin: 6px;
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    position: sticky;
+    top: 0;
+  }
+
+  .nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 16px 0;
+  }
+
+  .logo {
+    text-align: center;
+    font-size: 2rem;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .nav-links li {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-links a {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  .dropdown-menu {
+    background: #0f1727;
+    border: 1px solid #25324a;
+    padding: 8px 0;
+  }
+
+  .dropdown-menu a {
+    padding: 10px 14px;
+    font-size: 0.98rem;
+  }
+
+  .hero {
+    padding: 70px 0 50px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle,
+  .hero-proof {
+    font-size: 1rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-cta .btn {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .spotlight-grid,
+  .market-hub-grid,
+  .premium-preview-grid,
+  .info-grid,
+  .why-grid,
+  .pricing-grid,
+  .league-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spotlight-card,
+  .market-hub-card,
+  .premium-preview-card,
+  .info-card,
+  .why-card,
+  .pricing-card,
+  .cta-box,
+  .leaderboard-box,
+  .trends-promo-box {
+    padding: 20px;
+  }
+
+  .section-header h2,
+  .featured-leagues h2,
+  .how-it-works h2,
+  .cta-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .market-hub-card h3,
+  .spotlight-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
