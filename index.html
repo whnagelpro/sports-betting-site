@@ -535,5 +535,23 @@
     }
   });
 </script>
+<script>
+let lastScrollY = window.scrollY;
+
+window.addEventListener("scroll", () => {
+  const header = document.querySelector(".site-header");
+  const currentScrollY = window.scrollY;
+
+  if (currentScrollY > lastScrollY && currentScrollY > 80) {
+    // Scrolling DOWN → hide header
+    header.classList.add("hidden");
+  } else {
+    // Scrolling UP → show header
+    header.classList.remove("hidden");
+  }
+
+  lastScrollY = currentScrollY;
+});
+</script>
 </body>
 </html>
