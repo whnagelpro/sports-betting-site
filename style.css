@@ -814,22 +814,6 @@ body {
   display: block;
 }
 
-@media (max-width: 768px) {
-  .dropdown-menu {
-    display: none;
-    position: static;
-    margin-top: 8px;
-    box-shadow: none;
-    border-radius: 8px;
-    min-width: unset;
-    width: 100%;
-  }
-
-  .dropdown.open .dropdown-menu {
-    display: block;
-  }
-}
-
 input.sportsbook-select {
   width: 100%;
 }
@@ -1859,116 +1843,6 @@ select:disabled {
   margin: 6px;
 }
 
-@media (max-width: 768px) {
-  .site-header {
-    position: sticky;
-    top: 0;
-  }
-
-  .nav {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 14px;
-    padding: 16px 0;
-  }
-
-  .logo {
-    text-align: center;
-    font-size: 2rem;
-  }
-
-  .nav-links {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    width: 100%;
-  }
-
-  .nav-links li {
-    text-align: center;
-  }
-
-  .nav-links a {
-    display: block;
-    padding: 12px;
-    background: #0f1727;
-    border: 1px solid #22304a;
-    border-radius: 10px;
-  }
-
-  .dropdown-menu {
-    grid-column: span 2; /* dropdown takes full width */
-  }
-
-  .dropdown-menu a {
-    padding: 10px 14px;
-    font-size: 0.98rem;
-  }
-
-  .hero {
-    padding: 70px 0 50px;
-  }
-
-  .hero-title {
-    font-size: 2rem;
-    line-height: 1.2;
-  }
-
-  .hero-subtitle,
-  .hero-proof {
-    font-size: 1rem;
-  }
-
-  .hero-cta {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .hero-cta .btn {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .spotlight-grid,
-  .market-hub-grid,
-  .premium-preview-grid,
-  .info-grid,
-  .why-grid,
-  .pricing-grid,
-  .league-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .spotlight-card,
-  .market-hub-card,
-  .premium-preview-card,
-  .info-card,
-  .why-card,
-  .pricing-card,
-  .cta-box,
-  .leaderboard-box,
-  .trends-promo-box {
-    padding: 20px;
-  }
-
-  .section-header h2,
-  .featured-leagues h2,
-  .how-it-works h2,
-  .cta-section h2 {
-    font-size: 1.6rem;
-  }
-
-  .market-hub-card h3,
-  .spotlight-card h3 {
-    font-size: 1.2rem;
-  }
-
-  .footer-links {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
 .site-header {
   transition: transform 0.3s ease;
 }
@@ -2063,5 +1937,150 @@ select:disabled {
     border: none;
     padding: 10px 16px;
     border-radius: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    position: sticky;
+    top: 0;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 0;
+  }
+
+  .logo {
+    font-size: 1.6rem;
+    text-align: left;
+    line-height: 1.15;
+    max-width: calc(100% - 70px);
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  #site-nav {
+    display: none;
+    width: 100%;
+  }
+
+  #site-nav.mobile-open {
+    display: block;
+    margin-top: 12px;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .nav-links li {
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-links a {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    background: #0f1727;
+    border: 1px solid #22304a;
+    border-radius: 10px;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: static;
+    width: 100%;
+    margin-top: 8px;
+    background: #10192a;
+    border: 1px solid #22304a;
+    border-radius: 10px;
+    box-shadow: none;
+    padding: 8px 0;
+  }
+
+  .dropdown.open .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown-menu a {
+    background: transparent;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 0;
+  }
+
+  .hero {
+    padding: 54px 0 42px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    line-height: 1.15;
+  }
+
+  .hero-subtitle,
+  .hero-proof {
+    font-size: 1rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-cta .btn {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .spotlight-grid,
+  .market-hub-grid,
+  .premium-preview-grid,
+  .info-grid,
+  .why-grid,
+  .pricing-grid,
+  .league-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spotlight-card,
+  .market-hub-card,
+  .premium-preview-card,
+  .info-card,
+  .why-card,
+  .pricing-card,
+  .cta-box,
+  .leaderboard-box,
+  .trends-promo-box {
+    padding: 20px;
+  }
+
+  .section-header h2,
+  .featured-leagues h2,
+  .how-it-works h2,
+  .cta-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .market-hub-card h3,
+  .spotlight-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
   }
 }

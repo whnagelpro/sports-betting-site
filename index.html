@@ -529,19 +529,6 @@
   });
 </script>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    if (window.innerWidth <= 768) {
-      document.querySelectorAll(".dropdown > a").forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const parent = link.parentElement;
-          parent.classList.toggle("open");
-        });
-      });
-    }
-  });
-</script>
-<script>
 let lastScrollY = window.scrollY;
 
 window.addEventListener("scroll", () => {
