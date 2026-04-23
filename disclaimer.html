@@ -190,6 +190,48 @@
     <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
   </div>
 </footer>
+<script>
+let lastScrollY = window.scrollY;
 
+window.addEventListener("scroll", () => {
+  const header = document.querySelector(".site-header");
+  const currentScrollY = window.scrollY;
+
+  if (!header) return;
+
+  if (currentScrollY > lastScrollY && currentScrollY > 80) {
+    header.classList.add("hidden");
+  } else {
+    header.classList.remove("hidden");
+  }
+
+  lastScrollY = currentScrollY;
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const nav = document.getElementById("site-nav");
+
+  if (toggle && nav) {
+    toggle.addEventListener("click", () => {
+      nav.classList.toggle("mobile-open");
+      const isOpen = nav.classList.contains("mobile-open");
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      toggle.textContent = isOpen ? "✕" : "☰";
+    });
+  }
+
+  if (window.innerWidth <= 768) {
+    document.querySelectorAll(".dropdown > a").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const parent = link.parentElement;
+        parent.classList.toggle("open");
+      });
+    });
+  }
+});
+</script>
 </body>
 </html>

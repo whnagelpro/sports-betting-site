@@ -1843,14 +1843,6 @@ select:disabled {
   margin: 6px;
 }
 
-.site-header {
-  transition: transform 0.3s ease;
-}
-
-.site-header.hidden {
-  transform: translateY(-100%);
-}
-
 .mobile-menu-toggle {
   display: none;
   background: #0f1727;
@@ -2083,4 +2075,23 @@ select:disabled {
     flex-direction: column;
     gap: 10px;
   }
+}
+
+.site-header {
+  z-index: 5000;
+  transition: transform 0.3s ease;
+}
+
+.site-header.hidden {
+  transform: translateY(-100%);
+}
+
+.mobile-menu-toggle {
+  position: relative;
+  z-index: 5001;
+}
+
+#site-nav {
+  position: relative;
+  z-index: 5000;
 }
