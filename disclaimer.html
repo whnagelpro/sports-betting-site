@@ -101,6 +101,19 @@
       </div>
 
       <div class="bet-card">
+  <h2>Third-Party Data Sources</h2>
+  <p>
+    Sports Betting Guide relies on data provided by third-party sources, including external sports data and odds APIs.
+    We do not control, verify, or guarantee the accuracy, completeness, or timeliness of this data.
+  </p>
+  <p style="margin-top: 14px;">
+    By using this website, you acknowledge that all data, including odds, player statistics, projections, and trends,
+    may contain errors or delays, and you agree that Sports Betting Guide is not responsible for any discrepancies
+    or inaccuracies in third-party data.
+  </p>
+</div>
+
+      <div class="bet-card">
         <h2>No Guarantee of Results</h2>
         <p>
           Sports betting involves risk. Past results, model outputs, expected value calculations,
@@ -186,26 +199,35 @@
 
 <footer class="site-footer">
   <div class="container">
-    <p><strong>Disclaimer:</strong> This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
+    <p><strong>Disclaimer:</strong> Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
     <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
   </div>
 </footer>
 <script>
 let lastScrollY = window.scrollY;
+let ticking = false;
 
-window.addEventListener("scroll", () => {
+function handleHeaderScroll() {
   const header = document.querySelector(".site-header");
-  const currentScrollY = window.scrollY;
-
   if (!header) return;
 
-  if (currentScrollY > lastScrollY && currentScrollY > 80) {
+  const currentScrollY = window.scrollY;
+
+  if (currentScrollY > lastScrollY && currentScrollY > 120) {
     header.classList.add("hidden");
   } else {
     header.classList.remove("hidden");
   }
 
   lastScrollY = currentScrollY;
+  ticking = false;
+}
+
+window.addEventListener("scroll", () => {
+  if (!ticking) {
+    window.requestAnimationFrame(handleHeaderScroll);
+    ticking = true;
+  }
 });
 </script>
 <script>

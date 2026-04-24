@@ -103,6 +103,18 @@
     </div>
 
     <div class="bet-card">
+  <h2>Third-Party Data and Services</h2>
+  <p>
+    This website relies on data provided by third-party services and APIs. We do not guarantee the accuracy,
+    completeness, or reliability of any third-party data displayed on the site.
+  </p>
+  <p style="margin-top: 14px;">
+    We are not responsible for errors, delays, or inaccuracies in third-party data, and you agree that your
+    use of such data is at your own risk.
+  </p>
+</div>
+
+    <div class="bet-card">
       <h2>No Guarantees</h2>
       <p>
         While we provide data-driven insights and expected value analysis, there are no guarantees
@@ -169,20 +181,29 @@
 </footer>
 <script>
 let lastScrollY = window.scrollY;
+let ticking = false;
 
-window.addEventListener("scroll", () => {
+function handleHeaderScroll() {
   const header = document.querySelector(".site-header");
-  const currentScrollY = window.scrollY;
-
   if (!header) return;
 
-  if (currentScrollY > lastScrollY && currentScrollY > 80) {
+  const currentScrollY = window.scrollY;
+
+  if (currentScrollY > lastScrollY && currentScrollY > 120) {
     header.classList.add("hidden");
   } else {
     header.classList.remove("hidden");
   }
 
   lastScrollY = currentScrollY;
+  ticking = false;
+}
+
+window.addEventListener("scroll", () => {
+  if (!ticking) {
+    window.requestAnimationFrame(handleHeaderScroll);
+    ticking = true;
+  }
 });
 </script>
 <script>

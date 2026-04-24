@@ -165,6 +165,20 @@
               A bet on whether the combined score will go over or under the sportsbook’s number.
             </div>
           </div>
+
+          <span class="hover-guide-item">
+  <span class="hover-guide-term">Implied Probability</span>
+  <span class="hover-guide-tooltip">
+    The chance of an outcome based on the sportsbook’s listed odds before removing sportsbook margin.
+  </span>
+</span>
+
+<span class="hover-guide-item">
+  <span class="hover-guide-term">Vig-Free Probability</span>
+  <span class="hover-guide-tooltip">
+    A cleaner estimate of each team’s true market probability after removing the sportsbook’s built-in margin.
+  </span>
+</span>
         </div>
       </div>
     </div>
@@ -203,7 +217,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p><strong>Disclaimer:</strong> This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
+      <p><strong>Disclaimer:</strong> Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.</p>
       <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
     </div>
   </footer>
@@ -215,20 +229,29 @@
   </script>
 <script>
 let lastScrollY = window.scrollY;
+let ticking = false;
 
-window.addEventListener("scroll", () => {
+function handleHeaderScroll() {
   const header = document.querySelector(".site-header");
-  const currentScrollY = window.scrollY;
-
   if (!header) return;
 
-  if (currentScrollY > lastScrollY && currentScrollY > 80) {
+  const currentScrollY = window.scrollY;
+
+  if (currentScrollY > lastScrollY && currentScrollY > 120) {
     header.classList.add("hidden");
   } else {
     header.classList.remove("hidden");
   }
 
   lastScrollY = currentScrollY;
+  ticking = false;
+}
+
+window.addEventListener("scroll", () => {
+  if (!ticking) {
+    window.requestAnimationFrame(handleHeaderScroll);
+    ticking = true;
+  }
 });
 </script>
 <script>

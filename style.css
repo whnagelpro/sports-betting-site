@@ -2079,7 +2079,8 @@ select:disabled {
 
 .site-header {
   z-index: 5000;
-  transition: transform 0.3s ease;
+  transition: transform 0.22s ease;
+  will-change: transform;
 }
 
 .site-header.hidden {
@@ -2094,4 +2095,27 @@ select:disabled {
 #site-nav {
   position: relative;
   z-index: 5000;
+}
+
+@media (max-width: 768px) {
+  .bet-card,
+  .prop-card,
+  .spotlight-card,
+  .market-hub-card,
+  .premium-preview-card,
+  .leaderboard-box,
+  .trends-promo-box,
+  .why-card,
+  .info-card,
+  .pricing-card {
+    box-shadow: none;
+  }
+
+  .locked-teaser-overlay {
+    backdrop-filter: none;
+  }
+
+  .site-header {
+    will-change: transform;
+  }
 }

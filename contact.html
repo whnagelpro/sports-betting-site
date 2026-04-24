@@ -204,7 +204,8 @@
     </div>
 
     <p class="footer-disclaimer">
-      This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.
+      Data provided by BallDontLie API. This website is for informational and educational purposes only.
+      Nothing on this site guarantees results or should be considered financial advice. Bet responsibly.
     </p>
 
     <p>&copy; 2026 Sports Betting Guide. All rights reserved.</p>
@@ -213,20 +214,29 @@
 </footer>
 <script>
 let lastScrollY = window.scrollY;
+let ticking = false;
 
-window.addEventListener("scroll", () => {
+function handleHeaderScroll() {
   const header = document.querySelector(".site-header");
-  const currentScrollY = window.scrollY;
-
   if (!header) return;
 
-  if (currentScrollY > lastScrollY && currentScrollY > 80) {
+  const currentScrollY = window.scrollY;
+
+  if (currentScrollY > lastScrollY && currentScrollY > 120) {
     header.classList.add("hidden");
   } else {
     header.classList.remove("hidden");
   }
 
   lastScrollY = currentScrollY;
+  ticking = false;
+}
+
+window.addEventListener("scroll", () => {
+  if (!ticking) {
+    window.requestAnimationFrame(handleHeaderScroll);
+    ticking = true;
+  }
 });
 </script>
 <script>
