@@ -20,9 +20,8 @@ body {
 .site-header {
   background: #111a2b;
   border-bottom: 1px solid #22304a;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  position: relative;
+  z-index: 5000;
 }
 
 .nav {
@@ -1843,6 +1842,25 @@ select:disabled {
   margin: 6px;
 }
 
+@media (max-width: 768px) {
+  .bet-card,
+  .prop-card,
+  .spotlight-card,
+  .market-hub-card,
+  .premium-preview-card,
+  .leaderboard-box,
+  .trends-promo-box,
+  .why-card,
+  .info-card,
+  .pricing-card {
+    box-shadow: none;
+  }
+
+  .locked-teaser-overlay {
+    backdrop-filter: none;
+  }
+}
+
 .mobile-menu-toggle {
   display: none;
   background: #0f1727;
@@ -1852,92 +1870,16 @@ select:disabled {
   padding: 10px 14px;
   font-size: 1.5rem;
   cursor: pointer;
+  position: relative;
+  z-index: 5001;
+}
+
+#site-nav {
+  position: relative;
+  z-index: 5000;
 }
 
 @media (max-width: 768px) {
-  .nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 14px 0;
-  }
-
-  .logo {
-    font-size: 1.6rem;
-    text-align: left;
-  }
-
-  .mobile-menu-toggle {
-    display: block;
-    flex-shrink: 0;
-  }
-
-  #site-nav {
-    display: none;
-    width: 100%;
-  }
-
-  #site-nav.mobile-open {
-    display: block;
-    margin-top: 12px;
-  }
-
-  .nav {
-    flex-wrap: wrap;
-  }
-
-  .nav-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .nav-links li {
-    width: 100%;
-    text-align: left;
-  }
-
-  .nav-links a {
-    display: block;
-    width: 100%;
-    padding: 12px 14px;
-    background: #0f1727;
-    border: 1px solid #22304a;
-    border-radius: 10px;
-  }
-
-  .dropdown-menu {
-    display: none;
-    position: static;
-    width: 100%;
-    margin-top: 8px;
-    background: #10192a;
-    border: 1px solid #22304a;
-    border-radius: 10px;
-    box-shadow: none;
-    padding: 8px 0;
-  }
-
-  .dropdown.open .dropdown-menu {
-    display: block;
-  }
-
-  .dropdown-menu a {
-    background: transparent;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .site-header {
-    position: sticky;
-    top: 0;
-  }
-
   .nav {
     display: flex;
     align-items: center;
@@ -2057,6 +1999,16 @@ select:disabled {
   .leaderboard-box,
   .trends-promo-box {
     padding: 20px;
+    box-shadow: none;
+  }
+
+  .bet-card,
+  .prop-card {
+    box-shadow: none;
+  }
+
+  .locked-teaser-overlay {
+    backdrop-filter: none;
   }
 
   .section-header h2,
@@ -2074,48 +2026,5 @@ select:disabled {
   .footer-links {
     flex-direction: column;
     gap: 10px;
-  }
-}
-
-.site-header {
-  z-index: 5000;
-  transition: transform 0.22s ease;
-  will-change: transform;
-}
-
-.site-header.hidden {
-  transform: translateY(-100%);
-}
-
-.mobile-menu-toggle {
-  position: relative;
-  z-index: 5001;
-}
-
-#site-nav {
-  position: relative;
-  z-index: 5000;
-}
-
-@media (max-width: 768px) {
-  .bet-card,
-  .prop-card,
-  .spotlight-card,
-  .market-hub-card,
-  .premium-preview-card,
-  .leaderboard-box,
-  .trends-promo-box,
-  .why-card,
-  .info-card,
-  .pricing-card {
-    box-shadow: none;
-  }
-
-  .locked-teaser-overlay {
-    backdrop-filter: none;
-  }
-
-  .site-header {
-    will-change: transform;
   }
 }
