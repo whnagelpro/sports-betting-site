@@ -254,5 +254,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  if (!isMobile) return;
+
+  document.querySelectorAll(".guide-panel .hover-guide-term").forEach((term) => {
+    term.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const item = term.closest(".hover-guide-item");
+      if (!item) return;
+
+      document.querySelectorAll(".guide-panel .hover-guide-item.tooltip-open").forEach((openItem) => {
+        if (openItem !== item) {
+          openItem.classList.remove("tooltip-open");
+        }
+      });
+
+      item.classList.toggle("tooltip-open");
+    });
+  });
+
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".guide-panel .hover-guide-item.tooltip-open").forEach((item) => {
+      item.classList.remove("tooltip-open");
+    });
+  });
+});
+</script>
 </body>
 </html>

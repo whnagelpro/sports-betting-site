@@ -1801,6 +1801,21 @@ select:disabled {
   }
 }
 
+.guide-panel .hover-guide-item.tooltip-open .hover-guide-tooltip {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .guide-panel .hover-guide-term {
+    cursor: pointer;
+  }
+
+  .guide-panel .hover-guide-tooltip {
+    left: 0;
+    width: min(280px, 82vw);
+  }
+}
+
 .trends-promo-section {
   margin: 40px 0;
 }
