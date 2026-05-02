@@ -2069,3 +2069,17 @@ select:disabled {
     gap: 10px;
   }
 }
+
+.secure-checkout {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.support-email {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #9ca3af;
+}
