@@ -2096,3 +2096,25 @@ select:disabled {
   font-size: 0.95rem;
   text-align: center;
 }
+
+a[href^="mailto:"] {
+  color: #60a5fa; /* 👈 softer, modern blue */
+  text-decoration: none;
+}
+
+a[href^="mailto:"]:hover {
+  color: #93c5fd; /* 👈 lighter on hover */
+  text-decoration: underline;
+}
+
+a[href^="mailto:"],
+a[href^="mailto:"]:visited {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+a[href^="mailto:"]:hover,
+a[href^="mailto:"]:focus {
+  color: #93c5fd;
+  text-decoration: underline;
+}
