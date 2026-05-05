@@ -2118,3 +2118,8 @@ a[href^="mailto:"]:focus {
   color: #93c5fd;
   text-decoration: underline;
 }
+
+.logo img {
+  height: 40px;
+  width: auto;
+}
