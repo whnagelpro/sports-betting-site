@@ -2212,22 +2212,7 @@ async function fetchLeagueTrends(csvUrl) {
 }
 
 function formatTrendLabel(statKey) {
-  const labelMap = {
-    hits_last5: "Hits",
-    home_runs_last5: "Home Runs",
-    rbis_last5: "RBIs",
-    runs_scored_last5: "Runs Scored",
-    stolen_bases_last5: "Stolen Bases",
-    total_bases_last5: "Total Bases",
-    strikeouts_last5: "Batter Strikeouts",
-    pitcher_strikeouts_last5: "Pitcher Strikeouts",
-    pitcher_outs_last5: "Pitcher Outs",
-    pitcher_earned_runs_last5: "Pitcher Earned Runs",
-    pitcher_hits_allowed_last5: "Pitcher Hits Allowed",
-    pitcher_walks_last5: "Pitcher Walks Allowed"
-  };
-
-  return labelMap[statKey] || statKey;
+  return statKey || "Trend";
 }
 
 function formatNBATrendLabel(statKey) {
@@ -2263,15 +2248,26 @@ function createNBATrendCard(player, statKey) {
   `;
 }
 
-function createTrendCard(player, statKey) {
-  const statValue = Number(player[statKey]);
-  const gamesUsed = player.games_used_last5 || "N/A";
+function createTrendCard(player) {
+  const seasonAvg = Number(player["Season Avg"]);
+  const last3 = Number(player["Last 3 Avg"]);
+  const last5 = Number(player["Last 5 Avg"]);
+  const last10 = Number(player["Last 10 Avg"]);
+  const trendScore = Number(player["Trend Score"]);
+  const consistency = Number(player["Consistency"]);
 
   return `
     <div class="leaderboard-item">
-      <strong>${player["Player Name"] || "Unknown Player"}</strong>
-      <div>${formatTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
-      <div>Games Used: ${gamesUsed}</div>
+      <strong>${player["Player Name"] || "Unknown Player"} — ${player["Stat Type"] || "Trend"}</strong>
+      <div>Last 5 Avg: ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+      <div>Last 3 Avg: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)} | Last 10 Avg: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}</div>
+      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+      <div>
+        Trend: ${player["Trend Direction"] || "N/A"} |
+        Score: ${Number.isNaN(trendScore) ? "N/A" : trendScore.toFixed(1)} |
+        Consistency: ${Number.isNaN(consistency) ? "N/A" : consistency.toFixed(1)} |
+        Risk: ${player["Risk Tier"] || "N/A"}
+      </div>
     </div>
   `;
 }
@@ -2576,29 +2572,29 @@ async function initNHLTrendsPage() {
 }
 
 function formatMLBTeamTrendLabel(statKey) {
-  const labelMap = {
-    runs_scored_last5: "Runs Scored",
-    runs_allowed_last5: "Runs Allowed",
-    hits_last5: "Hits",
-    home_runs_last5: "Home Runs",
-    total_bases_last5: "Total Bases",
-    team_strikeouts_last5: "Team Strikeouts",
-    overs_last5: "Overs",
-    unders_last5: "Unders"
-  };
-
-  return labelMap[statKey] || statKey;
+  return statKey || "Trend";
 }
 
-function createMLBTeamTrendCard(teamRow, statKey) {
-  const statValue = Number(teamRow[statKey]);
-  const gamesUsed = teamRow.games_used_last5 || "N/A";
+function createMLBTeamTrendCard(teamRow) {
+  const seasonAvg = Number(teamRow["Season Avg"]);
+  const last3 = Number(teamRow["Last 3 Avg"]);
+  const last5 = Number(teamRow["Last 5 Avg"]);
+  const last10 = Number(teamRow["Last 10 Avg"]);
+  const trendScore = Number(teamRow["Trend Score"]);
+  const consistency = Number(teamRow["Consistency"]);
 
   return `
     <div class="leaderboard-item">
-      <strong>${teamRow["Team"] || "Unknown Team"}</strong>
-      <div>${formatMLBTeamTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
-      <div>Games Used: ${gamesUsed}</div>
+      <strong>${teamRow["Team"] || "Unknown Team"} — ${teamRow["Metric"] || "Trend"}</strong>
+      <div>Last 5 Avg: ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+      <div>Last 3 Avg: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)} | Last 10 Avg: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}</div>
+      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+      <div>
+        Trend: ${teamRow["Trend Direction"] || "N/A"} |
+        Score: ${Number.isNaN(trendScore) ? "N/A" : trendScore.toFixed(1)} |
+        Consistency: ${Number.isNaN(consistency) ? "N/A" : consistency.toFixed(1)} |
+        Risk: ${teamRow["Risk Tier"] || "N/A"}
+      </div>
     </div>
   `;
 }
@@ -2638,7 +2634,6 @@ async function renderMLBTeamTrends() {
 
     const renderPage = () => {
       const currentTier = CURRENT_USER_TIER || "Rookie";
-      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
 
       const filterIds = [
         "mlb-team-trends-team-filter",
@@ -2661,13 +2656,15 @@ async function renderMLBTeamTrends() {
       setTrendsFiltersDisabled(filterIds, false);
 
       const selectedStat =
-        document.getElementById("mlb-team-trends-stat-filter")?.value || "runs_scored_last5";
+        document.getElementById("mlb-team-trends-stat-filter")?.value || "Runs For";
+
       const selectedSort =
         document.getElementById("mlb-team-trends-sort-filter")?.value || "desc";
 
       let filteredRows = rows
         .filter((row) => row["Team"])
-        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+        .filter((row) => row["Metric"] === selectedStat)
+        .filter((row) => !Number.isNaN(Number(row["Last 5 Avg"])));
 
       populateTeamFilter("mlb-team-trends-team-filter", filteredRows, renderPage);
 
@@ -2681,8 +2678,8 @@ async function renderMLBTeamTrends() {
       }
 
       filteredRows.sort((a, b) => {
-        const aVal = Number(a[selectedStat]);
-        const bVal = Number(b[selectedStat]);
+        const aVal = Number(a["Last 5 Avg"]);
+        const bVal = Number(b["Last 5 Avg"]);
         return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
       });
 
@@ -2703,10 +2700,8 @@ async function renderMLBTeamTrends() {
         return;
       }
 
-      const visibleRows = filteredRows;
-
-      container.innerHTML = visibleRows
-        .map((row) => createMLBTeamTrendCard(row, selectedStat))
+      container.innerHTML = filteredRows
+        .map((row) => createMLBTeamTrendCard(row))
         .join("");
     };
 
@@ -2715,7 +2710,7 @@ async function renderMLBTeamTrends() {
 
     bindButton("mlb-team-trends-reset-filters", () => {
       resetSelectToAll("mlb-team-trends-team-filter");
-      resetSelectToValue("mlb-team-trends-stat-filter", "runs_scored_last5");
+      resetSelectToValue("mlb-team-trends-stat-filter", "Runs For");
       resetSelectToValue("mlb-team-trends-sort-filter", "desc");
       renderPage();
     });
@@ -2758,6 +2753,7 @@ async function renderMLBTrends() {
     const renderPage = () => {
       const currentTier = CURRENT_USER_TIER || "Rookie";
       const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
       const filterIds = [
         "mlb-trends-stat-filter",
         "mlb-trends-sort-filter",
@@ -2778,13 +2774,15 @@ async function renderMLBTrends() {
       setTrendsFiltersDisabled(filterIds, false);
 
       const selectedStat =
-        document.getElementById("mlb-trends-stat-filter")?.value || "hits_last5";
+        document.getElementById("mlb-trends-stat-filter")?.value || "Hits";
+
       const selectedSort =
         document.getElementById("mlb-trends-sort-filter")?.value || "desc";
 
       let filteredRows = rows
         .filter((row) => row["Player Name"])
-        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+        .filter((row) => row["Stat Type"] === selectedStat)
+        .filter((row) => !Number.isNaN(Number(row["Last 5 Avg"])));
 
       populateTrendsPlayerFilter("mlb-trends-player-filter", filteredRows, renderPage);
 
@@ -2798,8 +2796,8 @@ async function renderMLBTrends() {
       }
 
       filteredRows.sort((a, b) => {
-        const aVal = Number(a[selectedStat]);
-        const bVal = Number(b[selectedStat]);
+        const aVal = Number(a["Last 5 Avg"]);
+        const bVal = Number(b["Last 5 Avg"]);
         return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
       });
 
@@ -2820,10 +2818,8 @@ async function renderMLBTrends() {
         return;
       }
 
-      const visibleRows = filteredRows;
-
-      container.innerHTML = visibleRows
-        .map((row) => createTrendCard(row, selectedStat))
+      container.innerHTML = filteredRows
+        .map((row) => createTrendCard(row))
         .join("");
     };
 
@@ -2831,7 +2827,7 @@ async function renderMLBTrends() {
     bindSelectChange("mlb-trends-sort-filter", renderPage);
 
     bindButton("mlb-trends-reset-filters", () => {
-      resetSelectToValue("mlb-trends-stat-filter", "hits_last5");
+      resetSelectToValue("mlb-trends-stat-filter", "Hits");
       resetSelectToValue("mlb-trends-sort-filter", "desc");
       resetSelectToAll("mlb-trends-player-filter");
       renderPage();
@@ -2844,7 +2840,7 @@ async function renderMLBTrends() {
     container.innerHTML = `
       <div class="empty-state">
         <h3>Unable to load MLB trends right now.</h3>
-        <p>Please check your published MLB Trends CSV.</p>
+        <p>Please check your published MLB Player Trends CSV.</p>
       </div>
     `;
   }
