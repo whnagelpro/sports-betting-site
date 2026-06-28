@@ -2123,3 +2123,104 @@ a[href^="mailto:"]:focus {
   height: 60px;
   width: auto;
 }
+
+/* ===== TREND CARD UPGRADE ===== */
+
+.trend-card {
+  background: #131d31;
+  border: 1px solid #25324a;
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 22px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.trend-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.trend-title h3 {
+  font-size: 1.35rem;
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.trend-subtitle {
+  color: #9fb0cc;
+  font-size: 0.95rem;
+}
+
+.trend-strength-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #22c55e;
+  color: #081018;
+  font-weight: bold;
+  padding: 9px 13px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.trend-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.trend-metric-box {
+  background: #0f1727;
+  border: 1px solid #22304a;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.trend-metric-label {
+  color: #9fb0cc;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.trend-metric-value {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+
+.trend-note {
+  margin-top: 16px;
+  padding: 15px;
+  background: #0f1727;
+  border: 1px solid #22304a;
+  border-radius: 12px;
+  color: #dbe7ff;
+  line-height: 1.55;
+}
+
+.trend-secondary-line {
+  margin-top: 14px;
+  color: #c7d2e3;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .trend-card {
+    padding: 20px;
+    box-shadow: none;
+  }
+
+  .trend-title h3 {
+    font-size: 1.15rem;
+  }
+
+  .trend-strength-badge {
+    width: 100%;
+  }
+}
