@@ -1927,33 +1927,51 @@ function createNBATrendCard(player) {
   const hitRate5 = Number(player["Hit Rate Last 5"]);
   const aboveSeason = Number(player["Above Season %"]);
 
-  const hitRateText = Number.isNaN(hitRate5)
-    ? "N/A"
-    : `${Math.round(hitRate5 * 100)}%`;
-
+  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
   const aboveSeasonText = Number.isNaN(aboveSeason)
     ? "N/A"
     : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
 
   return `
-    <div class="leaderboard-item">
-      <strong>${player["Player Name"] || "Unknown Player"} — ${player["Stat Type"] || "Trend"}</strong>
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-title">
+          <h3>${player["Player Name"] || "Unknown Player"}</h3>
+          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
+        </div>
 
-      <div><strong>Trend Strength:</strong> ${player["Trend Strength"] || "N/A"}</div>
+        <div class="trend-strength-badge">
+          ${player["Trend Strength"] || "N/A"}
+        </div>
+      </div>
 
-      <div><strong>Last 5 Avg:</strong> ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+      <div class="trend-metric-grid">
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Last 5 Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+        </div>
 
-      <div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Hit Rate Last 5</div>
+          <div class="trend-metric-value">${hitRateText}</div>
+        </div>
+
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Above Season</div>
+          <div class="trend-metric-value">${aboveSeasonText}</div>
+        </div>
+
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Season Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div class="trend-secondary-line">
         Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
         |
         Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
       </div>
-
-      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-
-      <div><strong>1+ Hit Rate Last 5:</strong> ${hitRateText}</div>
-
-      <div><strong>Above Season Avg:</strong> ${aboveSeasonText}</div>
 
       <div class="trend-note">
         ${player["Trend Note"] || ""}
@@ -2087,29 +2105,51 @@ function createNBATeamTrendCard(teamRow) {
   const hitRate5 = Number(teamRow["Hit Rate Last 5"]);
   const aboveSeason = Number(teamRow["Above Season %"]);
 
-  const hitRateText = Number.isNaN(hitRate5)
-    ? "N/A"
-    : `${Math.round(hitRate5 * 100)}%`;
-
+  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
   const aboveSeasonText = Number.isNaN(aboveSeason)
     ? "N/A"
     : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
 
   return `
-    <div class="leaderboard-item">
-      <strong>${teamRow["Team"] || "Unknown Team"} — ${teamRow["Metric"] || "Trend"}</strong>
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-title">
+          <h3>${teamRow["Team"] || "Unknown Team"}</h3>
+          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
+        </div>
 
-      <div><strong>Trend Strength:</strong> ${teamRow["Trend Strength"] || "N/A"}</div>
+        <div class="trend-strength-badge">
+          ${teamRow["Trend Strength"] || "N/A"}
+        </div>
+      </div>
 
-      <div>Last 3 Avg: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}</div>
-      <div><strong>Last 5 Avg:</strong> ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-      <div>Last 10 Avg: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}</div>
+      <div class="trend-metric-grid">
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Last 5 Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+        </div>
 
-      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Hit Rate Last 5</div>
+          <div class="trend-metric-value">${hitRateText}</div>
+        </div>
 
-      <div><strong>1+ Hit Rate Last 5:</strong> ${hitRateText}</div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Above Season</div>
+          <div class="trend-metric-value">${aboveSeasonText}</div>
+        </div>
 
-      <div><strong>Above Season Avg:</strong> ${aboveSeasonText}</div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Season Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div class="trend-secondary-line">
+        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
+        |
+        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+      </div>
 
       <div class="trend-note">
         ${teamRow["Trend Note"] || ""}
@@ -2248,33 +2288,51 @@ function createNHLTrendCard(player) {
   const hitRate5 = Number(player["Hit Rate Last 5"]);
   const aboveSeason = Number(player["Above Season %"]);
 
-  const hitRateText = Number.isNaN(hitRate5)
-    ? "N/A"
-    : `${Math.round(hitRate5 * 100)}%`;
-
+  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
   const aboveSeasonText = Number.isNaN(aboveSeason)
     ? "N/A"
     : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
 
   return `
-    <div class="leaderboard-item">
-      <strong>${player["Player Name"] || "Unknown Player"} — ${player["Stat Type"] || "Trend"}</strong>
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-title">
+          <h3>${player["Player Name"] || "Unknown Player"}</h3>
+          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
+        </div>
 
-      <div><strong>Trend Strength:</strong> ${player["Trend Strength"] || "N/A"}</div>
+        <div class="trend-strength-badge">
+          ${player["Trend Strength"] || "N/A"}
+        </div>
+      </div>
 
-      <div><strong>Last 5 Avg:</strong> ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+      <div class="trend-metric-grid">
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Last 5 Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+        </div>
 
-      <div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Hit Rate Last 5</div>
+          <div class="trend-metric-value">${hitRateText}</div>
+        </div>
+
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Above Season</div>
+          <div class="trend-metric-value">${aboveSeasonText}</div>
+        </div>
+
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Season Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div class="trend-secondary-line">
         Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
         |
         Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
       </div>
-
-      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-
-      <div><strong>1+ Hit Rate Last 5:</strong> ${hitRateText}</div>
-
-      <div><strong>Above Season Avg:</strong> ${aboveSeasonText}</div>
 
       <div class="trend-note">
         ${player["Trend Note"] || ""}
@@ -2408,29 +2466,51 @@ function createNHLTeamTrendCard(teamRow) {
   const hitRate5 = Number(teamRow["Hit Rate Last 5"]);
   const aboveSeason = Number(teamRow["Above Season %"]);
 
-  const hitRateText = Number.isNaN(hitRate5)
-    ? "N/A"
-    : `${Math.round(hitRate5 * 100)}%`;
-
+  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
   const aboveSeasonText = Number.isNaN(aboveSeason)
     ? "N/A"
     : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
 
   return `
-    <div class="leaderboard-item">
-      <strong>${teamRow["Team"] || "Unknown Team"} — ${teamRow["Metric"] || "Trend"}</strong>
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-title">
+          <h3>${teamRow["Team"] || "Unknown Team"}</h3>
+          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
+        </div>
 
-      <div><strong>Trend Strength:</strong> ${teamRow["Trend Strength"] || "N/A"}</div>
+        <div class="trend-strength-badge">
+          ${teamRow["Trend Strength"] || "N/A"}
+        </div>
+      </div>
 
-      <div>Last 3 Avg: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}</div>
-      <div><strong>Last 5 Avg:</strong> ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-      <div>Last 10 Avg: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}</div>
+      <div class="trend-metric-grid">
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Last 5 Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+        </div>
 
-      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Hit Rate Last 5</div>
+          <div class="trend-metric-value">${hitRateText}</div>
+        </div>
 
-      <div><strong>1+ Hit Rate Last 5:</strong> ${hitRateText}</div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Above Season</div>
+          <div class="trend-metric-value">${aboveSeasonText}</div>
+        </div>
 
-      <div><strong>Above Season Avg:</strong> ${aboveSeasonText}</div>
+        <div class="trend-metric-box">
+          <div class="trend-metric-label">Season Avg</div>
+          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div class="trend-secondary-line">
+        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
+        |
+        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+      </div>
 
       <div class="trend-note">
         ${teamRow["Trend Note"] || ""}
