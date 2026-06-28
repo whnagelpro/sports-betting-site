@@ -2256,17 +2256,76 @@ function createTrendCard(player) {
   const trendScore = Number(player["Trend Score"]);
   const consistency = Number(player["Consistency"]);
 
+  const hitRate3 = Number(player["Hit Rate Last 3"]);
+  const hitRate5 = Number(player["Hit Rate Last 5"]);
+  const hitRate10 = Number(player["Hit Rate Last 10"]);
+  const aboveSeason = Number(player["Above Season %"]);
+
+  const trendStrength = player["Trend Strength"] || "N/A";
+  const trendNote = player["Trend Note"] || "";
+
+  const hitRate3Text = Number.isNaN(hitRate3) ? "N/A" : `${Math.round(hitRate3 * 100)}%`;
+  const hitRate5Text = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
+  const hitRate10Text = Number.isNaN(hitRate10) ? "N/A" : `${Math.round(hitRate10 * 100)}%`;
+
+  const aboveSeasonText = Number.isNaN(aboveSeason)
+    ? "N/A"
+    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
+
   return `
     <div class="leaderboard-item">
-      <strong>${player["Player Name"] || "Unknown Player"} — ${player["Stat Type"] || "Trend"}</strong>
-      <div>Last 5 Avg: ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-      <div>Last 3 Avg: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)} | Last 10 Avg: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}</div>
-      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+      <strong>
+        ${player["Player Name"] || "Unknown Player"}
+        — ${player["Stat Type"] || "Trend"}
+      </strong>
+
+      <div><strong>Trend Strength:</strong> ${trendStrength}</div>
+
       <div>
-        Trend: ${player["Trend Direction"] || "N/A"} |
-        Score: ${Number.isNaN(trendScore) ? "N/A" : trendScore.toFixed(1)} |
-        Consistency: ${Number.isNaN(consistency) ? "N/A" : consistency.toFixed(1)} |
+        <strong>Last 5 Avg:</strong>
+        ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}
+      </div>
+
+      <div>
+        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
+        |
+        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+      </div>
+
+      <div>
+        Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}
+      </div>
+
+      <div>
+        Trend: <strong>${player["Trend Direction"] || "N/A"}</strong>
+        |
+        Score: ${Number.isNaN(trendScore) ? "N/A" : trendScore.toFixed(1)}
+      </div>
+
+      <div>
+        Consistency: ${Number.isNaN(consistency) ? "N/A" : consistency.toFixed(1)}
+        |
         Risk: ${player["Risk Tier"] || "N/A"}
+      </div>
+
+      <hr>
+
+      <div><strong>1+ Hit Rate</strong></div>
+
+      <div>
+        Last 3: ${hitRate3Text}
+        |
+        Last 5: ${hitRate5Text}
+        |
+        Last 10: ${hitRate10Text}
+      </div>
+
+      <div>
+        Above Season Avg: <strong>${aboveSeasonText}</strong>
+      </div>
+
+      <div class="trend-note">
+        ${trendNote}
       </div>
     </div>
   `;
@@ -2580,20 +2639,56 @@ function createMLBTeamTrendCard(teamRow) {
   const last3 = Number(teamRow["Last 3 Avg"]);
   const last5 = Number(teamRow["Last 5 Avg"]);
   const last10 = Number(teamRow["Last 10 Avg"]);
-  const trendScore = Number(teamRow["Trend Score"]);
-  const consistency = Number(teamRow["Consistency"]);
+
+  const hitRate5 = Number(teamRow["Hit Rate Last 5"]);
+  const aboveSeason = Number(teamRow["Above Season %"]);
+
+  const trendStrength = teamRow["Trend Strength"] || "N/A";
+
+  const hitRateText = Number.isNaN(hitRate5)
+    ? "N/A"
+    : `${Math.round(hitRate5 * 100)}%`;
+
+  const aboveSeasonText = Number.isNaN(aboveSeason)
+    ? "N/A"
+    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
 
   return `
     <div class="leaderboard-item">
       <strong>${teamRow["Team"] || "Unknown Team"} — ${teamRow["Metric"] || "Trend"}</strong>
-      <div>Last 5 Avg: ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-      <div>Last 3 Avg: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)} | Last 10 Avg: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}</div>
-      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+
+      <div><strong>Trend Strength:</strong> ${trendStrength}</div>
+
       <div>
-        Trend: ${teamRow["Trend Direction"] || "N/A"} |
-        Score: ${Number.isNaN(trendScore) ? "N/A" : trendScore.toFixed(1)} |
-        Consistency: ${Number.isNaN(consistency) ? "N/A" : consistency.toFixed(1)} |
-        Risk: ${teamRow["Risk Tier"] || "N/A"}
+        Last 3 Avg:
+        ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
+      </div>
+
+      <div>
+        Last 5 Avg:
+        ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}
+      </div>
+
+      <div>
+        Last 10 Avg:
+        ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+      </div>
+
+      <div>
+        Season Avg:
+        ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}
+      </div>
+
+      <div>
+        <strong>Hit Rate (Last 5):</strong> ${hitRateText}
+      </div>
+
+      <div>
+        <strong>Above Season Avg:</strong> ${aboveSeasonText}
+      </div>
+
+      <div style="margin-top:8px;">
+        ${teamRow["Trend Note"] || ""}
       </div>
     </div>
   `;
