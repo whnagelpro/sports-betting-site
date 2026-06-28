@@ -1915,28 +1915,205 @@ async function fetchCurrentUserProfile() {
   return profile;
 }
 
-function formatNBATeamTrendLabel(statKey) {
-  const labelMap = {
-    points_scored_last5: "Points Scored",
-    points_allowed_last5: "Points Allowed",
-    rebounds_last5: "Rebounds",
-    assists_last5: "Assists",
-    threes_last5: "3-Pointers",
-    turnovers_last5: "Turnovers"
-  };
-
-  return labelMap[statKey] || statKey;
+function formatNBATrendLabel(statKey) {
+  return statKey || "Trend";
 }
 
-function createNBATeamTrendCard(teamRow, statKey) {
-  const statValue = Number(teamRow[statKey]);
-  const gamesUsed = teamRow.games_used_last5 || "N/A";
+function createNBATrendCard(player) {
+  const seasonAvg = Number(player["Season Avg"]);
+  const last3 = Number(player["Last 3 Avg"]);
+  const last5 = Number(player["Last 5 Avg"]);
+  const last10 = Number(player["Last 10 Avg"]);
+  const hitRate5 = Number(player["Hit Rate Last 5"]);
+  const aboveSeason = Number(player["Above Season %"]);
+
+  const hitRateText = Number.isNaN(hitRate5)
+    ? "N/A"
+    : `${Math.round(hitRate5 * 100)}%`;
+
+  const aboveSeasonText = Number.isNaN(aboveSeason)
+    ? "N/A"
+    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
 
   return `
     <div class="leaderboard-item">
-      <strong>${teamRow["Team"] || "Unknown Team"}</strong>
-      <div>${formatNBATeamTrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
-      <div>Games Used: ${gamesUsed}</div>
+      <strong>${player["Player Name"] || "Unknown Player"} — ${player["Stat Type"] || "Trend"}</strong>
+
+      <div><strong>Trend Strength:</strong> ${player["Trend Strength"] || "N/A"}</div>
+
+      <div><strong>Last 5 Avg:</strong> ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+
+      <div>
+        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
+        |
+        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+      </div>
+
+      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+
+      <div><strong>1+ Hit Rate Last 5:</strong> ${hitRateText}</div>
+
+      <div><strong>Above Season Avg:</strong> ${aboveSeasonText}</div>
+
+      <div class="trend-note">
+        ${player["Trend Note"] || ""}
+      </div>
+    </div>
+  `;
+}
+
+async function renderNBATrends() {
+  const container = document.getElementById("nba-trends-container");
+  if (!container) return;
+
+  updateTierDisplay("nba-tier-display");
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>Loading NBA trends...</h3>
+      <p>Please wait while recent trend data is pulled in.</p>
+    </div>
+  `;
+
+  try {
+    const rows = await fetchLeagueTrends(NBA_TRENDS_CSV_URL);
+    updateLastUpdated("nba-trends-last-updated");
+
+    const renderPage = () => {
+      const currentTier = CURRENT_USER_TIER || "Rookie";
+      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+      const filterIds = [
+        "nba-trends-stat-filter",
+        "nba-trends-sort-filter",
+        "nba-trends-player-filter"
+      ];
+
+      if (!currentRules.showPlayerProps) {
+        setTrendsFiltersDisabled(filterIds, true);
+        renderTrendsLockedState(
+          container,
+          "nba-trends-filter-summary",
+          currentTier,
+          "NBA Player"
+        );
+        return;
+      }
+
+      setTrendsFiltersDisabled(filterIds, false);
+
+      const selectedStat =
+        document.getElementById("nba-trends-stat-filter")?.value || "Points";
+
+      const selectedSort =
+        document.getElementById("nba-trends-sort-filter")?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Player Name"])
+        .filter((row) => row["Stat Type"] === selectedStat)
+        .filter((row) => !Number.isNaN(Number(row["Last 5 Avg"])));
+
+      populateTrendsPlayerFilter("nba-trends-player-filter", filteredRows, renderPage);
+
+      const selectedPlayer =
+        document.getElementById("nba-trends-player-filter")?.value || "All";
+
+      if (selectedPlayer !== "All") {
+        filteredRows = filteredRows.filter(
+          (row) => (row["Player Name"] || "").trim() === selectedPlayer
+        );
+      }
+
+      filteredRows.sort((a, b) => {
+        const aVal = Number(a["Last 5 Avg"]);
+        const bVal = Number(b["Last 5 Avg"]);
+        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
+      });
+
+      renderFilterSummary("nba-trends-filter-summary", [
+        { label: "Trend", value: formatNBATrendLabel(selectedStat) },
+        { label: "Player", value: selectedPlayer },
+        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Tier", value: currentTier }
+      ]);
+
+      if (filteredRows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NBA trends found for this filter.</h3>
+            <p>Try changing the trend category, player, or sort order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredRows
+        .map((row) => createNBATrendCard(row))
+        .join("");
+    };
+
+    bindSelectChange("nba-trends-stat-filter", renderPage);
+    bindSelectChange("nba-trends-sort-filter", renderPage);
+
+    bindButton("nba-trends-reset-filters", () => {
+      resetSelectToValue("nba-trends-stat-filter", "Points");
+      resetSelectToValue("nba-trends-sort-filter", "desc");
+      resetSelectToAll("nba-trends-player-filter");
+      renderPage();
+    });
+
+    renderPage();
+  } catch (error) {
+    console.error("NBA trends render error:", error);
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load NBA trends right now.</h3>
+        <p>Please check your published NBA Player Trends CSV.</p>
+      </div>
+    `;
+  }
+}
+
+function formatNBATeamTrendLabel(statKey) {
+  return statKey || "Trend";
+}
+
+function createNBATeamTrendCard(teamRow) {
+  const seasonAvg = Number(teamRow["Season Avg"]);
+  const last3 = Number(teamRow["Last 3 Avg"]);
+  const last5 = Number(teamRow["Last 5 Avg"]);
+  const last10 = Number(teamRow["Last 10 Avg"]);
+  const hitRate5 = Number(teamRow["Hit Rate Last 5"]);
+  const aboveSeason = Number(teamRow["Above Season %"]);
+
+  const hitRateText = Number.isNaN(hitRate5)
+    ? "N/A"
+    : `${Math.round(hitRate5 * 100)}%`;
+
+  const aboveSeasonText = Number.isNaN(aboveSeason)
+    ? "N/A"
+    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
+
+  return `
+    <div class="leaderboard-item">
+      <strong>${teamRow["Team"] || "Unknown Team"} — ${teamRow["Metric"] || "Trend"}</strong>
+
+      <div><strong>Trend Strength:</strong> ${teamRow["Trend Strength"] || "N/A"}</div>
+
+      <div>Last 3 Avg: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}</div>
+      <div><strong>Last 5 Avg:</strong> ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
+      <div>Last 10 Avg: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}</div>
+
+      <div>Season Avg: ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
+
+      <div><strong>1+ Hit Rate Last 5:</strong> ${hitRateText}</div>
+
+      <div><strong>Above Season Avg:</strong> ${aboveSeasonText}</div>
+
+      <div class="trend-note">
+        ${teamRow["Trend Note"] || ""}
+      </div>
     </div>
   `;
 }
@@ -1982,13 +2159,15 @@ async function renderNBATeamTrends() {
       setTrendsFiltersDisabled(filterIds, false);
 
       const selectedStat =
-        document.getElementById("nba-team-trends-stat-filter")?.value || "points_scored_last5";
+        document.getElementById("nba-team-trends-stat-filter")?.value || "Points For";
+
       const selectedSort =
         document.getElementById("nba-team-trends-sort-filter")?.value || "desc";
 
       let filteredRows = rows
         .filter((row) => row["Team"])
-        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
+        .filter((row) => row["Metric"] === selectedStat)
+        .filter((row) => !Number.isNaN(Number(row["Last 5 Avg"])));
 
       populateTeamFilter("nba-team-trends-team-filter", filteredRows, renderPage);
 
@@ -2002,8 +2181,8 @@ async function renderNBATeamTrends() {
       }
 
       filteredRows.sort((a, b) => {
-        const aVal = Number(a[selectedStat]);
-        const bVal = Number(b[selectedStat]);
+        const aVal = Number(a["Last 5 Avg"]);
+        const bVal = Number(b["Last 5 Avg"]);
         return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
       });
 
@@ -2025,7 +2204,7 @@ async function renderNBATeamTrends() {
       }
 
       container.innerHTML = filteredRows
-        .map((row) => createNBATeamTrendCard(row, selectedStat))
+        .map((row) => createNBATeamTrendCard(row))
         .join("");
     };
 
@@ -2034,7 +2213,7 @@ async function renderNBATeamTrends() {
 
     bindButton("nba-team-trends-reset-filters", () => {
       resetSelectToAll("nba-team-trends-team-filter");
-      resetSelectToValue("nba-team-trends-stat-filter", "points_scored_last5");
+      resetSelectToValue("nba-team-trends-stat-filter", "Points For");
       resetSelectToValue("nba-team-trends-sort-filter", "desc");
       renderPage();
     });
@@ -2395,39 +2574,6 @@ function formatTrendLabel(statKey) {
   return statKey || "Trend";
 }
 
-function formatNBATrendLabel(statKey) {
-  const labelMap = {
-    points_last5: "Points",
-    rebounds_last5: "Rebounds",
-    assists_last5: "Assists",
-    threes_last5: "3-Pointers",
-    steals_last5: "Steals",
-    blocks_last5: "Blocks",
-    points_assists_last5: "Points + Assists",
-    points_rebounds_last5: "Points + Rebounds",
-    points_rebounds_assists_last5: "PRA",
-    rebounds_assists_last5: "Rebounds + Assists",
-    points_1q_last5: "1Q Points",
-    rebounds_1q_last5: "1Q Rebounds",
-    assists_1q_last5: "1Q Assists"
-  };
-
-  return labelMap[statKey] || statKey;
-}
-
-function createNBATrendCard(player, statKey) {
-  const statValue = Number(player[statKey]);
-  const gamesUsed = player.games_used_last5 || "N/A";
-
-  return `
-    <div class="leaderboard-item">
-      <strong>${player["Player Name"] || "Unknown Player"}</strong>
-      <div>${formatNBATrendLabel(statKey)}: ${Number.isNaN(statValue) ? "N/A" : statValue.toFixed(2)}</div>
-      <div>Games Used: ${gamesUsed}</div>
-    </div>
-  `;
-}
-
 function createTrendCard(player) {
   const seasonAvg = Number(player["Season Avg"]);
   const last3 = Number(player["Last 3 Avg"]);
@@ -2549,118 +2695,6 @@ function renderTrendsLockedState(container, summaryId, currentTier, leagueLabel,
       </div>
     </div>
   `;
-}
-
-async function renderNBATrends() {
-  const container = document.getElementById("nba-trends-container");
-  if (!container) return;
-
-  updateTierDisplay("nba-tier-display");
-
-  container.innerHTML = `
-    <div class="empty-state">
-      <h3>Loading NBA trends...</h3>
-      <p>Please wait while recent trend data is pulled in.</p>
-    </div>
-  `;
-
-  try {
-    const rows = await fetchLeagueTrends(NBA_TRENDS_CSV_URL);
-    updateLastUpdated("nba-trends-last-updated");
-
-    const renderPage = () => {
-      const currentTier = CURRENT_USER_TIER || "Rookie";
-      const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
-      const filterIds = [
-        "nba-trends-stat-filter",
-        "nba-trends-sort-filter",
-        "nba-trends-player-filter"
-      ];
-
-      if (!currentRules.showPlayerProps) {
-        setTrendsFiltersDisabled(filterIds, true);
-        renderTrendsLockedState(
-          container,
-          "nba-trends-filter-summary",
-          currentTier,
-          "NBA Player"
-        );
-        return;
-      }
-
-      setTrendsFiltersDisabled(filterIds, false);
-
-      const selectedStat =
-        document.getElementById("nba-trends-stat-filter")?.value || "points_last5";
-      const selectedSort =
-        document.getElementById("nba-trends-sort-filter")?.value || "desc";
-
-      let filteredRows = rows
-        .filter((row) => row["Player Name"])
-        .filter((row) => !Number.isNaN(Number(row[selectedStat])));
-
-      populateTrendsPlayerFilter("nba-trends-player-filter", filteredRows, renderPage);
-
-      const selectedPlayer =
-        document.getElementById("nba-trends-player-filter")?.value || "All";
-
-      if (selectedPlayer !== "All") {
-        filteredRows = filteredRows.filter(
-          (row) => (row["Player Name"] || "").trim() === selectedPlayer
-        );
-      }
-
-      filteredRows.sort((a, b) => {
-        const aVal = Number(a[selectedStat]);
-        const bVal = Number(b[selectedStat]);
-        return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
-      });
-
-      renderFilterSummary("nba-trends-filter-summary", [
-        { label: "Trend", value: formatNBATrendLabel(selectedStat) },
-        { label: "Player", value: selectedPlayer },
-        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
-        { label: "Tier", value: currentTier }
-      ]);
-
-      if (filteredRows.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <h3>No NBA trends found for this filter.</h3>
-            <p>Try changing the trend category, player, or sort order.</p>
-          </div>
-        `;
-        return;
-      }
-
-      const visibleRows = filteredRows;
-
-      container.innerHTML = visibleRows
-        .map((row) => createNBATrendCard(row, selectedStat))
-        .join("");
-    };
-
-    bindSelectChange("nba-trends-stat-filter", renderPage);
-    bindSelectChange("nba-trends-sort-filter", renderPage);
-
-    bindButton("nba-trends-reset-filters", () => {
-      resetSelectToValue("nba-trends-stat-filter", "points_last5");
-      resetSelectToValue("nba-trends-sort-filter", "desc");
-      resetSelectToAll("nba-trends-player-filter");
-      renderPage();
-    });
-
-    renderPage();
-  } catch (error) {
-    console.error("NBA trends render error:", error);
-
-    container.innerHTML = `
-      <div class="empty-state">
-        <h3>Unable to load NBA trends right now.</h3>
-        <p>Please check your published NBA Trends CSV.</p>
-      </div>
-    `;
-  }
 }
 
 async function initNBATrendsPage() {
