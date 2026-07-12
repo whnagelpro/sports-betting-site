@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>NFL Player Trends | Sportacular Analytics</title>
+
+  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">
+        <a href="/">
+          <img
+            src="/logo.png"
+            alt="Sportacular Analytics Logo"
+          />
+        </a>
+      </div>
+
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <nav id="site-nav">
+        <ul class="nav-links">
+          <li>
+            <a href="index.html">Home</a>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NBA</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="nba-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="nba-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="nba-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="nba-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NHL</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="nhl-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="nhl-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="nhl-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="nhl-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">MLB</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="mlb-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="mlb-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="mlb-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="mlb-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NFL</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="nfl-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="nfl-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="nfl-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="nfl-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="pricing.html">Pricing</a>
+          </li>
+
+          <li>
+            <a href="index.html#about">About</a>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">Legal</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="privacy.html">Privacy Policy</a>
+              </li>
+
+              <li>
+                <a href="terms.html">Terms of Service</a>
+              </li>
+
+              <li>
+                <a href="disclaimer.html">Disclaimer</a>
+              </li>
+
+              <li>
+                <a href="contact.html">Contact</a>
+              </li>
+            </ul>
+          </li>
+
+          <li id="nav-login-item">
+            <a href="auth.html">Login</a>
+          </li>
+
+          <li
+            id="nav-account-item"
+            style="display: none;"
+          >
+            <a href="auth.html">Account</a>
+          </li>
+
+          <li
+            id="nav-logout-item"
+            style="display: none;"
+          >
+            <a href="#" id="nav-logout-link">
+              Logout
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="league-page">
+    <section class="league-hero">
+      <div class="container">
+        <h1>NFL Player Trends</h1>
+
+        <p class="league-description">
+          Review recent NFL player form across passing, rushing, and
+          receiving categories using season averages and recent-game
+          performance.
+        </p>
+      </div>
+    </section>
+
+    <section class="league-controls">
+      <div class="container controls-layout">
+        <div class="controls-left">
+          <div class="control-box">
+            <span class="control-label">View</span>
+            <strong>Recent Games vs. Season</strong>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">
+              Membership Tier
+            </span>
+
+            <strong id="nfl-tier-display">
+              Loading...
+            </strong>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">Player</span>
+
+            <select
+              id="nfl-trends-player-filter"
+              class="sportsbook-select"
+            >
+              <option value="All">
+                All Players
+              </option>
+            </select>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">
+              Trend Category
+            </span>
+
+            <select
+              id="nfl-trends-stat-filter"
+              class="sportsbook-select"
+            >
+              <option value="Passing Yards">
+                Passing Yards
+              </option>
+
+              <option value="Passing TDs">
+                Passing TDs
+              </option>
+
+              <option value="Interceptions">
+                Interceptions
+              </option>
+
+              <option value="Completions">
+                Completions
+              </option>
+
+              <option value="Pass Attempts">
+                Pass Attempts
+              </option>
+
+              <option value="Rushing Yards">
+                Rushing Yards
+              </option>
+
+              <option value="Rushing Attempts">
+                Rushing Attempts
+              </option>
+
+              <option value="Rushing TDs">
+                Rushing TDs
+              </option>
+
+              <option value="Receptions">
+                Receptions
+              </option>
+
+              <option value="Receiving Yards">
+                Receiving Yards
+              </option>
+
+              <option value="Receiving TDs">
+                Receiving TDs
+              </option>
+            </select>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">Sort</span>
+
+            <select
+              id="nfl-trends-sort-filter"
+              class="sportsbook-select"
+            >
+              <option value="desc">
+                Highest First
+              </option>
+
+              <option value="asc">
+                Lowest First
+              </option>
+            </select>
+          </div>
+
+          <p class="last-updated-text">
+            Last Updated:
+            <span id="nfl-trends-last-updated">
+              --:--
+            </span>
+          </p>
+
+          <div class="control-box">
+            <span class="control-label">Actions</span>
+
+            <button
+              id="nfl-trends-reset-filters"
+              class="filter-reset-btn"
+            >
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
+        <div class="controls-right">
+          <div class="guide-panel">
+            <h3 class="guide-panel-title">
+              How to Read NFL Player Trends
+            </h3>
+
+            <p class="guide-panel-text">
+              Hover over any term below for a quick explanation in
+              plain English.
+            </p>
+
+            <div class="guide-panel-links">
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Last 5 Average
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Last 5 Average</strong>
+                  <br />
+
+                  The player’s average in the selected statistical
+                  category over their five most recent appearances.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Season Average
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Season Average</strong>
+                  <br />
+
+                  The player’s average in the selected category across
+                  all recorded appearances during the season.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Hit Rate
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Hit Rate Last 5</strong>
+                  <br />
+
+                  The percentage of the player’s last five appearances
+                  in which the recorded statistic was at least one.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Above Season
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Above Season Percentage</strong>
+                  <br />
+
+                  The percentage difference between the player’s recent
+                  average and season average. Positive values indicate
+                  stronger recent production.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Trend Strength
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Trend Strength</strong>
+                  <br />
+
+                  A summary classification based on recent form, hit
+                  rate, season comparison, and the calculated trend
+                  score.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Risk Tier
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Risk Tier</strong>
+                  <br />
+
+                  A consistency-based label that helps describe how
+                  steady or volatile the player’s recent results have
+                  been.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Passing Trends
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Passing Trends</strong>
+                  <br />
+
+                  Quarterback categories including passing yards,
+                  touchdowns, interceptions, completions, and attempts.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Rushing and Receiving
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Rushing and Receiving Trends</strong>
+                  <br />
+
+                  Categories covering rushing yards, rushing attempts,
+                  receptions, receiving yards, and touchdowns.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="filter-summary-section">
+      <div class="container">
+        <div
+          id="nfl-trends-filter-summary"
+          class="filter-summary-box"
+        ></div>
+      </div>
+    </section>
+
+    <section class="bets-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>NFL Player Trend Data</h2>
+
+          <p>
+            Compare recent player production with season-long
+            performance across the NFL’s primary passing, rushing,
+            and receiving categories.
+          </p>
+        </div>
+
+        <div
+          id="nfl-trends-container"
+          class="trends-grid"
+        >
+          <div class="empty-state">
+            <h3>Loading NFL player trends...</h3>
+
+            <p>
+              Please wait while recent NFL trend data is pulled in.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        <strong>Disclaimer:</strong>
+        Data provided by BallDontLie API. This website is for
+        informational and educational purposes only. Nothing on this
+        site guarantees results or should be considered financial
+        advice. If you sports bet, always bet responsibly.
+      </p>
+
+      <p class="support-email">
+        We would love to hear from you! Contact us at
+        support@sportacularanalytics.com.
+      </p>
+
+      <p>
+        &copy; 2026 Sportacular Analytics. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      initNFLTrendsPage();
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle =
+        document.getElementById("mobile-menu-toggle");
+
+      const nav =
+        document.getElementById("site-nav");
+
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          nav.classList.toggle("mobile-open");
+
+          const isOpen =
+            nav.classList.contains("mobile-open");
+
+          toggle.setAttribute(
+            "aria-expanded",
+            isOpen ? "true" : "false"
+          );
+
+          toggle.textContent =
+            isOpen ? "✕" : "☰";
+        });
+      }
+
+      if (window.innerWidth <= 768) {
+        document
+          .querySelectorAll(".dropdown > a")
+          .forEach((link) => {
+            link.addEventListener(
+              "click",
+              (event) => {
+                event.preventDefault();
+
+                const parent =
+                  link.parentElement;
+
+                if (parent) {
+                  parent.classList.toggle("open");
+                }
+              }
+            );
+          });
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isMobile =
+        window
+          .matchMedia("(max-width: 768px)")
+          .matches;
+
+      if (!isMobile) return;
+
+      document
+        .querySelectorAll(
+          ".guide-panel .hover-guide-term"
+        )
+        .forEach((term) => {
+          term.addEventListener(
+            "click",
+            (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              const item =
+                term.closest(".hover-guide-item");
+
+              if (!item) return;
+
+              document
+                .querySelectorAll(
+                  ".guide-panel .hover-guide-item.tooltip-open"
+                )
+                .forEach((openItem) => {
+                  if (openItem !== item) {
+                    openItem.classList.remove(
+                      "tooltip-open"
+                    );
+                  }
+                });
+
+              item.classList.toggle(
+                "tooltip-open"
+              );
+            }
+          );
+        });
+
+      document.addEventListener("click", () => {
+        document
+          .querySelectorAll(
+            ".guide-panel .hover-guide-item.tooltip-open"
+          )
+          .forEach((item) => {
+            item.classList.remove(
+              "tooltip-open"
+            );
+          });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,5073 @@
+/**
+ * BALLDONTLIE API - Google Sheets Integration
+ *
+ * This script provides custom functions to fetch sports data from the BALLDONTLIE API
+ * directly in Google Sheets.
+ *
+ * SETUP:
+ * 1. Open your Google Sheet
+ * 2. Go to Extensions > Apps Script
+ * 3. Copy this entire script into the editor
+ * 4. Run the BDL_SET_API_KEY function once to set your API key
+ * 5. Use the custom functions in your spreadsheet cells
+ *
+ * Get your API key at: https://app.balldontlie.io
+ * Documentation: https://www.balldontlie.io/docs
+ */
+
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+
+const BASE_URL = 'https://api.balldontlie.io';
+
+/**
+ * Sets your BALLDONTLIE API key. Run this once from the Apps Script editor.
+ * @param {string} apiKey Your API key from app.balldontlie.io
+ * @customfunction
+ */
+function BDL_SET_API_KEY(apiKey) {
+  if (!apiKey || apiKey.trim() === '') {
+    throw new Error('API key cannot be empty. Get your key at app.balldontlie.io');
+  }
+  PropertiesService.getUserProperties().setProperty('BDL_API_KEY', apiKey.trim());
+  return 'API key saved successfully!';
+}
+
+/**
+ * Gets the stored API key
+ * @returns {string} The API key
+ */
+function getApiKey_() {
+  const key = PropertiesService.getUserProperties().getProperty('BDL_API_KEY');
+  if (!key) {
+    throw new Error('API key not set. Run BDL_SET_API_KEY("your-api-key") first.');
+  }
+  return key;
+}
+
+// ============================================================================
+// CORE API FUNCTIONS
+// ============================================================================
+
+/**
+ * Makes a request to the BALLDONTLIE API
+ * @param {string} endpoint The API endpoint
+ * @param {Object} params Query parameters
+ * @returns {Object} API response
+ */
+function fetchApi_(endpoint, params = {}) {
+  const apiKey = getApiKey_();
+
+  // Build query string
+  const queryParts = [];
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') {
+      if (Array.isArray(value)) {
+        value.forEach(v => queryParts.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`));
+      } else {
+        queryParts.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+      }
+    }
+  }
+
+  const queryString = queryParts.length > 0 ? '?' + queryParts.join('&') : '';
+  const url = BASE_URL + endpoint + queryString;
+
+  const options = {
+    method: 'get',
+    headers: {
+      'Authorization': apiKey
+    },
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+  const statusCode = response.getResponseCode();
+
+  if (statusCode === 401) {
+    throw new Error('Invalid API key. Check your key at app.balldontlie.io');
+  }
+  if (statusCode === 429) {
+    throw new Error('Rate limit exceeded. Please wait and try again.');
+  }
+  if (statusCode !== 200) {
+    throw new Error(`API error (${statusCode}): ${response.getContentText()}`);
+  }
+
+  return JSON.parse(response.getContentText());
+}
+
+/**
+ * Converts API response data to a 2D array for spreadsheet display
+ * @param {Array} data Array of objects
+ * @param {Array} columns Column names to extract (optional)
+ * @returns {Array} 2D array with headers
+ */
+function toSheet_(data, columns = null) {
+  if (!data || data.length === 0) {
+    return [['No data found']];
+  }
+
+  // Flatten nested objects
+  const flatData = data.map(item => flattenObject_(item));
+
+  // Get all unique keys or use specified columns
+  const keys = columns || [...new Set(flatData.flatMap(obj => Object.keys(obj)))];
+
+  // Create header row
+  const header = keys.map(k => formatHeader_(k));
+
+  // Create data rows
+  const rows = flatData.map(obj => keys.map(key => {
+    const val = obj[key];
+    if (val === null || val === undefined) return '';
+    if (typeof val === 'object') return JSON.stringify(val);
+    return val;
+  }));
+
+  return [header, ...rows];
+}
+
+/**
+ * Flattens nested objects with dot notation
+ * @param {Object} obj Object to flatten
+ * @param {string} prefix Key prefix
+ * @returns {Object} Flattened object
+ */
+function flattenObject_(obj, prefix = '') {
+  const result = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey = prefix ? `${prefix}.${key}` : key;
+
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      Object.assign(result, flattenObject_(value, newKey));
+    } else {
+      result[newKey] = value;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Gets today's date in YYYY-MM-DD format using the spreadsheet's timezone.
+ * @returns {string}
+ */
+function getTodayString_() {
+  const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || Session.getScriptTimeZone();
+  return Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
+}
+
+/**
+ * Fetches all NBA games for a specific date, handling pagination.
+ * @param {string} dateString YYYY-MM-DD
+ * @returns {Array<Object>}
+ */
+function fetchAllNBAGamesForDate_(dateString) {
+  const allGames = [];
+  let cursor = null;
+
+  do {
+    const params = {
+      "dates[]": dateString,
+      per_page: 100
+    };
+
+    if (cursor) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_('/nba/v1/games', params);
+    const games = Array.isArray(response.data) ? response.data : [];
+    allGames.push(...games);
+
+    cursor = response.meta && response.meta.next_cursor ? response.meta.next_cursor : null;
+  } while (cursor);
+
+  return allGames;
+}
+
+/**
+ * Fetches all NBA player props for one game, handling pagination if needed.
+ * @param {number|string} gameId
+ * @returns {Array<Object>}
+ */
+function fetchAllNBAPlayerPropsForGame_(gameId) {
+  const allProps = [];
+  let cursor = null;
+
+  do {
+    const params = {
+      game_id: gameId,
+      per_page: 100
+    };
+
+    if (cursor) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_('/nba/v2/odds/player_props', params);
+    const props = Array.isArray(response.data) ? response.data : [];
+    allProps.push(...props);
+
+    cursor = response.meta && response.meta.next_cursor ? response.meta.next_cursor : null;
+  } while (cursor);
+
+  return allProps;
+}
+
+function ensurePropFormulaTemplates_(sheet) {
+  const formulas = sheet.getRange("O2:U2").getFormulas()[0];
+  const missing = formulas.some(formula => !formula);
+
+  if (missing) {
+    throw new Error('Missing formula template in O2:U2. Restore those formulas before refreshing.');
+  }
+}
+
+function ensureNameFormulaTemplates_(sheet) {
+  const formulas = sheet.getRange("V2:W2").getFormulas()[0];
+  const missing = formulas.some(formula => !formula);
+
+  if (missing) {
+    throw new Error('Missing helper/formula template in V2:W2. Restore those formulas before refreshing.');
+  }
+}
+
+function clearPlayerPropsData_(sheet) {
+  const maxRows = sheet.getMaxRows();
+
+  if (maxRows > 2) {
+    // Clear raw imported data only
+    sheet.getRange(3, 1, maxRows - 2, 14).clearContent(); // A:N
+
+    // Clear copied helper/formula columns only
+    sheet.getRange(3, 22, maxRows - 2, 3).clearContent(); // V:X
+  }
+}
+
+function copyFormulaTemplatesDown_(sheet, rowCount) {
+  if (!rowCount || rowCount <= 0) return;
+
+  // Copy formulas only for O:U
+  sheet.getRange("O2:U2").copyTo(
+    sheet.getRange(3, 15, rowCount, 7),
+    SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
+    false
+  );
+
+  // Copy formulas only for V:X
+  sheet.getRange("V2:W2").copyTo(
+    sheet.getRange(3, 22, rowCount, 3),
+    SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
+    false
+  );
+}
+
+function refreshNBAActiveRostersSheet() {
+  const sheetName = "Rosters";
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found.`);
+  }
+
+  Logger.log("Refreshing NBA active rosters...");
+
+  const players = fetchAllNBAActivePlayers_();
+
+  const headers = [
+    "Id",
+    "First Name",
+    "Last Name",
+    "Full Name",
+    "Team Id",
+    "Team Name",
+    "Team Abbreviation",
+    "Conference",
+    "Division",
+    "Position",
+    "Height",
+    "Weight",
+    "Jersey Number",
+    "College",
+    "Country",
+    "Draft Year",
+    "Draft Round",
+    "Draft Number",
+    "Status"
+  ];
+
+  const rows = players.map(player => {
+    const firstName = player.first_name || "";
+    const lastName = player.last_name || "";
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    return [
+      player.id || "",                                // A Id
+      firstName,                                      // B First Name
+      lastName,                                       // C Last Name
+      fullName,                                       // D Full Name
+      (player.team && player.team.id) || "",          // E Team Id
+      (player.team && player.team.full_name) || "",   // F Team Name
+      (player.team && player.team.abbreviation) || "",// G Team Abbreviation
+      (player.team && player.team.conference) || "",  // H Conference
+      (player.team && player.team.division) || "",    // I Division
+      player.position || "",                          // J Position
+      player.height || "",                            // K Height
+      player.weight || "",                            // L Weight
+      player.jersey_number || "",                     // M Jersey Number
+      player.college || "",                           // N College
+      player.country || "",                           // O Country
+      player.draft_year || "",                        // P Draft Year
+      player.draft_round || "",                       // Q Draft Round
+      player.draft_number || "",                      // R Draft Number
+      "Active"                                        // S Status
+    ];
+  });
+
+  clearRosterSheet_(sheet);
+
+  // Write headers
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+
+  if (rows.length > 0) {
+    // Write data rows
+    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  }
+
+  Logger.log(`Wrote ${rows.length} active NBA players to "${sheetName}"`);
+}
+
+function fetchAllNBAActivePlayers_() {
+  const allPlayers = [];
+  let cursor = null;
+
+  do {
+    const params = {
+      per_page: 100
+    };
+
+    if (cursor) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_('/nba/v1/players/active', params);
+    const players = Array.isArray(response.data) ? response.data : [];
+    allPlayers.push(...players);
+
+    cursor = response.meta && response.meta.next_cursor
+      ? response.meta.next_cursor
+      : null;
+
+  } while (cursor);
+
+  return allPlayers;
+}
+
+function clearRosterSheet_(sheet) {
+  const maxRows = sheet.getMaxRows();
+  const maxCols = 19; // A:S
+
+  if (maxRows > 0) {
+    sheet.getRange(1, 1, maxRows, maxCols).clearContent();
+  }
+}
+
+function refreshNBAScheduleSheet() {
+  const sheetName = "Schedule";
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found.`);
+  }
+
+  const today = getTodayString_();
+  Logger.log(`Refreshing NBA schedule for ${today}...`);
+
+  const games = fetchAllNBAGamesForDate_(today);
+
+  const headers = [
+    "Game Id",
+    "Game Date",
+    "Away Team",
+    "Home Team",
+    "Status",
+    "Season",
+    "Postseason",
+    "Start Time",
+    "Home Team Id",
+    "Away Team Id"
+  ];
+
+  const rows = games.map(game => {
+    return [
+      game.id || "",                                           // A Game Id
+      game.date || today,                                      // B Game Date
+      (game.visitor_team && game.visitor_team.full_name) || "",// C Away Team
+      (game.home_team && game.home_team.full_name) || "",      // D Home Team
+      game.status || "",                                       // E Status
+      game.season || "",                                       // F Season
+      game.postseason || "",                                   // G Postseason
+      game.time || game.date || "",                            // H Start Time
+      (game.home_team && game.home_team.id) || "",            // I Home Team Id
+      (game.visitor_team && game.visitor_team.id) || ""       // J Away Team Id
+    ];
+  });
+
+  clearScheduleSheet_(sheet, 10);
+
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  }
+
+  Logger.log(`Wrote ${rows.length} NBA games to "${sheetName}"`);
+}
+
+function clearScheduleSheet_(sheet, columnCount) {
+  const maxRows = sheet.getMaxRows();
+
+  if (maxRows > 0) {
+    sheet.getRange(1, 1, maxRows, columnCount).clearContent();
+  }
+}
+
+function copyGameOddsFormulaBlockDown_(sheetName, startCol, endCol) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found.`);
+  }
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  const numCols = endCol - startCol + 1;
+  const templateRange = sheet.getRange(2, startCol, 1, numCols);
+
+  // Clear old formulas below row 2 in the formula block only
+  if (lastRow > 2) {
+    sheet.getRange(3, startCol, lastRow - 2, numCols).clearContent();
+  }
+
+  // Copy row 2 formulas down
+  if (lastRow >= 3) {
+    templateRange.copyTo(
+      sheet.getRange(3, startCol, lastRow - 2, numCols),
+      SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
+      false
+    );
+  }
+}
+
+function refreshNBAGameOddsSheet() {
+  const sheetName = "Game Odds";
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found.`);
+  }
+
+  ensureGameOddsFormulaTemplates_(sheet);
+
+  const today = getTodayString_();
+  Logger.log(`Refreshing NBA game odds for ${today}...`);
+
+  const games = fetchAllNBAGamesForDate_(today);
+  const odds = fetchAllNBAOddsForDate_(today);
+
+  const gameMap = {};
+  games.forEach(game => {
+    gameMap[String(game.id)] = {
+      game_date: game.date || today,
+      away_team: (game.visitor_team && game.visitor_team.full_name) || "",
+      home_team: (game.home_team && game.home_team.full_name) || ""
+    };
+  });
+
+  const rawHeaders = [
+    "Odds Id",               // A
+    "Game Id",               // B
+    "Vendor",                // C
+    "Spread Away Value",     // D
+    "Spread Away Odds",      // E
+    "Spread Home Value",     // F
+    "Spread Home Odds",      // G
+    "Moneyline Away Odds",   // H
+    "Moneyline Home Odds",   // I
+    "Total Value",           // J
+    "Total Over Odds",       // K
+    "Total Under Odds",      // L
+    "Updated At"             // M
+  ];
+
+  const formulaHeaders = [
+    "EV Total Over ($1 bet)",    // N
+    "EV Total Under ($1 bet)",   // O
+    "Poisson Prob Total Over",   // P
+    "Poisson Prob Total Under",  // Q
+    "EV Away ML ($1 bet)",       // R
+    "EV Home ML ($1 bet)",       // S
+    "EV Away Spread ($1 bet)",   // T
+    "EV Home Spread ($1 bet)",   // U
+    "Game Date",                 // V
+    "Away Team",                 // W
+    "Home Team",                 // X
+    "Implied Prob Away ML",      // Y
+    "Implied Prob Home ML",      // Z
+    "Vig-Free Prob Away ML",     // AA
+    "Vig-Free Prob Home ML",     // AB
+    "Moneyline Edge Away",       // AC
+    "Moneyline Edge Home",       // AD
+    "Best ML Edge"               // AE
+  ];
+
+  const rawRows = [];
+  const helperRows = [];
+
+  odds.forEach(item => {
+    const gameId = String(item.game_id || "");
+    const gameInfo = gameMap[gameId] || {
+      game_date: today,
+      away_team: "",
+      home_team: ""
+    };
+
+    rawRows.push([
+      item.id || "",
+      item.game_id || "",
+      item.vendor || "",
+      item.spread_away_value || "",
+      item.spread_away_odds || "",
+      item.spread_home_value || "",
+      item.spread_home_odds || "",
+      item.moneyline_away_odds || "",
+      item.moneyline_home_odds || "",
+      item.total_value || "",
+      item.total_over_odds || "",
+      item.total_under_odds || "",
+      item.updated_at || ""
+    ]);
+
+    helperRows.push([
+      gameInfo.game_date || "",   // V
+      gameInfo.away_team || "",   // W
+      gameInfo.home_team || ""    // X
+    ]);
+  });
+
+  clearNBAGameOddsSheet_(sheet);
+  formatGameOddsModelColumns_(sheet);
+
+  // A:M
+  sheet.getRange(1, 1, 1, rawHeaders.length).setValues([rawHeaders]);
+
+  // N:AE
+  sheet.getRange(1, 14, 1, formulaHeaders.length).setValues([formulaHeaders]);
+
+  if (!rawRows.length) {
+    Logger.log(`No NBA odds rows returned for ${today}`);
+    return;
+  }
+
+  // Raw data A:M from row 3 down
+  sheet.getRange(3, 1, rawRows.length, 13).setValues(rawRows);
+
+  // Helper values V:X from row 3 down
+  sheet.getRange(3, 22, helperRows.length, 3).setValues(helperRows);
+
+  // Copy formula block N:AE from row 2 down
+  copyGameOddsFormulaBlockDown_("Game Odds", 14, 31);
+
+  Logger.log(`Wrote ${rawRows.length} NBA game odds rows to "${sheetName}"`);
+}
+
+function fetchAllNBAOddsForDate_(dateString) {
+  const allOdds = [];
+  let cursor = null;
+
+  do {
+    const params = {
+      "dates[]": dateString,
+      per_page: 100
+    };
+
+    if (cursor) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_('/nba/v2/odds', params);
+    const odds = Array.isArray(response.data) ? response.data : [];
+    allOdds.push(...odds);
+
+    cursor = response.meta && response.meta.next_cursor
+      ? response.meta.next_cursor
+      : null;
+
+  } while (cursor);
+
+  return allOdds;
+}
+
+function clearNBAGameOddsSheet_(sheet) {
+  const maxRows = sheet.getMaxRows();
+
+  if (maxRows > 2) {
+    // Clear raw imported data A:M
+    sheet.getRange(3, 1, maxRows - 2, 13).clearContent();
+
+    // Clear helper values V:X
+    sheet.getRange(3, 22, maxRows - 2, 3).clearContent();
+
+    // Clear formula area N:AE below row 2
+    sheet.getRange(3, 14, maxRows - 2, 18).clearContent();
+  }
+}
+
+function ensureGameOddsFormulaTemplates_(sheet) {
+  const formulas = sheet.getRange("N2:AE2").getFormulas()[0];
+  const missing = formulas.some(formula => !formula);
+
+  if (missing) {
+    throw new Error('Missing Game Odds formula template in N2:AE2. Restore those formulas before refreshing.');
+  }
+}
+
+function formatGameOddsModelColumns_(sheet) {
+  sheet.getRange("Y:AB").setNumberFormat("0.000000");
+  sheet.getRange("AC:AE").setNumberFormat("0.00%");
+}
+
+function getGamesFromScheduleSheet_(scheduleSheet) {
+  const lastRow = scheduleSheet.getLastRow();
+
+  if (lastRow < 2) {
+    return [];
+  }
+
+  const values = scheduleSheet.getRange(2, 1, lastRow - 1, 10).getValues();
+
+  return values
+    .filter(row => row[0]) // require Game Id in column A
+    .map(row => ({
+      id: row[0],          // A Game Id
+      game_date: row[1],   // B Game Date
+      away_team: row[2],   // C Away Team
+      home_team: row[3]    // D Home Team
+    }));
+}
+
+function getCurrentNBASeason_() {
+  const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || Session.getScriptTimeZone();
+  const now = new Date();
+  const month = Number(Utilities.formatDate(now, tz, "M"));
+  const year = Number(Utilities.formatDate(now, tz, "yyyy"));
+
+  return month >= 9 ? year : year - 1;
+}
+
+function getNBAPlayerIdsFromPlayerProps_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Player Props");
+
+  if (!sheet) {
+    throw new Error('Sheet "Player Props" not found.');
+  }
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 3) return [];
+
+  const values = sheet.getRange(3, 1, lastRow - 2, 14).getValues();
+  const ids = {};
+
+  values.forEach(row => {
+    const playerId = row[5]; // F = Player Id
+    if (playerId !== "" && playerId !== null && playerId !== undefined) {
+      ids[String(playerId)] = true;
+    }
+  });
+
+  return Object.keys(ids);
+}
+
+function getNBAPlayerLookupMap_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Rosters");
+
+  if (!sheet) return {};
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return {};
+
+  const values = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
+  const map = {};
+
+  values.forEach(row => {
+    const playerId = row[0];
+    const firstName = row[1];
+    const lastName = row[2];
+    const fullName = row[3];
+
+    if (!playerId) return;
+
+    map[String(playerId)] = {
+      playerName: fullName || `${firstName || ""} ${lastName || ""}`.trim()
+    };
+  });
+
+  return map;
+}
+
+function fetchNBAPlayerSeasonStats_(playerId, season) {
+  const response = fetchApi_('/nba/v1/season_averages', {
+    season: season,
+    player_id: Number(playerId)
+  });
+
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+function clearNBATrendsSheet_(sheet) {
+  const maxRows = sheet.getMaxRows();
+  const maxCols = 18; // A:R
+
+  if (maxRows > 0) {
+    sheet.getRange(1, 1, maxRows, maxCols).clearContent();
+  }
+}
+
+function fetchRecentNBAStatsForPlayer_(playerId, season) {
+  const allRows = [];
+  let cursor = null;
+
+  do {
+    const params = {
+      "player_ids[]": playerId,
+      "seasons[]": season,
+      per_page: 100
+    };
+
+    if (cursor) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_('/nba/v1/stats', params);
+    const rows = Array.isArray(response.data) ? response.data : [];
+    allRows.push(...rows);
+
+    cursor = response.meta && response.meta.next_cursor
+      ? response.meta.next_cursor
+      : null;
+
+  } while (cursor);
+
+  return allRows;
+}
+
+function normalizeNBATeamName_(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replace(/\./g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function clearNBATeamTrendsSheet_(sheet) {
+  const maxRows = sheet.getMaxRows();
+  const maxCols = 8; // A:H
+
+  if (maxRows > 0) {
+    sheet.getRange(1, 1, maxRows, maxCols).clearContent();
+  }
+}
+
+function isCompletedNBAGame_(game) {
+  const status = String(game.status || "").toLowerCase();
+
+  return (
+    status.includes("final") ||
+    status.includes("finished")
+  );
+}
+
+function buildNBATeamGameStatsMap_(statRows) {
+  const map = {};
+
+  statRows.forEach(row => {
+    const gameId = String(
+      (row.game && row.game.id) ||
+      row.game_id ||
+      ""
+    ).trim();
+
+    const rawTeamName =
+      (row.team && row.team.full_name) ||
+      row.team_name ||
+      "";
+
+    const teamName = normalizeNBATeamName_(rawTeamName);
+
+    if (!gameId || !teamName) return;
+
+    const key = `${gameId}_${teamName}`;
+
+    if (!map[key]) {
+      map[key] = {
+        points: 0,
+        rebounds: 0,
+        assists: 0,
+        threes: 0,
+        turnovers: 0,
+        rowCount: 0
+      };
+    }
+
+    map[key].points += Number(row.pts || 0);
+    map[key].rebounds += Number(row.reb || 0);
+    map[key].assists += Number(row.ast || 0);
+    map[key].threes += Number(row.fg3m || 0);
+    map[key].turnovers += Number(row.turnover || row.turnovers || 0);
+    map[key].rowCount += 1;
+  });
+
+  const sampleKeys = Object.keys(map).slice(0, 5);
+  sampleKeys.forEach(k => {
+    Logger.log(`NBA MAP SAMPLE: ${k} -> ${JSON.stringify(map[k])}`);
+  });
+
+  return map;
+}
+
+function fetchAllNBATeams_() {
+  const response = fetchApi_('/nba/v1/teams', {
+    per_page: 100
+  });
+
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+function fetchAllNBAStatsForGameIds_(gameIds) {
+  const allRows = [];
+
+  gameIds.forEach((gameId, index) => {
+    Logger.log(`Fetching NBA stats for game ${index + 1}/${gameIds.length} (ID: ${gameId})`);
+
+    let cursor = null;
+
+    do {
+      const params = {
+        "game_ids[]": gameId,
+        per_page: 100
+      };
+
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      const response = fetchApi_('/nba/v1/stats', params);
+      const rows = Array.isArray(response.data) ? response.data : [];
+      allRows.push(...rows);
+
+      cursor = response.meta && response.meta.next_cursor
+        ? response.meta.next_cursor
+        : null;
+
+    } while (cursor);
+
+    Utilities.sleep(150);
+  });
+
+  return allRows;
+}
+
+function getPastDateString_(daysAgo) {
+  const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || Session.getScriptTimeZone();
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return Utilities.formatDate(d, tz, "yyyy-MM-dd");
+}
+
+function getRecentCompletedNBAGamesForTeamTrends_(gamesNeededPerTeam, maxLookbackDays) {
+  const teams = fetchAllNBATeams_();
+  const teamNeedMap = {};
+  const selectedGameMap = {};
+
+  teams.forEach(team => {
+    teamNeedMap[String(team.id)] = [];
+  });
+
+  for (let daysAgo = 1; daysAgo <= maxLookbackDays; daysAgo++) {
+    const dateString = getPastDateString_(daysAgo);
+    Logger.log(`Checking NBA completed games for ${dateString}...`);
+
+    const games = fetchAllNBAGamesForDate_(dateString)
+      .filter(isCompletedNBAGame_);
+
+    games.sort((a, b) => {
+      const aDate = new Date(a.date || 0).getTime();
+      const bDate = new Date(b.date || 0).getTime();
+      return bDate - aDate;
+    });
+
+    games.forEach(game => {
+      const gameId = String(game.id || "");
+      const homeTeamId = String((game.home_team && game.home_team.id) || "");
+      const awayTeamId = String((game.visitor_team && game.visitor_team.id) || "");
+
+      if (!gameId || !homeTeamId || !awayTeamId) return;
+
+      if (teamNeedMap[homeTeamId] && teamNeedMap[homeTeamId].length < gamesNeededPerTeam) {
+        if (!teamNeedMap[homeTeamId].some(g => String(g.id) === gameId)) {
+          teamNeedMap[homeTeamId].push(game);
+          selectedGameMap[gameId] = game;
+        }
+      }
+
+      if (teamNeedMap[awayTeamId] && teamNeedMap[awayTeamId].length < gamesNeededPerTeam) {
+        if (!teamNeedMap[awayTeamId].some(g => String(g.id) === gameId)) {
+          teamNeedMap[awayTeamId].push(game);
+          selectedGameMap[gameId] = game;
+        }
+      }
+    });
+
+    Utilities.sleep(150);
+
+    const allSatisfied = Object.values(teamNeedMap).every(arr => arr.length >= gamesNeededPerTeam);
+    if (allSatisfied) break;
+  }
+
+  return {
+    teams,
+    teamGamesMap: teamNeedMap,
+    selectedGames: Object.values(selectedGameMap)
+  };
+}
+
+const SPORTACULAR_TIMEZONE = "America/Phoenix";
+
+function getNBAGameRawDate_(game) {
+  return (
+    game.datetime ||
+    game.start_time ||
+    game.scheduled ||
+    game.game_time ||
+    game.date ||
+    game.game_date ||
+    ""
+  );
+}
+
+function getNBAGameAZDate_(game) {
+  const rawDate = getNBAGameRawDate_(game);
+  if (!rawDate) return "";
+
+  return Utilities.formatDate(
+    new Date(rawDate),
+    SPORTACULAR_TIMEZONE,
+    "yyyy-MM-dd"
+  );
+}
+
+function addDaysToDateString_(dateString, days) {
+  const d = new Date(dateString + "T00:00:00");
+  d.setDate(d.getDate() + days);
+
+  return Utilities.formatDate(
+    d,
+    SPORTACULAR_TIMEZONE,
+    "yyyy-MM-dd"
+  );
+}
+
+function getNBACompletedGamesForDateRange_(startDate, endDate) {
+  const selectedGamesMap = {};
+
+  const fetchStartDate = addDaysToDateString_(startDate, -1);
+  const fetchEndDate = addDaysToDateString_(endDate, 1);
+
+  let current = new Date(fetchStartDate + "T00:00:00");
+  const end = new Date(fetchEndDate + "T00:00:00");
+
+  while (current <= end) {
+    const apiDateString = Utilities.formatDate(
+      current,
+      SPORTACULAR_TIMEZONE,
+      "yyyy-MM-dd"
+    );
+
+    Logger.log(`Checking NBA API games for ${apiDateString}`);
+
+    const games = fetchAllNBAGamesForDate_(apiDateString)
+      .filter(isCompletedNBAGame_)
+      .filter(game => {
+        const azDate = getNBAGameAZDate_(game);
+        return azDate >= startDate && azDate <= endDate;
+      });
+
+    games.forEach(game => {
+      if (game.id) {
+        selectedGamesMap[String(game.id)] = game;
+      }
+    });
+
+    current.setDate(current.getDate() + 1);
+    Utilities.sleep(100);
+  }
+
+  return Object.values(selectedGamesMap);
+}
+
+function upsertRowsByKey_(sheet, headers, newRows, keyColumnIndexes) {
+  const existingValues = sheet.getDataRange().getValues();
+  const existingRows = existingValues.length > 1 ? existingValues.slice(1) : [];
+  const rowMap = {};
+
+  existingRows.forEach(row => {
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  newRows.forEach(row => {
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  const finalRows = Object.values(rowMap).sort((a, b) =>
+    new Date(b[0]).getTime() - new Date(a[0]).getTime()
+  );
+
+  writeNBAOutputSheet_(sheet, headers, finalRows);
+}
+
+function normalizeSheetDateForCompare_(value) {
+  if (!value) return "";
+
+  if (Object.prototype.toString.call(value) === "[object Date]") {
+    return Utilities.formatDate(
+      value,
+      SPORTACULAR_TIMEZONE,
+      "yyyy-MM-dd"
+    );
+  }
+
+  const text = String(value).trim();
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    return text;
+  }
+
+  const parsed = new Date(text);
+
+  if (!isNaN(parsed.getTime())) {
+    return Utilities.formatDate(
+      parsed,
+      SPORTACULAR_TIMEZONE,
+      "yyyy-MM-dd"
+    );
+  }
+
+  return text;
+}
+
+function upsertRowsByKeyForDateRange_(sheet, headers, newRows, keyColumnIndexes, startDate, endDate) {
+  const existingValues = sheet.getDataRange().getValues();
+  const existingRows = existingValues.length > 1 ? existingValues.slice(1) : [];
+  const rowMap = {};
+
+  existingRows.forEach(row => {
+    const rowDate = normalizeSheetDateForCompare_(row[0]);
+
+    // Remove old rows from the same refreshed month/date range.
+    // They will be replaced only by valid new rows.
+    if (rowDate >= startDate && rowDate <= endDate) {
+      return;
+    }
+
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  newRows.forEach(row => {
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  const finalRows = Object.values(rowMap).sort((a, b) =>
+    new Date(b[0]).getTime() - new Date(a[0]).getTime()
+  );
+
+  writeNBAOutputSheet_(sheet, headers, finalRows);
+}
+
+// ============================================================================
+// NEW NBA GAME LOG → SEASON STAT → TREND PIPELINE
+// ============================================================================
+
+const NBA_TEAM_GAMES_TO_LOAD = 10;
+const NBA_TEAM_LOOKBACK_DAYS = 60;
+
+const NBA_PLAYER_TREND_STATS = [
+  { label: "Minutes", key: "minutes" },
+  { label: "Points", key: "points" },
+  { label: "Rebounds", key: "rebounds" },
+  { label: "Assists", key: "assists" },
+  { label: "Threes", key: "threes" },
+  { label: "PRA", key: "pra" }
+];
+
+const NBA_TEAM_TREND_STATS = [
+  { label: "Points For", key: "pointsFor" },
+  { label: "Points Allowed", key: "pointsAllowed" },
+  { label: "Rebounds", key: "rebounds" },
+  { label: "Assists", key: "assists" },
+  { label: "Threes", key: "threes" },
+  { label: "Turnovers", key: "turnovers" }
+];
+
+function refreshNBAPlayerTrendPipeline() {
+  ensureNBATrendTabs_();
+
+  refreshNBAPlayerSeasonStatsSheet();
+  refreshNBAPlayerTrendsSheet();
+
+  Logger.log("NBA player trend pipeline complete.");
+}
+
+function refreshNBATeamTrendPipeline() {
+  ensureNBATrendTabs_();
+
+  refreshNBATeamSeasonStatsSheet();
+  refreshNBATeamTrendsOutputSheet();
+
+  Logger.log("NBA team trend pipeline complete.");
+}
+
+function refreshNBATopPlayerTrendPipeline() {
+  ensureNBATrendTabs_();
+  refreshNBATopPlayerTrendsSheet();
+  Logger.log("NBA top player trends pipeline complete.");
+}
+
+function refreshNBATopTeamTrendPipeline() {
+  ensureNBATrendTabs_();
+  refreshNBATopTeamTrendsSheet();
+  Logger.log("NBA top team trends pipeline complete.");
+}
+
+function refreshNBADailyOddsAndProps() {
+  refreshNBAScheduleSheet();
+  refreshNBAGameOddsSheet();
+  refreshNBAPlayerPropsSheet();
+
+  Logger.log("NBA daily odds and props refresh complete.");
+}
+
+function ensureNBATrendTabs_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  [
+    "NBA Player Game Logs",
+    "NBA Player Season Stats",
+    "NBA Player Trends",
+    "NBA Team Game Logs",
+    "NBA Team Season Stats",
+    "NBA Team Trends",
+    "NBA Top Player Trends",
+    "NBA Top Team Trends"
+  ].forEach(name => {
+    if (!ss.getSheetByName(name)) {
+      ss.insertSheet(name);
+    }
+  });
+}
+
+// ----------------------------------------------------------------------------
+// PLAYER GAME LOGS
+// ----------------------------------------------------------------------------
+
+function refreshNBAPlayerGameLogsSheet() {
+  refreshNBAPlayerGameLogsForDateRange_("2025-10-01", "2026-06-30");
+}
+
+function refreshNBAPlayerGameLogsForDateRange_(startDate, endDate) {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("NBA Player Game Logs");
+
+  const headers = [
+    "Game Date", "Game ID", "Player ID", "Player Name", "Team", "Opponent",
+    "Minutes", "Points", "Rebounds", "Assists", "Threes", "Steals", "Blocks", "Turnovers"
+  ];
+
+  Logger.log(`Refreshing NBA Player Game Logs from ${startDate} to ${endDate}`);
+
+  const selectedGames = getNBACompletedGamesForDateRange_(startDate, endDate);
+  if (!selectedGames.length) return;
+
+  const gameMap = {};
+  const gameIds = selectedGames.map(game => {
+    const gameId = String(game.id || "");
+    gameMap[gameId] = {
+      date: getNBAGameAZDate_(game),
+      homeTeam: (game.home_team && game.home_team.full_name) || "",
+      awayTeam: (game.visitor_team && game.visitor_team.full_name) || ""
+    };
+    return gameId;
+  }).filter(Boolean);
+
+  const statRows = fetchAllNBAStatsForGameIds_(gameIds);
+  const rows = [];
+
+  statRows.forEach(stat => {
+    const gameId = String(stat.game_id || (stat.game && stat.game.id) || "");
+    const gameInfo = gameMap[gameId] || {};
+    const player = stat.player || {};
+    const team = stat.team || {};
+
+    const playerId = stat.player_id || player.id || "";
+    const playerName = player.full_name || `${player.first_name || ""} ${player.last_name || ""}`.trim();
+
+    const teamName = team.full_name || team.abbreviation || "";
+
+    const opponent =
+      teamName === gameInfo.homeTeam ? gameInfo.awayTeam :
+      teamName === gameInfo.awayTeam ? gameInfo.homeTeam :
+      getNBAOpponentFromStat_(stat);
+
+    const minutesPlayed = parseNBAMinutes_(stat.min);
+    const points = Number(stat.pts || 0);
+    const rebounds = Number(stat.reb || 0);
+    const assists = Number(stat.ast || 0);
+    const threes = Number(stat.fg3m || 0);
+    const steals = Number(stat.stl || 0);
+    const blocks = Number(stat.blk || 0);
+    const turnovers = Number(stat.turnover || stat.turnovers || 0);
+
+    if (!playerId && !playerName) return;
+
+    if (minutesPlayed <= 0) return;
+
+    rows.push([
+      gameInfo.date, gameId, playerId, playerName, teamName, opponent,
+      minutesPlayed, points, rebounds, assists, threes, steals, blocks, turnovers
+    ]);
+  });
+
+  upsertRowsByKeyForDateRange_(sheet, headers, rows, [1, 2], startDate, endDate);
+  Logger.log(`Upserted ${rows.length} NBA player game-log rows for ${startDate} to ${endDate}.`);
+}
+
+// ----------------------------------------------------------------------------
+// PLAYER SEASON STATS
+// ----------------------------------------------------------------------------
+
+function refreshNBAPlayerSeasonStatsSheet() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("NBA Player Game Logs");
+  const sheet = ss.getSheetByName("NBA Player Season Stats");
+
+  const headers = [
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Games Played",
+    "Avg Minutes",
+    "Avg Points",
+    "Avg Rebounds",
+    "Avg Assists",
+    "Avg Threes",
+    "Avg PRA",
+    "Consistency Score",
+    "Last Updated"
+  ];
+
+  const logs = getNBAObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const playerId = String(row["Player ID"] || "");
+    if (!playerId) return;
+
+    if (!grouped[playerId]) {
+      grouped[playerId] = {
+        playerId,
+        playerName: row["Player Name"] || "",
+        team: row["Team"] || "",
+        games: []
+      };
+    }
+
+    grouped[playerId].games.push({
+      minutes: Number(row["Minutes"] || 0),
+      points: Number(row["Points"] || 0),
+      rebounds: Number(row["Rebounds"] || 0),
+      assists: Number(row["Assists"] || 0),
+      threes: Number(row["Threes"] || 0),
+      pra:
+        Number(row["Points"] || 0) +
+        Number(row["Rebounds"] || 0) +
+        Number(row["Assists"] || 0)
+    });
+  });
+
+  const now = new Date();
+
+  const rows = Object.values(grouped).map(player => {
+    const games = player.games;
+    const praValues = games.map(g => g.pra);
+
+    return [
+      player.playerId,
+      player.playerName,
+      player.team,
+      games.length,
+      avgNBA_(games.map(g => g.minutes)),
+      avgNBA_(games.map(g => g.points)),
+      avgNBA_(games.map(g => g.rebounds)),
+      avgNBA_(games.map(g => g.assists)),
+      avgNBA_(games.map(g => g.threes)),
+      avgNBA_(praValues),
+      consistencyScoreNBA_(praValues),
+      now
+    ];
+  });
+
+  rows.sort((a, b) => String(a[1] || "").localeCompare(String(b[1] || "")));
+
+  writeNBAOutputSheet_(sheet, headers, rows);
+
+  Logger.log(`Wrote ${rows.length} rows to NBA Player Season Stats.`);
+}
+
+// ----------------------------------------------------------------------------
+// PLAYER TRENDS
+// ----------------------------------------------------------------------------
+
+function refreshNBAPlayerTrendsSheet() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("NBA Player Game Logs");
+  const sheet = ss.getSheetByName("NBA Player Trends");
+
+  const headers = [
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Stat Type",
+    "Season Avg",
+    "Last 3 Avg",
+    "Last 5 Avg",
+    "Last 10 Avg",
+    "Trend Direction",
+    "Trend Score",
+    "Consistency",
+    "Risk Tier",
+    "Hit Rate Last 3",
+    "Hit Rate Last 5",
+    "Hit Rate Last 10",
+    "Above Season %",
+    "Trend Strength",
+    "Trend Note",
+    "Last Updated"
+  ];
+
+  const logs = getNBAObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const playerId = String(row["Player ID"] || "");
+    if (!playerId) return;
+
+    if (!grouped[playerId]) {
+      grouped[playerId] = {
+        playerId,
+        playerName: row["Player Name"] || "",
+        team: row["Team"] || "",
+        games: []
+      };
+    }
+
+    grouped[playerId].games.push({
+      date: row["Game Date"],
+      minutes: Number(row["Minutes"] || 0),
+      points: Number(row["Points"] || 0),
+      rebounds: Number(row["Rebounds"] || 0),
+      assists: Number(row["Assists"] || 0),
+      threes: Number(row["Threes"] || 0),
+      pra:
+        Number(row["Points"] || 0) +
+        Number(row["Rebounds"] || 0) +
+        Number(row["Assists"] || 0)
+    });
+  });
+
+  const now = new Date();
+  const rows = [];
+
+  Object.values(grouped).forEach(player => {
+    const games = player.games.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    NBA_PLAYER_TREND_STATS.forEach(stat => {
+      const values = games.map(g => Number(g[stat.key] || 0));
+
+      const seasonAvg = avgNBA_(values);
+      const last3 = avgNBA_(values.slice(0, 3));
+      const last5 = avgNBA_(values.slice(0, 5));
+      const last10 = avgNBA_(values.slice(0, 10));
+      const consistency = consistencyScoreNBA_(values);
+      const score = trendScoreNBA_(last5, seasonAvg);
+
+      const hitRateLast3 = hitRateNBA_(values.slice(0, 3), 1);
+      const hitRateLast5 = hitRateNBA_(values.slice(0, 5), 1);
+      const hitRateLast10 = hitRateNBA_(values.slice(0, 10), 1);
+      const aboveSeasonPct = aboveSeasonPctNBA_(last5, seasonAvg);
+      const strength = trendStrengthNBA_(hitRateLast5, aboveSeasonPct, score);
+
+      const note = buildNBAPlayerTrendNote_(
+        player.playerName,
+        stat.label,
+        seasonAvg,
+        last5,
+        hitRateLast5,
+        score
+      );
+
+      rows.push([
+        player.playerId,
+        player.playerName,
+        player.team,
+        stat.label,
+        seasonAvg,
+        last3,
+        last5,
+        last10,
+        trendDirectionNBA_(score),
+        score,
+        consistency,
+        riskTierNBA_(consistency, Math.abs(score)),
+        hitRateLast3,
+        hitRateLast5,
+        hitRateLast10,
+        aboveSeasonPct,
+        strength,
+        note,
+        now
+      ]);
+    });
+  });
+
+  rows.sort((a, b) =>
+    String(a[1] || "").localeCompare(String(b[1] || "")) ||
+    String(a[3] || "").localeCompare(String(b[3] || ""))
+  );
+
+  writeNBAOutputSheet_(sheet, headers, rows);
+
+  sheet.getRange("M:O").setNumberFormat("0%");
+  sheet.getRange("P:P").setNumberFormat("0.0");
+
+  Logger.log(`Wrote ${rows.length} rows to NBA Player Trends v2.`);
+}
+
+// ----------------------------------------------------------------------------
+// TEAM GAME LOGS
+// ----------------------------------------------------------------------------
+
+function refreshNBATeamGameLogsSheet() {
+  refreshNBATeamGameLogsForDateRange_("2025-10-01", "2026-06-30");
+}
+
+function refreshNBATeamGameLogsForDateRange_(startDate, endDate) {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("NBA Team Game Logs");
+
+  const headers = [
+    "Game Date",
+    "Game ID",
+    "Team",
+    "Opponent",
+    "Points For",
+    "Points Allowed",
+    "Rebounds",
+    "Assists",
+    "Threes",
+    "Turnovers"
+  ];
+
+  Logger.log(`Refreshing NBA Team Game Logs from ${startDate} to ${endDate}`);
+
+  const selectedGames = getNBACompletedGamesForDateRange_(startDate, endDate);
+
+  if (!selectedGames.length) {
+    Logger.log("No completed NBA games found for this team-log date range.");
+    return;
+  }
+
+  const gameIds = selectedGames.map(g => g.id).filter(Boolean);
+  const statRows = fetchAllNBAStatsForGameIds_(gameIds);
+  const teamGameStatsMap = buildNBATeamGameStatsMap_(statRows);
+
+  const rows = [];
+
+  selectedGames.forEach(game => {
+    const gameId = String(game.id || "");
+    const homeTeam = game.home_team || {};
+    const awayTeam = game.visitor_team || {};
+
+    addNBATeamGameLogRow_(rows, game, gameId, homeTeam, awayTeam, teamGameStatsMap);
+    addNBATeamGameLogRow_(rows, game, gameId, awayTeam, homeTeam, teamGameStatsMap);
+  });
+
+  upsertRowsByKey_(sheet, headers, rows, [1, 2]);
+
+  Logger.log(`Upserted ${rows.length} NBA team game-log rows for ${startDate} to ${endDate}.`);
+}
+
+function clearNBAPlayerGameLogsSheetOnly() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("NBA Player Game Logs");
+
+  const headers = [
+    "Game Date",
+    "Game ID",
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Opponent",
+    "Minutes",
+    "Points",
+    "Rebounds",
+    "Assists",
+    "Threes",
+    "Steals",
+    "Blocks",
+    "Turnovers"
+  ];
+
+  writeNBAOutputSheet_(sheet, headers, []);
+}
+
+function clearNBATeamGameLogsSheetOnly() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("NBA Team Game Logs");
+
+  const headers = [
+    "Game Date",
+    "Game ID",
+    "Team",
+    "Opponent",
+    "Points For",
+    "Points Allowed",
+    "Rebounds",
+    "Assists",
+    "Threes",
+    "Turnovers"
+  ];
+
+  writeNBAOutputSheet_(sheet, headers, []);
+}
+
+function refreshNBAPlayerGameLogsOctober() {
+  refreshNBAPlayerGameLogsForDateRange_("2025-10-21", "2025-10-31");
+}
+
+function refreshNBAPlayerGameLogsNovember() {
+  refreshNBAPlayerGameLogsForDateRange_("2025-11-01", "2025-11-30");
+}
+
+function refreshNBAPlayerGameLogsDecember() {
+  refreshNBAPlayerGameLogsForDateRange_("2025-12-01", "2025-12-31");
+}
+
+function refreshNBAPlayerGameLogsJanuary() {
+  refreshNBAPlayerGameLogsForDateRange_("2026-01-01", "2026-01-31");
+}
+
+function refreshNBAPlayerGameLogsFebruary() {
+  refreshNBAPlayerGameLogsForDateRange_("2026-02-01", "2026-02-28");
+}
+
+function refreshNBAPlayerGameLogsMarch() {
+  refreshNBAPlayerGameLogsForDateRange_("2026-03-01", "2026-03-31");
+}
+
+function refreshNBAPlayerGameLogsApril() {
+  refreshNBAPlayerGameLogsForDateRange_("2026-04-01", "2026-04-30");
+}
+
+function refreshNBAPlayerGameLogsMay() {
+  refreshNBAPlayerGameLogsForDateRange_("2026-05-01", "2026-05-31");
+}
+
+function refreshNBAPlayerGameLogsJune() {
+  refreshNBAPlayerGameLogsForDateRange_("2026-06-01", "2026-06-13");
+}
+
+function refreshNBATeamGameLogsOctober() {
+  refreshNBATeamGameLogsForDateRange_("2025-10-21", "2025-10-31");
+}
+
+function refreshNBATeamGameLogsNovember() {
+  refreshNBATeamGameLogsForDateRange_("2025-11-01", "2025-11-30");
+}
+
+function refreshNBATeamGameLogsDecember() {
+  refreshNBATeamGameLogsForDateRange_("2025-12-01", "2025-12-31");
+}
+
+function refreshNBATeamGameLogsJanuary() {
+  refreshNBATeamGameLogsForDateRange_("2026-01-01", "2026-01-31");
+}
+
+function refreshNBATeamGameLogsFebruary() {
+  refreshNBATeamGameLogsForDateRange_("2026-02-01", "2026-02-28");
+}
+
+function refreshNBATeamGameLogsMarch() {
+  refreshNBATeamGameLogsForDateRange_("2026-03-01", "2026-03-31");
+}
+
+function refreshNBATeamGameLogsApril() {
+  refreshNBATeamGameLogsForDateRange_("2026-04-01", "2026-04-30");
+}
+
+function refreshNBATeamGameLogsMay() {
+  refreshNBATeamGameLogsForDateRange_("2026-05-01", "2026-05-31");
+}
+
+function refreshNBATeamGameLogsJune() {
+  refreshNBATeamGameLogsForDateRange_("2026-06-01", "2026-06-13");
+}
+
+function addNBATeamGameLogRow_(rows, game, gameId, team, opponent, statMap) {
+  const teamName = team.full_name || "";
+  const opponentName = opponent.full_name || "";
+
+  const teamKey = normalizeNBATeamName_(teamName);
+  const opponentKey = normalizeNBATeamName_(opponentName);
+
+  const stat = statMap[`${gameId}_${teamKey}`] || {};
+  const opp = statMap[`${gameId}_${opponentKey}`] || {};
+
+  rows.push([
+    getNBAGameAZDate_(game),
+    gameId,
+    teamName,
+    opponentName,
+    Number(stat.points || 0),
+    Number(opp.points || 0),
+    Number(stat.rebounds || 0),
+    Number(stat.assists || 0),
+    Number(stat.threes || 0),
+    Number(stat.turnovers || 0)
+  ]);
+}
+
+// ----------------------------------------------------------------------------
+// TEAM SEASON STATS
+// ----------------------------------------------------------------------------
+
+function refreshNBATeamSeasonStatsSheet() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("NBA Team Game Logs");
+  const sheet = ss.getSheetByName("NBA Team Season Stats");
+
+  const headers = [
+    "Team",
+    "Games Played",
+    "Avg Points For",
+    "Avg Points Allowed",
+    "Avg Rebounds",
+    "Avg Assists",
+    "Avg Threes",
+    "Avg Turnovers",
+    "Last Updated"
+  ];
+
+  const logs = getNBAObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const team = row["Team"];
+    if (!team) return;
+
+    if (!grouped[team]) grouped[team] = [];
+
+    grouped[team].push({
+      pointsFor: Number(row["Points For"] || 0),
+      pointsAllowed: Number(row["Points Allowed"] || 0),
+      rebounds: Number(row["Rebounds"] || 0),
+      assists: Number(row["Assists"] || 0),
+      threes: Number(row["Threes"] || 0),
+      turnovers: Number(row["Turnovers"] || 0)
+    });
+  });
+
+  const now = new Date();
+
+  const rows = Object.keys(grouped).map(team => {
+    const games = grouped[team];
+
+    return [
+      team,
+      games.length,
+      avgNBA_(games.map(g => g.pointsFor)),
+      avgNBA_(games.map(g => g.pointsAllowed)),
+      avgNBA_(games.map(g => g.rebounds)),
+      avgNBA_(games.map(g => g.assists)),
+      avgNBA_(games.map(g => g.threes)),
+      avgNBA_(games.map(g => g.turnovers)),
+      now
+    ];
+  });
+
+  rows.sort((a, b) => String(a[0] || "").localeCompare(String(b[0] || "")));
+
+  writeNBAOutputSheet_(sheet, headers, rows);
+
+  Logger.log(`Wrote ${rows.length} rows to NBA Team Season Stats.`);
+}
+
+// ----------------------------------------------------------------------------
+// TEAM TRENDS
+// ----------------------------------------------------------------------------
+
+function refreshNBATeamTrendsOutputSheet() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("NBA Team Game Logs");
+  const sheet = ss.getSheetByName("NBA Team Trends");
+
+  const headers = [
+    "Team",
+    "Metric",
+    "Season Avg",
+    "Last 3 Avg",
+    "Last 5 Avg",
+    "Last 10 Avg",
+    "Trend Direction",
+    "Trend Score",
+    "Consistency",
+    "Risk Tier",
+    "Hit Rate Last 3",
+    "Hit Rate Last 5",
+    "Hit Rate Last 10",
+    "Above Season %",
+    "Trend Strength",
+    "Trend Note",
+    "Last Updated"
+  ];
+
+  const logs = getNBAObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const team = row["Team"];
+    if (!team) return;
+
+    if (!grouped[team]) grouped[team] = [];
+
+    grouped[team].push({
+      date: row["Game Date"],
+      pointsFor: Number(row["Points For"] || 0),
+      pointsAllowed: Number(row["Points Allowed"] || 0),
+      rebounds: Number(row["Rebounds"] || 0),
+      assists: Number(row["Assists"] || 0),
+      threes: Number(row["Threes"] || 0),
+      turnovers: Number(row["Turnovers"] || 0)
+    });
+  });
+
+  const now = new Date();
+  const rows = [];
+
+  Object.keys(grouped).forEach(team => {
+    const games = grouped[team].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    NBA_TEAM_TREND_STATS.forEach(metric => {
+      const values = games.map(g => Number(g[metric.key] || 0));
+
+      const seasonAvg = avgNBA_(values);
+      const last3 = avgNBA_(values.slice(0, 3));
+      const last5 = avgNBA_(values.slice(0, 5));
+      const last10 = avgNBA_(values.slice(0, 10));
+      const consistency = consistencyScoreNBA_(values);
+      const score = trendScoreNBA_(last5, seasonAvg);
+
+      const hitRateLast3 = hitRateNBA_(values.slice(0, 3), 1);
+      const hitRateLast5 = hitRateNBA_(values.slice(0, 5), 1);
+      const hitRateLast10 = hitRateNBA_(values.slice(0, 10), 1);
+      const aboveSeasonPct = aboveSeasonPctNBA_(last5, seasonAvg);
+      const strength = trendStrengthNBA_(hitRateLast5, aboveSeasonPct, score);
+
+      const note = buildNBATeamTrendNote_(
+        team,
+        metric.label,
+        seasonAvg,
+        last5,
+        hitRateLast5,
+        score
+      );
+
+      rows.push([
+        team,
+        metric.label,
+        seasonAvg,
+        last3,
+        last5,
+        last10,
+        trendDirectionNBA_(score),
+        score,
+        consistency,
+        riskTierNBA_(consistency, Math.abs(score)),
+        hitRateLast3,
+        hitRateLast5,
+        hitRateLast10,
+        aboveSeasonPct,
+        strength,
+        note,
+        now
+      ]);
+    });
+  });
+
+  rows.sort((a, b) =>
+    String(a[0] || "").localeCompare(String(b[0] || "")) ||
+    String(a[1] || "").localeCompare(String(b[1] || ""))
+  );
+
+  writeNBAOutputSheet_(sheet, headers, rows);
+
+  sheet.getRange("K:M").setNumberFormat("0%");
+  sheet.getRange("N:N").setNumberFormat("0.0");
+
+  Logger.log(`Wrote ${rows.length} rows to NBA Team Trends v2.`);
+}
+
+function hitRateNBA_(values, threshold) {
+  const nums = values
+    .map(Number)
+    .filter(value => !Number.isNaN(value));
+
+  if (!nums.length) return 0;
+
+  const hits = nums.filter(value => value >= threshold).length;
+
+  return hits / nums.length;
+}
+
+function aboveSeasonPctNBA_(recentAvg, seasonAvg) {
+  if (!seasonAvg) return 0;
+
+  return ((recentAvg - seasonAvg) / seasonAvg) * 100;
+}
+
+function formatPercentNBA_(value) {
+  const num = Number(value);
+
+  if (Number.isNaN(num)) return "0%";
+
+  return `${Math.round(num * 100)}%`;
+}
+
+function formatSignedPercentNBA_(value) {
+  const num = Number(value);
+
+  if (Number.isNaN(num)) return "0%";
+
+  return num >= 0 ? `+${num.toFixed(1)}%` : `${num.toFixed(1)}%`;
+}
+
+function trendStrengthNBA_(hitRate, aboveSeasonPct, trendScore) {
+  const hr = Number(hitRate);
+  const above = Number(aboveSeasonPct);
+  const score = Number(trendScore);
+
+  if (Number.isNaN(hr) || Number.isNaN(above) || Number.isNaN(score)) {
+    return "Unknown";
+  }
+
+  if (hr >= 0.80 && above >= 20 && score >= 15) {
+    return "Elite Trend";
+  }
+
+  if (hr >= 0.70 && above >= 10 && score >= 7.5) {
+    return "Strong Trend";
+  }
+
+  if (hr >= 0.60 && score >= 0) {
+    return "Moderate Trend";
+  }
+
+  if (score < -10 || above < -10) {
+    return "Cold Trend";
+  }
+
+  return "Weak Trend";
+}
+
+function buildNBAPlayerTrendNote_(playerName, statLabel, seasonAvg, last5, hitRateLast5, trendScore) {
+  const safeName = playerName || "This player";
+  const safeStat = statLabel || "this stat";
+
+  const last5Text = Number(last5).toFixed(2);
+  const seasonText = Number(seasonAvg).toFixed(2);
+  const hitRateText = formatPercentNBA_(hitRateLast5);
+  const trendText = formatSignedPercentNBA_(trendScore);
+
+  if (trendScore >= 15) {
+    return `${safeName} is trending up in ${safeStat}, averaging ${last5Text} over the last 5 compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
+  }
+
+  if (trendScore <= -15) {
+    return `${safeName} is trending down in ${safeStat}, averaging ${last5Text} over the last 5 compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
+  }
+
+  return `${safeName} is holding steady in ${safeStat}, averaging ${last5Text} over the last 5 compared to ${seasonText} on the season, with a 1+ hit rate of ${hitRateText}.`;
+}
+
+function buildNBATeamTrendNote_(teamName, metricLabel, seasonAvg, last5, hitRateLast5, trendScore) {
+  const team = `The ${teamName || "team"}`;
+  const metric = metricLabel || "this metric";
+
+  const last5Text = Number(last5).toFixed(2);
+  const seasonText = Number(seasonAvg).toFixed(2);
+  const hitRateText = formatPercentNBA_(hitRateLast5);
+  const trendText = formatSignedPercentNBA_(trendScore);
+
+  if (trendScore >= 15) {
+    return `${team} are trending up in ${metric}, averaging ${last5Text} over the last 5 games compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
+  }
+
+  if (trendScore <= -15) {
+    return `${team} are trending down in ${metric}, averaging ${last5Text} over the last 5 games compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
+  }
+
+  return `${team} are holding steady in ${metric}, averaging ${last5Text} over the last 5 games compared to ${seasonText} on the season, with a 1+ hit rate of ${hitRateText}.`;
+}
+
+function strengthRank_(strength) {
+  const value = String(strength || "").toLowerCase();
+  if (value.includes("elite")) return 100;
+  if (value.includes("strong")) return 80;
+  if (value.includes("moderate")) return 60;
+  if (value.includes("weak")) return 35;
+  if (value.includes("cold")) return 15;
+  return 0;
+}
+
+function clampScore_(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function calculateTrendConfidence_(row) {
+  const strengthScore = strengthRank_(row["Trend Strength"]);
+  const hitRate = Number(row["Hit Rate Last 5"] || 0) * 100;
+  const trendScore = clampScore_(Number(row["Trend Score"] || 0), -50, 50);
+  const consistency = clampScore_(Number(row["Consistency"] || 0), 0, 100);
+  const aboveSeason = clampScore_(Number(row["Above Season %"] || 0), -50, 50);
+  const last5 = Number(row["Last 5 Avg"] || 0);
+  const seasonAvg = Number(row["Season Avg"] || 0);
+
+  const recentForm = seasonAvg > 0
+    ? clampScore_((last5 / seasonAvg) * 50, 0, 100)
+    : 0;
+
+  return Math.round(clampScore_(
+    strengthScore * 0.35 +
+    hitRate * 0.25 +
+    (trendScore + 50) * 0.15 +
+    consistency * 0.10 +
+    (aboveSeason + 50) * 0.10 +
+    recentForm * 0.05,
+    0,
+    100
+  ));
+}
+
+function refreshNBATopPlayerTrendsSheet() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sourceSheet = ss.getSheetByName("NBA Player Trends");
+  let sheet = ss.getSheetByName("NBA Top Player Trends");
+  if (!sheet) sheet = ss.insertSheet("NBA Top Player Trends");
+
+  const rows = getNBAObjectsFromSheet_(sourceSheet);
+
+  const headers = [
+    "Rank", "Player ID", "Player Name", "Team", "Stat Type",
+    "Confidence Score", "Trend Strength", "Hit Rate Last 5",
+    "Above Season %", "Trend Score", "Last 5 Avg", "Season Avg",
+    "Risk Tier", "Trend Note", "Last Updated"
+  ];
+
+  const ranked = rows
+    .filter(row => row["Player Name"])
+    .map(row => ({ row, confidence: calculateTrendConfidence_(row) }))
+    .filter(item => Number(item.row["Hit Rate Last 5"] || 0) >= 0.5)
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 25);
+
+  const now = new Date();
+
+  const outputRows = ranked.map((item, index) => {
+    const row = item.row;
+    return [
+      index + 1,
+      row["Player ID"] || "",
+      row["Player Name"] || "",
+      row["Team"] || "",
+      row["Stat Type"] || "",
+      item.confidence,
+      row["Trend Strength"] || "",
+      row["Hit Rate Last 5"] || 0,
+      row["Above Season %"] || 0,
+      row["Trend Score"] || 0,
+      row["Last 5 Avg"] || 0,
+      row["Season Avg"] || 0,
+      row["Risk Tier"] || "",
+      row["Trend Note"] || "",
+      now
+    ];
+  });
+
+  writeNBAOutputSheet_(sheet, headers, outputRows);
+  sheet.getRange("H:H").setNumberFormat("0%");
+  sheet.getRange("I:L").setNumberFormat("0.0");
+}
+
+function refreshNBATopTeamTrendsSheet() {
+  ensureNBATrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sourceSheet = ss.getSheetByName("NBA Team Trends");
+  let sheet = ss.getSheetByName("NBA Top Team Trends");
+  if (!sheet) sheet = ss.insertSheet("NBA Top Team Trends");
+
+  const rows = getNBAObjectsFromSheet_(sourceSheet);
+
+  const headers = [
+    "Rank", "Team", "Metric", "Confidence Score", "Trend Strength",
+    "Hit Rate Last 5", "Above Season %", "Trend Score",
+    "Last 5 Avg", "Season Avg", "Risk Tier", "Trend Note", "Last Updated"
+  ];
+
+  const ranked = rows
+    .filter(row => row["Team"])
+    .map(row => ({ row, confidence: calculateTrendConfidence_(row) }))
+    .filter(item => Number(item.row["Hit Rate Last 5"] || 0) >= 0.5)
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 25);
+
+  const now = new Date();
+
+  const outputRows = ranked.map((item, index) => {
+    const row = item.row;
+    return [
+      index + 1,
+      row["Team"] || "",
+      row["Metric"] || "",
+      item.confidence,
+      row["Trend Strength"] || "",
+      row["Hit Rate Last 5"] || 0,
+      row["Above Season %"] || 0,
+      row["Trend Score"] || 0,
+      row["Last 5 Avg"] || 0,
+      row["Season Avg"] || 0,
+      row["Risk Tier"] || "",
+      row["Trend Note"] || "",
+      now
+    ];
+  });
+
+  writeNBAOutputSheet_(sheet, headers, outputRows);
+  sheet.getRange("F:F").setNumberFormat("0%");
+  sheet.getRange("G:J").setNumberFormat("0.0");
+}
+
+// ----------------------------------------------------------------------------
+// BACKWARD-COMPATIBLE WRAPPERS
+// These let old menu items/triggers still work safely.
+// ----------------------------------------------------------------------------
+
+function refreshNBATrendsSheet() {
+  refreshNBAPlayerTrendsSheet();
+}
+
+function refreshNBATeamTrendsSheet() {
+  refreshNBATeamTrendsOutputSheet();
+}
+
+// ----------------------------------------------------------------------------
+// SHARED NBA TREND HELPERS
+// ----------------------------------------------------------------------------
+
+function writeNBAOutputSheet_(sheet, headers, rows) {
+  sheet.clearContents();
+
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  }
+
+  sheet.autoResizeColumns(1, headers.length);
+}
+
+function getNBAObjectsFromSheet_(sheet) {
+  const values = sheet.getDataRange().getValues();
+
+  if (values.length < 2) return [];
+
+  const headers = values[0];
+
+  return values.slice(1).map(row => {
+    const obj = {};
+
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+
+    return obj;
+  });
+}
+
+function avgNBA_(values) {
+  const nums = values
+    .map(Number)
+    .filter(value => !Number.isNaN(value));
+
+  if (!nums.length) return 0;
+
+  return nums.reduce((sum, value) => sum + value, 0) / nums.length;
+}
+
+function stdDevNBA_(values) {
+  const nums = values
+    .map(Number)
+    .filter(value => !Number.isNaN(value));
+
+  if (nums.length < 2) return 0;
+
+  const mean = avgNBA_(nums);
+  const variance = avgNBA_(nums.map(value => Math.pow(value - mean, 2)));
+
+  return Math.sqrt(variance);
+}
+
+function consistencyScoreNBA_(values) {
+  const mean = avgNBA_(values);
+
+  if (!mean) return 0;
+
+  const cv = stdDevNBA_(values) / mean;
+
+  return Math.max(0, Math.min(100, 100 - cv * 100));
+}
+
+function trendScoreNBA_(recentAvg, seasonAvg) {
+  if (!seasonAvg) return 0;
+
+  return ((recentAvg - seasonAvg) / seasonAvg) * 100;
+}
+
+function trendDirectionNBA_(score) {
+  if (score >= 7.5) return "Up";
+  if (score <= -7.5) return "Down";
+
+  return "Flat";
+}
+
+function riskTierNBA_(consistency, absTrendScore) {
+  if (consistency >= 75 && absTrendScore <= 20) return "Low";
+  if (consistency >= 55) return "Medium";
+
+  return "High";
+}
+
+function parseNBAMinutes_(value) {
+  if (value === null || value === undefined || value === "") return 0;
+
+  const str = String(value);
+
+  if (str.includes(":")) {
+    const parts = str.split(":");
+    const minutes = Number(parts[0] || 0);
+    const seconds = Number(parts[1] || 0);
+
+    return minutes + seconds / 60;
+  }
+
+  const num = Number(value);
+
+  return Number.isNaN(num) ? 0 : num;
+}
+
+function getNBAOpponentFromStat_(stat) {
+  const game = stat.game || {};
+  const team = stat.team || {};
+
+  const teamId = String(team.id || "");
+  const homeTeamId = String((game.home_team && game.home_team.id) || "");
+  const awayTeamId = String((game.visitor_team && game.visitor_team.id) || "");
+
+  if (teamId && teamId === homeTeamId) {
+    return (game.visitor_team && game.visitor_team.full_name) || "";
+  }
+
+  if (teamId && teamId === awayTeamId) {
+    return (game.home_team && game.home_team.full_name) || "";
+  }
+
+  return "";
+}
+
+function getNBAPlayerIdsForTrendPipeline_() {
+  const propIds = getNBAPlayerIdsFromPlayerProps_();
+
+  if (propIds.length > 0) {
+    return propIds;
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const rosterSheet = ss.getSheetByName("Rosters");
+
+  if (!rosterSheet) return [];
+
+  const lastRow = rosterSheet.getLastRow();
+  if (lastRow < 2) return [];
+
+  const values = rosterSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+
+  return values
+    .map(row => row[0])
+    .filter(id => id !== "" && id !== null && id !== undefined)
+    .map(id => String(id));
+}
+
+/**
+ * Refreshes the "Player Props" tab with all NBA player props for today's games.
+ * This avoids using many volatile custom functions in sheet cells.
+ */
+function refreshNBAPlayerPropsSheet() {
+  const sheetName = "Player Props";
+  const scheduleSheetName = "Schedule";
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+  const scheduleSheet = ss.getSheetByName(scheduleSheetName);
+
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found.`);
+  }
+
+  if (!scheduleSheet) {
+    throw new Error(`Sheet "${scheduleSheetName}" not found.`);
+  }
+
+  ensurePropFormulaTemplates_(sheet);
+  ensureNameFormulaTemplates_(sheet);
+
+  Logger.log("Refreshing NBA player props using Schedule tab game IDs...");
+
+  const games = getGamesFromScheduleSheet_(scheduleSheet);
+
+  if (!games.length) {
+    clearPlayerPropsData_(sheet);
+    Logger.log("No schedule rows found, so Player Props was cleared.");
+    return;
+  }
+
+  const gameMap = {};
+  games.forEach(game => {
+    gameMap[String(game.id)] = {
+      game_date: game.game_date || "",
+      away_team: game.away_team || "",
+      home_team: game.home_team || ""
+    };
+  });
+
+  let allRows = [];
+
+  games.forEach((game, index) => {
+    Logger.log(`Fetching props for game ${index + 1}/${games.length} (ID: ${game.id})`);
+
+    const props = fetchAllNBAPlayerPropsForGame_(game.id);
+    const gameInfo = gameMap[String(game.id)] || {};
+
+    props.forEach(prop => {
+      const playerId =
+        prop.player_id ||
+        (prop.player && prop.player.id) ||
+        "";
+
+      const vendor =
+        prop.vendor ||
+        prop.sportsbook ||
+        prop.bookmaker ||
+        "";
+
+      const propType =
+        prop.prop_type ||
+        prop.market ||
+        "";
+
+      const lineValue =
+        prop.line ||
+        prop.line_value ||
+        "";
+
+      const typeValue =
+        (prop.market && prop.market.type) ||
+        "";
+
+      const odds =
+        (prop.market && prop.market.odds) ||
+        "";
+
+      const updatedAt =
+        prop.updated_at ||
+        "";
+
+      const overOdds =
+        (prop.market && prop.market.over_odds) ||
+        "";
+
+      const underOdds =
+        (prop.market && prop.market.under_odds) ||
+        "";
+
+      allRows.push([
+        game.id,                  // A Game Id
+        gameInfo.game_date,       // B Game Date
+        gameInfo.away_team,       // C Away Team
+        gameInfo.home_team,       // D Home Team
+        prop.id || "",            // E Id
+        playerId,                 // F Player Id
+        vendor,                   // G Vendor
+        propType,                 // H Prop Type
+        lineValue,                // I Line Value
+        typeValue,                // J Type
+        odds,                     // K Odds
+        updatedAt,                // L Updated At
+        overOdds,                 // M Over Odds
+        underOdds                 // N Under Odds
+      ]);
+    });
+
+    Utilities.sleep(200);
+  });
+
+  clearPlayerPropsData_(sheet);
+
+  if (!allRows.length) {
+    Logger.log("No NBA player props were returned for the schedule slate.");
+    return;
+  }
+
+  sheet.getRange(3, 1, allRows.length, 14).setValues(allRows);
+
+  copyFormulaTemplatesDown_(sheet, allRows.length);
+
+  Logger.log(`Wrote ${allRows.length} NBA player props rows to "${sheetName}"`);
+}
+
+function debugNBAFirstOverUnderPropObject() {
+  const today = getTodayString_();
+  const games = fetchAllNBAGamesForDate_(today);
+
+  if (!games.length) {
+    Logger.log("No NBA games found for today.");
+    return;
+  }
+
+  for (const game of games) {
+    const props = fetchAllNBAPlayerPropsForGame_(game.id);
+
+    const overUnderProp = props.find(
+      prop => prop.market && prop.market.type === "over_under"
+    );
+
+    if (overUnderProp) {
+      Logger.log("FOUND OVER_UNDER PROP IN GAME ID: " + game.id);
+      Logger.log(JSON.stringify(overUnderProp, null, 2));
+      return;
+    }
+  }
+
+  Logger.log("No over_under prop found in any game for today.");
+}
+
+function debugNBAFirstPropObject() {
+  const today = getTodayString_();
+  const games = fetchAllNBAGamesForDate_(today);
+
+  if (!games.length) {
+    Logger.log("No NBA games found for today.");
+    return;
+  }
+
+  const firstGame = games[0];
+  const props = fetchAllNBAPlayerPropsForGame_(firstGame.id);
+
+  if (!props.length) {
+    Logger.log(`No props found for game ID ${firstGame.id}`);
+    return;
+  }
+
+  Logger.log("FIRST GAME ID: " + firstGame.id);
+  Logger.log("FIRST PROP OBJECT:");
+  Logger.log(JSON.stringify(props[0], null, 2));
+}
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("Sports Data")
+    .addItem("Refresh NBA Schedule", "refreshNBAScheduleSheet")
+    .addItem("Refresh NBA Game Odds", "refreshNBAGameOddsSheet")
+    .addItem("Refresh NBA Player Props", "refreshNBAPlayerPropsSheet")
+    .addItem("Refresh NBA Rosters", "refreshNBAActiveRostersSheet")
+
+    .addSeparator()
+
+    .addItem("Refresh NBA Player Trend Pipeline", "refreshNBAPlayerTrendPipeline")
+    .addItem("Refresh NBA Team Trend Pipeline", "refreshNBATeamTrendPipeline")
+    .addItem("Refresh NBA Top Player Trend Pipeline", "refreshNBATopPlayerTrendPipeline")
+    .addItem("Refresh NBA Top Team Trend Pipeline", "refreshNBATopTeamTrendPipeline")
+
+    .addSeparator()
+
+    .addItem("Clear NBA Player Game Logs", "clearNBAPlayerGameLogsSheetOnly")
+    .addItem("Clear NBA Team Game Logs", "clearNBATeamGameLogsSheetOnly")
+
+    .addSeparator()
+
+    .addItem("Refresh NBA Player Logs October", "refreshNBAPlayerGameLogsOctober")
+    .addItem("Refresh NBA Player Logs November", "refreshNBAPlayerGameLogsNovember")
+    .addItem("Refresh NBA Player Logs December", "refreshNBAPlayerGameLogsDecember")
+    .addItem("Refresh NBA Player Logs January", "refreshNBAPlayerGameLogsJanuary")
+    .addItem("Refresh NBA Player Logs February", "refreshNBAPlayerGameLogsFebruary")
+    .addItem("Refresh NBA Player Logs March", "refreshNBAPlayerGameLogsMarch")
+    .addItem("Refresh NBA Player Logs April", "refreshNBAPlayerGameLogsApril")
+    .addItem("Refresh NBA Player Logs May", "refreshNBAPlayerGameLogsMay")
+    .addItem("Refresh NBA Player Logs June", "refreshNBAPlayerGameLogsJune")
+
+    .addSeparator()
+
+    .addItem("Refresh NBA Team Logs October", "refreshNBATeamGameLogsOctober")
+    .addItem("Refresh NBA Team Logs November", "refreshNBATeamGameLogsNovember")
+    .addItem("Refresh NBA Team Logs December", "refreshNBATeamGameLogsDecember")
+    .addItem("Refresh NBA Team Logs January", "refreshNBATeamGameLogsJanuary")
+    .addItem("Refresh NBA Team Logs February", "refreshNBATeamGameLogsFebruary")
+    .addItem("Refresh NBA Team Logs March", "refreshNBATeamGameLogsMarch")
+    .addItem("Refresh NBA Team Logs April", "refreshNBATeamGameLogsApril")
+    .addItem("Refresh NBA Team Logs May", "refreshNBATeamGameLogsMay")
+    .addItem("Refresh NBA Team Logs June", "refreshNBATeamGameLogsJune")
+
+    .addToUi();
+}
+
+/**
+ * Formats a key as a readable header
+ * @param {string} key The key to format
+ * @returns {string} Formatted header
+ */
+function formatHeader_(key) {
+  return key.split('.').pop().replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+// ============================================================================
+// NBA FUNCTIONS
+// ============================================================================
+
+/**
+ * Get NBA teams
+ * @param {string} conference Filter by conference (East/West)
+ * @param {string} division Filter by division
+ * @returns {Array} NBA teams data
+ * @customfunction
+ */
+function BDL_NBA_TEAMS(conference, division) {
+  const params = {};
+  if (conference) params.conference = conference;
+  if (division) params.division = division;
+  const response = fetchApi_('/nba/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get a specific NBA team by ID
+ * @param {number} teamId The team ID
+ * @returns {Array} Team data
+ * @customfunction
+ */
+function BDL_NBA_TEAM(teamId) {
+  if (!teamId) throw new Error('Team ID is required');
+  const response = fetchApi_(`/nba/v1/teams/${teamId}`);
+  return toSheet_([response.data]);
+}
+
+/**
+ * Get NBA players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page (max 100)
+ * @returns {Array} NBA players data
+ * @customfunction
+ */
+function BDL_NBA_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nba/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get active NBA players only
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page (max 100)
+ * @returns {Array} Active NBA players data
+ * @customfunction
+ */
+function BDL_NBA_PLAYERS_ACTIVE(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nba/v1/players/active', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get a specific NBA player by ID
+ * @param {number} playerId The player ID
+ * @returns {Array} Player data
+ * @customfunction
+ */
+function BDL_NBA_PLAYER(playerId) {
+  if (!playerId) throw new Error('Player ID is required');
+  const response = fetchApi_(`/nba/v1/players/${playerId}`);
+  return toSheet_([response.data]);
+}
+
+/**
+ * Get NBA games
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page (max 100)
+ * @returns {Array} NBA games data
+ * @customfunction
+ */
+function BDL_NBA_GAMES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nba/v1/games', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get a specific NBA game by ID
+ * @param {number} gameId The game ID
+ * @returns {Array} Game data
+ * @customfunction
+ */
+function BDL_NBA_GAME(gameId) {
+  if (!gameId) throw new Error('Game ID is required');
+  const response = fetchApi_(`/nba/v1/games/${gameId}`);
+  return toSheet_([response.data]);
+}
+
+/**
+ * Get NBA player stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} gameId Filter by game ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page (max 100)
+ * @returns {Array} NBA stats data
+ * @customfunction
+ */
+function BDL_NBA_STATS(playerId, gameId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (gameId) params['game_ids[]'] = gameId;
+  if (season) params['seasons[]'] = season;
+  const response = fetchApi_('/nba/v1/stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA season averages for a player
+ * @param {number} playerId The player ID (required)
+ * @param {number} season The season year (required)
+ * @returns {Array} Season averages data
+ * @customfunction
+ */
+function BDL_NBA_SEASON_AVERAGES(playerId, season) {
+  if (!playerId) throw new Error('Player ID is required');
+  if (!season) throw new Error('Season is required');
+  const response = fetchApi_('/nba/v1/season_averages', { player_id: playerId, season: season });
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_NBA_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/nba/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA player injuries
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Injury data
+ * @customfunction
+ */
+function BDL_NBA_INJURIES(teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nba/v1/player_injuries', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get live NBA box scores
+ * @returns {Array} Live box scores data
+ * @customfunction
+ */
+function BDL_NBA_BOX_SCORES_LIVE() {
+  const response = fetchApi_('/nba/v1/box_scores/live');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA box scores for a specific date
+ * @param {string} date Date in YYYY-MM-DD format (required)
+ * @returns {Array} Box scores data
+ * @customfunction
+ */
+function BDL_NBA_BOX_SCORES(date) {
+  if (!date) throw new Error('Date is required (YYYY-MM-DD)');
+  const response = fetchApi_('/nba/v1/box_scores', { date: date });
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA stat leaders
+ * @param {string} statType Type of stat (pts, ast, reb, stl, blk, etc.)
+ * @param {number} season The season year
+ * @param {string} seasonType Season type (regular/playoffs)
+ * @returns {Array} Leaders data
+ * @customfunction
+ */
+function BDL_NBA_LEADERS(statType, season, seasonType) {
+  if (!statType) throw new Error('Stat type is required (pts, ast, reb, stl, blk, etc.)');
+  const params = { stat_type: statType };
+  if (season) params.season = season;
+  if (seasonType) params.season_type = seasonType;
+  const response = fetchApi_('/nba/v1/leaders', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} gameId Filter by game ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_NBA_ODDS(date, gameId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (gameId) params['game_ids[]'] = gameId;
+  const response = fetchApi_('/nba/v2/odds', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA player prop betting odds
+ * @param {number} gameId The game ID (required)
+ * @param {number} playerId Filter by player ID
+ * @param {string} propType Filter by prop type (points, rebounds, assists, etc.)
+ * @returns {Array} Player props data
+ * @customfunction
+ */
+function BDL_NBA_PLAYER_PROPS(gameId, playerId, propType) {
+  if (!gameId) throw new Error('Game ID is required');
+  const params = { game_id: gameId };
+  if (playerId) params.player_id = playerId;
+  if (propType) params.prop_type = propType;
+  const response = fetchApi_('/nba/v2/odds/player_props', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA advanced stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} gameId Filter by game ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} Advanced stats data
+ * @customfunction
+ */
+function BDL_NBA_ADVANCED_STATS(playerId, gameId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (gameId) params['game_ids[]'] = gameId;
+  if (season) params['seasons[]'] = season;
+  const response = fetchApi_('/nba/v1/stats/advanced', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA game lineups
+ * @param {number} gameId The game ID (required)
+ * @returns {Array} Lineup data
+ * @customfunction
+ */
+function BDL_NBA_LINEUPS(gameId) {
+  if (!gameId) throw new Error('Game ID is required');
+  const response = fetchApi_('/nba/v1/lineups', { 'game_ids[]': gameId });
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NBA play-by-play data
+ * @param {number} gameId Filter by game ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Play-by-play data
+ * @customfunction
+ */
+function BDL_NBA_PLAYS(gameId, perPage) {
+  const params = { per_page: perPage || 100 };
+  if (gameId) params['game_ids[]'] = gameId;
+  const response = fetchApi_('/nba/v1/plays', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// NFL FUNCTIONS
+// ============================================================================
+
+/**
+ * Get NFL teams
+ * @param {string} conference Filter by conference (AFC/NFC)
+ * @param {string} division Filter by division
+ * @returns {Array} NFL teams data
+ * @customfunction
+ */
+function BDL_NFL_TEAMS(conference, division) {
+  const params = {};
+  if (conference) params.conference = conference;
+  if (division) params.division = division;
+  const response = fetchApi_('/nfl/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get a specific NFL team by ID
+ * @param {number} teamId The team ID
+ * @returns {Array} Team data
+ * @customfunction
+ */
+function BDL_NFL_TEAM(teamId) {
+  if (!teamId) throw new Error('Team ID is required');
+  const response = fetchApi_(`/nfl/v1/teams/${teamId}`);
+  return toSheet_([response.data]);
+}
+
+/**
+ * Get NFL team roster
+ * @param {number} teamId The team ID (required)
+ * @param {number} season Filter by season year
+ * @returns {Array} Roster data
+ * @customfunction
+ */
+function BDL_NFL_ROSTER(teamId, season) {
+  if (!teamId) throw new Error('Team ID is required');
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_(`/nfl/v1/teams/${teamId}/roster`, params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} NFL players data
+ * @customfunction
+ */
+function BDL_NFL_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nfl/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get active NFL players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Active NFL players data
+ * @customfunction
+ */
+function BDL_NFL_PLAYERS_ACTIVE(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nfl/v1/players/active', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL games
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} week Filter by week number
+ * @param {number} perPage Results per page
+ * @returns {Array} NFL games data
+ * @customfunction
+ */
+function BDL_NFL_GAMES(date, season, week, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (week) params.week = week;
+  const response = fetchApi_('/nfl/v1/games', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL player stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} gameId Filter by game ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} NFL stats data
+ * @customfunction
+ */
+function BDL_NFL_STATS(playerId, gameId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (gameId) params['game_ids[]'] = gameId;
+  if (season) params['seasons[]'] = season;
+  const response = fetchApi_('/nfl/v1/stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_NFL_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/nfl/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL player injuries
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Injury data
+ * @customfunction
+ */
+function BDL_NFL_INJURIES(teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nfl/v1/player_injuries', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL season stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} season Filter by season year
+ * @param {string} seasonType Season type (regular/postseason)
+ * @param {number} perPage Results per page
+ * @returns {Array} Season stats data
+ * @customfunction
+ */
+function BDL_NFL_SEASON_STATS(playerId, season, seasonType, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (season) params.season = season;
+  if (seasonType) params.season_type = seasonType;
+  const response = fetchApi_('/nfl/v1/season_stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} gameId Filter by game ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_NFL_ODDS(date, gameId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (gameId) params['game_ids[]'] = gameId;
+  const response = fetchApi_('/nfl/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL player prop betting odds
+ * @param {number} gameId The game ID (required)
+ * @param {number} playerId Filter by player ID
+ * @param {string} propType Filter by prop type
+ * @returns {Array} Player props data
+ * @customfunction
+ */
+function BDL_NFL_PLAYER_PROPS(gameId, playerId, propType) {
+  if (!gameId) throw new Error('Game ID is required');
+  const params = { game_id: gameId };
+  if (playerId) params.player_id = playerId;
+  if (propType) params.prop_type = propType;
+  const response = fetchApi_('/nfl/v1/odds/player_props', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL advanced rushing stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} Advanced rushing stats
+ * @customfunction
+ */
+function BDL_NFL_ADVANCED_RUSHING(playerId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (season) params.season = season;
+  const response = fetchApi_('/nfl/v1/advanced_stats/rushing', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL advanced passing stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} Advanced passing stats
+ * @customfunction
+ */
+function BDL_NFL_ADVANCED_PASSING(playerId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (season) params.season = season;
+  const response = fetchApi_('/nfl/v1/advanced_stats/passing', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL advanced receiving stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} Advanced receiving stats
+ * @customfunction
+ */
+function BDL_NFL_ADVANCED_RECEIVING(playerId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (season) params.season = season;
+  const response = fetchApi_('/nfl/v1/advanced_stats/receiving', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NFL play-by-play data
+ * @param {number} gameId Filter by game ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Play-by-play data
+ * @customfunction
+ */
+function BDL_NFL_PLAYS(gameId, perPage) {
+  const params = { per_page: perPage || 100 };
+  if (gameId) params['game_ids[]'] = gameId;
+  const response = fetchApi_('/nfl/v1/plays', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// MLB FUNCTIONS
+// ============================================================================
+
+/**
+ * Get MLB teams
+ * @param {string} league Filter by league (AL/NL)
+ * @param {string} division Filter by division
+ * @returns {Array} MLB teams data
+ * @customfunction
+ */
+function BDL_MLB_TEAMS(league, division) {
+  const params = {};
+  if (league) params.league = league;
+  if (division) params.division = division;
+  const response = fetchApi_('/mlb/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLB players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} MLB players data
+ * @customfunction
+ */
+function BDL_MLB_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/mlb/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get active MLB players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Active MLB players data
+ * @customfunction
+ */
+function BDL_MLB_PLAYERS_ACTIVE(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/mlb/v1/players/active', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLB games
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} MLB games data
+ * @customfunction
+ */
+function BDL_MLB_GAMES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/mlb/v1/games', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLB player stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} gameId Filter by game ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} MLB stats data
+ * @customfunction
+ */
+function BDL_MLB_STATS(playerId, gameId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (gameId) params['game_ids[]'] = gameId;
+  if (season) params['seasons[]'] = season;
+  const response = fetchApi_('/mlb/v1/stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLB standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_MLB_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/mlb/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLB player injuries
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Injury data
+ * @customfunction
+ */
+function BDL_MLB_INJURIES(teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/mlb/v1/player_injuries', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLB season stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} season Filter by season year
+ * @param {string} statType Stats type (hitting/pitching)
+ * @param {number} perPage Results per page
+ * @returns {Array} Season stats data
+ * @customfunction
+ */
+function BDL_MLB_SEASON_STATS(playerId, season, statType, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params['player_ids[]'] = playerId;
+  if (season) params.season = season;
+  if (statType) params.type = statType;
+  const response = fetchApi_('/mlb/v1/season_stats', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// NHL FUNCTIONS
+// ============================================================================
+
+/**
+ * Get NHL teams
+ * @param {string} conference Filter by conference
+ * @param {string} division Filter by division
+ * @returns {Array} NHL teams data
+ * @customfunction
+ */
+function BDL_NHL_TEAMS(conference, division) {
+  const params = {};
+  if (conference) params.conference = conference;
+  if (division) params.division = division;
+  const response = fetchApi_('/nhl/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NHL players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} NHL players data
+ * @customfunction
+ */
+function BDL_NHL_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nhl/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NHL games
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} NHL games data
+ * @customfunction
+ */
+function BDL_NHL_GAMES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nhl/v1/games', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NHL standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_NHL_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/nhl/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NHL box scores
+ * @param {string} date Date in YYYY-MM-DD format (required)
+ * @returns {Array} Box scores data
+ * @customfunction
+ */
+function BDL_NHL_BOX_SCORES(date) {
+  if (!date) throw new Error('Date is required (YYYY-MM-DD)');
+  const response = fetchApi_('/nhl/v1/box_scores', { date: date });
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NHL player injuries
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Injury data
+ * @customfunction
+ */
+function BDL_NHL_INJURIES(teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/nhl/v1/player_injuries', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NHL betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} gameId Filter by game ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_NHL_ODDS(date, gameId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (gameId) params['game_ids[]'] = gameId;
+  const response = fetchApi_('/nhl/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NHL player prop betting odds
+ * @param {number} gameId The game ID (required)
+ * @param {number} playerId Filter by player ID
+ * @param {string} propType Filter by prop type
+ * @returns {Array} Player props data
+ * @customfunction
+ */
+function BDL_NHL_PLAYER_PROPS(gameId, playerId, propType) {
+  if (!gameId) throw new Error('Game ID is required');
+  const params = { game_id: gameId };
+  if (playerId) params.player_id = playerId;
+  if (propType) params.prop_type = propType;
+  const response = fetchApi_('/nhl/v1/odds/player_props', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// WNBA FUNCTIONS
+// ============================================================================
+
+/**
+ * Get WNBA teams
+ * @returns {Array} WNBA teams data
+ * @customfunction
+ */
+function BDL_WNBA_TEAMS() {
+  const response = fetchApi_('/wnba/v1/teams');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WNBA players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} WNBA players data
+ * @customfunction
+ */
+function BDL_WNBA_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/wnba/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get active WNBA players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Active WNBA players data
+ * @customfunction
+ */
+function BDL_WNBA_PLAYERS_ACTIVE(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/wnba/v1/players/active', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WNBA games
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} WNBA games data
+ * @customfunction
+ */
+function BDL_WNBA_GAMES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/wnba/v1/games', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WNBA standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_WNBA_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/wnba/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WNBA player injuries
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Injury data
+ * @customfunction
+ */
+function BDL_WNBA_INJURIES(teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/wnba/v1/player_injuries', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// NCAAF (College Football) FUNCTIONS
+// ============================================================================
+
+/**
+ * Get NCAAF conferences
+ * @returns {Array} NCAAF conferences data
+ * @customfunction
+ */
+function BDL_NCAAF_CONFERENCES() {
+  const response = fetchApi_('/ncaaf/v1/conferences');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAF teams
+ * @param {number} conferenceId Filter by conference ID
+ * @returns {Array} NCAAF teams data
+ * @customfunction
+ */
+function BDL_NCAAF_TEAMS(conferenceId) {
+  const params = {};
+  if (conferenceId) params.conference_id = conferenceId;
+  const response = fetchApi_('/ncaaf/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAF players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} NCAAF players data
+ * @customfunction
+ */
+function BDL_NCAAF_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/ncaaf/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAF games
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} week Filter by week number
+ * @param {number} perPage Results per page
+ * @returns {Array} NCAAF games data
+ * @customfunction
+ */
+function BDL_NCAAF_GAMES(date, season, week, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (week) params.week = week;
+  const response = fetchApi_('/ncaaf/v1/games', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAF standings
+ * @param {number} season The season year
+ * @param {number} conferenceId Filter by conference ID
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_NCAAF_STANDINGS(season, conferenceId) {
+  const params = {};
+  if (season) params.season = season;
+  if (conferenceId) params.conference_id = conferenceId;
+  const response = fetchApi_('/ncaaf/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAF rankings
+ * @param {number} season The season year
+ * @param {number} week The week number
+ * @returns {Array} Rankings data
+ * @customfunction
+ */
+function BDL_NCAAF_RANKINGS(season, week) {
+  const params = {};
+  if (season) params.season = season;
+  if (week) params.week = week;
+  const response = fetchApi_('/ncaaf/v1/rankings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAF betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} gameId Filter by game ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_NCAAF_ODDS(date, gameId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (gameId) params['game_ids[]'] = gameId;
+  const response = fetchApi_('/ncaaf/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// NCAAB (College Basketball) FUNCTIONS
+// ============================================================================
+
+/**
+ * Get NCAAB conferences
+ * @returns {Array} NCAAB conferences data
+ * @customfunction
+ */
+function BDL_NCAAB_CONFERENCES() {
+  const response = fetchApi_('/ncaab/v1/conferences');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAB teams
+ * @param {number} conferenceId Filter by conference ID
+ * @returns {Array} NCAAB teams data
+ * @customfunction
+ */
+function BDL_NCAAB_TEAMS(conferenceId) {
+  const params = {};
+  if (conferenceId) params.conference_id = conferenceId;
+  const response = fetchApi_('/ncaab/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAB players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} NCAAB players data
+ * @customfunction
+ */
+function BDL_NCAAB_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/ncaab/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAB games
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} NCAAB games data
+ * @customfunction
+ */
+function BDL_NCAAB_GAMES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/ncaab/v1/games', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAB standings
+ * @param {number} season The season year
+ * @param {number} conferenceId Filter by conference ID
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_NCAAB_STANDINGS(season, conferenceId) {
+  const params = {};
+  if (season) params.season = season;
+  if (conferenceId) params.conference_id = conferenceId;
+  const response = fetchApi_('/ncaab/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAB rankings
+ * @param {number} season The season year
+ * @param {number} week The week number
+ * @returns {Array} Rankings data
+ * @customfunction
+ */
+function BDL_NCAAB_RANKINGS(season, week) {
+  const params = {};
+  if (season) params.season = season;
+  if (week) params.week = week;
+  const response = fetchApi_('/ncaab/v1/rankings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAB March Madness bracket
+ * @param {number} season The season year (required)
+ * @returns {Array} Bracket data
+ * @customfunction
+ */
+function BDL_NCAAB_BRACKET(season) {
+  if (!season) throw new Error('Season is required');
+  const response = fetchApi_('/ncaab/v1/bracket', { season: season });
+  return toSheet_(response.data);
+}
+
+/**
+ * Get NCAAB betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} gameId Filter by game ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_NCAAB_ODDS(date, gameId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (gameId) params['game_ids[]'] = gameId;
+  const response = fetchApi_('/ncaab/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// EPL (English Premier League) FUNCTIONS
+// ============================================================================
+
+/**
+ * Get EPL teams
+ * @param {number} season Filter by season year
+ * @returns {Array} EPL teams data
+ * @customfunction
+ */
+function BDL_EPL_TEAMS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/epl/v2/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get EPL players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} EPL players data
+ * @customfunction
+ */
+function BDL_EPL_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/epl/v2/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get EPL matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} EPL matches data
+ * @customfunction
+ */
+function BDL_EPL_MATCHES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/epl/v2/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get EPL standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_EPL_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/epl/v2/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get EPL betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_EPL_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/epl/v2/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// LA LIGA FUNCTIONS
+// ============================================================================
+
+/**
+ * Get La Liga teams
+ * @param {number} season Filter by season year
+ * @returns {Array} La Liga teams data
+ * @customfunction
+ */
+function BDL_LALIGA_TEAMS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/laliga/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get La Liga players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} La Liga players data
+ * @customfunction
+ */
+function BDL_LALIGA_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/laliga/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get La Liga matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} La Liga matches data
+ * @customfunction
+ */
+function BDL_LALIGA_MATCHES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/laliga/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get La Liga standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_LALIGA_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/laliga/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get La Liga betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_LALIGA_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/laliga/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// SERIE A FUNCTIONS
+// ============================================================================
+
+/**
+ * Get Serie A teams
+ * @param {number} season Filter by season year
+ * @returns {Array} Serie A teams data
+ * @customfunction
+ */
+function BDL_SERIEA_TEAMS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/seriea/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Serie A players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Serie A players data
+ * @customfunction
+ */
+function BDL_SERIEA_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/seriea/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Serie A matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Serie A matches data
+ * @customfunction
+ */
+function BDL_SERIEA_MATCHES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/seriea/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Serie A standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_SERIEA_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/seriea/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Serie A betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_SERIEA_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/seriea/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// BUNDESLIGA FUNCTIONS
+// ============================================================================
+
+/**
+ * Get Bundesliga teams
+ * @param {number} season Filter by season year
+ * @returns {Array} Bundesliga teams data
+ * @customfunction
+ */
+function BDL_BUNDESLIGA_TEAMS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/bundesliga/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Bundesliga players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Bundesliga players data
+ * @customfunction
+ */
+function BDL_BUNDESLIGA_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/bundesliga/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Bundesliga matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Bundesliga matches data
+ * @customfunction
+ */
+function BDL_BUNDESLIGA_MATCHES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/bundesliga/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Bundesliga standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_BUNDESLIGA_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/bundesliga/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Bundesliga betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_BUNDESLIGA_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/bundesliga/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// LIGUE 1 FUNCTIONS
+// ============================================================================
+
+/**
+ * Get Ligue 1 teams
+ * @param {number} season Filter by season year
+ * @returns {Array} Ligue 1 teams data
+ * @customfunction
+ */
+function BDL_LIGUE1_TEAMS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/ligue1/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Ligue 1 players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Ligue 1 players data
+ * @customfunction
+ */
+function BDL_LIGUE1_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/ligue1/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Ligue 1 matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Ligue 1 matches data
+ * @customfunction
+ */
+function BDL_LIGUE1_MATCHES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/ligue1/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Ligue 1 standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_LIGUE1_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/ligue1/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Ligue 1 betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_LIGUE1_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/ligue1/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// UEFA CHAMPIONS LEAGUE FUNCTIONS
+// ============================================================================
+
+/**
+ * Get UCL teams
+ * @param {number} season Filter by season year
+ * @returns {Array} UCL teams data
+ * @customfunction
+ */
+function BDL_UCL_TEAMS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/ucl/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get UCL players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} UCL players data
+ * @customfunction
+ */
+function BDL_UCL_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/ucl/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get UCL matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} UCL matches data
+ * @customfunction
+ */
+function BDL_UCL_MATCHES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/ucl/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get UCL standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_UCL_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/ucl/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get UCL betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_UCL_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/ucl/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// MLS FUNCTIONS
+// ============================================================================
+
+/**
+ * Get MLS teams
+ * @param {number} season Filter by season year
+ * @returns {Array} MLS teams data
+ * @customfunction
+ */
+function BDL_MLS_TEAMS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/mls/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLS players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} MLS players data
+ * @customfunction
+ */
+function BDL_MLS_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/mls/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLS matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} season Filter by season year
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} MLS matches data
+ * @customfunction
+ */
+function BDL_MLS_MATCHES(date, season, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (season) params['seasons[]'] = season;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/mls/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLS standings
+ * @param {number} season The season year
+ * @returns {Array} Standings data
+ * @customfunction
+ */
+function BDL_MLS_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/mls/v1/standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MLS betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_MLS_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/mls/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// MMA FUNCTIONS
+// ============================================================================
+
+/**
+ * Get MMA leagues
+ * @returns {Array} MMA leagues data
+ * @customfunction
+ */
+function BDL_MMA_LEAGUES() {
+  const response = fetchApi_('/mma/v1/leagues');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MMA events
+ * @param {number} leagueId Filter by league ID
+ * @param {number} perPage Results per page
+ * @returns {Array} MMA events data
+ * @customfunction
+ */
+function BDL_MMA_EVENTS(leagueId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (leagueId) params.league_id = leagueId;
+  const response = fetchApi_('/mma/v1/events', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MMA fighters
+ * @param {string} search Search by fighter name
+ * @param {number} perPage Results per page
+ * @returns {Array} MMA fighters data
+ * @customfunction
+ */
+function BDL_MMA_FIGHTERS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/mma/v1/fighters', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MMA fights
+ * @param {number} eventId Filter by event ID
+ * @param {number} fighterId Filter by fighter ID
+ * @param {number} perPage Results per page
+ * @returns {Array} MMA fights data
+ * @customfunction
+ */
+function BDL_MMA_FIGHTS(eventId, fighterId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (eventId) params.event_id = eventId;
+  if (fighterId) params['fighter_ids[]'] = fighterId;
+  const response = fetchApi_('/mma/v1/fights', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MMA rankings
+ * @param {number} leagueId Filter by league ID
+ * @returns {Array} MMA rankings data
+ * @customfunction
+ */
+function BDL_MMA_RANKINGS(leagueId) {
+  const params = {};
+  if (leagueId) params.league_id = leagueId;
+  const response = fetchApi_('/mma/v1/rankings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MMA fight stats
+ * @param {number} fightId Filter by fight ID
+ * @param {number} perPage Results per page
+ * @returns {Array} MMA fight stats data
+ * @customfunction
+ */
+function BDL_MMA_FIGHT_STATS(fightId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (fightId) params['fight_ids[]'] = fightId;
+  const response = fetchApi_('/mma/v1/fight_stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get MMA betting odds
+ * @param {number} eventId Filter by event ID
+ * @param {number} fightId Filter by fight ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_MMA_ODDS(eventId, fightId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (eventId) params.event_id = eventId;
+  if (fightId) params['fight_ids[]'] = fightId;
+  const response = fetchApi_('/mma/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// FORMULA 1 FUNCTIONS
+// ============================================================================
+
+/**
+ * Get F1 drivers
+ * @param {string} search Search by driver name
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 drivers data
+ * @customfunction
+ */
+function BDL_F1_DRIVERS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/f1/v1/drivers', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 teams
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 teams data
+ * @customfunction
+ */
+function BDL_F1_TEAMS(perPage) {
+  const params = { per_page: perPage || 25 };
+  const response = fetchApi_('/f1/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 circuits
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 circuits data
+ * @customfunction
+ */
+function BDL_F1_CIRCUITS(perPage) {
+  const params = { per_page: perPage || 25 };
+  const response = fetchApi_('/f1/v1/circuits', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 seasons
+ * @returns {Array} F1 seasons data
+ * @customfunction
+ */
+function BDL_F1_SEASONS() {
+  const response = fetchApi_('/f1/v1/seasons');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 events (races)
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 events data
+ * @customfunction
+ */
+function BDL_F1_EVENTS(season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (season) params.season = season;
+  const response = fetchApi_('/f1/v1/events', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 sessions
+ * @param {number} eventId Filter by event ID
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 sessions data
+ * @customfunction
+ */
+function BDL_F1_SESSIONS(eventId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (eventId) params.event_id = eventId;
+  const response = fetchApi_('/f1/v1/sessions', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 session results
+ * @param {number} sessionId Filter by session ID (required)
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 session results data
+ * @customfunction
+ */
+function BDL_F1_SESSION_RESULTS(sessionId, perPage) {
+  if (!sessionId) throw new Error('Session ID is required');
+  const params = { session_id: sessionId, per_page: perPage || 25 };
+  const response = fetchApi_('/f1/v1/session_results', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 driver standings
+ * @param {number} season Filter by season year
+ * @returns {Array} F1 driver standings data
+ * @customfunction
+ */
+function BDL_F1_DRIVER_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/f1/v1/driver_standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 team standings
+ * @param {number} season Filter by season year
+ * @returns {Array} F1 team standings data
+ * @customfunction
+ */
+function BDL_F1_TEAM_STANDINGS(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/f1/v1/team_standings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 lap times
+ * @param {number} sessionId Filter by session ID (required)
+ * @param {number} driverId Filter by driver ID
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 lap times data
+ * @customfunction
+ */
+function BDL_F1_LAP_TIMES(sessionId, driverId, perPage) {
+  if (!sessionId) throw new Error('Session ID is required');
+  const params = { session_id: sessionId, per_page: perPage || 100 };
+  if (driverId) params.driver_id = driverId;
+  const response = fetchApi_('/f1/v1/lap_times', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 qualifying results
+ * @param {number} sessionId Filter by session ID (required)
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 qualifying results data
+ * @customfunction
+ */
+function BDL_F1_QUALIFYING_RESULTS(sessionId, perPage) {
+  if (!sessionId) throw new Error('Session ID is required');
+  const params = { session_id: sessionId, per_page: perPage || 25 };
+  const response = fetchApi_('/f1/v1/qualifying_results', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 pit stops
+ * @param {number} sessionId Filter by session ID (required)
+ * @param {number} driverId Filter by driver ID
+ * @param {number} perPage Results per page
+ * @returns {Array} F1 pit stops data
+ * @customfunction
+ */
+function BDL_F1_PIT_STOPS(sessionId, driverId, perPage) {
+  if (!sessionId) throw new Error('Session ID is required');
+  const params = { session_id: sessionId, per_page: perPage || 100 };
+  if (driverId) params.driver_id = driverId;
+  const response = fetchApi_('/f1/v1/pit_stops', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get F1 futures odds
+ * @param {number} season Filter by season year
+ * @returns {Array} F1 futures odds data
+ * @customfunction
+ */
+function BDL_F1_ODDS_FUTURES(season) {
+  const params = {};
+  if (season) params.season = season;
+  const response = fetchApi_('/f1/v1/odds/futures', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// ATP TENNIS FUNCTIONS
+// ============================================================================
+
+/**
+ * Get ATP players
+ * @param {string} search Search by player name
+ * @param {number} perPage Results per page
+ * @returns {Array} ATP players data
+ * @customfunction
+ */
+function BDL_ATP_PLAYERS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/atp/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get ATP tournaments
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} ATP tournaments data
+ * @customfunction
+ */
+function BDL_ATP_TOURNAMENTS(season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (season) params.season = season;
+  const response = fetchApi_('/atp/v1/tournaments', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get ATP rankings
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} ATP rankings data
+ * @customfunction
+ */
+function BDL_ATP_RANKINGS(season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (season) params.season = season;
+  const response = fetchApi_('/atp/v1/rankings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get ATP matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} playerId Filter by player ID
+ * @param {number} perPage Results per page
+ * @returns {Array} ATP matches data
+ * @customfunction
+ */
+function BDL_ATP_MATCHES(date, tournamentId, playerId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (playerId) params['player_ids[]'] = playerId;
+  const response = fetchApi_('/atp/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get ATP match stats
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} ATP match stats data
+ * @customfunction
+ */
+function BDL_ATP_MATCH_STATS(matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/atp/v1/match_stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get ATP head to head
+ * @param {number} player1Id First player ID (required)
+ * @param {number} player2Id Second player ID (required)
+ * @returns {Array} ATP head to head data
+ * @customfunction
+ */
+function BDL_ATP_HEAD_TO_HEAD(player1Id, player2Id) {
+  if (!player1Id || !player2Id) throw new Error('Both player IDs are required');
+  const response = fetchApi_('/atp/v1/head_to_head', { player_ids: `${player1Id},${player2Id}` });
+  return toSheet_(response.data);
+}
+
+/**
+ * Get ATP betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_ATP_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/atp/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// WTA TENNIS FUNCTIONS
+// ============================================================================
+
+/**
+ * Get WTA players
+ * @param {string} search Search by player name
+ * @param {number} perPage Results per page
+ * @returns {Array} WTA players data
+ * @customfunction
+ */
+function BDL_WTA_PLAYERS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/wta/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WTA tournaments
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} WTA tournaments data
+ * @customfunction
+ */
+function BDL_WTA_TOURNAMENTS(season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (season) params.season = season;
+  const response = fetchApi_('/wta/v1/tournaments', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WTA rankings
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} WTA rankings data
+ * @customfunction
+ */
+function BDL_WTA_RANKINGS(season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (season) params.season = season;
+  const response = fetchApi_('/wta/v1/rankings', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WTA matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} playerId Filter by player ID
+ * @param {number} perPage Results per page
+ * @returns {Array} WTA matches data
+ * @customfunction
+ */
+function BDL_WTA_MATCHES(date, tournamentId, playerId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (playerId) params['player_ids[]'] = playerId;
+  const response = fetchApi_('/wta/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WTA head to head
+ * @param {number} player1Id First player ID (required)
+ * @param {number} player2Id Second player ID (required)
+ * @returns {Array} WTA head to head data
+ * @customfunction
+ */
+function BDL_WTA_HEAD_TO_HEAD(player1Id, player2Id) {
+  if (!player1Id || !player2Id) throw new Error('Both player IDs are required');
+  const response = fetchApi_('/wta/v1/head_to_head', { player_ids: `${player1Id},${player2Id}` });
+  return toSheet_(response.data);
+}
+
+/**
+ * Get WTA betting odds
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} matchId Filter by match ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Odds data
+ * @customfunction
+ */
+function BDL_WTA_ODDS(date, matchId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (matchId) params['match_ids[]'] = matchId;
+  const response = fetchApi_('/wta/v1/odds', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// PGA TOUR FUNCTIONS
+// ============================================================================
+
+/**
+ * Get PGA players
+ * @param {string} search Search by player name
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA players data
+ * @customfunction
+ */
+function BDL_PGA_PLAYERS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/pga/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get PGA tournaments
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA tournaments data
+ * @customfunction
+ */
+function BDL_PGA_TOURNAMENTS(season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (season) params.season = season;
+  const response = fetchApi_('/pga/v1/tournaments', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get PGA courses
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA courses data
+ * @customfunction
+ */
+function BDL_PGA_COURSES(perPage) {
+  const params = { per_page: perPage || 25 };
+  const response = fetchApi_('/pga/v1/courses', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get PGA tournament results
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA tournament results data
+ * @customfunction
+ */
+function BDL_PGA_TOURNAMENT_RESULTS(tournamentId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (tournamentId) params.tournament_id = tournamentId;
+  const response = fetchApi_('/pga/v1/tournament_results', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get PGA player round results
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} playerId Filter by player ID
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA player round results data
+ * @customfunction
+ */
+function BDL_PGA_PLAYER_ROUND_RESULTS(tournamentId, playerId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (playerId) params.player_id = playerId;
+  const response = fetchApi_('/pga/v1/player_round_results', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get PGA player round stats
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} playerId Filter by player ID
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA player round stats data
+ * @customfunction
+ */
+function BDL_PGA_PLAYER_ROUND_STATS(tournamentId, playerId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (playerId) params.player_id = playerId;
+  const response = fetchApi_('/pga/v1/player_round_stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get PGA player season stats
+ * @param {number} playerId Filter by player ID
+ * @param {number} season Filter by season year
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA player season stats data
+ * @customfunction
+ */
+function BDL_PGA_PLAYER_SEASON_STATS(playerId, season, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (playerId) params.player_id = playerId;
+  if (season) params.season = season;
+  const response = fetchApi_('/pga/v1/player_season_stats', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get PGA player scorecards
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} playerId Filter by player ID
+ * @param {number} perPage Results per page
+ * @returns {Array} PGA player scorecards data
+ * @customfunction
+ */
+function BDL_PGA_SCORECARDS(tournamentId, playerId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (playerId) params.player_id = playerId;
+  const response = fetchApi_('/pga/v1/player_scorecards', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// CS2 (Counter-Strike 2) FUNCTIONS
+// ============================================================================
+
+/**
+ * Get CS2 teams
+ * @param {string} search Search by team name
+ * @param {number} perPage Results per page
+ * @returns {Array} CS2 teams data
+ * @customfunction
+ */
+function BDL_CS2_TEAMS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/cs/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get CS2 players
+ * @param {string} search Search by player name
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} CS2 players data
+ * @customfunction
+ */
+function BDL_CS2_PLAYERS(search, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  if (teamId) params.team_id = teamId;
+  const response = fetchApi_('/cs/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get CS2 tournaments
+ * @param {number} perPage Results per page
+ * @returns {Array} CS2 tournaments data
+ * @customfunction
+ */
+function BDL_CS2_TOURNAMENTS(perPage) {
+  const params = { per_page: perPage || 25 };
+  const response = fetchApi_('/cs/v1/tournaments', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get CS2 rankings
+ * @returns {Array} CS2 rankings data
+ * @customfunction
+ */
+function BDL_CS2_RANKINGS() {
+  const response = fetchApi_('/cs/v1/rankings');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get CS2 matches
+ * @param {string} date Filter by date (YYYY-MM-DD)
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} CS2 matches data
+ * @customfunction
+ */
+function BDL_CS2_MATCHES(date, tournamentId, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (date) params['dates[]'] = date;
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/cs/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// LEAGUE OF LEGENDS FUNCTIONS
+// ============================================================================
+
+/**
+ * Get LoL teams
+ * @param {string} search Search by team name
+ * @param {number} perPage Results per page
+ * @returns {Array} LoL teams data
+ * @customfunction
+ */
+function BDL_LOL_TEAMS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/lol/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get LoL players
+ * @param {string} search Search by player name
+ * @param {number} perPage Results per page
+ * @returns {Array} LoL players data
+ * @customfunction
+ */
+function BDL_LOL_PLAYERS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/lol/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get LoL champions
+ * @returns {Array} LoL champions data
+ * @customfunction
+ */
+function BDL_LOL_CHAMPIONS() {
+  const response = fetchApi_('/lol/v1/champions');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get LoL tournaments
+ * @param {number} perPage Results per page
+ * @returns {Array} LoL tournaments data
+ * @customfunction
+ */
+function BDL_LOL_TOURNAMENTS(perPage) {
+  const params = { per_page: perPage || 25 };
+  const response = fetchApi_('/lol/v1/tournaments', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get LoL matches
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} LoL matches data
+ * @customfunction
+ */
+function BDL_LOL_MATCHES(tournamentId, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/lol/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// DOTA 2 FUNCTIONS
+// ============================================================================
+
+/**
+ * Get Dota 2 teams
+ * @param {string} search Search by team name
+ * @param {number} perPage Results per page
+ * @returns {Array} Dota 2 teams data
+ * @customfunction
+ */
+function BDL_DOTA_TEAMS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/dota/v1/teams', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Dota 2 players
+ * @param {string} search Search by player name
+ * @param {number} perPage Results per page
+ * @returns {Array} Dota 2 players data
+ * @customfunction
+ */
+function BDL_DOTA_PLAYERS(search, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (search) params.search = search;
+  const response = fetchApi_('/dota/v1/players', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Dota 2 heroes
+ * @returns {Array} Dota 2 heroes data
+ * @customfunction
+ */
+function BDL_DOTA_HEROES() {
+  const response = fetchApi_('/dota/v1/heroes');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Dota 2 tournaments
+ * @param {number} perPage Results per page
+ * @returns {Array} Dota 2 tournaments data
+ * @customfunction
+ */
+function BDL_DOTA_TOURNAMENTS(perPage) {
+  const params = { per_page: perPage || 25 };
+  const response = fetchApi_('/dota/v1/tournaments', params);
+  return toSheet_(response.data);
+}
+
+/**
+ * Get Dota 2 matches
+ * @param {number} tournamentId Filter by tournament ID
+ * @param {number} teamId Filter by team ID
+ * @param {number} perPage Results per page
+ * @returns {Array} Dota 2 matches data
+ * @customfunction
+ */
+function BDL_DOTA_MATCHES(tournamentId, teamId, perPage) {
+  const params = { per_page: perPage || 25 };
+  if (tournamentId) params.tournament_id = tournamentId;
+  if (teamId) params['team_ids[]'] = teamId;
+  const response = fetchApi_('/dota/v1/matches', params);
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// FIFA WORLD CUP FUNCTIONS
+// ============================================================================
+
+/**
+ * Get FIFA World Cup teams
+ * @returns {Array} FIFA World Cup teams data
+ * @customfunction
+ */
+function BDL_FIFA_TEAMS() {
+  const response = fetchApi_('/fifa/worldcup/v1/teams');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get FIFA World Cup stadiums
+ * @returns {Array} FIFA World Cup stadiums data
+ * @customfunction
+ */
+function BDL_FIFA_STADIUMS() {
+  const response = fetchApi_('/fifa/worldcup/v1/stadiums');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get FIFA World Cup group standings
+ * @returns {Array} FIFA World Cup group standings data
+ * @customfunction
+ */
+function BDL_FIFA_GROUP_STANDINGS() {
+  const response = fetchApi_('/fifa/worldcup/v1/group_standings');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get FIFA World Cup matches
+ * @returns {Array} FIFA World Cup matches data
+ * @customfunction
+ */
+function BDL_FIFA_MATCHES() {
+  const response = fetchApi_('/fifa/worldcup/v1/matches');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get FIFA World Cup betting odds
+ * @returns {Array} FIFA World Cup odds data
+ * @customfunction
+ */
+function BDL_FIFA_ODDS() {
+  const response = fetchApi_('/fifa/worldcup/v1/odds');
+  return toSheet_(response.data);
+}
+
+/**
+ * Get FIFA World Cup futures odds
+ * @returns {Array} FIFA World Cup futures odds data
+ * @customfunction
+ */
+function BDL_FIFA_ODDS_FUTURES() {
+  const response = fetchApi_('/fifa/worldcup/v1/odds/futures');
+  return toSheet_(response.data);
+}
+
+// ============================================================================
+// GENERIC API FUNCTION
+// ============================================================================
+
+/**
+ * Call any BALLDONTLIE API endpoint directly
+ * @param {string} endpoint The API endpoint (e.g., "/nba/v1/teams")
+ * @param {string} paramsJson Optional JSON string of query parameters
+ * @returns {Array} API response data
+ * @customfunction
+ */
+function BDL_API(endpoint, paramsJson) {
+  if (!endpoint) throw new Error('Endpoint is required');
+  let params = {};
+  if (paramsJson) {
+    try {
+      params = JSON.parse(paramsJson);
+    } catch (e) {
+      throw new Error('Invalid JSON parameters: ' + e.message);
+    }
+  }
+  const response = fetchApi_(endpoint, params);
+  return toSheet_(response.data);
+}

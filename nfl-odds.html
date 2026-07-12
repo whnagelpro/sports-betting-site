@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>NFL Game Odds | Sportacular Analytics</title>
+
+  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">
+        <a href="/">
+          <img src="/logo.png" alt="Sportacular Analytics Logo" />
+        </a>
+      </div>
+
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <nav id="site-nav">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+
+          <li class="dropdown">
+            <a href="#">NBA</a>
+
+            <ul class="dropdown-menu">
+              <li><a href="nba-odds.html">Game Odds</a></li>
+              <li><a href="nba-props.html">Player Props</a></li>
+              <li><a href="nba-trends.html">Player Trends</a></li>
+              <li><a href="nba-team-trends.html">Team Trends</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NHL</a>
+
+            <ul class="dropdown-menu">
+              <li><a href="nhl-odds.html">Game Odds</a></li>
+              <li><a href="nhl-props.html">Player Props</a></li>
+              <li><a href="nhl-trends.html">Player Trends</a></li>
+              <li><a href="nhl-team-trends.html">Team Trends</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">MLB</a>
+
+            <ul class="dropdown-menu">
+              <li><a href="mlb-odds.html">Game Odds</a></li>
+              <li><a href="mlb-props.html">Player Props</a></li>
+              <li><a href="mlb-trends.html">Player Trends</a></li>
+              <li><a href="mlb-team-trends.html">Team Trends</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NFL</a>
+
+            <ul class="dropdown-menu">
+              <li><a href="nfl-odds.html">Game Odds</a></li>
+              <li><a href="nfl-props.html">Player Props</a></li>
+              <li><a href="nfl-trends.html">Player Trends</a></li>
+              <li><a href="nfl-team-trends.html">Team Trends</a></li>
+            </ul>
+          </li>
+
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="index.html#about">About</a></li>
+
+          <li class="dropdown">
+            <a href="#">Legal</a>
+
+            <ul class="dropdown-menu">
+              <li><a href="privacy.html">Privacy Policy</a></li>
+              <li><a href="terms.html">Terms of Service</a></li>
+              <li><a href="disclaimer.html">Disclaimer</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </li>
+
+          <li id="nav-login-item">
+            <a href="auth.html">Login</a>
+          </li>
+
+          <li id="nav-account-item" style="display: none;">
+            <a href="auth.html">Account</a>
+          </li>
+
+          <li id="nav-logout-item" style="display: none;">
+            <a href="#" id="nav-logout-link">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="league-page">
+    <section class="league-hero">
+      <div class="container">
+        <h1>Today’s NFL Game Odds Ranked by Expected Value</h1>
+
+        <p class="league-description">
+          Review today’s NFL spreads, moneylines, totals, and EV rankings
+          from your live board.
+        </p>
+      </div>
+    </section>
+
+    <section class="league-controls">
+      <div class="container controls-layout">
+        <div class="controls-left">
+          <div class="control-box">
+            <span class="control-label">Ranking</span>
+            <strong>Highest EV First</strong>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">Membership Tier</span>
+            <strong id="nfl-tier-display">Loading...</strong>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">Game</span>
+
+            <select
+              id="nfl-game-filter"
+              class="sportsbook-select"
+            >
+              <option value="All">All Games</option>
+            </select>
+          </div>
+
+          <div class="control-box">
+            <span class="control-label">Sportsbook</span>
+
+            <select
+              id="nfl-sportsbook-filter"
+              class="sportsbook-select"
+            >
+              <option value="All">All Sportsbooks</option>
+            </select>
+          </div>
+
+          <p class="last-updated-text">
+            Last Updated:
+            <span id="nfl-last-updated">--:--</span>
+          </p>
+
+          <div class="control-box">
+            <span class="control-label">Actions</span>
+
+            <button
+              id="nfl-odds-reset-filters"
+              class="filter-reset-btn"
+            >
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
+        <div class="controls-right">
+          <div class="guide-panel">
+            <h3 class="guide-panel-title">
+              How to Read Game Odds
+            </h3>
+
+            <p class="guide-panel-text">
+              Hover over any term below for a quick explanation in plain
+              English.
+            </p>
+
+            <div class="guide-panel-links">
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">EV</span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>EV (Expected Value)</strong>
+                  <br />
+
+                  A quick way to measure how much value certain data may
+                  actually have. Positive EV means the model thinks the price
+                  may be better than it should be.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Model Probability
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Model Probability</strong>
+                  <br />
+
+                  The model’s estimate of how often the odds should hit.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">Spread</span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Spread</strong>
+                  <br />
+
+                  The margin a team must cover. Favorites usually have a
+                  negative number and underdogs usually have a positive
+                  number.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">Moneyline</span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Moneyline</strong>
+                  <br />
+
+                  The sportsbook’s weighted analysis of which team will win
+                  the game outright.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">Total</span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Total</strong>
+                  <br />
+
+                  The sportsbook’s analysis of whether the combined score
+                  will go over or under a certain number.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Implied Probability
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Implied Probability</strong>
+                  <br />
+
+                  The chance of an outcome based on the sportsbook’s listed
+                  odds before removing sportsbook margin.
+                </div>
+              </div>
+
+              <div class="hover-guide-item">
+                <span class="hover-guide-term">
+                  Vig-Free Probability
+                </span>
+
+                <div class="hover-guide-tooltip">
+                  <strong>Vig-Free Probability</strong>
+                  <br />
+
+                  A cleaner estimate of each team’s true market probability
+                  after removing the sportsbook’s built-in margin.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="filter-summary-section">
+      <div class="container">
+        <div
+          id="nfl-odds-filter-summary"
+          class="filter-summary-box"
+        ></div>
+      </div>
+    </section>
+
+    <section class="bets-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Top NFL Opportunities</h2>
+
+          <p>
+            Live game odds and EV-ranked opportunities for today’s NFL slate.
+          </p>
+        </div>
+
+        <div class="leaderboard-box">
+          <h3>Top EV Data Today</h3>
+
+          <div id="nfl-leaderboard">
+            <p>Loading leaderboard...</p>
+          </div>
+        </div>
+
+        <div
+          id="nfl-bets-container"
+          class="bets-grid"
+        >
+          <div class="empty-state">
+            <h3>Loading NFL game odds...</h3>
+
+            <p>
+              Please wait while live data is pulled from Google Sheets.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        <strong>Disclaimer:</strong>
+        Data provided by BallDontLie API. This website is for informational
+        and educational purposes only. Nothing on this site guarantees
+        results or should be considered financial advice. If you sports bet,
+        always bet responsibly.
+      </p>
+
+      <p class="support-email">
+        We would love to hear from you! Contact us at
+        support@sportacularanalytics.com.
+      </p>
+
+      <p>
+        &copy; 2026 Sportacular Analytics. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      initNFLBetsPage();
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle =
+        document.getElementById("mobile-menu-toggle");
+
+      const nav =
+        document.getElementById("site-nav");
+
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          nav.classList.toggle("mobile-open");
+
+          const isOpen =
+            nav.classList.contains("mobile-open");
+
+          toggle.setAttribute(
+            "aria-expanded",
+            isOpen ? "true" : "false"
+          );
+
+          toggle.textContent =
+            isOpen ? "✕" : "☰";
+        });
+      }
+
+      if (window.innerWidth <= 768) {
+        document
+          .querySelectorAll(".dropdown > a")
+          .forEach((link) => {
+            link.addEventListener("click", (event) => {
+              event.preventDefault();
+
+              const parent = link.parentElement;
+
+              if (parent) {
+                parent.classList.toggle("open");
+              }
+            });
+          });
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isMobile =
+        window
+          .matchMedia("(max-width: 768px)")
+          .matches;
+
+      if (!isMobile) return;
+
+      document
+        .querySelectorAll(
+          ".guide-panel .hover-guide-term"
+        )
+        .forEach((term) => {
+          term.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const item =
+              term.closest(".hover-guide-item");
+
+            if (!item) return;
+
+            document
+              .querySelectorAll(
+                ".guide-panel .hover-guide-item.tooltip-open"
+              )
+              .forEach((openItem) => {
+                if (openItem !== item) {
+                  openItem.classList.remove(
+                    "tooltip-open"
+                  );
+                }
+              });
+
+            item.classList.toggle("tooltip-open");
+          });
+        });
+
+      document.addEventListener("click", () => {
+        document
+          .querySelectorAll(
+            ".guide-panel .hover-guide-item.tooltip-open"
+          )
+          .forEach((item) => {
+            item.classList.remove("tooltip-open");
+          });
+      });
+    });
+  </script>
+</body>
+</html>

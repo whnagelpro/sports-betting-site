@@ -25,6 +25,9 @@ const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1
 const MLB_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=2103952049&single=true&output=csv";
 const MLB_TOP_PLAYER_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=111828453&single=true&output=csv";
 const MLB_TOP_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1644397014&single=true&output=csv";
+const NFL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1933017030&single=true&output=csv";
+const NFL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1953623841&single=true&output=csv";
+const NFL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=40257281&single=true&output=csv";
 
 const NBA_PROPS_PREMIUM_URL = "/.netlify/functions/nba-props-premium";
 const NBA_PROPS_TEASER_URL = "/.netlify/functions/nba-props-teaser";
@@ -32,6 +35,8 @@ const NHL_PROPS_PREMIUM_URL = "/.netlify/functions/nhl-props-premium";
 const NHL_PROPS_TEASER_URL = "/.netlify/functions/nhl-props-teaser";
 const MLB_PROPS_PREMIUM_URL = "/.netlify/functions/mlb-props-premium";
 const MLB_PROPS_TEASER_URL = "/.netlify/functions/mlb-props-teaser";
+const NFL_PROPS_PREMIUM_URL = "/.netlify/functions/nfl-props-premium";
+const NFL_PROPS_TEASER_URL = "/.netlify/functions/nfl-props-teaser";
 
 const TIER_RULES = {
   Rookie: {
@@ -90,6 +95,7 @@ const ODDS_PAGE_CONFIG = {
     lastUpdatedId: "nba-last-updated",
     emptyLabel: "NBA"
   },
+
   nhl: {
     csvUrl: NHL_CSV_URL,
     containerId: "nhl-bets-container",
@@ -103,6 +109,7 @@ const ODDS_PAGE_CONFIG = {
     lastUpdatedId: "nhl-last-updated",
     emptyLabel: "NHL"
   },
+
   mlb: {
     csvUrl: MLB_CSV_URL,
     containerId: "mlb-bets-container",
@@ -115,12 +122,27 @@ const ODDS_PAGE_CONFIG = {
     seeButtonId: "mlb-see-odds-btn",
     lastUpdatedId: "mlb-last-updated",
     emptyLabel: "MLB"
+  },
+
+  nfl: {
+    csvUrl: NFL_CSV_URL,
+    containerId: "nfl-bets-container",
+    leaderboardId: "nfl-leaderboard",
+    summaryId: "nfl-odds-filter-summary",
+    sportsbookFilterId: "nfl-sportsbook-filter",
+    gameFilterId: "nfl-game-filter",
+    tierFilterId: "nfl-tier-filter",
+    resetButtonId: "nfl-odds-reset-filters",
+    seeButtonId: "nfl-see-odds-btn",
+    lastUpdatedId: "nfl-last-updated",
+    emptyLabel: "NFL"
   }
 };
 
 const PROPS_PAGE_CONFIG = {
   nba: {
     csvUrl: NBA_PROPS_PREMIUM_URL,
+    teaserUrl: NBA_PROPS_TEASER_URL,
     containerId: "nba-props-container",
     leaderboardId: "nba-props-leaderboard",
     summaryId: "nba-props-filter-summary",
@@ -133,8 +155,10 @@ const PROPS_PAGE_CONFIG = {
     lastUpdatedId: "nba-props-last-updated",
     emptyLabel: "NBA"
   },
+
   nhl: {
     csvUrl: NHL_PROPS_PREMIUM_URL,
+    teaserUrl: NHL_PROPS_TEASER_URL,
     containerId: "nhl-props-container",
     leaderboardId: "nhl-props-leaderboard",
     summaryId: "nhl-props-filter-summary",
@@ -147,8 +171,10 @@ const PROPS_PAGE_CONFIG = {
     lastUpdatedId: "nhl-props-last-updated",
     emptyLabel: "NHL"
   },
+
   mlb: {
     csvUrl: MLB_PROPS_PREMIUM_URL,
+    teaserUrl: MLB_PROPS_TEASER_URL,
     containerId: "mlb-props-container",
     leaderboardId: "mlb-props-leaderboard",
     summaryId: "mlb-props-filter-summary",
@@ -160,6 +186,22 @@ const PROPS_PAGE_CONFIG = {
     resetButtonId: "mlb-props-reset-filters",
     lastUpdatedId: "mlb-props-last-updated",
     emptyLabel: "MLB"
+  },
+
+  nfl: {
+    csvUrl: NFL_PROPS_PREMIUM_URL,
+    teaserUrl: NFL_PROPS_TEASER_URL,
+    containerId: "nfl-props-container",
+    leaderboardId: "nfl-props-leaderboard",
+    summaryId: "nfl-props-filter-summary",
+    gameFilterId: "nfl-props-game-filter",
+    propTypeFilterId: "nfl-prop-type-filter",
+    playerFilterId: "nfl-player-filter",
+    sportsbookFilterId: "nfl-props-sportsbook-filter",
+    sortFilterId: "nfl-props-sort-filter",
+    resetButtonId: "nfl-props-reset-filters",
+    lastUpdatedId: "nfl-props-last-updated",
+    emptyLabel: "NFL"
   }
 };
 
@@ -617,6 +659,115 @@ function buildPropsFromRows(rows) {
     );
 }
 
+function buildNFLPropsFromRows(rows) {
+  const props = [];
+
+  rows.forEach((row) => {
+    const gameDate = normalizeDate(row["Game Date"]);
+
+    const playerFirstName = safeText(
+      row["Player First Name"],
+      ""
+    );
+
+    const playerLastName = safeText(
+      row["Player Last Name"],
+      ""
+    );
+
+    const combinedName =
+      `${playerFirstName} ${playerLastName}`.trim();
+
+    const playerName =
+      safeText(row["Player Name"], "") ||
+      combinedName;
+
+    const vendor = safeText(row["Vendor"], "");
+    const propType = safeText(row["Prop Type"], "");
+    const lineValue = safeText(row["Line Value"], "");
+
+    const overOdds = safeText(row["Over Odds"], "");
+    const underOdds = safeText(row["Under Odds"], "");
+
+    const awayTeam = safeText(row["Away Team"], "");
+    const homeTeam = safeText(row["Home Team"], "");
+
+    const gameLabel =
+      awayTeam && homeTeam
+        ? `${awayTeam} at ${homeTeam}`
+        : "";
+
+    const overEV = toNumber(row["EV Over"]);
+    const underEV = toNumber(row["EV Under"]);
+
+    const impliedProbOver = toNumber(
+      row["Implied Prob Over"]
+    );
+
+    const impliedProbUnder = toNumber(
+      row["Implied Prob Under"]
+    );
+
+    if (
+      playerName &&
+      vendor &&
+      propType &&
+      lineValue !== "" &&
+      overOdds !== "" &&
+      !Number.isNaN(overEV)
+    ) {
+      props.push({
+        gameDate,
+        playerName,
+        playerFirstName,
+        playerLastName,
+        vendor,
+        propType,
+        lineValue,
+        betType: "Over",
+        overOdds,
+        underOdds,
+        genericOdds: overOdds,
+        impliedProbability: impliedProbOver,
+        ev: overEV,
+        awayTeam,
+        homeTeam,
+        gameLabel
+      });
+    }
+
+    if (
+      playerName &&
+      vendor &&
+      propType &&
+      lineValue !== "" &&
+      underOdds !== "" &&
+      !Number.isNaN(underEV)
+    ) {
+      props.push({
+        gameDate,
+        playerName,
+        playerFirstName,
+        playerLastName,
+        vendor,
+        propType,
+        lineValue,
+        betType: "Under",
+        overOdds,
+        underOdds,
+        genericOdds: underOdds,
+        impliedProbability: impliedProbUnder,
+        ev: underEV,
+        awayTeam,
+        homeTeam,
+        gameLabel
+      });
+    }
+  });
+
+  return props;
+}
+
 function createBetCard(game, tierName = "Rookie") {
   const rules = TIER_RULES[tierName] || TIER_RULES.Rookie;
   const visibleRankings = game.rankings.slice(0, rules.maxRankingsPerGame);
@@ -825,7 +976,12 @@ async function fetchLeagueProps(csvUrl) {
 
   const text = await response.text();
   const rows = parseCSV(text);
-  const props = buildPropsFromRows(rows);
+
+  const props =
+    csvUrl === NFL_PROPS_PREMIUM_URL
+      ? buildNFLPropsFromRows(rows)
+      : buildPropsFromRows(rows);
+
   const today = getTodayDateString();
 
   console.log("fetchLeagueProps csvUrl:", csvUrl);
@@ -1555,6 +1711,7 @@ async function updateSessionStatus() {
     updateTierDisplay("nba-tier-display");
     updateTierDisplay("nhl-tier-display");
     updateTierDisplay("mlb-tier-display");
+    updateTierDisplay("nfl-tier-display");
 
     if (statusEl) statusEl.textContent = "Unable to check session.";
     if (tierEl) tierEl.textContent = "Tier: --";
@@ -1573,6 +1730,7 @@ async function updateSessionStatus() {
     updateTierDisplay("nba-tier-display");
     updateTierDisplay("nhl-tier-display");
     updateTierDisplay("mlb-tier-display");
+    updateTierDisplay("nfl-tier-display");
 
     if (statusEl) {
       statusEl.textContent = `Logged in as ${session.user.email}`;
@@ -1589,6 +1747,7 @@ async function updateSessionStatus() {
     updateTierDisplay("nba-tier-display");
     updateTierDisplay("nhl-tier-display");
     updateTierDisplay("mlb-tier-display");
+    updateTierDisplay("nfl-tier-display");
 
     if (statusEl) statusEl.textContent = "Not currently logged in.";
     if (tierEl) tierEl.textContent = "Tier: --";
@@ -3242,13 +3401,573 @@ async function initMLBTrendsPage() {
   ]);
 }
 
+function formatNFLTrendLabel(statKey) {
+  return statKey || "Trend";
+}
+
+function createNFLTrendCard(player) {
+  const seasonAvg = Number(player["Season Avg"]);
+  const last3 = Number(player["Last 3 Avg"]);
+  const last5 = Number(player["Last 5 Avg"]);
+  const last10 = Number(player["Last 10 Avg"]);
+  const hitRateLast5 = Number(player["Hit Rate Last 5"]);
+  const aboveSeason = Number(player["Above Season %"]);
+
+  const hitRateText = Number.isNaN(hitRateLast5)
+    ? "N/A"
+    : `${Math.round(hitRateLast5 * 100)}%`;
+
+  const aboveSeasonText = Number.isNaN(aboveSeason)
+    ? "N/A"
+    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
+
+  return `
+    <div class="leaderboard-item">
+      <strong>
+        ${player["Player Name"] || "Unknown Player"}
+      </strong>
+
+      <div>
+        ${player["Team"] || "N/A"} |
+        ${formatNFLTrendLabel(player["Stat Type"])}
+      </div>
+
+      <div>
+        Last 5 Avg:
+        ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}
+      </div>
+
+      <div>
+        Season Avg:
+        ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}
+      </div>
+
+      <div>
+        Last 3:
+        ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
+        |
+        Last 10:
+        ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+      </div>
+
+      <div>
+        Hit Rate Last 5: ${hitRateText}
+        |
+        Above Season: ${aboveSeasonText}
+      </div>
+
+      <div>
+        Trend Strength:
+        ${player["Trend Strength"] || "N/A"}
+        |
+        Risk:
+        ${player["Risk Tier"] || "N/A"}
+      </div>
+
+      <div>
+        ${player["Trend Note"] || ""}
+      </div>
+    </div>
+  `;
+}
+
+async function renderNFLTrends() {
+  const container =
+    document.getElementById("nfl-trends-container");
+
+  if (!container) return;
+
+  try {
+    const rows =
+      await fetchLeagueTrends(NFL_TRENDS_CSV_URL);
+
+    updateLastUpdated(
+      "nfl-trends-last-updated"
+    );
+
+    const renderPage = () => {
+      const currentTier =
+        CURRENT_USER_TIER || "Rookie";
+
+      const currentRules =
+        TIER_RULES[currentTier] ||
+        TIER_RULES.Rookie;
+
+      const filterIds = [
+        "nfl-trends-player-filter",
+        "nfl-trends-stat-filter",
+        "nfl-trends-sort-filter"
+      ];
+
+      if (!currentRules.showPlayerProps) {
+        setTrendsFiltersDisabled(
+          filterIds,
+          true
+        );
+
+        renderTrendsLockedState(
+          container,
+          "nfl-trends-filter-summary",
+          currentTier,
+          "NFL Player"
+        );
+
+        return;
+      }
+
+      setTrendsFiltersDisabled(
+        filterIds,
+        false
+      );
+
+      const selectedStat =
+        document.getElementById(
+          "nfl-trends-stat-filter"
+        )?.value || "Passing Yards";
+
+      const selectedSort =
+        document.getElementById(
+          "nfl-trends-sort-filter"
+        )?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Player Name"])
+        .filter(
+          (row) =>
+            row["Stat Type"] === selectedStat
+        )
+        .filter(
+          (row) =>
+            !Number.isNaN(
+              Number(row["Last 5 Avg"])
+            )
+        );
+
+      populateTrendsPlayerFilter(
+        "nfl-trends-player-filter",
+        filteredRows,
+        renderPage
+      );
+
+      const selectedPlayer =
+        document.getElementById(
+          "nfl-trends-player-filter"
+        )?.value || "All";
+
+      if (selectedPlayer !== "All") {
+        filteredRows =
+          filteredRows.filter(
+            (row) =>
+              String(
+                row["Player Name"] || ""
+              ).trim() === selectedPlayer
+          );
+      }
+
+      filteredRows.sort((a, b) => {
+        const aValue =
+          Number(a["Last 5 Avg"]);
+
+        const bValue =
+          Number(b["Last 5 Avg"]);
+
+        return selectedSort === "asc"
+          ? aValue - bValue
+          : bValue - aValue;
+      });
+
+      renderFilterSummary(
+        "nfl-trends-filter-summary",
+        [
+          {
+            label: "Trend",
+            value: selectedStat
+          },
+          {
+            label: "Player",
+            value: selectedPlayer
+          },
+          {
+            label: "Sort",
+            value:
+              selectedSort === "asc"
+                ? "Lowest First"
+                : "Highest First"
+          },
+          {
+            label: "Tier",
+            value: currentTier
+          }
+        ]
+      );
+
+      if (!filteredRows.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NFL player trends found.</h3>
+            <p>
+              Try changing the player, trend category,
+              or sort order.
+            </p>
+          </div>
+        `;
+
+        return;
+      }
+
+      container.innerHTML =
+        filteredRows
+          .map(createNFLTrendCard)
+          .join("");
+    };
+
+    bindSelectChange(
+      "nfl-trends-stat-filter",
+      renderPage
+    );
+
+    bindSelectChange(
+      "nfl-trends-sort-filter",
+      renderPage
+    );
+
+    bindButton(
+      "nfl-trends-reset-filters",
+      () => {
+        resetSelectToAll(
+          "nfl-trends-player-filter"
+        );
+
+        resetSelectToValue(
+          "nfl-trends-stat-filter",
+          "Passing Yards"
+        );
+
+        resetSelectToValue(
+          "nfl-trends-sort-filter",
+          "desc"
+        );
+
+        renderPage();
+      }
+    );
+
+    renderPage();
+  } catch (error) {
+    console.error(
+      "NFL trends render error:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>No NFL trends available right now.</h3>
+        <p>
+          Please check back when NFL games and trend
+          data are live.
+        </p>
+      </div>
+    `;
+  }
+}
+
+async function initNFLTrendsPage() {
+  await updateSessionStatus();
+  await renderNFLTrends();
+}
+
+function formatNFLTeamTrendLabel(statKey) {
+  return statKey || "Trend";
+}
+
+function createNFLTeamTrendCard(teamRow) {
+  const seasonAvg = Number(teamRow["Season Avg"]);
+  const last3 = Number(teamRow["Last 3 Avg"]);
+  const last5 = Number(teamRow["Last 5 Avg"]);
+  const last10 = Number(teamRow["Last 10 Avg"]);
+  const hitRateLast5 = Number(
+    teamRow["Hit Rate Last 5"]
+  );
+  const aboveSeason = Number(
+    teamRow["Above Season %"]
+  );
+
+  const hitRateText = Number.isNaN(hitRateLast5)
+    ? "N/A"
+    : `${Math.round(hitRateLast5 * 100)}%`;
+
+  const aboveSeasonText =
+    Number.isNaN(aboveSeason)
+      ? "N/A"
+      : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
+
+  return `
+    <div class="leaderboard-item">
+      <strong>
+        ${teamRow["Team"] || "Unknown Team"}
+      </strong>
+
+      <div>
+        ${formatNFLTeamTrendLabel(
+          teamRow["Metric"]
+        )}
+      </div>
+
+      <div>
+        Last 5 Avg:
+        ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}
+      </div>
+
+      <div>
+        Season Avg:
+        ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}
+      </div>
+
+      <div>
+        Last 3:
+        ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
+        |
+        Last 10:
+        ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+      </div>
+
+      <div>
+        Hit Rate Last 5: ${hitRateText}
+        |
+        Above Season: ${aboveSeasonText}
+      </div>
+
+      <div>
+        Trend Strength:
+        ${teamRow["Trend Strength"] || "N/A"}
+        |
+        Risk:
+        ${teamRow["Risk Tier"] || "N/A"}
+      </div>
+
+      <div>
+        ${teamRow["Trend Note"] || ""}
+      </div>
+    </div>
+  `;
+}
+
+async function renderNFLTeamTrends() {
+  const container =
+    document.getElementById(
+      "nfl-team-trends-container"
+    );
+
+  if (!container) return;
+
+  try {
+    const rows =
+      await fetchLeagueTrends(
+        NFL_TEAM_TRENDS_CSV_URL
+      );
+
+    updateLastUpdated(
+      "nfl-team-trends-last-updated"
+    );
+
+    const renderPage = () => {
+      const currentTier =
+        CURRENT_USER_TIER || "Rookie";
+
+      const filterIds = [
+        "nfl-team-trends-team-filter",
+        "nfl-team-trends-stat-filter",
+        "nfl-team-trends-sort-filter"
+      ];
+
+      if (currentTier === "Rookie") {
+        setTrendsFiltersDisabled(
+          filterIds,
+          true
+        );
+
+        renderTrendsLockedState(
+          container,
+          "nfl-team-trends-filter-summary",
+          currentTier,
+          "NFL Team",
+          "Veteran"
+        );
+
+        return;
+      }
+
+      setTrendsFiltersDisabled(
+        filterIds,
+        false
+      );
+
+      const selectedStat =
+        document.getElementById(
+          "nfl-team-trends-stat-filter"
+        )?.value || "Points For";
+
+      const selectedSort =
+        document.getElementById(
+          "nfl-team-trends-sort-filter"
+        )?.value || "desc";
+
+      let filteredRows = rows
+        .filter((row) => row["Team"])
+        .filter(
+          (row) =>
+            row["Metric"] === selectedStat
+        )
+        .filter(
+          (row) =>
+            !Number.isNaN(
+              Number(row["Last 5 Avg"])
+            )
+        );
+
+      populateTeamFilter(
+        "nfl-team-trends-team-filter",
+        filteredRows,
+        renderPage
+      );
+
+      const selectedTeam =
+        document.getElementById(
+          "nfl-team-trends-team-filter"
+        )?.value || "All";
+
+      if (selectedTeam !== "All") {
+        filteredRows =
+          filteredRows.filter(
+            (row) =>
+              String(
+                row["Team"] || ""
+              ).trim() === selectedTeam
+          );
+      }
+
+      filteredRows.sort((a, b) => {
+        const aValue =
+          Number(a["Last 5 Avg"]);
+
+        const bValue =
+          Number(b["Last 5 Avg"]);
+
+        return selectedSort === "asc"
+          ? aValue - bValue
+          : bValue - aValue;
+      });
+
+      renderFilterSummary(
+        "nfl-team-trends-filter-summary",
+        [
+          {
+            label: "Team",
+            value: selectedTeam
+          },
+          {
+            label: "Trend",
+            value: selectedStat
+          },
+          {
+            label: "Sort",
+            value:
+              selectedSort === "asc"
+                ? "Lowest First"
+                : "Highest First"
+          },
+          {
+            label: "Tier",
+            value: currentTier
+          }
+        ]
+      );
+
+      if (!filteredRows.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NFL team trends found.</h3>
+            <p>
+              Try changing the team, trend category,
+              or sort order.
+            </p>
+          </div>
+        `;
+
+        return;
+      }
+
+      container.innerHTML =
+        filteredRows
+          .map(createNFLTeamTrendCard)
+          .join("");
+    };
+
+    bindSelectChange(
+      "nfl-team-trends-stat-filter",
+      renderPage
+    );
+
+    bindSelectChange(
+      "nfl-team-trends-sort-filter",
+      renderPage
+    );
+
+    bindButton(
+      "nfl-team-trends-reset-filters",
+      () => {
+        resetSelectToAll(
+          "nfl-team-trends-team-filter"
+        );
+
+        resetSelectToValue(
+          "nfl-team-trends-stat-filter",
+          "Points For"
+        );
+
+        resetSelectToValue(
+          "nfl-team-trends-sort-filter",
+          "desc"
+        );
+
+        renderPage();
+      }
+    );
+
+    renderPage();
+  } catch (error) {
+    console.error(
+      "NFL team trends render error:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>
+          Unable to load NFL team trends right now.
+        </h3>
+        <p>
+          Please check your published NFL Team Trends CSV.
+        </p>
+      </div>
+    `;
+  }
+}
+
+async function initNFLTeamTrendsPage() {
+  await updateSessionStatus();
+  await renderNFLTeamTrends();
+}
+
 function renderNBABets() { return renderOddsPage("nba"); }
 function renderNHLBets() { return renderOddsPage("nhl"); }
 function renderMLBBets() { return renderOddsPage("mlb"); }
+function renderNFLBets() { return renderOddsPage("nfl"); }
 
 function renderNBAProps() { return renderPropsPage("nba"); }
 function renderNHLProps() { return renderPropsPage("nhl"); }
 function renderMLBProps() { return renderPropsPage("mlb"); }
+function renderNFLProps() { return renderPropsPage("nfl"); }
 
 async function initNBABetsPage() {
   await updateSessionStatus();
@@ -3265,6 +3984,11 @@ async function initMLBBetsPage() {
   await renderMLBBets();
 }
 
+async function initNFLBetsPage() {
+  await updateSessionStatus();
+  await renderNFLBets();
+}
+
 async function initNBAPropsPage() {
   await updateSessionStatus();
   await renderNBAProps();
@@ -3278,6 +4002,11 @@ async function initNHLPropsPage() {
 async function initMLBPropsPage() {
   await updateSessionStatus();
   await renderMLBProps();
+}
+
+async function initNFLPropsPage() {
+  await updateSessionStatus();
+  await renderNFLProps();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

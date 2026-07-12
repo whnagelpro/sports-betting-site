@@ -247,6 +247,42 @@ function fetchAllMLBGamesForDate_(dateString) {
   return allGames;
 }
 
+const SPORTACULAR_TIMEZONE = "America/Phoenix";
+
+function getMLBGameRawDate_(game) {
+  return (
+    game.datetime ||
+    game.start_time ||
+    game.scheduled ||
+    game.game_time ||
+    game.date ||
+    game.game_date ||
+    ""
+  );
+}
+
+function getMLBGameAZDate_(game) {
+  const rawDate = getMLBGameRawDate_(game);
+  if (!rawDate) return "";
+
+  return Utilities.formatDate(
+    new Date(rawDate),
+    SPORTACULAR_TIMEZONE,
+    "yyyy-MM-dd"
+  );
+}
+
+function addDaysToDateString_(dateString, days) {
+  const d = new Date(dateString + "T00:00:00");
+  d.setDate(d.getDate() + days);
+
+  return Utilities.formatDate(
+    d,
+    SPORTACULAR_TIMEZONE,
+    "yyyy-MM-dd"
+  );
+}
+
 function fetchAllMLBTeams_() {
   const allTeams = [];
   let cursor = null;
@@ -1184,15 +1220,6 @@ function getMLBSeasonStatsObject_(statsArray) {
   return statsArray[0];
 }
 
-function clearMLBBaselinesSheet_(sheet) {
-  const maxRows = sheet.getMaxRows();
-  const maxCols = 23; // A:W
-
-  if (maxRows > 0) {
-    sheet.getRange(1, 1, maxRows, maxCols).clearContent();
-  }
-}
-
 function clearMLBGameOddsSheet_(sheet) {
   const maxRows = sheet.getMaxRows();
 
@@ -1206,143 +1233,6 @@ function clearMLBGameOddsSheet_(sheet) {
     // Clear formula area N:AE below row 2
     sheet.getRange(3, 14, maxRows - 2, 18).clearContent();
   }
-}
-
-function refreshMLBBaselinesSheet() {
-  const sheetName = "MLB Baselines";
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(sheetName);
-
-  if (!sheet) {
-    throw new Error(`Sheet "${sheetName}" not found.`);
-  }
-
-  Logger.log("Refreshing MLB Baselines from player season stats...");
-
-  const headers = [
-    "Player Id",
-    "Player Name",
-    "doubles",
-    "first_home_run",
-    "hits",
-    "hits_runs_rbis",
-    "home_runs",
-    "pitcher_earned_runs",
-    "pitcher_hits_allowed",
-    "pitcher_strikeouts",
-    "pitcher_outs",
-    "pitcher_record_a_win",
-    "pitcher_walks",
-    "rbis",
-    "runs_scored",
-    "singles",
-    "stolen_bases",
-    "strikeouts",
-    "total_bases",
-    "triples",
-    "walks",
-    "games_used"
-  ];
-
-  const season = getCurrentMLBSeason_();
-  const playerIds = getMLBPlayerIdsFromPlayerProps_();
-  const playerLookup = getMLBPlayerLookupMap_();
-
-  const rows = [];
-
-  playerIds.forEach((playerId, index) => {
-    Logger.log(`Fetching MLB season stats for player ${index + 1}/${playerIds.length} (ID: ${playerId})`);
-
-    const statsArray = fetchMLBPlayerSeasonStats_(playerId, season);
-    const stat = getMLBSeasonStatsObject_(statsArray);
-
-    if (!stat) {
-      Utilities.sleep(100);
-      return;
-    }
-
-    const battingGp = Number(stat.batting_gp || 0);
-    const pitchingGp = Number(stat.pitching_gp || 0);
-    const gamesUsed = Math.max(battingGp, pitchingGp);
-
-    if (!gamesUsed) {
-      Utilities.sleep(100);
-      return;
-    }
-
-    const playerInfo = playerLookup[String(playerId)] || {};
-
-    const doublesPerGame = Number(stat.batting_2b || 0) / gamesUsed;
-    const triplesPerGame = Number(stat.batting_3b || 0) / gamesUsed;
-    const hitsPerGame = Number(stat.batting_h || 0) / gamesUsed;
-    const homeRunsPerGame = Number(stat.batting_hr || 0) / gamesUsed;
-    const rbisPerGame = Number(stat.batting_rbi || 0) / gamesUsed;
-    const runsPerGame = Number(stat.batting_r || 0) / gamesUsed;
-    const totalBasesPerGame = Number(stat.batting_tb || 0) / gamesUsed;
-    const walksPerGame = Number(stat.batting_bb || 0) / gamesUsed;
-    const batterKsPerGame = Number(stat.batting_so || 0) / gamesUsed;
-    const stolenBasesPerGame = Number(stat.batting_sb || 0) / gamesUsed;
-
-    const singlesPerGame = Math.max(
-      0,
-      (Number(stat.batting_h || 0) -
-        Number(stat.batting_2b || 0) -
-        Number(stat.batting_3b || 0) -
-        Number(stat.batting_hr || 0)) / gamesUsed
-    );
-
-    const earnedRunsPerGame = Number(stat.pitching_er || 0) / gamesUsed;
-    const hitsAllowedPerGame = Number(stat.pitching_h || 0) / gamesUsed;
-    const pitcherKsPerGame = Number(stat.pitching_so || 0) / gamesUsed;
-    const outsPerGame = Number(stat.pitching_outs || 0) / gamesUsed;
-    const pitcherWalksPerGame = Number(stat.pitching_bb || 0) / gamesUsed;
-    const pitcherWinsPerGame = Number(stat.pitching_wins || 0) / gamesUsed;
-
-    const hrrPerGame = hitsPerGame + runsPerGame + rbisPerGame;
-
-    rows.push([
-      playerId,                     // A
-      playerInfo.playerName || "",  // B
-      doublesPerGame,               // C doubles
-      homeRunsPerGame,              // D first_home_run (proxy)
-      hitsPerGame,                  // E hits
-      hrrPerGame,                   // F hits_runs_rbis
-      homeRunsPerGame,              // G home_runs
-      earnedRunsPerGame,            // H pitcher_earned_runs
-      hitsAllowedPerGame,           // I pitcher_hits_allowed
-      pitcherKsPerGame,             // J pitcher_strikeouts
-      outsPerGame,                  // K pitcher_outs
-      pitcherWinsPerGame,           // L pitcher_record_a_win
-      pitcherWalksPerGame,          // M pitcher_walks
-      rbisPerGame,                  // N rbis
-      runsPerGame,                  // O runs_scored
-      singlesPerGame,               // P singles
-      stolenBasesPerGame,           // Q stolen_bases
-      batterKsPerGame,              // R strikeouts
-      totalBasesPerGame,            // S total_bases
-      triplesPerGame,               // T triples
-      walksPerGame,                 // U walks
-      gamesUsed                     // V games_used
-    ]);
-
-    Utilities.sleep(100);
-  });
-
-  rows.sort((a, b) => {
-    const nameA = (a[1] || "").toLowerCase();
-    const nameB = (b[1] || "").toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-
-  clearMLBBaselinesSheet_(sheet);
-
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-
-  if (rows.length > 0) {
-    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-  }
-
-  Logger.log(`Wrote ${rows.length} MLB baseline rows to "${sheetName}" for season ${season}`);
 }
 
 function fetchRecentMLBStatsForPlayer_(playerId, season) {
@@ -1374,13 +1264,24 @@ function fetchRecentMLBStatsForPlayer_(playerId, season) {
 }
 
 function getMLBGameStatFlexible_(row, keys) {
+  const flat = flattenObject_(row);
+
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
-    if (row[key] !== undefined && row[key] !== null && row[key] !== "") {
-      const value = Number(row[key]);
-      if (!isNaN(value)) return value;
+
+    const directValue = row[key];
+    if (directValue !== undefined && directValue !== null && directValue !== "") {
+      const num = Number(directValue);
+      if (!isNaN(num)) return num;
+    }
+
+    const flatValue = flat[key];
+    if (flatValue !== undefined && flatValue !== null && flatValue !== "") {
+      const num = Number(flatValue);
+      if (!isNaN(num)) return num;
     }
   }
+
   return 0;
 }
 
@@ -1401,15 +1302,6 @@ function getMLBGamesFromScheduleSheet_(scheduleSheet) {
       away_team: row[2],   // C Away Team
       home_team: row[3]    // D Home Team
     }));
-}
-
-function clearMLBTeamTrendsSheet_(sheet) {
-  const maxRows = sheet.getMaxRows();
-  const maxCols = 10; // A:J
-
-  if (maxRows > 0) {
-    sheet.getRange(1, 1, maxRows, maxCols).clearContent();
-  }
 }
 
 function getPastDateString_(daysAgo) {
@@ -1637,44 +1529,6 @@ function getFirstValidNumber_(values) {
   return 0;
 }
 
-function buildMLBTeamGameStatsMap_(statRows) {
-  const map = {};
-
-  statRows.forEach(row => {
-    const gameId = String(row.game_id || "").trim();
-    const teamName = normalizeMLBTeamName_(row.team_name || "");
-
-    if (!gameId || !teamName) return;
-
-    const key = `${gameId}_${teamName}`;
-
-    if (!map[key]) {
-      map[key] = {
-        runs: 0,
-        hits: 0,
-        home_runs: 0,
-        total_bases: 0,
-        strikeouts: 0,
-        rowCount: 0
-      };
-    }
-
-    map[key].runs += Number(row.runs || 0);
-    map[key].hits += Number(row.hits || 0);
-    map[key].home_runs += Number(row.hr || 0);
-    map[key].total_bases += Number(row.total_bases || 0);
-    map[key].strikeouts += Number(row.k || 0);
-    map[key].rowCount += 1;
-  });
-
-  const sampleKeys = Object.keys(map).slice(0, 5);
-  sampleKeys.forEach(k => {
-    Logger.log(`MAP SAMPLE: ${k} -> ${JSON.stringify(map[k])}`);
-  });
-
-  return map;
-}
-
 function buildMLBGameAverageTotalMap_(oddsRows) {
   const totals = {};
 
@@ -1740,279 +1594,1238 @@ function getMLBHistoricalTotalMapFromGameOdds_() {
   return avgMap;
 }
 
-function refreshMLBTeamTrendsSheet() {
-  const sheetName = "MLB Team Trends";
+// ============================================================================
+// NEW MLB GAME LOG → SEASON STAT → TREND PIPELINE
+// ============================================================================
+
+const MLB_TEAM_GAMES_TO_LOAD = 10;
+const MLB_TEAM_LOOKBACK_DAYS = 60;
+
+const MLB_PLAYER_TREND_STATS = [
+  { label: "Hits", key: "hits" },
+  { label: "Runs", key: "runs" },
+  { label: "RBIs", key: "rbis" },
+  { label: "Home Runs", key: "homeRuns" },
+  { label: "Total Bases", key: "totalBases" },
+  { label: "Strikeouts", key: "strikeouts" },
+  { label: "Walks", key: "walks" },
+  { label: "Stolen Bases", key: "stolenBases" },
+  { label: "Hits + Runs + RBIs", key: "hrr" },
+  { label: "Pitcher Strikeouts", key: "pitcherStrikeouts" },
+  { label: "Pitcher Outs", key: "pitcherOuts" },
+  { label: "Pitcher Earned Runs", key: "pitcherEarnedRuns" },
+  { label: "Pitcher Hits Allowed", key: "pitcherHitsAllowed" },
+  { label: "Pitcher Walks", key: "pitcherWalks" }
+];
+
+const MLB_TEAM_TREND_STATS = [
+  { label: "Runs For", key: "runsFor" },
+  { label: "Runs Allowed", key: "runsAllowed" },
+  { label: "Hits", key: "hits" },
+  { label: "Home Runs", key: "homeRuns" },
+  { label: "Total Bases", key: "totalBases" },
+  { label: "Strikeouts", key: "strikeouts" }
+];
+
+function ensureMLBTrendTabs_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(sheetName);
 
-  if (!sheet) {
-    throw new Error(`Sheet "${sheetName}" not found.`);
-  }
+  [
+    "MLB Player Game Logs",
+    "MLB Player Season Stats",
+    "MLB Player Trends",
+    "MLB Team Game Logs",
+    "MLB Team Season Stats",
+    "MLB Team Trends",
+    "MLB Top Player Trends",
+    "MLB Top Team Trends"
+  ].forEach(name => {
+    if (!ss.getSheetByName(name)) {
+      ss.insertSheet(name);
+    }
+  });
+}
 
-  Logger.log("Refreshing MLB Team Trends...");
+function refreshMLBDailyOddsAndProps() {
+  refreshMLBScheduleSheet();
+  refreshMLBGameOddsSheet();
+  refreshMLBPlayerPropsSheet();
+
+  Logger.log("MLB daily odds and props refresh complete.");
+}
+
+function refreshMLBPlayerTrendPipeline() {
+  ensureMLBTrendTabs_();
+
+  refreshMLBPlayerSeasonStatsSheet();
+  refreshMLBPlayerTrendsSheet();
+
+  Logger.log("MLB player trend pipeline complete.");
+}
+
+function refreshMLBTeamTrendPipeline() {
+  ensureMLBTrendTabs_();
+
+  refreshMLBTeamSeasonStatsSheet();
+  refreshMLBTeamTrendsOutputSheet();
+
+  Logger.log("MLB team trend pipeline complete.");
+}
+
+function refreshMLBTopPlayerTrendPipeline() {
+  ensureMLBTrendTabs_();
+  refreshMLBTopPlayerTrendsSheet();
+  Logger.log("MLB top player trends pipeline complete.");
+}
+
+function refreshMLBTopTeamTrendPipeline() {
+  ensureMLBTrendTabs_();
+  refreshMLBTopTeamTrendsSheet();
+  Logger.log("MLB top team trends pipeline complete.");
+}
+
+function refreshMLBPlayerGameLogsMarch() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-03-25", "2026-03-31");
+}
+
+function refreshMLBPlayerGameLogsApril() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-04-01", "2026-04-30");
+}
+
+function refreshMLBPlayerGameLogsMay() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-05-01", "2026-05-31");
+}
+
+function refreshMLBPlayerGameLogsJune() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-06-01", "2026-06-30");
+}
+
+function refreshMLBPlayerGameLogsJuly() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-07-01", "2026-07-31");
+}
+
+function refreshMLBPlayerGameLogsAugust() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-08-01", "2026-08-31");
+}
+
+function refreshMLBPlayerGameLogsSeptember() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-09-01", "2026-09-30");
+}
+
+function refreshMLBPlayerGameLogsOctober() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-10-01", "2026-10-31");
+}
+
+function refreshMLBPlayerGameLogsNovember() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-11-01", "2026-11-30");
+}
+
+function refreshMLBTeamGameLogsMarch() {
+  refreshMLBTeamGameLogsForDateRange_("2026-03-25", "2026-03-31");
+}
+
+function refreshMLBTeamGameLogsApril() {
+  refreshMLBTeamGameLogsForDateRange_("2026-04-01", "2026-04-30");
+}
+
+function refreshMLBTeamGameLogsMay() {
+  refreshMLBTeamGameLogsForDateRange_("2026-05-01", "2026-05-31");
+}
+
+function refreshMLBTeamGameLogsJune() {
+  refreshMLBTeamGameLogsForDateRange_("2026-06-01", "2026-06-30");
+}
+
+function refreshMLBTeamGameLogsJuly() {
+  refreshMLBTeamGameLogsForDateRange_("2026-07-01", "2026-07-31");
+}
+
+function refreshMLBTeamGameLogsAugust() {
+  refreshMLBTeamGameLogsForDateRange_("2026-08-01", "2026-08-31");
+}
+
+function refreshMLBTeamGameLogsSeptember() {
+  refreshMLBTeamGameLogsForDateRange_("2026-09-01", "2026-09-30");
+}
+
+function refreshMLBTeamGameLogsOctober() {
+  refreshMLBTeamGameLogsForDateRange_("2026-10-01", "2026-10-31");
+}
+
+function refreshMLBTeamGameLogsNovember() {
+  refreshMLBTeamGameLogsForDateRange_("2026-11-01", "2026-11-30");
+}
+
+// ----------------------------------------------------------------------------
+// PLAYER GAME LOGS
+// ----------------------------------------------------------------------------
+
+function refreshMLBPlayerGameLogsSheet() {
+  refreshMLBPlayerGameLogsForDateRange_("2026-03-01", "2026-11-30");
+}
+
+function refreshMLBPlayerGameLogsForDateRange_(startDate, endDate) {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("MLB Player Game Logs");
 
   const headers = [
-    "Team",
-    "runs_scored_last5",
-    "runs_allowed_last5",
-    "hits_last5",
-    "home_runs_last5",
-    "total_bases_last5",
-    "team_strikeouts_last5",
-    "overs_last5",
-    "unders_last5",
-    "games_used_last5"
+    "Game Date", "Game ID", "Player ID", "Player Name", "Team", "Opponent",
+    "Hits", "Runs", "RBIs", "Home Runs", "Total Bases", "Strikeouts", "Walks",
+    "Stolen Bases", "Hits + Runs + RBIs", "Pitcher Strikeouts", "Pitcher Outs",
+    "Pitcher Earned Runs", "Pitcher Hits Allowed", "Pitcher Walks"
   ];
 
-  const lookback = getRecentCompletedMLBGamesForTeamTrends_(5, 10);
-  const teams = lookback.teams;
-  const teamGamesMap = lookback.teamGamesMap;
-  const selectedGames = lookback.selectedGames;
+  Logger.log(`Refreshing MLB Player Game Logs from ${startDate} to ${endDate}`);
+
+  const selectedGames = getMLBCompletedGamesForDateRange_(startDate, endDate);
+  if (!selectedGames.length) return;
+
+  const gameMap = {};
+  const gameIds = selectedGames.map(game => {
+    const gameId = String(game.id || "");
+    gameMap[gameId] = {
+      date: getMLBGameAZDate_(game),
+      homeTeam: getMLBTeamName_(game.home_team || {}),
+      awayTeam: getMLBTeamName_(game.away_team || game.visitor_team || {})
+    };
+    return gameId;
+  }).filter(Boolean);
+
+  const statRows = fetchAllMLBStatsForGameIds_(gameIds);
+  const rows = [];
+
+  statRows.forEach(stat => {
+    const gameId = String(stat.game_id || (stat.game && stat.game.id) || "");
+    const gameInfo = gameMap[gameId] || {};
+
+    const playerId = stat.player_id || (stat.player && stat.player.id) || "";
+    const playerName = getMLBPlayerNameFromStat_(stat);
+
+    const teamName = stat.team_name || getMLBTeamName_(stat.team || {}) || "";
+
+    const opponent =
+      teamName === gameInfo.homeTeam ? gameInfo.awayTeam :
+      teamName === gameInfo.awayTeam ? gameInfo.homeTeam : "";
+
+    const hits = getMLBGameStatFlexible_(stat, ["batting_h", "hits", "h"]);
+    const runs = getMLBGameStatFlexible_(stat, ["batting_r", "runs", "runs_scored"]);
+    const rbis = getMLBGameStatFlexible_(stat, ["batting_rbi", "rbis", "rbi"]);
+    const homeRuns = getMLBGameStatFlexible_(stat, ["batting_hr", "home_runs", "hr"]);
+    const totalBases = getMLBGameStatFlexible_(stat, ["batting_tb", "total_bases", "tb"]);
+    const strikeouts = getMLBGameStatFlexible_(stat, ["batting_so", "strikeouts", "k"]);
+    const walks = getMLBGameStatFlexible_(stat, ["batting_bb", "walks", "bb"]);
+    const stolenBases = getMLBGameStatFlexible_(stat, ["batting_sb", "stolen_bases", "sb"]);
+
+    const pitcherStrikeouts = getMLBGameStatFlexible_(stat, ["p_k", "pitching_k", "pitching_so"]);
+    const pitcherOuts = getMLBGameStatFlexible_(stat, ["pitching_outs", "outs_recorded", "pitcher_outs"]);
+    const pitcherEarnedRuns = getMLBGameStatFlexible_(stat, ["pitching_er", "earned_runs", "er"]);
+    const pitcherHitsAllowed = getMLBGameStatFlexible_(stat, ["p_hits", "pitching_h", "hits_allowed"]);
+    const pitcherWalks = getMLBGameStatFlexible_(stat, ["p_bb", "pitching_bb", "walks_allowed", "pitcher_walks"]);
+
+    if (!playerId && !playerName) return;
+
+    const played =
+      hits > 0 || runs > 0 || rbis > 0 || homeRuns > 0 || totalBases > 0 ||
+      strikeouts > 0 || walks > 0 || stolenBases > 0 ||
+      pitcherStrikeouts > 0 || pitcherOuts > 0 || pitcherEarnedRuns > 0 ||
+      pitcherHitsAllowed > 0 || pitcherWalks > 0;
+
+    if (!played) return;
+
+    rows.push([
+      gameInfo.date, gameId, playerId, playerName, teamName, opponent,
+      hits, runs, rbis, homeRuns, totalBases, strikeouts, walks, stolenBases,
+      hits + runs + rbis, pitcherStrikeouts, pitcherOuts, pitcherEarnedRuns,
+      pitcherHitsAllowed, pitcherWalks
+    ]);
+  });
+
+  upsertRowsByKeyForDateRange_(sheet, headers, rows, [1, 2], startDate, endDate);
+  Logger.log(`Upserted ${rows.length} MLB player game-log rows for ${startDate} to ${endDate}.`);
+}
+
+function getMLBPlayerNameFromStat_(stat) {
+  const player = stat.player || {};
+
+  const fullName =
+    player.full_name ||
+    player.name ||
+    stat.player_name ||
+    "";
+
+  if (fullName) return fullName;
+
+  return `${player.first_name || ""} ${player.last_name || ""}`.trim();
+}
+
+// ----------------------------------------------------------------------------
+// PLAYER SEASON STATS
+// ----------------------------------------------------------------------------
+
+function refreshMLBPlayerSeasonStatsSheet() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("MLB Player Game Logs");
+  const sheet = ss.getSheetByName("MLB Player Season Stats");
+
+  const headers = [
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Games Played",
+    "Avg Hits",
+    "Avg Runs",
+    "Avg RBIs",
+    "Avg Home Runs",
+    "Avg Total Bases",
+    "Avg Strikeouts",
+    "Avg Walks",
+    "Avg Stolen Bases",
+    "Avg Hits + Runs + RBIs",
+    "Avg Pitcher Strikeouts",
+    "Avg Pitcher Outs",
+    "Avg Pitcher Earned Runs",
+    "Avg Pitcher Hits Allowed",
+    "Avg Pitcher Walks",
+    "Consistency Score",
+    "Last Updated"
+  ];
+
+  const logs = getMLBObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const playerId = String(row["Player ID"] || "");
+    if (!playerId) return;
+
+    if (!grouped[playerId]) {
+      grouped[playerId] = {
+        playerId,
+        playerName: row["Player Name"] || "",
+        team: row["Team"] || "",
+        games: []
+      };
+    }
+
+    grouped[playerId].games.push({
+      hits: Number(row["Hits"] || 0),
+      runs: Number(row["Runs"] || 0),
+      rbis: Number(row["RBIs"] || 0),
+      homeRuns: Number(row["Home Runs"] || 0),
+      totalBases: Number(row["Total Bases"] || 0),
+      strikeouts: Number(row["Strikeouts"] || 0),
+      walks: Number(row["Walks"] || 0),
+      stolenBases: Number(row["Stolen Bases"] || 0),
+      hrr: Number(row["Hits + Runs + RBIs"] || 0),
+      pitcherStrikeouts: Number(row["Pitcher Strikeouts"] || 0),
+      pitcherOuts: Number(row["Pitcher Outs"] || 0),
+      pitcherEarnedRuns: Number(row["Pitcher Earned Runs"] || 0),
+      pitcherHitsAllowed: Number(row["Pitcher Hits Allowed"] || 0),
+      pitcherWalks: Number(row["Pitcher Walks"] || 0)
+    });
+  });
+
+  const now = new Date();
+
+  const rows = Object.values(grouped).map(player => {
+    const games = player.games;
+    const hrrValues = games.map(g => g.hrr);
+
+    return [
+      player.playerId,
+      player.playerName,
+      player.team,
+      games.length,
+      avgMLB_(games.map(g => g.hits)),
+      avgMLB_(games.map(g => g.runs)),
+      avgMLB_(games.map(g => g.rbis)),
+      avgMLB_(games.map(g => g.homeRuns)),
+      avgMLB_(games.map(g => g.totalBases)),
+      avgMLB_(games.map(g => g.strikeouts)),
+      avgMLB_(games.map(g => g.walks)),
+      avgMLB_(games.map(g => g.stolenBases)),
+      avgMLB_(hrrValues),
+      avgMLB_(games.map(g => g.pitcherStrikeouts)),
+      avgMLB_(games.map(g => g.pitcherOuts)),
+      avgMLB_(games.map(g => g.pitcherEarnedRuns)),
+      avgMLB_(games.map(g => g.pitcherHitsAllowed)),
+      avgMLB_(games.map(g => g.pitcherWalks)),
+      consistencyScoreMLB_(hrrValues),
+      now
+    ];
+  });
+
+  rows.sort((a, b) => String(a[1] || "").localeCompare(String(b[1] || "")));
+
+  writeMLBOutputSheet_(sheet, headers, rows);
+
+  Logger.log(`Wrote ${rows.length} rows to MLB Player Season Stats.`);
+}
+
+function hitRateMLB_(values, threshold) {
+  const nums = values
+    .map(Number)
+    .filter(value => !Number.isNaN(value));
+
+  if (!nums.length) return 0;
+
+  const hits = nums.filter(value => value >= threshold).length;
+
+  return hits / nums.length;
+}
+
+function aboveSeasonPctMLB_(recentAvg, seasonAvg) {
+  if (!seasonAvg) return 0;
+
+  return ((recentAvg - seasonAvg) / seasonAvg) * 100;
+}
+
+function formatPercentMLB_(value) {
+  const num = Number(value);
+
+  if (Number.isNaN(num)) return "0%";
+
+  return `${Math.round(num * 100)}%`;
+}
+
+function formatSignedPercentMLB_(value) {
+  const num = Number(value);
+
+  if (Number.isNaN(num)) return "0%";
+
+  return num >= 0 ? `+${num.toFixed(1)}%` : `${num.toFixed(1)}%`;
+}
+
+function buildMLBTrendNote_(playerName, statLabel, seasonAvg, last5, hitRateLast5, trendScore) {
+  const safeName = playerName || "This player";
+  const safeStat = statLabel || "this stat";
+
+  const last5Text = Number(last5).toFixed(2);
+  const seasonText = Number(seasonAvg).toFixed(2);
+  const hitRateText = formatPercentMLB_(hitRateLast5);
+  const trendText = formatSignedPercentMLB_(trendScore);
+
+  if (trendScore >= 15) {
+    return `${safeName} is trending up in ${safeStat}, averaging ${last5Text} over the last 5 compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
+  }
+
+  if (trendScore <= -15) {
+    return `${safeName} is trending down in ${safeStat}, averaging ${last5Text} over the last 5 compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
+  }
+
+  return `${safeName} is holding steady in ${safeStat}, averaging ${last5Text} over the last 5 compared to ${seasonText} on the season, with a 1+ hit rate of ${hitRateText}.`;
+}
+
+function clearMLBPlayerGameLogsSheetOnly() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("MLB Player Game Logs");
+
+  const headers = [
+    "Game Date",
+    "Game ID",
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Opponent",
+    "Hits",
+    "Runs",
+    "RBIs",
+    "Home Runs",
+    "Total Bases",
+    "Strikeouts",
+    "Walks",
+    "Stolen Bases",
+    "Hits + Runs + RBIs",
+    "Pitcher Strikeouts",
+    "Pitcher Outs",
+    "Pitcher Earned Runs",
+    "Pitcher Hits Allowed",
+    "Pitcher Walks"
+  ];
+
+  writeMLBOutputSheet_(sheet, headers, []);
+}
+
+function clearMLBTeamGameLogsSheetOnly() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("MLB Team Game Logs");
+
+  const headers = [
+    "Game Date",
+    "Game ID",
+    "Team",
+    "Opponent",
+    "Runs For",
+    "Runs Allowed",
+    "Hits",
+    "Home Runs",
+    "Total Bases",
+    "Strikeouts"
+  ];
+
+  writeMLBOutputSheet_(sheet, headers, []);
+}
+
+// ----------------------------------------------------------------------------
+// PLAYER TRENDS
+// ----------------------------------------------------------------------------
+
+function refreshMLBPlayerTrendsSheet() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("MLB Player Game Logs");
+  const sheet = ss.getSheetByName("MLB Player Trends");
+
+  const headers = [
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Stat Type",
+    "Season Avg",
+    "Last 3 Avg",
+    "Last 5 Avg",
+    "Last 10 Avg",
+    "Trend Direction",
+    "Trend Score",
+    "Consistency",
+    "Risk Tier",
+    "Hit Rate Last 3",
+    "Hit Rate Last 5",
+    "Hit Rate Last 10",
+    "Above Season %",
+    "Trend Strength",
+    "Trend Note",
+    "Last Updated"
+  ];
+
+  const logs = getMLBObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const playerId = String(row["Player ID"] || "");
+    if (!playerId) return;
+
+    if (!grouped[playerId]) {
+      grouped[playerId] = {
+        playerId,
+        playerName: row["Player Name"] || "",
+        team: row["Team"] || "",
+        games: []
+      };
+    }
+
+    grouped[playerId].games.push({
+      date: row["Game Date"],
+      hits: Number(row["Hits"] || 0),
+      runs: Number(row["Runs"] || 0),
+      rbis: Number(row["RBIs"] || 0),
+      homeRuns: Number(row["Home Runs"] || 0),
+      totalBases: Number(row["Total Bases"] || 0),
+      strikeouts: Number(row["Strikeouts"] || 0),
+      walks: Number(row["Walks"] || 0),
+      stolenBases: Number(row["Stolen Bases"] || 0),
+      hrr: Number(row["Hits + Runs + RBIs"] || 0),
+      pitcherStrikeouts: Number(row["Pitcher Strikeouts"] || 0),
+      pitcherOuts: Number(row["Pitcher Outs"] || 0),
+      pitcherEarnedRuns: Number(row["Pitcher Earned Runs"] || 0),
+      pitcherHitsAllowed: Number(row["Pitcher Hits Allowed"] || 0),
+      pitcherWalks: Number(row["Pitcher Walks"] || 0)
+    });
+  });
+
+  const now = new Date();
+  const rows = [];
+
+  Object.values(grouped).forEach(player => {
+    const games = player.games.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    MLB_PLAYER_TREND_STATS.forEach(stat => {
+      const values = games.map(g => Number(g[stat.key] || 0));
+
+      const seasonAvg = avgMLB_(values);
+      const last3 = avgMLB_(values.slice(0, 3));
+      const last5 = avgMLB_(values.slice(0, 5));
+      const last10 = avgMLB_(values.slice(0, 10));
+      const consistency = consistencyScoreMLB_(values);
+      const score = trendScoreMLB_(last5, seasonAvg);
+
+      const hitRateLast3 = hitRateMLB_(values.slice(0, 3), 1);
+      const hitRateLast5 = hitRateMLB_(values.slice(0, 5), 1);
+      const hitRateLast10 = hitRateMLB_(values.slice(0, 10), 1);
+      const aboveSeasonPct = aboveSeasonPctMLB_(last5, seasonAvg);
+      const strength = trendStrengthMLB_(hitRateLast5, aboveSeasonPct, score);
+      const note = buildMLBTrendNote_(
+        player.playerName,
+        stat.label,
+        seasonAvg,
+        last5,
+        hitRateLast5,
+        score
+      );
+
+      rows.push([
+        player.playerId,
+        player.playerName,
+        player.team,
+        stat.label,
+        seasonAvg,
+        last3,
+        last5,
+        last10,
+        trendDirectionMLB_(score),
+        score,
+        consistency,
+        riskTierMLB_(consistency, Math.abs(score)),
+        hitRateLast3,
+        hitRateLast5,
+        hitRateLast10,
+        aboveSeasonPct,
+        strength,
+        note,
+        now
+      ]);
+    });
+  });
+
+  rows.sort((a, b) =>
+    String(a[1] || "").localeCompare(String(b[1] || "")) ||
+    String(a[3] || "").localeCompare(String(b[3] || ""))
+  );
+
+  writeMLBOutputSheet_(sheet, headers, rows);
+
+  sheet.getRange("M:O").setNumberFormat("0%");
+  sheet.getRange("P:P").setNumberFormat("0.0");
+
+  Logger.log(`Wrote ${rows.length} rows to MLB Player Trends with hit-rate metrics.`);
+}
+
+// ----------------------------------------------------------------------------
+// TEAM GAME LOGS
+// ----------------------------------------------------------------------------
+
+function refreshMLBTeamGameLogsSheet() {
+  refreshMLBTeamGameLogsForDateRange_("2026-03-01", "2026-11-30");
+}
+
+function refreshMLBTeamGameLogsForDateRange_(startDate, endDate) {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("MLB Team Game Logs");
+
+  const headers = [
+    "Game Date",
+    "Game ID",
+    "Team",
+    "Opponent",
+    "Runs For",
+    "Runs Allowed",
+    "Hits",
+    "Home Runs",
+    "Total Bases",
+    "Strikeouts"
+  ];
+
+  Logger.log(`Refreshing MLB Team Game Logs from ${startDate} to ${endDate}`);
+
+  const selectedGames = getMLBCompletedGamesForDateRange_(startDate, endDate);
 
   if (!selectedGames.length) {
-    clearMLBTeamTrendsSheet_(sheet);
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    Logger.log("No completed MLB games found for Team Trends.");
+    Logger.log("No completed MLB games found for this team-log date range.");
     return;
   }
 
   const gameIds = selectedGames.map(g => g.id).filter(Boolean);
   const statRows = fetchAllMLBStatsForGameIds_(gameIds);
-  Logger.log(`Stat rows fetched: ${statRows.length}`);
-
   const teamGameStatsMap = buildMLBTeamGameStatsMap_(statRows);
-  Logger.log(`TeamGameStatsMap keys: ${Object.keys(teamGameStatsMap).length}`);
 
   const rows = [];
 
-  teams.forEach(team => {
-    const teamId = String(team.id || "");
-    const teamNameDisplay = getMLBTeamName_(team);
-    const teamNameKey = normalizeMLBTeamName_(teamNameDisplay);
+  selectedGames.forEach(game => {
+    const gameId = String(game.id || "");
+    const homeTeam = game.home_team || {};
+    const awayTeam = game.away_team || game.visitor_team || {};
 
-    const games = (teamGamesMap[teamId] || [])
-      .slice()
-      .sort((a, b) => getMLBGameDateTimestamp_(b) - getMLBGameDateTimestamp_(a))
-      .slice(0, 5);
+    addMLBTeamGameLogRow_(rows, game, gameId, homeTeam, awayTeam, teamGameStatsMap);
+    addMLBTeamGameLogRow_(rows, game, gameId, awayTeam, homeTeam, teamGameStatsMap);
+  });
 
-    const used = games.length;
-    if (!used) return;
+  upsertRowsByKey_(sheet, headers, rows, [1, 2]);
 
-    let runsScored = 0;
-    let runsAllowed = 0;
-    let hits = 0;
-    let homeRuns = 0;
-    let totalBases = 0;
-    let strikeouts = 0;
+  Logger.log(`Upserted ${rows.length} MLB team game-log rows for ${startDate} to ${endDate}.`);
+}
 
-    // Leave totals blank for now until you add a historical totals source
-    const overs = "";
-    const unders = "";
+function getMLBCompletedGamesForDateRange_(startDate, endDate) {
+  const selectedGamesMap = {};
+
+  const fetchStartDate = addDaysToDateString_(startDate, -1);
+  const fetchEndDate = addDaysToDateString_(endDate, 1);
+
+  let current = new Date(fetchStartDate + "T00:00:00");
+  const end = new Date(fetchEndDate + "T00:00:00");
+
+  while (current <= end) {
+    const apiDateString = Utilities.formatDate(
+      current,
+      SPORTACULAR_TIMEZONE,
+      "yyyy-MM-dd"
+    );
+
+    Logger.log(`Checking MLB API games for ${apiDateString}`);
+
+    const games = fetchAllMLBGamesForDate_(apiDateString)
+      .filter(isCompletedMLBGame_)
+      .filter(game => {
+        const azDate = getMLBGameAZDate_(game);
+        return azDate >= startDate && azDate <= endDate;
+      });
 
     games.forEach(game => {
-      const gameId = String(game.id || "");
-      const homeTeamId = getMLBHomeTeamIdFromGame_(game);
-      const awayTeamId = getMLBAwayTeamIdFromGame_(game);
-      const isHome = teamId === homeTeamId;
-
-      const opponentNameKey = normalizeMLBTeamName_(
-        isHome ? getMLBAwayTeamNameFromGame_(game) : getMLBHomeTeamNameFromGame_(game)
-      );
-
-      const statKey = `${gameId}_${teamNameKey}`;
-      const oppStatKey = `${gameId}_${opponentNameKey}`;
-
-      const statBlock = teamGameStatsMap[statKey] || {
-        runs: 0,
-        hits: 0,
-        home_runs: 0,
-        total_bases: 0,
-        strikeouts: 0
-      };
-
-      const oppStatBlock = teamGameStatsMap[oppStatKey] || {
-        runs: 0
-      };
-
-      runsScored += statBlock.runs;
-      runsAllowed += oppStatBlock.runs;
-      hits += statBlock.hits;
-      homeRuns += statBlock.home_runs;
-      totalBases += statBlock.total_bases;
-      strikeouts += statBlock.strikeouts;
+      if (game.id) {
+        selectedGamesMap[String(game.id)] = game;
+      }
     });
 
-    rows.push([
-      teamNameDisplay,
-      runsScored / used,
-      runsAllowed / used,
-      hits / used,
-      homeRuns / used,
-      totalBases / used,
-      strikeouts / used,
-      overs,
-      unders,
-      used
-    ]);
+    current.setDate(current.getDate() + 1);
+    Utilities.sleep(100);
+  }
+
+  return Object.values(selectedGamesMap);
+}
+
+function upsertRowsByKey_(sheet, headers, newRows, keyColumnIndexes) {
+  const existingValues = sheet.getDataRange().getValues();
+
+  const existingRows =
+    existingValues.length > 1 ? existingValues.slice(1) : [];
+
+  const rowMap = {};
+
+  existingRows.forEach(row => {
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  newRows.forEach(row => {
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  const finalRows = Object.values(rowMap).sort((a, b) =>
+    new Date(b[0]).getTime() - new Date(a[0]).getTime()
+  );
+
+  writeMLBOutputSheet_(sheet, headers, finalRows);
+}
+
+function upsertRowsByKeyForDateRange_(sheet, headers, newRows, keyColumnIndexes, startDate, endDate) {
+  const existingValues = sheet.getDataRange().getValues();
+  const existingRows = existingValues.length > 1 ? existingValues.slice(1) : [];
+  const rowMap = {};
+
+  existingRows.forEach(row => {
+    const rowDate = String(row[0] || "");
+
+    if (rowDate >= startDate && rowDate <= endDate) {
+      return;
+    }
+
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  newRows.forEach(row => {
+    const key = keyColumnIndexes.map(index => String(row[index] || "")).join("|");
+    if (key.trim()) rowMap[key] = row;
+  });
+
+  const finalRows = Object.values(rowMap).sort((a, b) =>
+    new Date(b[0]).getTime() - new Date(a[0]).getTime()
+  );
+
+  writeMLBOutputSheet_(sheet, headers, finalRows);
+}
+
+function addMLBTeamGameLogRow_(rows, game, gameId, team, opponent, statMap) {
+  const teamName = getMLBTeamName_(team);
+  const opponentName = getMLBTeamName_(opponent);
+
+  const teamKey = normalizeMLBTeamName_(teamName);
+  const opponentKey = normalizeMLBTeamName_(opponentName);
+
+  const stat = statMap[`${gameId}_${teamKey}`] || {};
+  const opp = statMap[`${gameId}_${opponentKey}`] || {};
+
+  rows.push([
+    getMLBGameAZDate_(game),
+    gameId,
+    teamName,
+    opponentName,
+    Number(stat.runs || 0),
+    Number(opp.runs || 0),
+    Number(stat.hits || 0),
+    Number(stat.homeRuns || 0),
+    Number(stat.totalBases || 0),
+    Number(stat.strikeouts || 0)
+  ]);
+}
+
+// ----------------------------------------------------------------------------
+// TEAM SEASON STATS
+// ----------------------------------------------------------------------------
+
+function refreshMLBTeamSeasonStatsSheet() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("MLB Team Game Logs");
+  const sheet = ss.getSheetByName("MLB Team Season Stats");
+
+  const headers = [
+    "Team",
+    "Games Played",
+    "Avg Runs For",
+    "Avg Runs Allowed",
+    "Avg Hits",
+    "Avg Home Runs",
+    "Avg Total Bases",
+    "Avg Strikeouts",
+    "Last Updated"
+  ];
+
+  const logs = getMLBObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const team = row["Team"];
+    if (!team) return;
+
+    if (!grouped[team]) grouped[team] = [];
+
+    grouped[team].push({
+      runsFor: Number(row["Runs For"] || 0),
+      runsAllowed: Number(row["Runs Allowed"] || 0),
+      hits: Number(row["Hits"] || 0),
+      homeRuns: Number(row["Home Runs"] || 0),
+      totalBases: Number(row["Total Bases"] || 0),
+      strikeouts: Number(row["Strikeouts"] || 0)
+    });
+  });
+
+  const now = new Date();
+
+  const rows = Object.keys(grouped).map(team => {
+    const games = grouped[team];
+
+    return [
+      team,
+      games.length,
+      avgMLB_(games.map(g => g.runsFor)),
+      avgMLB_(games.map(g => g.runsAllowed)),
+      avgMLB_(games.map(g => g.hits)),
+      avgMLB_(games.map(g => g.homeRuns)),
+      avgMLB_(games.map(g => g.totalBases)),
+      avgMLB_(games.map(g => g.strikeouts)),
+      now
+    ];
   });
 
   rows.sort((a, b) => String(a[0] || "").localeCompare(String(b[0] || "")));
 
-  clearMLBTeamTrendsSheet_(sheet);
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  writeMLBOutputSheet_(sheet, headers, rows);
 
-  if (rows.length > 0) {
-    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-  }
-
-  Logger.log(`Wrote ${rows.length} MLB team trend rows to "${sheetName}"`);
+  Logger.log(`Wrote ${rows.length} rows to MLB Team Season Stats.`);
 }
 
-function clearMLBTrendsSheet_(sheet) {
-  const maxRows = sheet.getMaxRows();
-  const maxCols = 22; // A:V
+// ----------------------------------------------------------------------------
+// TEAM TRENDS
+// ----------------------------------------------------------------------------
 
-  if (maxRows > 0) {
-    sheet.getRange(1, 1, maxRows, maxCols).clearContent();
+function refreshMLBTeamTrendsOutputSheet() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("MLB Team Game Logs");
+  const sheet = ss.getSheetByName("MLB Team Trends");
+
+  const headers = [
+    "Team",
+    "Metric",
+    "Season Avg",
+    "Last 3 Avg",
+    "Last 5 Avg",
+    "Last 10 Avg",
+    "Trend Direction",
+    "Trend Score",
+    "Consistency",
+    "Risk Tier",
+    "Hit Rate Last 3",
+    "Hit Rate Last 5",
+    "Hit Rate Last 10",
+    "Above Season %",
+    "Trend Strength",
+    "Trend Note",
+    "Last Updated"
+  ];
+
+  const logs = getMLBObjectsFromSheet_(logSheet);
+  const grouped = {};
+
+  logs.forEach(row => {
+    const team = row["Team"];
+    if (!team) return;
+
+    if (!grouped[team]) grouped[team] = [];
+
+    grouped[team].push({
+      date: row["Game Date"],
+      runsFor: Number(row["Runs For"] || 0),
+      runsAllowed: Number(row["Runs Allowed"] || 0),
+      hits: Number(row["Hits"] || 0),
+      homeRuns: Number(row["Home Runs"] || 0),
+      totalBases: Number(row["Total Bases"] || 0),
+      strikeouts: Number(row["Strikeouts"] || 0)
+    });
+  });
+
+  const now = new Date();
+  const rows = [];
+
+  Object.keys(grouped).forEach(team => {
+    const games = grouped[team].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    MLB_TEAM_TREND_STATS.forEach(metric => {
+      const values = games.map(g => Number(g[metric.key] || 0));
+
+      const seasonAvg = avgMLB_(values);
+      const last3 = avgMLB_(values.slice(0, 3));
+      const last5 = avgMLB_(values.slice(0, 5));
+      const last10 = avgMLB_(values.slice(0, 10));
+      const consistency = consistencyScoreMLB_(values);
+      const score = trendScoreMLB_(last5, seasonAvg);
+
+      const hitRateLast3 = hitRateMLB_(values.slice(0, 3), 1);
+      const hitRateLast5 = hitRateMLB_(values.slice(0, 5), 1);
+      const hitRateLast10 = hitRateMLB_(values.slice(0, 10), 1);
+      const aboveSeasonPct = aboveSeasonPctMLB_(last5, seasonAvg);
+      const strength = trendStrengthMLB_(hitRateLast5, aboveSeasonPct, score);
+
+      const note = buildMLBTeamTrendNote_(
+        team,
+        metric.label,
+        seasonAvg,
+        last5,
+        hitRateLast5,
+        score
+      );
+
+      rows.push([
+        team,
+        metric.label,
+        seasonAvg,
+        last3,
+        last5,
+        last10,
+        trendDirectionMLB_(score),
+        score,
+        consistency,
+        riskTierMLB_(consistency, Math.abs(score)),
+        hitRateLast3,
+        hitRateLast5,
+        hitRateLast10,
+        aboveSeasonPct,
+        strength,
+        note,
+        now
+      ]);
+    });
+  });
+
+  rows.sort((a, b) =>
+    String(a[0] || "").localeCompare(String(b[0] || "")) ||
+    String(a[1] || "").localeCompare(String(b[1] || ""))
+  );
+
+  writeMLBOutputSheet_(sheet, headers, rows);
+
+  sheet.getRange("K:M").setNumberFormat("0%");
+  sheet.getRange("N:N").setNumberFormat("0.0");
+
+  Logger.log(`Wrote ${rows.length} rows to MLB Team Trends with hit-rate metrics.`);
+}
+
+function buildMLBTeamTrendNote_(teamName, metricLabel, seasonAvg, last5, hitRateLast5, trendScore) {
+  const team = `The ${teamName || "team"}`;
+  const metric = metricLabel || "this metric";
+
+  const last5Text = Number(last5).toFixed(2);
+  const seasonText = Number(seasonAvg).toFixed(2);
+  const hitRateText = formatPercentMLB_(hitRateLast5);
+  const trendText = formatSignedPercentMLB_(trendScore);
+
+  if (trendScore >= 15) {
+    return `${team} are trending up in ${metric}, averaging ${last5Text} over the last 5 games compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
   }
+
+  if (trendScore <= -15) {
+    return `${team} are trending down in ${metric}, averaging ${last5Text} over the last 5 games compared to ${seasonText} on the season (${trendText}), with a 1+ hit rate of ${hitRateText}.`;
+  }
+
+  return `${team} are holding steady in ${metric}, averaging ${last5Text} over the last 5 games compared to ${seasonText} on the season, with a 1+ hit rate of ${hitRateText}.`;
+}
+
+function trendStrengthMLB_(hitRate, aboveSeasonPct, trendScore) {
+  const hr = Number(hitRate);
+  const above = Number(aboveSeasonPct);
+  const score = Number(trendScore);
+
+  if (Number.isNaN(hr) || Number.isNaN(above) || Number.isNaN(score)) {
+    return "Unknown";
+  }
+
+  if (hr >= 0.80 && above >= 20 && score >= 15) {
+    return "Elite Trend";
+  }
+
+  if (hr >= 0.70 && above >= 10 && score >= 7.5) {
+    return "Strong Trend";
+  }
+
+  if (hr >= 0.60 && score >= 0) {
+    return "Moderate Trend";
+  }
+
+  if (score < -10 || above < -10) {
+    return "Cold Trend";
+  }
+
+  return "Weak Trend";
+}
+
+function strengthRank_(strength) {
+  const value = String(strength || "").toLowerCase();
+  if (value.includes("elite")) return 100;
+  if (value.includes("strong")) return 80;
+  if (value.includes("moderate")) return 60;
+  if (value.includes("weak")) return 35;
+  if (value.includes("cold")) return 15;
+  return 0;
+}
+
+function clampScore_(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function calculateTrendConfidence_(row) {
+  const strengthScore = strengthRank_(row["Trend Strength"]);
+  const hitRate = Number(row["Hit Rate Last 5"] || 0) * 100;
+  const trendScore = clampScore_(Number(row["Trend Score"] || 0), -50, 50);
+  const consistency = clampScore_(Number(row["Consistency"] || 0), 0, 100);
+  const aboveSeason = clampScore_(Number(row["Above Season %"] || 0), -50, 50);
+  const last5 = Number(row["Last 5 Avg"] || 0);
+  const seasonAvg = Number(row["Season Avg"] || 0);
+
+  const recentForm = seasonAvg > 0
+    ? clampScore_((last5 / seasonAvg) * 50, 0, 100)
+    : 0;
+
+  return Math.round(clampScore_(
+    strengthScore * 0.35 +
+    hitRate * 0.25 +
+    (trendScore + 50) * 0.15 +
+    consistency * 0.10 +
+    (aboveSeason + 50) * 0.10 +
+    recentForm * 0.05,
+    0,
+    100
+  ));
+}
+
+function refreshMLBTopPlayerTrendsSheet() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sourceSheet = ss.getSheetByName("MLB Player Trends");
+  let sheet = ss.getSheetByName("MLB Top Player Trends");
+  if (!sheet) sheet = ss.insertSheet("MLB Top Player Trends");
+
+  const rows = getMLBObjectsFromSheet_(sourceSheet);
+
+  const headers = [
+    "Rank", "Player ID", "Player Name", "Team", "Stat Type",
+    "Confidence Score", "Trend Strength", "Hit Rate Last 5",
+    "Above Season %", "Trend Score", "Last 5 Avg", "Season Avg",
+    "Risk Tier", "Trend Note", "Last Updated"
+  ];
+
+  const ranked = rows
+    .filter(row => row["Player Name"])
+    .map(row => ({ row, confidence: calculateTrendConfidence_(row) }))
+    .filter(item => Number(item.row["Hit Rate Last 5"] || 0) >= 0.5)
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 25);
+
+  const now = new Date();
+
+  const outputRows = ranked.map((item, index) => {
+    const row = item.row;
+    return [
+      index + 1,
+      row["Player ID"] || "",
+      row["Player Name"] || "",
+      row["Team"] || "",
+      row["Stat Type"] || "",
+      item.confidence,
+      row["Trend Strength"] || "",
+      row["Hit Rate Last 5"] || 0,
+      row["Above Season %"] || 0,
+      row["Trend Score"] || 0,
+      row["Last 5 Avg"] || 0,
+      row["Season Avg"] || 0,
+      row["Risk Tier"] || "",
+      row["Trend Note"] || "",
+      now
+    ];
+  });
+
+  writeMLBOutputSheet_(sheet, headers, outputRows);
+  sheet.getRange("H:H").setNumberFormat("0%");
+  sheet.getRange("I:L").setNumberFormat("0.0");
+}
+
+function refreshMLBTopTeamTrendsSheet() {
+  ensureMLBTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sourceSheet = ss.getSheetByName("MLB Team Trends");
+  let sheet = ss.getSheetByName("MLB Top Team Trends");
+  if (!sheet) sheet = ss.insertSheet("MLB Top Team Trends");
+
+  const rows = getMLBObjectsFromSheet_(sourceSheet);
+
+  const headers = [
+    "Rank", "Team", "Metric", "Confidence Score", "Trend Strength",
+    "Hit Rate Last 5", "Above Season %", "Trend Score",
+    "Last 5 Avg", "Season Avg", "Risk Tier", "Trend Note", "Last Updated"
+  ];
+
+  const ranked = rows
+    .filter(row => row["Team"])
+    .map(row => ({ row, confidence: calculateTrendConfidence_(row) }))
+    .filter(item => Number(item.row["Hit Rate Last 5"] || 0) >= 0.5)
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 25);
+
+  const now = new Date();
+
+  const outputRows = ranked.map((item, index) => {
+    const row = item.row;
+    return [
+      index + 1,
+      row["Team"] || "",
+      row["Metric"] || "",
+      item.confidence,
+      row["Trend Strength"] || "",
+      row["Hit Rate Last 5"] || 0,
+      row["Above Season %"] || 0,
+      row["Trend Score"] || 0,
+      row["Last 5 Avg"] || 0,
+      row["Season Avg"] || 0,
+      row["Risk Tier"] || "",
+      row["Trend Note"] || "",
+      now
+    ];
+  });
+
+  writeMLBOutputSheet_(sheet, headers, outputRows);
+  sheet.getRange("F:F").setNumberFormat("0%");
+  sheet.getRange("G:J").setNumberFormat("0.0");
+}
+
+// ----------------------------------------------------------------------------
+// BACKWARD-COMPATIBLE WRAPPERS
+// ----------------------------------------------------------------------------
+
+function refreshMLBBaselinesSheet() {
+  refreshMLBPlayerSeasonStatsSheet();
 }
 
 function refreshMLBTrendsSheet() {
-  const sheetName = "MLB Trends";
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(sheetName);
+  refreshMLBPlayerTrendsSheet();
+}
 
-  if (!sheet) {
-    throw new Error(`Sheet "${sheetName}" not found.`);
-  }
+function refreshMLBTeamTrendsSheet() {
+  refreshMLBTeamTrendsOutputSheet();
+}
 
-  Logger.log("Refreshing MLB Trends from recent MLB stats...");
+// ----------------------------------------------------------------------------
+// IMPROVED TEAM STAT MAP
+// ----------------------------------------------------------------------------
 
-  const headers = [
-    "Player Id",
-    "Player Name",
-    "doubles_last5",
-    "first_home_run_last5",
-    "hits_last5",
-    "hits_runs_rbis_last5",
-    "home_runs_last5",
-    "pitcher_earned_runs_last5",
-    "pitcher_hits_allowed_last5",
-    "pitcher_strikeouts_last5",
-    "pitcher_outs_last5",
-    "pitcher_record_a_win_last5",
-    "pitcher_walks_last5",
-    "rbis_last5",
-    "runs_scored_last5",
-    "singles_last5",
-    "stolen_bases_last5",
-    "strikeouts_last5",
-    "total_bases_last5",
-    "triples_last5",
-    "walks_last5",
-    "games_used_last5"
-  ];
+function buildMLBTeamGameStatsMap_(statRows) {
+  const map = {};
 
-  const season = getCurrentMLBSeason_();
-  const playerIds = getMLBPlayerIdsFromPlayerProps_();
-  const playerLookup = getMLBPlayerLookupMap_();
+  statRows.forEach(row => {
+    const gameId = String(
+      row.game_id ||
+      (row.game && row.game.id) ||
+      ""
+    ).trim();
 
-  const rows = [];
+    const rawTeamName =
+      row.team_name ||
+      (row.team && getMLBTeamName_(row.team)) ||
+      "";
 
-  playerIds.forEach((playerId, index) => {
-    Logger.log(`Fetching MLB recent stats for player ${index + 1}/${playerIds.length} (ID: ${playerId})`);
+    const teamName = normalizeMLBTeamName_(rawTeamName);
 
-    let stats = [];
+    if (!gameId || !teamName) return;
 
-    try {
-      stats = fetchRecentMLBStatsForPlayer_(playerId, season);
-    } catch (err) {
-      const message = String(err && err.message ? err.message : err);
+    const key = `${gameId}_${teamName}`;
 
-      if (message.includes('"season"') && message.includes('invalid value')) {
-        stats = fetchRecentMLBStatsForPlayer_(playerId, Number(season) - 1);
-      } else {
-        throw err;
-      }
+    if (!map[key]) {
+      map[key] = {
+        runs: 0,
+        hits: 0,
+        homeRuns: 0,
+        totalBases: 0,
+        strikeouts: 0,
+        rowCount: 0
+      };
     }
 
-    const sorted = stats
-      .slice()
-      .sort((a, b) => {
-        const aDate = new Date(
-          (a.game && (a.game.date || a.game.game_date)) || a.date || 0
-        ).getTime();
-        const bDate = new Date(
-          (b.game && (b.game.date || b.game.game_date)) || b.date || 0
-        ).getTime();
-        return bDate - aDate;
-      })
-      .slice(0, 5);
+    const hits = getMLBGameStatFlexible_(row, ["hits", "h", "batting_h"]);
+    const runs = getMLBGameStatFlexible_(row, ["runs", "runs_scored", "batting_r"]);
+    const homeRuns = getMLBGameStatFlexible_(row, ["home_runs", "hr", "batting_hr"]);
+    const totalBases = getMLBGameStatFlexible_(row, ["total_bases", "tb", "batting_tb"]);
+    const strikeouts = getMLBGameStatFlexible_(row, ["strikeouts", "k", "batting_so"]);
 
-    const used = sorted.length;
-    if (!used) {
-      Utilities.sleep(100);
-      return;
-    }
-
-    const avg = (keys) =>
-      sorted.reduce((sum, row) => sum + getMLBGameStatFlexible_(row, keys), 0) / used;
-
-    const playerInfo = playerLookup[String(playerId)] || {};
-
-    const doublesLast5 = avg(["doubles", "2b", "batting_2b"]);
-    const hitsLast5 = avg(["hits", "h", "batting_h"]);
-    const homeRunsLast5 = avg(["home_runs", "hr", "batting_hr"]);
-    const earnedRunsLast5 = avg(["earned_runs", "er", "pitching_er"]);
-    const hitsAllowedLast5 = avg(["hits_allowed", "pitching_h"]);
-    const pitcherKsLast5 = avg(["strikeouts_pitched", "pitcher_strikeouts", "pitching_so"]);
-    const outsLast5 = avg(["outs_recorded", "pitcher_outs", "pitching_outs"]);
-    const pitcherWalksLast5 = avg(["walks_allowed", "pitcher_walks", "pitching_bb"]);
-    const rbisLast5 = avg(["rbis", "rbi", "batting_rbi"]);
-    const runsLast5 = avg(["runs", "runs_scored", "batting_r"]);
-    const singlesLast5 = Math.max(0, hitsLast5 - doublesLast5 - avg(["triples", "3b", "batting_3b"]) - homeRunsLast5);
-    const stolenBasesLast5 = avg(["stolen_bases", "sb", "batting_sb"]);
-    const batterKsLast5 = avg(["strikeouts", "batting_so"]);
-    const totalBasesLast5 = avg(["total_bases", "tb", "batting_tb"]);
-    const triplesLast5 = avg(["triples", "3b", "batting_3b"]);
-    const walksLast5 = avg(["walks", "bb", "batting_bb"]);
-    const hrrLast5 = hitsLast5 + runsLast5 + rbisLast5;
-
-    rows.push([
-      playerId,                    // A
-      playerInfo.playerName || "", // B
-      doublesLast5,                // C
-      homeRunsLast5,               // D first_home_run_last5 (proxy)
-      hitsLast5,                   // E
-      hrrLast5,                    // F
-      homeRunsLast5,               // G
-      earnedRunsLast5,             // H
-      hitsAllowedLast5,            // I
-      pitcherKsLast5,              // J
-      outsLast5,                   // K
-      0.50,                        // L pitcher_record_a_win_last5 (proxy)
-      pitcherWalksLast5,           // M
-      rbisLast5,                   // N
-      runsLast5,                   // O
-      singlesLast5,                // P
-      stolenBasesLast5,            // Q
-      batterKsLast5,               // R
-      totalBasesLast5,             // S
-      triplesLast5,                // T
-      walksLast5,                  // U
-      used                         // V
-    ]);
-
-    Utilities.sleep(100);
+    map[key].runs += runs;
+    map[key].hits += hits;
+    map[key].homeRuns += homeRuns;
+    map[key].totalBases += totalBases;
+    map[key].strikeouts += strikeouts;
+    map[key].rowCount += 1;
   });
 
-  rows.sort((a, b) => {
-    const nameA = (a[1] || "").toLowerCase();
-    const nameB = (b[1] || "").toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
+  return map;
+}
 
-  clearMLBTrendsSheet_(sheet);
+// ----------------------------------------------------------------------------
+// SHARED MLB TREND HELPERS
+// ----------------------------------------------------------------------------
+
+function writeMLBOutputSheet_(sheet, headers, rows) {
+  sheet.clearContents();
 
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
 
@@ -2020,7 +2833,101 @@ function refreshMLBTrendsSheet() {
     sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
   }
 
-  Logger.log(`Wrote ${rows.length} MLB trend rows to "${sheetName}"`);
+  sheet.autoResizeColumns(1, headers.length);
+}
+
+function getMLBObjectsFromSheet_(sheet) {
+  const values = sheet.getDataRange().getValues();
+
+  if (values.length < 2) return [];
+
+  const headers = values[0];
+
+  return values.slice(1).map(row => {
+    const obj = {};
+
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+
+    return obj;
+  });
+}
+
+function avgMLB_(values) {
+  const nums = values
+    .map(Number)
+    .filter(value => !Number.isNaN(value));
+
+  if (!nums.length) return 0;
+
+  return nums.reduce((sum, value) => sum + value, 0) / nums.length;
+}
+
+function stdDevMLB_(values) {
+  const nums = values
+    .map(Number)
+    .filter(value => !Number.isNaN(value));
+
+  if (nums.length < 2) return 0;
+
+  const mean = avgMLB_(nums);
+  const variance = avgMLB_(nums.map(value => Math.pow(value - mean, 2)));
+
+  return Math.sqrt(variance);
+}
+
+function consistencyScoreMLB_(values) {
+  const mean = avgMLB_(values);
+
+  if (!mean) return 0;
+
+  const cv = stdDevMLB_(values) / mean;
+
+  return Math.max(0, Math.min(100, 100 - cv * 100));
+}
+
+function trendScoreMLB_(recentAvg, seasonAvg) {
+  if (!seasonAvg) return 0;
+
+  return ((recentAvg - seasonAvg) / seasonAvg) * 100;
+}
+
+function trendDirectionMLB_(score) {
+  if (score >= 7.5) return "Up";
+  if (score <= -7.5) return "Down";
+
+  return "Flat";
+}
+
+function riskTierMLB_(consistency, absTrendScore) {
+  if (consistency >= 75 && absTrendScore <= 20) return "Low";
+  if (consistency >= 55) return "Medium";
+
+  return "High";
+}
+
+function getMLBOpponentFromStat_(stat) {
+  const game = stat.game || {};
+  const team = stat.team || {};
+
+  const teamId = String(team.id || "");
+  const homeTeamId = String((game.home_team && game.home_team.id) || "");
+  const awayTeamId = String(
+    (game.away_team && game.away_team.id) ||
+    (game.visitor_team && game.visitor_team.id) ||
+    ""
+  );
+
+  if (teamId && teamId === homeTeamId) {
+    return getMLBTeamName_(game.away_team || game.visitor_team || {});
+  }
+
+  if (teamId && teamId === awayTeamId) {
+    return getMLBTeamName_(game.home_team || {});
+  }
+
+  return "";
 }
 
 function refreshMLBPlayerPropsSheet() {
@@ -2149,13 +3056,32 @@ function refreshMLBPlayerPropsSheet() {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("Sports Data")
-    .addItem("Refresh MLB Player Props", "refreshMLBPlayerPropsSheet")
-    .addItem("Refresh MLB Rosters", "refreshMLBRostersSheet")
-    .addItem("Refresh MLB Schedule", "refreshMLBScheduleSheet")
-    .addItem("Refresh MLB Game Odds", "refreshMLBGameOddsSheet")
-    .addItem("Refresh MLB Baselines", "refreshMLBBaselinesSheet")
-    .addItem("Refresh MLB Trends", "refreshMLBTrendsSheet")
-    .addItem("Refresh MLB Team Trends", "refreshMLBTeamTrendsSheet")
+    .addItem("Refresh MLB Daily Odds + Props", "refreshMLBDailyOddsAndProps")
+    .addSeparator()
+    .addItem("Refresh MLB Player Trend Pipeline", "refreshMLBPlayerTrendPipeline")
+    .addItem("Refresh MLB Team Trend Pipeline", "refreshMLBTeamTrendPipeline")
+    .addItem("Refresh MLB Top Player Trend Pipeline", "refreshMLBTopPlayerTrendPipeline")
+    .addItem("Refresh MLB Top Team Trend Pipeline", "refreshMLBTopTeamTrendPipeline")
+    .addSeparator()
+    .addItem("Refresh MLB Player Logs March", "refreshMLBPlayerGameLogsMarch")
+    .addItem("Refresh MLB Player Logs April", "refreshMLBPlayerGameLogsApril")
+    .addItem("Refresh MLB Player Logs May", "refreshMLBPlayerGameLogsMay")
+    .addItem("Refresh MLB Player Logs June", "refreshMLBPlayerGameLogsJune")
+    .addItem("Refresh MLB Player Logs July", "refreshMLBPlayerGameLogsJuly")
+    .addItem("Refresh MLB Player Logs August", "refreshMLBPlayerGameLogsAugust")
+    .addItem("Refresh MLB Player Logs September", "refreshMLBPlayerGameLogsSeptember")
+    .addItem("Refresh MLB Player Logs October", "refreshMLBPlayerGameLogsOctober")
+    .addItem("Refresh MLB Player Logs November", "refreshMLBPlayerGameLogsNovember")
+    .addSeparator()
+    .addItem("Refresh MLB Team Logs March", "refreshMLBTeamGameLogsMarch")
+    .addItem("Refresh MLB Team Logs April", "refreshMLBTeamGameLogsApril")
+    .addItem("Refresh MLB Team Logs May", "refreshMLBTeamGameLogsMay")
+    .addItem("Refresh MLB Team Logs June", "refreshMLBTeamGameLogsJune")
+    .addItem("Refresh MLB Team Logs July", "refreshMLBTeamGameLogsJuly")
+    .addItem("Refresh MLB Team Logs August", "refreshMLBTeamGameLogsAugust")
+    .addItem("Refresh MLB Team Logs September", "refreshMLBTeamGameLogsSeptember")
+    .addItem("Refresh MLB Team Logs October", "refreshMLBTeamGameLogsOctober")
+    .addItem("Refresh MLB Team Logs November", "refreshMLBTeamGameLogsNovember")
     .addToUi();
 }
 
