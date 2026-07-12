@@ -932,26 +932,88 @@ async function fetchLeagueProps(csvUrl) {
   const headers = {};
 
   if (csvUrl.includes("/.netlify/functions/")) {
-    const { data, error } = await supabaseClient.auth.getSession();
+  /*
+   * Refresh the stored Supabase session before making a protected
+   * Player Props request. This prevents an expired or stale token
+   * from producing a false "Please Login" state.
+   */
+  let session = null;
 
-    if (error) {
-      const sessionError = new Error("Unable to get session for protected props request.");
-      sessionError.status = 401;
-      throw sessionError;
+  const {
+    data: refreshedData,
+    error: refreshError
+  } = await supabaseClient.auth.refreshSession();
+
+  if (!refreshError && refreshedData?.session) {
+    session = refreshedData.session;
+  } else {
+    /*
+     * Fall back to the currently stored session if Supabase determines
+     * that a refresh is not necessary or cannot be completed.
+     */
+    const {
+      data: sessionData,
+      error: sessionError
+    } = await supabaseClient.auth.getSession();
+
+    if (sessionError) {
+      const authError = new Error(
+        "Unable to verify your login session."
+      );
+
+      authError.status = 401;
+      throw authError;
     }
 
-    const accessToken = data.session?.access_token;
-
-    if (!accessToken) {
-      const tokenError = new Error("No access token available for protected props request.");
-      tokenError.status = 401;
-      throw tokenError;
-    }
-
-    headers.Authorization = `Bearer ${accessToken}`;
+    session = sessionData?.session || null;
   }
 
-  const response = await fetch(csvUrl, { headers });
+  const accessToken =
+    session?.access_token || "";
+
+  if (!accessToken) {
+    const tokenError = new Error(
+      "No valid access token is available. Please log in again."
+    );
+
+    tokenError.status = 401;
+    throw tokenError;
+  }
+
+  CURRENT_USER =
+    session.user || CURRENT_USER;
+
+  headers.Authorization =
+    `Bearer ${accessToken}`;
+}
+
+  let response =
+  await fetch(csvUrl, { headers });
+
+/*
+ * If the server rejects an existing token, refresh it once and retry.
+ * This is especially useful after Supabase resumes from a paused state.
+ */
+if (
+  response.status === 401 &&
+  csvUrl.includes("/.netlify/functions/")
+) {
+  const {
+    data: retryData,
+    error: retryError
+  } = await supabaseClient.auth.refreshSession();
+
+  const retryToken =
+    retryData?.session?.access_token || "";
+
+  if (!retryError && retryToken) {
+    headers.Authorization =
+      `Bearer ${retryToken}`;
+
+    response =
+      await fetch(csvUrl, { headers });
+  }
+}
 
   if (!response.ok) {
     let payload = null;
