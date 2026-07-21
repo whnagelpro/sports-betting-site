@@ -2264,42 +2264,333 @@ function refreshMLBTeamGameLogsForDateRange_(startDate, endDate) {
   Logger.log(`Upserted ${rows.length} MLB team game-log rows for ${startDate} to ${endDate}.`);
 }
 
-function getMLBCompletedGamesForDateRange_(startDate, endDate) {
-  const selectedGamesMap = {};
+function isMLBTrendEligibleGame_(game) {
+  if (!game) return false;
 
-  const fetchStartDate = addDaysToDateString_(startDate, -1);
-  const fetchEndDate = addDaysToDateString_(endDate, 1);
+  const homeTeam = getMLBTeamName_(game.home_team || {});
+  const awayTeam = getMLBTeamName_(
+    game.away_team ||
+    game.visitor_team ||
+    {}
+  );
 
-  let current = new Date(fetchStartDate + "T00:00:00");
-  const end = new Date(fetchEndDate + "T00:00:00");
+  const searchableText = [
+    homeTeam,
+    awayTeam,
+    game.name,
+    game.title,
+    game.description,
+    game.game_type,
+    game.type,
+    game.season_type,
+    game.status
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 
-  while (current <= end) {
-    const apiDateString = Utilities.formatDate(
-      current,
+  const excludedTerms = [
+    "all-star",
+    "all star",
+    "all-stars",
+    "all stars",
+    "american league",
+    "national league",
+    "exhibition",
+    "spring training"
+  ];
+
+  const isExcluded = excludedTerms.some(term =>
+    searchableText.includes(term)
+  );
+
+  if (isExcluded) {
+    Logger.log(
+      `Excluded non-trend MLB game ${game.id || ""}: ` +
+      `${awayTeam} at ${homeTeam}`
+    );
+
+    return false;
+  }
+
+  return true;
+}
+
+function removeMLB2026AllStarGameFromLogs() {
+  const excludedDate = "2026-07-14";
+  const excludedGameId = "8712499";
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheetNames = [
+    "MLB Player Game Logs",
+    "MLB Team Game Logs"
+  ];
+
+  sheetNames.forEach(sheetName => {
+    const sheet = ss.getSheetByName(sheetName);
+
+    if (!sheet || sheet.getLastRow() < 2) {
+      Logger.log(
+        `${sheetName} does not exist or contains no data rows.`
+      );
+      return;
+    }
+
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(header =>
+      String(header || "").trim()
+    );
+
+    const gameDateIndex = headers.indexOf("Game Date");
+    const gameIdIndex = headers.indexOf("Game ID");
+
+    if (gameDateIndex === -1 || gameIdIndex === -1) {
+      Logger.log(
+        `${sheetName} is missing the Game Date or Game ID column.`
+      );
+      return;
+    }
+
+    const remainingRows = values
+      .slice(1)
+      .filter(row => {
+        const rowDate =
+          normalizeMLBLogDateForCleanup_(
+            row[gameDateIndex]
+          );
+
+        const rowGameId =
+          String(row[gameIdIndex] || "").trim();
+
+        const matchesAllStarDate =
+          rowDate === excludedDate;
+
+        const matchesAllStarGameId =
+          rowGameId === excludedGameId;
+
+        /*
+         * Remove a row if either:
+         * 1. It belongs to the known All-Star Game ID, or
+         * 2. It is dated July 14, 2026.
+         */
+        return !(
+          matchesAllStarGameId ||
+          matchesAllStarDate
+        );
+      });
+
+    const removedCount =
+      values.length - 1 - remainingRows.length;
+
+    sheet.clearContents();
+
+    sheet
+      .getRange(
+        1,
+        1,
+        1,
+        headers.length
+      )
+      .setValues([headers]);
+
+    if (remainingRows.length > 0) {
+      sheet
+        .getRange(
+          2,
+          1,
+          remainingRows.length,
+          headers.length
+        )
+        .setValues(remainingRows);
+    }
+
+    sheet.setFrozenRows(1);
+
+    Logger.log(
+      `Removed ${removedCount} rows from ${sheetName} ` +
+      `for date ${excludedDate} or Game ID ${excludedGameId}.`
+    );
+  });
+}
+
+function normalizeMLBLogDateForCleanup_(value) {
+  if (!value) return "";
+
+  if (
+    Object.prototype.toString.call(value) ===
+    "[object Date]"
+  ) {
+    return Utilities.formatDate(
+      value,
       SPORTACULAR_TIMEZONE,
       "yyyy-MM-dd"
     );
+  }
 
-    Logger.log(`Checking MLB API games for ${apiDateString}`);
+  const raw = String(value).trim();
 
-    const games = fetchAllMLBGamesForDate_(apiDateString)
-      .filter(isCompletedMLBGame_)
-      .filter(game => {
-        const azDate = getMLBGameAZDate_(game);
-        return azDate >= startDate && azDate <= endDate;
-      });
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return raw;
+  }
+
+  const mmddyyyyMatch = raw.match(
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+  );
+
+  if (mmddyyyyMatch) {
+    const month =
+      mmddyyyyMatch[1].padStart(2, "0");
+
+    const day =
+      mmddyyyyMatch[2].padStart(2, "0");
+
+    const year =
+      mmddyyyyMatch[3];
+
+    return `${year}-${month}-${day}`;
+  }
+
+  const parsed = new Date(raw);
+
+  if (!isNaN(parsed.getTime())) {
+    return Utilities.formatDate(
+      parsed,
+      SPORTACULAR_TIMEZONE,
+      "yyyy-MM-dd"
+    );
+  }
+
+  return raw;
+}
+
+function removeMLBLogRowsByGameIds_(
+  sheet,
+  excludedGameIds
+) {
+  if (
+    !sheet ||
+    sheet.getLastRow() < 2
+  ) {
+    return;
+  }
+
+  const values =
+    sheet
+      .getDataRange()
+      .getValues();
+
+  const headers = values[0];
+  const gameIdIndex =
+    headers.indexOf("Game ID");
+
+  if (gameIdIndex === -1) {
+    Logger.log(
+      `${sheet.getName()} does not contain a Game ID column.`
+    );
+
+    return;
+  }
+
+  const remainingRows =
+    values
+      .slice(1)
+      .filter(row =>
+        !excludedGameIds.has(
+          String(row[gameIdIndex] || "")
+        )
+      );
+
+  sheet.clearContents();
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([headers]);
+
+  if (remainingRows.length) {
+    sheet
+      .getRange(
+        2,
+        1,
+        remainingRows.length,
+        headers.length
+      )
+      .setValues(remainingRows);
+  }
+
+  sheet.setFrozenRows(1);
+
+  Logger.log(
+    `Removed ${
+      values.length - 1 - remainingRows.length
+    } rows from ${sheet.getName()}.`
+  );
+}
+
+function getMLBCompletedGamesForDateRange_(startDate, endDate) {
+  const selectedGamesMap = {};
+
+  const fetchStartDate =
+    addDaysToDateString_(startDate, -1);
+
+  const fetchEndDate =
+    addDaysToDateString_(endDate, 1);
+
+  let current =
+    new Date(fetchStartDate + "T00:00:00");
+
+  const end =
+    new Date(fetchEndDate + "T00:00:00");
+
+  while (current <= end) {
+    const apiDateString =
+      Utilities.formatDate(
+        current,
+        SPORTACULAR_TIMEZONE,
+        "yyyy-MM-dd"
+      );
+
+    Logger.log(
+      `Checking MLB API games for ${apiDateString}`
+    );
+
+    const games =
+      fetchAllMLBGamesForDate_(apiDateString)
+        .filter(isCompletedMLBGame_)
+        .filter(isMLBTrendEligibleGame_)
+        .filter(game => {
+          const azDate =
+            getMLBGameAZDate_(game);
+
+          return (
+            azDate >= startDate &&
+            azDate <= endDate
+          );
+        });
 
     games.forEach(game => {
       if (game.id) {
-        selectedGamesMap[String(game.id)] = game;
+        selectedGamesMap[
+          String(game.id)
+        ] = game;
       }
     });
 
-    current.setDate(current.getDate() + 1);
+    current.setDate(
+      current.getDate() + 1
+    );
+
     Utilities.sleep(100);
   }
 
-  return Object.values(selectedGamesMap);
+  return Object.values(
+    selectedGamesMap
+  );
 }
 
 function upsertRowsByKey_(sheet, headers, newRows, keyColumnIndexes) {
@@ -2754,10 +3045,6 @@ function refreshMLBTopTeamTrendsSheet() {
 // ----------------------------------------------------------------------------
 // BACKWARD-COMPATIBLE WRAPPERS
 // ----------------------------------------------------------------------------
-
-function refreshMLBBaselinesSheet() {
-  refreshMLBPlayerSeasonStatsSheet();
-}
 
 function refreshMLBTrendsSheet() {
   refreshMLBPlayerTrendsSheet();

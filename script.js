@@ -1502,116 +1502,349 @@ function getRiskClass(riskTier) {
 
 async function renderHomeSpotlights() {
   try {
-    const [nbaGames, nhlGames, mlbGames, nbaProps, nhlProps, mlbProps] = await Promise.all([
+    const [
+      nbaGames,
+      nhlGames,
+      mlbGames,
+      nflGames,
+      nbaProps,
+      nhlProps,
+      mlbProps,
+      nflProps
+    ] = await Promise.all([
       fetchLeagueGames(NBA_CSV_URL).catch(() => []),
       fetchLeagueGames(NHL_CSV_URL).catch(() => []),
       fetchLeagueGames(MLB_CSV_URL).catch(() => []),
+      fetchLeagueGames(NFL_CSV_URL).catch(() => []),
+
       fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
       fetchTeaserPropsJson(NHL_PROPS_TEASER_URL).catch(() => []),
-      fetchTeaserPropsJson(MLB_PROPS_TEASER_URL).catch(() => [])
+      fetchTeaserPropsJson(MLB_PROPS_TEASER_URL).catch(() => []),
+      fetchTeaserPropsJson(NFL_PROPS_TEASER_URL).catch(() => [])
     ]);
 
     const topNBAGame = [...nbaGames].sort((a, b) => {
-      const aTopEV = Math.max(...a.rankings.map((item) => item.ev));
-      const bTopEV = Math.max(...b.rankings.map((item) => item.ev));
+      const aTopEV = Math.max(
+        ...a.rankings.map((item) => item.ev)
+      );
+
+      const bTopEV = Math.max(
+        ...b.rankings.map((item) => item.ev)
+      );
+
       return bTopEV - aTopEV;
     })[0];
 
     const topNHLGame = [...nhlGames].sort((a, b) => {
-      const aTopEV = Math.max(...a.rankings.map((item) => item.ev));
-      const bTopEV = Math.max(...b.rankings.map((item) => item.ev));
+      const aTopEV = Math.max(
+        ...a.rankings.map((item) => item.ev)
+      );
+
+      const bTopEV = Math.max(
+        ...b.rankings.map((item) => item.ev)
+      );
+
       return bTopEV - aTopEV;
     })[0];
 
     const topMLBGame = [...mlbGames].sort((a, b) => {
-      const aTopEV = Math.max(...a.rankings.map((item) => item.ev));
-      const bTopEV = Math.max(...b.rankings.map((item) => item.ev));
+      const aTopEV = Math.max(
+        ...a.rankings.map((item) => item.ev)
+      );
+
+      const bTopEV = Math.max(
+        ...b.rankings.map((item) => item.ev)
+      );
+
       return bTopEV - aTopEV;
     })[0];
 
-    const topNBAProp = [...nbaProps].sort((a, b) => b.ev - a.ev)[0];
-    const topNHLProp = [...nhlProps].sort((a, b) => b.ev - a.ev)[0];
-    const topMLBProp = [...mlbProps].sort((a, b) => b.ev - a.ev)[0];
+    const topNFLGame = [...nflGames].sort((a, b) => {
+      const aTopEV = Math.max(
+        ...a.rankings.map((item) => item.ev)
+      );
+
+      const bTopEV = Math.max(
+        ...b.rankings.map((item) => item.ev)
+      );
+
+      return bTopEV - aTopEV;
+    })[0];
+
+    const topNBAProp = [...nbaProps]
+      .sort((a, b) => b.ev - a.ev)[0];
+
+    const topNHLProp = [...nhlProps]
+      .sort((a, b) => b.ev - a.ev)[0];
+
+    const topMLBProp = [...mlbProps]
+      .sort((a, b) => b.ev - a.ev)[0];
+
+    const topNFLProp = [...nflProps]
+      .sort((a, b) => b.ev - a.ev)[0];
 
     if (topNBAGame) {
-      const bestRank = [...topNBAGame.rankings].sort((a, b) => b.ev - a.ev)[0];
-      renderHomeSpotlightCard("home-top-nba-bet", {
-        title: `${topNBAGame.awayTeam} at ${topNBAGame.homeTeam}`,
-        meta: `Featured High-EV Play | ${topNBAGame.vendor} | ${topNBAGame.gameDate}`,
-        ev: bestRank.ev,
-        subtext: `Top Bet: ${bestRank.bet}`
-      });
-    } else {
-      renderHomeSpotlightCard("home-top-nba-bet", null);
-    }
+      const bestRank = [...topNBAGame.rankings]
+        .sort((a, b) => b.ev - a.ev)[0];
 
-    if (topNHLGame) {
-      const bestRank = [...topNHLGame.rankings].sort((a, b) => b.ev - a.ev)[0];
-      renderHomeSpotlightCard("home-top-nhl-bet", {
-        title: `${topNHLGame.awayTeam} at ${topNHLGame.homeTeam}`,
-        meta: `Featured High-EV Play | ${topNHLGame.vendor} | ${topNHLGame.gameDate}`,
-        ev: bestRank.ev,
-        subtext: `Top Bet: ${bestRank.bet}`
-      });
-    } else {
-      renderHomeSpotlightCard("home-top-nhl-bet", null);
-    }
+      renderHomeSpotlightCard(
+        "home-top-nba-bet",
+        {
+          title:
+            `${topNBAGame.awayTeam} at ` +
+            `${topNBAGame.homeTeam}`,
 
-    if (topMLBGame) {
-      const bestRank = [...topMLBGame.rankings].sort((a, b) => b.ev - a.ev)[0];
-      renderHomeSpotlightCard("home-top-mlb-bet", {
-        title: `${topMLBGame.awayTeam} at ${topMLBGame.homeTeam}`,
-        meta: `Featured High-EV Play | ${topMLBGame.vendor} | ${topMLBGame.gameDate}`,
-        ev: bestRank.ev,
-        subtext: `Top Bet: ${bestRank.bet}`
-      });
+          meta:
+            `Featured High-EV Play | ` +
+            `${topNBAGame.vendor} | ` +
+            `${topNBAGame.gameDate}`,
+
+          ev: bestRank.ev,
+          subtext: `Top Bet: ${bestRank.bet}`
+        }
+      );
     } else {
-      renderHomeSpotlightCard("home-top-mlb-bet", null);
+      renderHomeSpotlightCard(
+        "home-top-nba-bet",
+        null
+      );
     }
 
     if (topNBAProp) {
-      renderHomeSpotlightCard("home-top-nba-prop", {
-        title: `${getPropFullName(topNBAProp)} — ${formatPropTypeLabel(topNBAProp.propType)}`,
-        meta: `Top Free Props Today | ${topNBAProp.vendor} | ${topNBAProp.gameDate || "Today"}`,
-        ev: topNBAProp.ev,
-        subtext: `Bet: ${topNBAProp.betType} ${formatLineValue(topNBAProp.lineValue)}`
-      });
+      renderHomeSpotlightCard(
+        "home-top-nba-prop",
+        {
+          title:
+            `${getPropFullName(topNBAProp)} — ` +
+            `${formatPropTypeLabel(topNBAProp.propType)}`,
+
+          meta:
+            `Top Free Props Today | ` +
+            `${topNBAProp.vendor} | ` +
+            `${topNBAProp.gameDate || "Today"}`,
+
+          ev: topNBAProp.ev,
+
+          subtext:
+            `Bet: ${topNBAProp.betType} ` +
+            `${formatLineValue(topNBAProp.lineValue)}`
+        }
+      );
     } else {
-      renderHomeSpotlightCard("home-top-nba-prop", null);
+      renderHomeSpotlightCard(
+        "home-top-nba-prop",
+        null
+      );
+    }
+
+    if (topNHLGame) {
+      const bestRank = [...topNHLGame.rankings]
+        .sort((a, b) => b.ev - a.ev)[0];
+
+      renderHomeSpotlightCard(
+        "home-top-nhl-bet",
+        {
+          title:
+            `${topNHLGame.awayTeam} at ` +
+            `${topNHLGame.homeTeam}`,
+
+          meta:
+            `Featured High-EV Play | ` +
+            `${topNHLGame.vendor} | ` +
+            `${topNHLGame.gameDate}`,
+
+          ev: bestRank.ev,
+          subtext: `Top Bet: ${bestRank.bet}`
+        }
+      );
+    } else {
+      renderHomeSpotlightCard(
+        "home-top-nhl-bet",
+        null
+      );
     }
 
     if (topNHLProp) {
-      renderHomeSpotlightCard("home-top-nhl-prop", {
-        title: `${getPropFullName(topNHLProp)} — ${formatPropTypeLabel(topNHLProp.propType)}`,
-        meta: `Top Free Props Today | ${topNHLProp.vendor} | ${topNHLProp.gameDate || "Today"}`,
-        ev: topNHLProp.ev,
-        subtext: `Bet: ${topNHLProp.betType} ${formatLineValue(topNHLProp.lineValue)}`
-      });
+      renderHomeSpotlightCard(
+        "home-top-nhl-prop",
+        {
+          title:
+            `${getPropFullName(topNHLProp)} — ` +
+            `${formatPropTypeLabel(topNHLProp.propType)}`,
+
+          meta:
+            `Top Free Props Today | ` +
+            `${topNHLProp.vendor} | ` +
+            `${topNHLProp.gameDate || "Today"}`,
+
+          ev: topNHLProp.ev,
+
+          subtext:
+            `Bet: ${topNHLProp.betType} ` +
+            `${formatLineValue(topNHLProp.lineValue)}`
+        }
+      );
     } else {
-      renderHomeSpotlightCard("home-top-nhl-prop", null);
+      renderHomeSpotlightCard(
+        "home-top-nhl-prop",
+        null
+      );
+    }
+
+    if (topMLBGame) {
+      const bestRank = [...topMLBGame.rankings]
+        .sort((a, b) => b.ev - a.ev)[0];
+
+      renderHomeSpotlightCard(
+        "home-top-mlb-bet",
+        {
+          title:
+            `${topMLBGame.awayTeam} at ` +
+            `${topMLBGame.homeTeam}`,
+
+          meta:
+            `Featured High-EV Play | ` +
+            `${topMLBGame.vendor} | ` +
+            `${topMLBGame.gameDate}`,
+
+          ev: bestRank.ev,
+          subtext: `Top Bet: ${bestRank.bet}`
+        }
+      );
+    } else {
+      renderHomeSpotlightCard(
+        "home-top-mlb-bet",
+        null
+      );
     }
 
     if (topMLBProp) {
-      renderHomeSpotlightCard("home-top-mlb-prop", {
-        title: `${getPropFullName(topMLBProp)} — ${formatPropTypeLabel(topMLBProp.propType)}`,
-        meta: `Top Free Props Today | ${topMLBProp.vendor} | ${topMLBProp.gameDate || "Today"}`,
-        ev: topMLBProp.ev,
-        subtext: `Bet: ${topMLBProp.betType} ${formatLineValue(topMLBProp.lineValue)}`
-      });
+      renderHomeSpotlightCard(
+        "home-top-mlb-prop",
+        {
+          title:
+            `${getPropFullName(topMLBProp)} — ` +
+            `${formatPropTypeLabel(topMLBProp.propType)}`,
+
+          meta:
+            `Top Free Props Today | ` +
+            `${topMLBProp.vendor} | ` +
+            `${topMLBProp.gameDate || "Today"}`,
+
+          ev: topMLBProp.ev,
+
+          subtext:
+            `Bet: ${topMLBProp.betType} ` +
+            `${formatLineValue(topMLBProp.lineValue)}`
+        }
+      );
     } else {
-      renderHomeSpotlightCard("home-top-mlb-prop", null);
+      renderHomeSpotlightCard(
+        "home-top-mlb-prop",
+        null
+      );
+    }
+
+    if (topNFLGame) {
+      const bestRank = [...topNFLGame.rankings]
+        .sort((a, b) => b.ev - a.ev)[0];
+
+      renderHomeSpotlightCard(
+        "home-top-nfl-bet",
+        {
+          title:
+            `${topNFLGame.awayTeam} at ` +
+            `${topNFLGame.homeTeam}`,
+
+          meta:
+            `Featured High-EV Play | ` +
+            `${topNFLGame.vendor} | ` +
+            `${topNFLGame.gameDate}`,
+
+          ev: bestRank.ev,
+          subtext: `Top Bet: ${bestRank.bet}`
+        }
+      );
+    } else {
+      renderHomeSpotlightCard(
+        "home-top-nfl-bet",
+        null
+      );
+    }
+
+    if (topNFLProp) {
+      renderHomeSpotlightCard(
+        "home-top-nfl-prop",
+        {
+          title:
+            `${getPropFullName(topNFLProp)} — ` +
+            `${formatPropTypeLabel(topNFLProp.propType)}`,
+
+          meta:
+            `Top Free Props Today | ` +
+            `${topNFLProp.vendor} | ` +
+            `${topNFLProp.gameDate || "Today"}`,
+
+          ev: topNFLProp.ev,
+
+          subtext:
+            `Bet: ${topNFLProp.betType} ` +
+            `${formatLineValue(topNFLProp.lineValue)}`
+        }
+      );
+    } else {
+      renderHomeSpotlightCard(
+        "home-top-nfl-prop",
+        null
+      );
     }
 
     updateHomeLastUpdated();
   } catch (error) {
-    console.error("Home spotlight render error:", error);
+    console.error(
+      "Home spotlight render error:",
+      error
+    );
 
-    renderHomeSpotlightCard("home-top-nba-bet", null);
-    renderHomeSpotlightCard("home-top-nba-prop", null);
-    renderHomeSpotlightCard("home-top-nhl-bet", null);
-    renderHomeSpotlightCard("home-top-nhl-prop", null);
-    renderHomeSpotlightCard("home-top-mlb-bet", null);
-    renderHomeSpotlightCard("home-top-mlb-prop", null);
+    renderHomeSpotlightCard(
+      "home-top-nba-bet",
+      null
+    );
+
+    renderHomeSpotlightCard(
+      "home-top-nba-prop",
+      null
+    );
+
+    renderHomeSpotlightCard(
+      "home-top-nhl-bet",
+      null
+    );
+
+    renderHomeSpotlightCard(
+      "home-top-nhl-prop",
+      null
+    );
+
+    renderHomeSpotlightCard(
+      "home-top-mlb-bet",
+      null
+    );
+
+    renderHomeSpotlightCard(
+      "home-top-mlb-prop",
+      null
+    );
+
+    renderHomeSpotlightCard(
+      "home-top-nfl-bet",
+      null
+    );
+
+    renderHomeSpotlightCard(
+      "home-top-nfl-prop",
+      null
+    );
 
     updateHomeLastUpdated();
   }
@@ -1624,13 +1857,35 @@ async function renderHomeTopProps() {
   const currentTier = CURRENT_USER_TIER || "Rookie";
 
   try {
-    const [nbaProps, nhlProps, mlbProps] = await Promise.all([
-      fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
-      fetchTeaserPropsJson(NHL_PROPS_TEASER_URL).catch(() => []),
-      fetchTeaserPropsJson(MLB_PROPS_TEASER_URL).catch(() => [])
-    ]);
+    const [
+  nbaProps,
+  nhlProps,
+  mlbProps,
+  nflProps
+] = await Promise.all([
+  fetchTeaserPropsJson(
+    NBA_PROPS_TEASER_URL
+  ).catch(() => []),
 
-    const allProps = [...nbaProps, ...nhlProps, ...mlbProps].sort((a, b) => b.ev - a.ev);
+  fetchTeaserPropsJson(
+    NHL_PROPS_TEASER_URL
+  ).catch(() => []),
+
+  fetchTeaserPropsJson(
+    MLB_PROPS_TEASER_URL
+  ).catch(() => []),
+
+  fetchTeaserPropsJson(
+    NFL_PROPS_TEASER_URL
+  ).catch(() => [])
+]);
+
+const allProps = [
+  ...nbaProps,
+  ...nhlProps,
+  ...mlbProps,
+  ...nflProps
+].sort((a, b) => b.ev - a.ev);
 
     const visibleProps = allProps.slice(0, 5);
 
