@@ -1,138 +1,62 @@
 // ======================================================
 // Sportacular Analytics
-// Player Endpoint
+// Player Mapper
 // ======================================================
 
-import { DATA_SOURCES } from "./lib/config.js";
+export function mapPlayer(row, league) {
 
-import {
+    return {
 
-    loadCSV,
+        id: row.Id,
 
-    findPlayer
+        league,
 
-} from "./lib/csv.js";
+        name: row["Full Name"],
 
-import {
+        firstName: row["First Name"],
 
-    mapPlayer
+        lastName: row["Last Name"],
 
-} from "./lib/mappers/player.js";
+        team: row["Team Name"],
 
-import {
+        teamAbbreviation: row["Team Abbreviation"],
 
-    success,
+        position: row.Position,
 
-    badRequest,
+        height: row.Height,
 
-    notFound,
+        weight: row.Weight,
 
-    serverError
+        jerseyNumber: row["Jersey Number"],
 
-} from "./lib/response.js";
+        bats: row.Bats,
 
-/**
- * Netlify Function
- */
-export async function handler(event) {
+        throws: row.Throws,
 
-    try {
+        status: row.Status,
 
-        //-------------------------------------------------
-        // Read query parameters
-        //-------------------------------------------------
+        analyticsScore: 0,
 
-        const league = (
-            event.queryStringParameters?.league || ""
-        ).toLowerCase();
+        age: "",
 
-        const id =
-            event.queryStringParameters?.id;
+        headshot: "",
 
-        //-------------------------------------------------
-        // Validate request
-        //-------------------------------------------------
+        quickStats: {},
 
-        if (!league) {
+        matchup: {},
 
-            return badRequest(
-                "Missing league parameter."
-            );
+        props: [],
 
-        }
+        trends: [],
 
-        if (!id) {
+        season: {},
 
-            return badRequest(
-                "Missing player id."
-            );
+        gameLogs: [],
 
-        }
+        summary: {},
 
-        if (!DATA_SOURCES[league]) {
+        relatedPlayers: []
 
-            return badRequest(
-                "Unsupported league."
-            );
-
-        }
-
-        //-------------------------------------------------
-        // Load roster
-        //-------------------------------------------------
-
-        const roster = await loadCSV(
-
-            DATA_SOURCES[league].roster
-
-        );
-
-        //-------------------------------------------------
-        // Find player
-        //-------------------------------------------------
-
-        const row = findPlayer(
-
-            roster,
-
-            id
-
-        );
-
-        if (!row) {
-
-            return notFound(
-
-                "Player not found."
-
-            );
-
-        }
-
-        //-------------------------------------------------
-        // Map player
-        //-------------------------------------------------
-
-        const player = mapPlayer(
-
-            row,
-
-            league
-
-        );
-
-        //-------------------------------------------------
-        // Return player
-        //-------------------------------------------------
-
-        return success(player);
-
-    }
-
-    catch (error) {
-
-        return serverError(error);
-
-    }
+    };
 
 }
