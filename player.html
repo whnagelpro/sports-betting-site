@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Player Profile | Sportacular Analytics</title>
+
+    <link rel="icon" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="player.css" />
+
+</head>
+
+<body>
+
+    <!-- ========================================= -->
+    <!-- Existing Site Header -->
+    <!-- Copy directly from mlb-props.html -->
+    <!-- ========================================= -->
+
+    <header class="site-header">
+  <div class="container nav">
+    <div class="logo">
+      <a href="/">
+        <img src="/logo.png" alt="Sportacular Analytics Logo" />
+      </a>
+    </div>
+
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open menu" aria-expanded="false">
+      ☰
+    </button>
+
+    <nav id="site-nav">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+
+        <li class="dropdown">
+          <a href="#">NBA</a>
+          <ul class="dropdown-menu">
+            <li><a href="nba-odds.html">Game Odds</a></li>
+            <li><a href="nba-props.html">Player Props</a></li>
+            <li><a href="nba-trends.html">Player Trends</a></li>
+            <li><a href="nba-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">NHL</a>
+          <ul class="dropdown-menu">
+            <li><a href="nhl-odds.html">Game Odds</a></li>
+            <li><a href="nhl-props.html">Player Props</a></li>
+            <li><a href="nhl-trends.html">Player Trends</a></li>
+            <li><a href="nhl-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">MLB</a>
+          <ul class="dropdown-menu">
+            <li><a href="mlb-odds.html">Game Odds</a></li>
+            <li><a href="mlb-props.html">Player Props</a></li>
+            <li><a href="mlb-trends.html">Player Trends</a></li>
+            <li><a href="mlb-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">NFL</a>
+          <ul class="dropdown-menu">
+            <li><a href="nfl-odds.html">Game Odds</a></li>
+            <li><a href="nfl-props.html">Player Props</a></li>
+            <li><a href="nfl-trends.html">Player Trends</a></li>
+            <li><a href="nfl-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="index.html#about">About</a></li>
+
+        <li class="dropdown">
+          <a href="#">Legal</a>
+          <ul class="dropdown-menu">
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="disclaimer.html">Disclaimer</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </li>
+
+        <li id="nav-login-item"><a href="auth.html">Login</a></li>
+        <li id="nav-account-item" style="display: none;"><a href="auth.html">Account</a></li>
+        <li id="nav-logout-item" style="display: none;"><a href="#" id="nav-logout-link">Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+    <main class="player-page">
+
+        <!-- Player Hero -->
+
+        <section class="player-hero">
+
+    <div class="container">
+
+        <a href="mlb-props.html" class="back-link">
+            ← Back to MLB Player Props
+        </a>
+
+        <div class="player-hero-card">
+
+            <div class="player-photo">
+
+                <img
+                    id="player-headshot"
+                    src="/images/placeholder-player.png"
+                    alt="Player Headshot"
+                >
+
+            </div>
+
+            <div class="player-info">
+
+                <div class="player-meta">
+
+    <span id="player-bats">
+
+        Bats: Right
+
+    </span>
+
+    <span id="player-throws">
+
+        Throws: Right
+
+    </span>
+
+    <span id="player-age">
+
+        Age: 34
+
+    </span>
+
+</div>
+
+                <p class="player-league">
+                    MLB PLAYER PROFILE
+                </p>
+
+                <h1 id="player-name">
+
+                    Aaron Judge
+
+                </h1>
+
+                <p id="player-team">
+
+                    New York Yankees
+
+                </p>
+
+                <p id="player-position">
+
+                    Right Field
+
+                </p>
+
+            </div>
+
+            <div class="player-score">
+
+                <span class="score-label">
+
+                    Analytics Score
+
+                </span>
+
+                <div
+                    class="analytics-score"
+                    id="analytics-score">
+
+                    97
+
+                </div>
+
+                <div
+                    id="player-stars"
+                    class="player-stars">
+
+                    ★★★★★
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+        <!-- Quick Stats -->
+
+        <section class="quick-stats-section">
+
+    <div class="container">
+
+        <h2>Quick Stats</h2>
+
+        <div class="quick-stats-grid">
+
+            <article class="stat-card">
+
+                <span class="stat-label">AVG</span>
+
+                <span
+                    class="stat-value"
+                    id="stat-avg">
+
+                    .327
+
+                </span>
+
+            </article>
+
+            <article class="stat-card">
+
+                <span class="stat-label">OPS</span>
+
+                <span
+                    class="stat-value"
+                    id="stat-ops">
+
+                    .988
+
+                </span>
+
+            </article>
+
+            <article class="stat-card">
+
+                <span class="stat-label">HR</span>
+
+                <span
+                    class="stat-value"
+                    id="stat-hr">
+
+                    34
+
+                </span>
+
+            </article>
+
+            <article class="stat-card">
+
+                <span class="stat-label">RBI</span>
+
+                <span
+                    class="stat-value"
+                    id="stat-rbi">
+
+                    89
+
+                </span>
+
+            </article>
+
+            <article class="stat-card">
+
+                <span class="stat-label">Runs</span>
+
+                <span
+                    class="stat-value"
+                    id="stat-runs">
+
+                    76
+
+                </span>
+
+            </article>
+
+            <article class="stat-card">
+
+                <span class="stat-label">Hits</span>
+
+                <span
+                    class="stat-value"
+                    id="stat-hits">
+
+                    121
+
+                </span>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+        <!-- Today's Matchup -->
+
+        <section class="matchup-section">
+
+    <div class="container">
+
+        <h2>Today's Matchup</h2>
+
+        <div class="matchup-card">
+
+            <h3 id="matchup-game">
+
+                Yankees @ Red Sox
+
+            </h3>
+
+            <p id="matchup-time">
+
+                7:10 PM ET
+
+            </p>
+
+            <div class="matchup-details">
+
+                <div>
+
+                    <strong>Opponent Pitcher</strong>
+
+                    <span id="opponent-pitcher">
+
+                        Garrett Crochet
+
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong>Throws</strong>
+
+                    <span id="opponent-handedness">
+
+                        Left
+
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong>Projected Batting Order</strong>
+
+                    <span id="lineup-position">
+
+                        2nd
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+        <!-- ========================================================= -->
+<!-- TODAY'S BEST OPPORTUNITIES -->
+<!-- ========================================================= -->
+
+<section class="player-props-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <div>
+
+                <p class="section-eyebrow">
+                    TODAY'S PROPS
+                </p>
+
+                <h2>
+                    Today's Best Opportunities
+                </h2>
+
+            </div>
+
+        </div>
+
+        <!-- Featured Prop -->
+
+        <article class="featured-prop-card">
+
+            <div class="featured-prop-left">
+
+                <span class="featured-badge">
+                    🏆 TOP MODEL EDGE
+                </span>
+
+                <h3 id="top-prop-name">
+                    Over 1.5 Hits
+                </h3>
+
+                <p id="top-prop-description">
+                    Highest expected value according to the Sportacular model.
+                </p>
+
+            </div>
+
+            <div class="featured-prop-center">
+
+                <div class="featured-stat">
+
+                    <span class="featured-label">
+                        Line
+                    </span>
+
+                    <span
+                        id="top-prop-line"
+                        class="featured-value">
+
+                        1.5
+
+                    </span>
+
+                </div>
+
+                <div class="featured-stat">
+
+                    <span class="featured-label">
+                        Odds
+                    </span>
+
+                    <span
+                        id="top-prop-odds"
+                        class="featured-value">
+
+                        +125
+
+                    </span>
+
+                </div>
+
+                <div class="featured-stat">
+
+                    <span class="featured-label">
+                        Sportsbook
+                    </span>
+
+                    <span
+                        id="top-prop-book">
+
+                        FanDuel
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="featured-prop-right">
+
+                <div class="ev-circle">
+
+                    <span
+                        id="top-prop-ev">
+
+                        +8.2%
+
+                    </span>
+
+                    <small>
+                        EV
+                    </small>
+
+                </div>
+
+                <div class="probability-display">
+
+                    <span class="probability-label">
+
+                        Model Probability
+
+                    </span>
+
+                    <strong
+                        id="top-prop-probability">
+
+                        61%
+
+                    </strong>
+
+                </div>
+
+                <button
+                    class="btn btn-primary"
+                    id="view-top-prop">
+
+                    View Trend →
+
+                </button>
+
+            </div>
+
+        </article>
+
+        <!-- Remaining Props -->
+
+        <div class="section-header secondary-header">
+
+            <h3>
+
+                All Available Props
+
+            </h3>
+
+        </div>
+
+        <div
+            class="props-grid"
+            id="props-grid">
+
+            <!-- Prop Card -->
+
+            <article class="prop-card">
+
+                <div class="prop-card-header">
+
+                    <h4>
+
+                        Hits
+
+                    </h4>
+
+                    <span class="prop-book">
+
+                        DK
+
+                    </span>
+
+                </div>
+
+                <div class="prop-line">
+
+                    Over 1.5
+
+                </div>
+
+                <div class="prop-odds">
+
+                    +110
+
+                </div>
+
+                <div class="prop-footer">
+
+                    <span class="positive-ev">
+
+                        +5.8% EV
+
+                    </span>
+
+                    <button
+                        class="btn btn-secondary">
+
+                        View
+
+                    </button>
+
+                </div>
+
+            </article>
+
+            <article class="prop-card">
+
+                <div class="prop-card-header">
+
+                    <h4>
+
+                        RBI
+
+                    </h4>
+
+                    <span class="prop-book">
+
+                        FD
+
+                    </span>
+
+                </div>
+
+                <div class="prop-line">
+
+                    Over 0.5
+
+                </div>
+
+                <div class="prop-odds">
+
+                    +150
+
+                </div>
+
+                <div class="prop-footer">
+
+                    <span class="positive-ev">
+
+                        +4.6%
+
+                    </span>
+
+                    <button class="btn btn-secondary">
+
+                        View
+
+                    </button>
+
+                </div>
+
+            </article>
+
+            <article class="prop-card">
+
+                <div class="prop-card-header">
+
+                    <h4>
+
+                        Runs
+
+                    </h4>
+
+                    <span>
+
+                        ESPN
+
+                    </span>
+
+                </div>
+
+                <div class="prop-line">
+
+                    Over 0.5
+
+                </div>
+
+                <div class="prop-odds">
+
+                    +102
+
+                </div>
+
+                <div class="prop-footer">
+
+                    <span>
+
+                        +3.2%
+
+                    </span>
+
+                    <button class="btn btn-secondary">
+
+                        View
+
+                    </button>
+
+                </div>
+
+            </article>
+
+            <article class="prop-card">
+
+                <div class="prop-card-header">
+
+                    <h4>
+
+                        HR
+
+                    </h4>
+
+                    <span>
+
+                        FD
+
+                    </span>
+
+                </div>
+
+                <div class="prop-line">
+
+                    Over 0.5
+
+                </div>
+
+                <div class="prop-odds">
+
+                    +410
+
+                </div>
+
+                <div class="prop-footer">
+
+                    <span>
+
+                        +2.8%
+
+                    </span>
+
+                    <button class="btn btn-secondary">
+
+                        View
+
+                    </button>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- CURRENT TRENDS -->
+<!-- ========================================================= -->
+
+<section class="player-trends-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <div>
+
+                <p class="section-eyebrow">
+
+                    PLAYER MOMENTUM
+
+                </p>
+
+                <h2>
+
+                    Current Trends
+
+                </h2>
+
+            </div>
+
+        </div>
+
+        <div
+            class="trend-grid"
+            id="trend-grid">
+
+            <article class="trend-card">
+
+                <div class="trend-icon">
+
+                    🔥
+
+                </div>
+
+                <h3>
+
+                    Hit Safely
+
+                </h3>
+
+                <p
+                    id="trend-hit">
+
+                    Hit safely in 12 consecutive games.
+
+                </p>
+
+            </article>
+
+            <article class="trend-card">
+
+                <div class="trend-icon">
+
+                    ⚾
+
+                </div>
+
+                <h3>
+
+                    Hits Prop
+
+                </h3>
+
+                <p
+                    id="trend-hits">
+
+                    Over in 8 of last 10 games.
+
+                </p>
+
+            </article>
+
+            <article class="trend-card">
+
+                <div class="trend-icon">
+
+                    💥
+
+                </div>
+
+                <h3>
+
+                    Multi-Hit Games
+
+                </h3>
+
+                <p
+                    id="trend-multihit">
+
+                    Recorded multiple hits in 6 of last 8.
+
+                </p>
+
+            </article>
+
+            <article class="trend-card">
+
+                <div class="trend-icon">
+
+                    🏃
+
+                </div>
+
+                <h3>
+
+                    RBI Trend
+
+                </h3>
+
+                <p
+                    id="trend-rbi">
+
+                    Recorded an RBI in 7 of last 10.
+
+                </p>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- SEASON STATISTICS -->
+<!-- ========================================================= -->
+
+<section class="season-stats-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <div>
+
+                <p class="section-eyebrow">
+
+                    SEASON OVERVIEW
+
+                </p>
+
+                <h2>
+
+                    Season Statistics
+
+                </h2>
+
+            </div>
+
+        </div>
+
+        <div class="season-dashboard">
+
+            <!-- Batting -->
+
+            <section class="stats-panel">
+
+                <h3>
+
+                    Batting
+
+                </h3>
+
+                <div class="stats-list">
+
+                    <div class="stat-row">
+
+                        <span>AVG</span>
+
+                        <strong id="season-avg">
+
+                            .327
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>OBP</span>
+
+                        <strong id="season-obp">
+
+                            .425
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>SLG</span>
+
+                        <strong id="season-slg">
+
+                            .632
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>OPS</span>
+
+                        <strong id="season-ops">
+
+                            1.057
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Power -->
+
+            <section class="stats-panel">
+
+                <h3>
+
+                    Power
+
+                </h3>
+
+                <div class="stats-list">
+
+                    <div class="stat-row">
+
+                        <span>HR</span>
+
+                        <strong id="season-hr">
+
+                            34
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>RBI</span>
+
+                        <strong id="season-rbi">
+
+                            89
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>XBH</span>
+
+                        <strong id="season-xbh">
+
+                            52
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>Total Bases</span>
+
+                        <strong id="season-tb">
+
+                            241
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Discipline -->
+
+            <section class="stats-panel">
+
+                <h3>
+
+                    Discipline
+
+                </h3>
+
+                <div class="stats-list">
+
+                    <div class="stat-row">
+
+                        <span>Walks</span>
+
+                        <strong id="season-bb">
+
+                            81
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>Strikeouts</span>
+
+                        <strong id="season-so">
+
+                            114
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>BB%</span>
+
+                        <strong id="season-bb-rate">
+
+                            15.8%
+
+                        </strong>
+
+                    </div>
+
+                    <div class="stat-row">
+
+                        <span>K%</span>
+
+                        <strong id="season-k-rate">
+
+                            22.6%
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+        <!-- ========================================================= -->
+<!-- LAST 10 GAMES -->
+<!-- ========================================================= -->
+
+<section class="game-log-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <div>
+
+                <p class="section-eyebrow">
+                    RECENT PERFORMANCE
+                </p>
+
+                <h2>
+                    Last 10 Games
+                </h2>
+
+            </div>
+
+        </div>
+
+        <div class="game-log-card">
+
+            <table class="game-log-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+                        <th>Opponent</th>
+                        <th>Result</th>
+                        <th>AB</th>
+                        <th>H</th>
+                        <th>R</th>
+                        <th>RBI</th>
+                        <th>HR</th>
+                        <th>BB</th>
+                        <th>SO</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="game-log-body">
+
+                    <tr>
+
+                        <td>7/20</td>
+                        <td>BOS</td>
+                        <td>W 6-4</td>
+                        <td>4</td>
+                        <td>2</td>
+                        <td>1</td>
+                        <td>3</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>7/19</td>
+                        <td>BOS</td>
+                        <td>W 8-3</td>
+                        <td>5</td>
+                        <td>3</td>
+                        <td>2</td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- PERFORMANCE SUMMARY -->
+<!-- ========================================================= -->
+
+<section class="performance-summary-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <div>
+
+                <p class="section-eyebrow">
+                    LAST 10 GAMES
+                </p>
+
+                <h2>
+                    Performance Summary
+                </h2>
+
+            </div>
+
+        </div>
+
+        <div class="summary-grid">
+
+            <article class="summary-card">
+
+                <span class="summary-label">
+                    AVG
+                </span>
+
+                <span
+                    id="summary-avg"
+                    class="summary-value">
+
+                    .364
+
+                </span>
+
+            </article>
+
+            <article class="summary-card">
+
+                <span class="summary-label">
+                    OPS
+                </span>
+
+                <span
+                    id="summary-ops"
+                    class="summary-value">
+
+                    1.145
+
+                </span>
+
+            </article>
+
+            <article class="summary-card">
+
+                <span class="summary-label">
+                    HR
+                </span>
+
+                <span
+                    id="summary-hr"
+                    class="summary-value">
+
+                    4
+
+                </span>
+
+            </article>
+
+            <article class="summary-card">
+
+                <span class="summary-label">
+                    RBI
+                </span>
+
+                <span
+                    id="summary-rbi"
+                    class="summary-value">
+
+                    12
+
+                </span>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- RELATED PLAYERS -->
+<!-- ========================================================= -->
+
+<section class="related-players-section">
+
+    <div class="container">
+
+        <div class="section-header">
+
+            <div>
+
+                <p class="section-eyebrow">
+                    MORE PLAYERS
+                </p>
+
+                <h2>
+                    Related Players
+                </h2>
+
+            </div>
+
+        </div>
+
+        <div
+            class="related-player-grid"
+            id="related-player-grid">
+
+            <article class="related-player-card">
+
+                <img
+                    src="/images/placeholder-player.png"
+                    alt="Player">
+
+                <h3>
+
+                    Juan Soto
+
+                </h3>
+
+                <p>
+
+                    New York Yankees
+
+                </p>
+
+                <a
+                    href="#"
+                    class="btn btn-secondary">
+
+                    View Profile
+
+                </a>
+
+            </article>
+
+            <article class="related-player-card">
+
+                <img
+                    src="/images/placeholder-player.png"
+                    alt="Player">
+
+                <h3>
+
+                    Giancarlo Stanton
+
+                </h3>
+
+                <p>
+
+                    New York Yankees
+
+                </p>
+
+                <a
+                    href="#"
+                    class="btn btn-secondary">
+
+                    View Profile
+
+                </a>
+
+            </article>
+
+            <article class="related-player-card">
+
+                <img
+                    src="/images/placeholder-player.png"
+                    alt="Player">
+
+                <h3>
+
+                    Mookie Betts
+
+                </h3>
+
+                <p>
+
+                    Los Angeles Dodgers
+
+                </p>
+
+                <a
+                    href="#"
+                    class="btn btn-secondary">
+
+                    View Profile
+
+                </a>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ========================================================= -->
+<!-- RETURN TO PLAYER PROPS -->
+<!-- ========================================================= -->
+
+<section class="return-section">
+
+    <div class="container">
+
+        <div class="return-card">
+
+            <h2>
+
+                Continue Exploring MLB Player Props
+
+            </h2>
+
+            <p>
+
+                View every available player prop, sportsbook, expected value,
+                and trend from today's slate.
+
+            </p>
+
+            <a
+                href="mlb-props.html"
+                class="btn btn-primary">
+
+                ← Back to MLB Player Props
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+    </main>
+
+    <!-- Existing Footer -->
+
+    <footer class="site-footer">
+    <div class="container">
+      <p><strong>Disclaimer:</strong> Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.</p>
+      <p class="support-email">
+        We would love to hear from you! Contact us at support@sportacularanalytics.com.
+      </p>
+      <p>&copy; 2026 Sportacular Analytics. All rights reserved.</p>
+    </div>
+  </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="script.js"></script>
+    <script src="player.js"></script>
+
+</body>
+
+</html>
