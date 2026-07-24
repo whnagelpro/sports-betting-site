@@ -57,6 +57,14 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
         season: seasonStats,
 
+        seasonPanels: buildSeasonPanels(
+
+            row,
+
+            seasonStats
+
+        ),
+
         gameLogs: [],
 
         summary: {},
@@ -144,5 +152,71 @@ function buildQuickStats(row, seasonStats) {
         }
 
     ];
+
+}
+
+function buildSeasonPanels(row, seasonStats) {
+
+    const position = (row.Position || "").toUpperCase();
+
+    if (["SP", "RP", "P"].includes(position)) {
+
+        return [
+
+            {
+                title: "Pitching",
+
+                stats: [
+
+                    {
+                        label: "Games",
+                        value: seasonStats["Games Played"] || "-"
+                    },
+
+                    {
+                        label: "Strikeouts",
+                        value: seasonStats["Avg Pitcher Strikeouts"] || "-"
+                    },
+
+                    {
+                        label: "Walks",
+                        value: seasonStats["Avg Pitcher Walks"] || "-"
+                    },
+
+                    {
+                        label: "ERA",
+                        value: seasonStats["Avg Pitcher Earned Runs"] || "-"
+                    }
+
+                ]
+
+            },
+
+            {
+                title: "Advanced",
+
+                stats: [
+
+                    {
+                        label: "Hits Allowed",
+                        value: seasonStats["Avg Pitcher Hits Allowed"] || "-"
+                    },
+
+                    {
+                        label: "Consistency",
+                        value: seasonStats["Consistency Score"] || "-"
+                    }
+
+                ]
+
+            }
+
+        ];
+
+    }
+
+    // Temporary hitter placeholder
+
+    return [];
 
 }

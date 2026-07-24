@@ -134,27 +134,17 @@ function renderQuickStats() {
 
     player.quickStats.forEach(stat => {
 
-        const card = document.createElement("article");
+        grid.appendChild(
 
-        card.className = "stat-card";
+    createStatCard(
 
-        card.innerHTML = `
+        stat.label,
 
-            <span class="stat-label">
+        stat.value
 
-                ${stat.label}
+    )
 
-            </span>
-
-            <span class="stat-value">
-
-                ${stat.value}
-
-            </span>
-
-        `;
-
-        grid.appendChild(card);
+);
 
     });
 
@@ -190,5 +180,31 @@ function renderFields(fields) {
         }
 
     );
+
+}
+
+function createStatCard(label, value) {
+
+    const card = document.createElement("article");
+
+    card.className = "stat-card";
+
+    card.innerHTML = `
+
+        <span class="stat-label">
+
+            ${label}
+
+        </span>
+
+        <span class="stat-value">
+
+            ${value}
+
+        </span>
+
+    `;
+
+    return card;
 
 }
