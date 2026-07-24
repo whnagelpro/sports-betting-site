@@ -122,41 +122,39 @@ function renderHero() {
 
 function renderQuickStats() {
 
-    if (!player.quickStats) return;
+    const grid = document.getElementById(
 
-    renderFields({
+        "quick-stats-grid"
 
-        "stat-games-played": player.quickStats.gamesPlayed,
+    );
 
-        "stat-strikeouts": player.quickStats.strikeouts,
+    if (!grid) return;
 
-        "stat-walks": player.quickStats.walks,
+    grid.innerHTML = "";
 
-        "stat-earned-runs": player.quickStats.earnedRuns,
+    player.quickStats.forEach(stat => {
 
-        "stat-hits-allowed": player.quickStats.hitsAllowed
+        const card = document.createElement("article");
 
-    });
+        card.className = "stat-card";
 
-}
+        card.innerHTML = `
 
-function renderQuickStats() {
+            <span class="stat-label">
 
-    if (!player.quickStats) return;
+                ${stat.label}
 
-    renderFields({
+            </span>
 
-        "stat-avg": player.quickStats.avg,
+            <span class="stat-value">
 
-        "stat-ops": player.quickStats.ops,
+                ${stat.value}
 
-        "stat-hr": player.quickStats.hr,
+            </span>
 
-        "stat-rbi": player.quickStats.rbi,
+        `;
 
-        "stat-runs": player.quickStats.runs,
-
-        "stat-hits": player.quickStats.hits
+        grid.appendChild(card);
 
     });
 
