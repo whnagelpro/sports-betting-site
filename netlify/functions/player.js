@@ -12,6 +12,13 @@ import {
     notFound,
     serverError
 } from "./lib/response.js";
+import {
+
+    loadSeasonStats,
+
+    findSeasonStats
+
+} from "./lib/seasonStats.js";
 
 export async function handler(event) {
 
@@ -56,9 +63,23 @@ export async function handler(event) {
 
         );
 
+        const seasonRows = await loadSeasonStats(
+
+            source.seasonStats
+
+        );
+
         const row = findPlayer(
 
             roster,
+
+            id
+
+        );
+
+        const seasonStats = findSeasonStats(
+
+            seasonRows,
 
             id
 
@@ -78,7 +99,9 @@ export async function handler(event) {
 
             row,
 
-            league
+            league,
+
+            seasonStats
 
         );
 

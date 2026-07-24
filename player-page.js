@@ -100,22 +100,49 @@ async function fetchPlayer() {
 
 function renderHero() {
 
-    setText(
-        "player-name",
-        player.name
-    );
+    renderFields({
 
-    setText(
-        "player-team",
-        player.team
-    );
+        "player-name": player.name,
 
-    setText(
-        "player-position",
-        player.position
-    );
+        "player-team": player.team,
+
+        "player-position": player.position,
+
+        "player-bats": player.bats,
+
+        "player-throws": player.throws,
+
+        "analytics-score": player.analyticsScore
+
+    });
 
 }
+
+function renderQuickStats() {
+
+    if (!player.quickStats) return;
+
+    renderFields({
+
+        "stat-avg": player.quickStats.avg,
+
+        "stat-ops": player.quickStats.ops,
+
+        "stat-hr": player.quickStats.hr,
+
+        "stat-rbi": player.quickStats.rbi,
+
+        "stat-runs": player.quickStats.runs,
+
+        "stat-hits": player.quickStats.hits
+
+    });
+
+}
+
+renderHero();
+
+renderQuickStats();
 
 // ------------------------------------------------------
 // Utilities
@@ -129,5 +156,19 @@ function setText(id, value) {
     if (!element) return;
 
     element.textContent = value;
+
+}
+
+function renderFields(fields) {
+
+    Object.entries(fields).forEach(
+
+        ([id, value]) => {
+
+            setText(id, value);
+
+        }
+
+    );
 
 }

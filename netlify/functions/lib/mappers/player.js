@@ -3,7 +3,7 @@
 // Player Mapper
 // ======================================================
 
-export function mapPlayer(row, league) {
+export function mapPlayer(row, league, seasonStats = {}) {
 
     return {
 
@@ -41,7 +41,21 @@ export function mapPlayer(row, league) {
 
         headshot: "",
 
-        quickStats: {},
+        quickStats: {
+
+    avg: "",
+
+    ops: "",
+
+    hr: "",
+
+    rbi: "",
+
+    runs: "",
+
+    hits: ""
+
+},
 
         matchup: {},
 
