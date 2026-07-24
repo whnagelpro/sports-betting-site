@@ -63,7 +63,7 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
         trends: [],
 
-        season: {},
+        season: seasonStats,
 
         gameLogs: [],
 
