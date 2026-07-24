@@ -43,17 +43,25 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
         quickStats: {
 
-    avg: "",
+    gamesPlayed:
 
-    ops: "",
+        seasonStats["Games Played"] || "",
 
-    hr: "",
+    strikeouts:
 
-    rbi: "",
+        seasonStats["Avg Pitcher Strikeouts"] || "",
 
-    runs: "",
+    walks:
 
-    hits: ""
+        seasonStats["Avg Pitcher Walks"] || "",
+
+    earnedRuns:
+
+        seasonStats["Avg Pitcher Earned Runs"] || "",
+
+    hitsAllowed:
+
+        seasonStats["Avg Pitcher Hits Allowed"] || ""
 
 },
 
