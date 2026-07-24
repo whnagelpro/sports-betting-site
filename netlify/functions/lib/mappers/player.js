@@ -41,29 +41,13 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
         headshot: "",
 
-        quickStats: {
+        quickStats: buildQuickStats(
 
-    gamesPlayed:
+    row,
 
-        seasonStats["Games Played"] || "",
+    seasonStats
 
-    strikeouts:
-
-        seasonStats["Avg Pitcher Strikeouts"] || "",
-
-    walks:
-
-        seasonStats["Avg Pitcher Walks"] || "",
-
-    earnedRuns:
-
-        seasonStats["Avg Pitcher Earned Runs"] || "",
-
-    hitsAllowed:
-
-        seasonStats["Avg Pitcher Hits Allowed"] || ""
-
-},
+),
 
         matchup: {},
 
@@ -80,5 +64,85 @@ export function mapPlayer(row, league, seasonStats = {}) {
         relatedPlayers: []
 
     };
+
+}
+
+function buildQuickStats(row, seasonStats) {
+
+    const position = (row.Position || "").toUpperCase();
+
+    // Pitchers
+    if (["SP", "RP", "P"].includes(position)) {
+
+        return [
+
+            {
+                label: "Games",
+                value: seasonStats["Games Played"] || "-"
+            },
+
+            {
+                label: "Strikeouts",
+                value: seasonStats["Avg Pitcher Strikeouts"] || "-"
+            },
+
+            {
+                label: "Walks",
+                value: seasonStats["Avg Pitcher Walks"] || "-"
+            },
+
+            {
+                label: "ERA",
+                value: seasonStats["Avg Pitcher Earned Runs"] || "-"
+            },
+
+            {
+                label: "Hits Allowed",
+                value: seasonStats["Avg Pitcher Hits Allowed"] || "-"
+            },
+
+            {
+                label: "Consistency",
+                value: seasonStats["Consistency Score"] || "-"
+            }
+
+        ];
+
+    }
+
+    // Hitters
+    return [
+
+        {
+            label: "AVG",
+            value: seasonStats["Avg Hits"] || "-"
+        },
+
+        {
+            label: "HR",
+            value: seasonStats["Avg Home Runs"] || "-"
+        },
+
+        {
+            label: "RBI",
+            value: seasonStats["Avg RBIs"] || "-"
+        },
+
+        {
+            label: "Runs",
+            value: seasonStats["Avg Runs"] || "-"
+        },
+
+        {
+            label: "Hits",
+            value: seasonStats["Avg Hits"] || "-"
+        },
+
+        {
+            label: "Consistency",
+            value: seasonStats["Consistency Score"] || "-"
+        }
+
+    ];
 
 }

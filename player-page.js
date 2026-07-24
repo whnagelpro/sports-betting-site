@@ -40,6 +40,8 @@ async function initPlayerPage() {
 
         renderHero();
 
+        renderQuickStats();
+
     }
 
     catch (error) {
@@ -113,6 +115,26 @@ function renderHero() {
         "player-throws": player.throws,
 
         "analytics-score": player.analyticsScore
+
+    });
+
+}
+
+function renderQuickStats() {
+
+    if (!player.quickStats) return;
+
+    renderFields({
+
+        "stat-games-played": player.quickStats.gamesPlayed,
+
+        "stat-strikeouts": player.quickStats.strikeouts,
+
+        "stat-walks": player.quickStats.walks,
+
+        "stat-earned-runs": player.quickStats.earnedRuns,
+
+        "stat-hits-allowed": player.quickStats.hitsAllowed
 
     });
 
