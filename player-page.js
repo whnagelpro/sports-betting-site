@@ -150,9 +150,33 @@ function renderQuickStats() {
 
 }
 
+function renderSeasonPanels() {
+
+    const dashboard = document.getElementById(
+
+        "season-dashboard"
+
+    );
+
+    if (!dashboard) return;
+
+    dashboard.innerHTML = "";
+
+    player.seasonPanels.forEach(panel => {
+
+        const section = createSeasonPanel(panel);
+
+        dashboard.appendChild(section);
+
+    });
+
+}
+
 renderHero();
 
 renderQuickStats();
+
+renderSeasonPanels();
 
 // ------------------------------------------------------
 // Utilities
@@ -206,5 +230,43 @@ function createStatCard(label, value) {
     `;
 
     return card;
+
+}
+
+function createSeasonPanel(panel) {
+
+    const section = document.createElement("section");
+
+    section.className = "stats-panel";
+
+    const rows = panel.stats.map(stat => `
+
+        <div class="stat-row">
+
+            <span>${stat.label}</span>
+
+            <strong>${stat.value}</strong>
+
+        </div>
+
+    `).join("");
+
+    section.innerHTML = `
+
+        <h3>
+
+            ${panel.title}
+
+        </h3>
+
+        <div class="stats-list">
+
+            ${rows}
+
+        </div>
+
+    `;
+
+    return section;
 
 }
