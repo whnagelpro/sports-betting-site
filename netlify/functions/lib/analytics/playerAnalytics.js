@@ -1,4 +1,6 @@
 import { calculateRecentForm } from "./recentForm.js";
+import { calculateConsistency } from "./consistency.js";
+import { calculateMatchup } from "./matchup.js";
 
 export function calculatePlayerAnalytics({
 
@@ -16,30 +18,60 @@ export function calculatePlayerAnalytics({
 
     const recentForm = calculateRecentForm(gameLogs);
 
+    const consistency = calculateConsistency(gameLogs);
+
+    const matchupAnalysis = calculateMatchup(matchup);
+
+    const strengths = [];
+
+    const weaknesses = [];
+
+    if (recentForm.trend === "Up") {
+
+    strengths.push(
+        "Recent performance trending upward"
+    );
+
+}
+
+    const analyticsScore = Math.round(
+
+    recentForm.score * 0.35 +
+
+    consistency.score * 0.35 +
+
+    matchupAnalysis.score * 0.30
+
+    );
+
     return {
 
-        score: recentForm.score,
+    score: analyticsScore,
 
-        confidence: "Unknown",
+    matchup: matchupAnalysis,
 
-        recommendation: "No Recommendation",
+    confidence: "Unknown",
 
-        strengths: [],
+    recommendation: "No Recommendation",
 
-        weaknesses: [],
+    bestProp: {
 
-        bestProp: {
+        market: "-",
 
-            market: "-",
+        line: "-",
 
-            line: "-",
+        ev: "-"
 
-            ev: "-"
+    },
 
-        },
-        
-        recentForm
+    strengths,
 
-    };
+    weaknesses,
+
+    recentForm,
+
+    consistency
+
+};
 
 }
