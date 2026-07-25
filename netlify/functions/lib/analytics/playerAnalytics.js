@@ -27,7 +27,7 @@ export function calculatePlayerAnalytics({
     const projection = calculateProjection({
 
     seasonAverage:
-        seasonStats.average,
+        recentForm.last10Average,
 
     recentAverage:
         recentForm.last5Average,
