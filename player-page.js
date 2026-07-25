@@ -224,13 +224,111 @@ function createGameLogRow(game) {
 
 }
 
+function renderAnalyticsDashboard() {
+
+    const dashboard = document.getElementById(
+        "analytics-dashboard"
+    );
+
+    if (!dashboard) return;
+
+    const analytics = player.analytics;
+
+    dashboard.innerHTML = `
+
+        <div class="analytics-left">
+
+            <span class="analytics-title">
+
+                Analytics Score
+
+            </span>
+
+            <div class="analytics-score-large">
+
+                ${analytics.score}
+
+            </div>
+
+            <div class="analytics-rating">
+
+                ★★★★★
+
+            </div>
+
+            <div class="analytics-recommendation">
+
+                ${analytics.recommendation}
+
+            </div>
+
+        </div>
+
+        <div class="analytics-right">
+
+            <div class="analytics-item">
+
+                <strong>Confidence</strong>
+
+                <span>
+
+                    ${analytics.confidence}
+
+                </span>
+
+            </div>
+
+            <div class="analytics-item">
+
+                <strong>Best Prop</strong>
+
+                <span>
+
+                    ${analytics.bestProp.market}
+
+                </span>
+
+            </div>
+
+            <div class="analytics-item">
+
+                <strong>Suggested Line</strong>
+
+                <span>
+
+                    ${analytics.bestProp.line}
+
+                </span>
+
+            </div>
+
+            <div class="analytics-item">
+
+                <strong>Expected Value</strong>
+
+                <span class="positive-ev">
+
+                    ${analytics.bestProp.ev}
+
+                </span>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
 renderHero();
+
+renderInsights();
+
+renderAnalyticsDashboard();
 
 renderQuickStats();
 
 renderSeasonPanels();
-
-renderInsights();
 
 renderGameLogs();
 
