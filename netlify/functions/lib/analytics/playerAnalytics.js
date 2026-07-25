@@ -34,6 +34,14 @@ export function calculatePlayerAnalytics({
 
 }
 
+    if (consistency.rating === "Elite") {
+
+    strengths.push(
+        "Highly consistent performer"
+    );
+
+}
+
     const analyticsScore = Math.round(
 
     recentForm.score * 0.35 +
