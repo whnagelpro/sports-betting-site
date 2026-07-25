@@ -1,9 +1,17 @@
+import { calculatePlayerAnalytics } from "../analytics/playerAnalytics.js"
+
 // ======================================================
 // Sportacular Analytics
 // Player Mapper
 // ======================================================
 
 export function mapPlayer(row, league, seasonStats = {}) {
+
+    const gameLogs = buildGameLogs(row);
+
+    const matchup = {};
+
+    const props = [];
 
     return {
 
@@ -49,9 +57,9 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
 ),
 
-        matchup: {},
+        matchup,
 
-        props: [],
+        props,
 
         trends: [],
 
@@ -84,9 +92,7 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
         }),
 
-        gameLogs: buildGameLogs(
-            row
-        ),
+        gameLogs,
 
         summary: {},
 
