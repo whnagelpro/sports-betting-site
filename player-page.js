@@ -172,11 +172,67 @@ function renderSeasonPanels() {
 
 }
 
+function renderGameLogs() {
+
+    const body = document.getElementById(
+        "game-log-body"
+    );
+
+    if (!body) return;
+
+    body.innerHTML = "";
+
+    player.gameLogs.forEach(game => {
+
+        body.appendChild(
+
+            createGameLogRow(
+                game
+            )
+
+        );
+
+    });
+
+}
+
+function createGameLogRow(game) {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+
+        <td>${game.date}</td>
+
+        <td>${game.opponent}</td>
+
+        <td>${game.result}</td>
+
+        <td>${game.innings}</td>
+
+        <td>${game.strikeouts}</td>
+
+        <td>${game.walks}</td>
+
+        <td>${game.hits}</td>
+
+        <td>${game.earnedRuns}</td>
+
+    `;
+
+    return row;
+
+}
+
 renderHero();
 
 renderQuickStats();
 
 renderSeasonPanels();
+
+renderInsights();
+
+renderGameLogs();
 
 // ------------------------------------------------------
 // Utilities
@@ -268,5 +324,61 @@ function createSeasonPanel(panel) {
     `;
 
     return section;
+
+}
+
+function createInsightCard(insight) {
+
+    const card = document.createElement("article");
+
+    card.className = "trend-card";
+
+    card.innerHTML = `
+
+        <div class="trend-icon">
+
+            ${insight.icon}
+
+        </div>
+
+        <h3>
+
+            ${insight.title}
+
+        </h3>
+
+        <p>
+
+            ${insight.text}
+
+        </p>
+
+    `;
+
+    return card;
+
+}
+
+function renderInsights() {
+
+    const grid = document.getElementById(
+        "analytics-insights-grid"
+    );
+
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    player.insights.forEach(insight => {
+
+        grid.appendChild(
+
+            createInsightCard(
+                insight
+            )
+
+        );
+
+    });
 
 }

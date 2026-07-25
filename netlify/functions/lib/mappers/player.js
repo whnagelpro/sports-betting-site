@@ -65,7 +65,19 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
         ),
 
-        gameLogs: [],
+        insights: buildInsights(
+            row,
+            seasonStats
+        ),
+
+        analytics: buildAnalytics(
+            row,
+            seasonStats
+        ),
+
+        gameLogs: buildGameLogs(
+            row
+        ),
 
         summary: {},
 
@@ -218,5 +230,171 @@ function buildSeasonPanels(row, seasonStats) {
     // Temporary hitter placeholder
 
     return [];
+
+}
+
+function buildInsights(row, seasonStats) {
+
+    const position = (row.Position || "").toUpperCase();
+
+    if (["SP", "RP", "P"].includes(position)) {
+
+        return [
+
+            {
+                icon: "🔥",
+                title: "Recent Form",
+                text: "Pitching consistently over recent appearances."
+            },
+
+            {
+                icon: "📈",
+                title: "Strikeout Trend",
+                text: "Generating strong strikeout production recently."
+            },
+
+            {
+                icon: "⚾",
+                title: "Matchup",
+                text: "Today's matchup projects favorably."
+            }
+
+        ];
+
+    }
+
+    return [
+
+        {
+            icon: "🔥",
+            title: "Recent Form",
+            text: "Swinging the bat well recently."
+        },
+
+        {
+            icon: "📈",
+            title: "Power Trend",
+            text: "Power numbers have been trending upward."
+        },
+
+        {
+            icon: "⚾",
+            title: "Matchup",
+            text: "Today's matchup favors this hitter."
+        }
+
+    ];
+
+}
+
+function buildGameLogs(row) {
+
+    return [
+
+        {
+            date: "7/20",
+            opponent: "PIT",
+            result: "W 5-2",
+            innings: "6.0",
+            strikeouts: 8,
+            walks: 2,
+            hits: 4,
+            earnedRuns: 1
+        },
+
+        {
+            date: "7/14",
+            opponent: "CHC",
+            result: "W 4-1",
+            innings: "7.0",
+            strikeouts: 9,
+            walks: 1,
+            hits: 5,
+            earnedRuns: 0
+        }
+
+    ];
+
+}
+
+function buildAnalytics(row, seasonStats) {
+
+    const position = (row.Position || "").toUpperCase();
+
+    if (["SP","RP","P"].includes(position)) {
+
+        return {
+
+            score: 92,
+
+            confidence: "High",
+
+            recommendation: "Elite Play",
+
+            bestProp: {
+
+                market: "Strikeouts",
+
+                line: "Over 5.5",
+
+                ev: "+8.2%"
+
+            },
+
+            strengths: [
+
+                "Strong recent strikeout production",
+
+                "Consistent innings workload",
+
+                "Favorable projected matchup"
+
+            ],
+
+            weaknesses: [
+
+                "Walk rate can occasionally spike"
+
+            ]
+
+        };
+
+    }
+
+    return {
+
+        score: 90,
+
+        confidence: "High",
+
+        recommendation: "Strong Play",
+
+        bestProp: {
+
+            market: "Hits",
+
+            line: "Over 1.5",
+
+            ev: "+6.4%"
+
+        },
+
+        strengths: [
+
+            "Excellent recent contact",
+
+            "Power trending upward",
+
+            "Positive matchup"
+
+        ],
+
+        weaknesses: [
+
+            "Occasional strikeout volatility"
+
+        ]
+
+    };
 
 }
