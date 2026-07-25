@@ -14,13 +14,11 @@ export function calculatePlayerAnalytics({
 
 }) {
 
-    const recentForm = calculateRecentForm(
-        gameLogs
-    );
+    const recentForm = calculateRecentForm(gameLogs);
 
     return {
 
-        score: 0,
+        score: recentForm.score,
 
         confidence: "Unknown",
 
@@ -30,7 +28,15 @@ export function calculatePlayerAnalytics({
 
         weaknesses: [],
 
-        bestProp: null,
+        bestProp: {
+
+            market: "-",
+
+            line: "-",
+
+            ev: "-"
+
+        },
         
         recentForm
 

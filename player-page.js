@@ -40,7 +40,15 @@ async function initPlayerPage() {
 
         renderHero();
 
+        renderInsights();
+
+        renderAnalyticsDashboard();
+
         renderQuickStats();
+
+        renderSeasonPanels();
+
+        renderGameLogs();
 
     }
 
@@ -319,18 +327,6 @@ function renderAnalyticsDashboard() {
     `;
 
 }
-
-renderHero();
-
-renderInsights();
-
-renderAnalyticsDashboard();
-
-renderQuickStats();
-
-renderSeasonPanels();
-
-renderGameLogs();
 
 // ------------------------------------------------------
 // Utilities
