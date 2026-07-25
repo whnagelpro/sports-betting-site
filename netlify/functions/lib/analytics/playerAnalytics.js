@@ -1,6 +1,8 @@
 import { calculateRecentForm } from "./recentForm.js";
 import { calculateConsistency } from "./consistency.js";
 import { calculateMatchup } from "./matchup.js";
+import { buildPlayerReasons } from "./ruleEngine.js";
+import { calculateProjection } from "./projection.js";
 
 export function calculatePlayerAnalytics({
 
@@ -22,25 +24,34 @@ export function calculatePlayerAnalytics({
 
     const matchupAnalysis = calculateMatchup(matchup);
 
-    const strengths = [];
+    const projection = calculateProjection({
 
-    const weaknesses = [];
+    seasonAverage:
+        seasonStats.average,
 
-    if (recentForm.trend === "Up") {
+    recentAverage:
+        recentForm.last5Average,
 
-    strengths.push(
-        "Recent performance trending upward"
-    );
+    matchupScore:
+        matchupAnalysis.score
 
-}
+});
 
-    if (consistency.rating === "Elite") {
+    const {
 
-    strengths.push(
-        "Highly consistent performer"
-    );
+    strengths,
 
-}
+    weaknesses
+
+} = buildPlayerReasons({
+
+    recentForm,
+
+    consistency,
+
+    matchup: matchupAnalysis
+
+});
 
     const analyticsScore = Math.round(
 
@@ -78,7 +89,9 @@ export function calculatePlayerAnalytics({
 
     recentForm,
 
-    consistency
+    consistency,
+
+    projection,
 
 };
 
