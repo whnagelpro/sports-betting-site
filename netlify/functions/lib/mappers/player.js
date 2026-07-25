@@ -70,10 +70,19 @@ export function mapPlayer(row, league, seasonStats = {}) {
             seasonStats
         ),
 
-        analytics: buildAnalytics(
+        analytics: calculatePlayerAnalytics({
+
             row,
-            seasonStats
-        ),
+
+            seasonStats,
+
+            gameLogs,
+
+            matchup,
+
+            props
+
+        }),
 
         gameLogs: buildGameLogs(
             row
