@@ -83,12 +83,12 @@ export async function handler(event) {
             );
 
         const gameOddsRows =
-            await loadTodayGameOdds(
+            await loadGameOdds(
                 source.gameOdds
             );
 
         const playerPropRows =
-            await loadTodayPlayerProps(
+            await loadPlayerProps(
                 source.playerProps
             );
 
