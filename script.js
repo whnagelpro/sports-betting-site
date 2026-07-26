@@ -630,24 +630,36 @@ function buildPropsFromRows(rows) {
         gameLabel = `${awayTeam} at ${homeTeam}`;
       }
 
-      return {
-        gameDate,
-        playerName,
-        playerFirstName,
-        playerLastName,
-        vendor,
-        propType,
-        lineValue,
-        betType,
-        overOdds,
-        underOdds,
-        genericOdds,
-        impliedProbability,
-        ev,
-        awayTeam,
-        homeTeam,
-        gameLabel
-      };
+return {
+    gameDate,
+
+    playerId: safeText(row["Player Id"], ""),
+
+    gameId: safeText(row["Game Id"], ""),
+
+    league: "mlb",
+
+    playerName,
+    playerFirstName,
+    playerLastName,
+
+    vendor,
+    propType,
+    lineValue,
+    betType,
+
+    overOdds,
+    underOdds,
+    genericOdds,
+
+    impliedProbability,
+    ev,
+
+    awayTeam,
+    homeTeam,
+
+    gameLabel
+};
     })
     .filter((prop) =>
       prop.gameDate &&
@@ -854,7 +866,21 @@ function createPropCard(prop) {
     <article class="prop-card">
       <div class="prop-card-header">
         <div>
-          <h3>${fullName} — ${formatPropTypeLabel(prop.propType)}</h3>
+          <h3>
+
+<a
+    class="player-link"
+    href="player.html?league=${prop.league}&id=${prop.playerId}">
+
+    ${fullName}
+
+</a>
+
+—
+
+${formatPropTypeLabel(prop.propType)}
+
+</h3>
           <p class="prop-meta">${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}</p>
         </div>
         <div class="ev-badge ${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>

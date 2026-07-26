@@ -166,6 +166,22 @@ function renderQuickStats() {
 
 function renderSeasonPanels() {
 
+    const section = document.getElementById(
+    "season-stats-section"
+);
+
+if (!section) return;
+
+if (!player.seasonPanels?.length) {
+
+    section.hidden = true;
+
+    return;
+
+}
+
+section.hidden = false;
+
     const dashboard = document.getElementById(
 
         "season-dashboard"
@@ -187,6 +203,22 @@ function renderSeasonPanels() {
 }
 
 function renderGameLogs() {
+
+    const section = document.getElementById(
+    "game-log-section"
+);
+
+if (!section) return;
+
+if (!player.gameLogs?.length) {
+
+    section.hidden = true;
+
+    return;
+
+}
+
+section.hidden = false;
 
     const body = document.getElementById(
         "game-log-body"
@@ -302,11 +334,26 @@ function createGameLogRow(game) {
 
 function renderAnalyticsDashboard() {
 
-    const dashboard = document.getElementById(
-        "analytics-dashboard"
+    const section = document.getElementById(
+        "analytics-dashboard-section"
     );
 
-    if (!dashboard) return;
+    const dashboard =
+        document.getElementById(
+            "analytics-dashboard"
+        );
+
+    if (!dashboard || !section) return;
+
+    if (!player.analytics) {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    section.hidden = false;
 
     const analytics = player.analytics;
 
@@ -398,28 +445,37 @@ function renderAnalyticsDashboard() {
 
 function renderMatchup() {
 
-    if (!player.matchup) return;
+    const section = document.getElementById(
+        "matchup-section"
+    );
+
+    if (!section) return;
+
+    if (!player.matchup) {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    section.hidden = false;
 
     renderFields({
 
         "matchup-game":
-
             `${player.matchup["Away Team"]} @ ${player.matchup["Home Team"]}`,
 
         "matchup-time":
-
             player.matchup["Game Date"],
 
         "opponent-pitcher":
-
             player.matchup["Opponent Pitcher"] ?? "-",
 
         "opponent-handedness":
-
             player.matchup["Opponent Throws"] ?? "-",
 
         "lineup-position":
-
             player.matchup["Projected Lineup Spot"] ?? "-"
 
     });
@@ -428,7 +484,21 @@ function renderMatchup() {
 
 function renderProps() {
 
-    if (!player.props?.length) return;
+    const section = document.getElementById(
+        "player-props-section"
+    );
+
+    if (!section) return;
+
+    if (!player.props?.length) {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    section.hidden = false;
 
     const topProp = player.props[0];
 
@@ -464,13 +534,25 @@ function renderProps() {
 
 function renderTrendCards() {
 
-    const grid = document.getElementById(
-
-        "trend-grid"
-
+    const section = document.getElementById(
+        "player-trends-section"
     );
 
-    if (!grid) return;
+    const grid = document.getElementById(
+        "trend-grid"
+    );
+
+    if (!grid || !section) return;
+
+    if (!player.trends?.length) {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    section.hidden = false;
 
     grid.innerHTML = "";
 
@@ -635,11 +717,25 @@ function createInsightCard(insight) {
 
 function renderInsights() {
 
+    const section = document.getElementById(
+        "analytics-insights-section"
+    );
+
     const grid = document.getElementById(
         "analytics-insights-grid"
     );
 
-    if (!grid) return;
+    if (!grid || !section) return;
+
+    if (!player.insights?.length) {
+
+        section.hidden = true;
+
+        return;
+
+    }
+
+    section.hidden = false;
 
     grid.innerHTML = "";
 
