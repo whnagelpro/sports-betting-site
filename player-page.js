@@ -345,13 +345,19 @@ function renderAnalyticsDashboard() {
 
     if (!dashboard || !section) return;
 
-    if (!player.analytics) {
+    if (
 
-        section.hidden = true;
+    !player.analytics ||
 
-        return;
+    !player.analytics.bestProp
 
-    }
+) {
+
+    section.hidden = true;
+
+    return;
+
+}
 
     section.hidden = false;
 
