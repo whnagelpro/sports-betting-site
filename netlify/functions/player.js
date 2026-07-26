@@ -141,11 +141,87 @@ const player = {
 
     props: context.props,
 
-    trends: context.trends,
+    trends: context.trends.map(trend => ({
 
-    gameLogs: context.gameLogs,
+    statType: trend["Stat Type"],
 
-    quickStats: [],
+    trendNote: trend["Trend Note"],
+
+    trendScore: trend["Trend Score"],
+
+    trendStrength: trend["Trend Strength"],
+
+    consistency: trend["Consistency"],
+
+    riskTier: trend["Risk Tier"]
+
+})),
+
+    gameLogs: context.gameLogs.map(game => ({
+
+    gameDate: game["Game Date"],
+
+    opponent: game["Opponent"],
+
+    hits: game["Hits"],
+
+    runs: game["Runs"],
+
+    rbis: game["RBIs"],
+
+    homeRuns: game["Home Runs"],
+
+    totalBases: game["Total Bases"],
+
+    strikeouts: game["Strikeouts"],
+
+    walks: game["Walks"],
+
+    pitcherStrikeouts: game["Pitcher Strikeouts"],
+
+    pitcherOuts: game["Pitcher Outs"],
+
+    pitcherEarnedRuns: game["Pitcher Earned Runs"],
+
+    pitcherHitsAllowed: game["Pitcher Hits Allowed"],
+
+    pitcherWalks: game["Pitcher Walks"]
+
+})),
+
+    quickStats: [
+
+    {
+        label: "Games",
+        value: context.seasonStats["Games Played"] ?? "-"
+    },
+
+    {
+        label: "Hits",
+        value: Number(context.seasonStats["Avg Hits"] ?? 0).toFixed(2)
+    },
+
+    {
+        label: "Runs",
+        value: Number(context.seasonStats["Avg Runs"] ?? 0).toFixed(2)
+    },
+
+    {
+        label: "RBIs",
+        value: Number(context.seasonStats["Avg RBIs"] ?? 0).toFixed(2)
+    },
+
+    {
+        label: "Home Runs",
+        value: Number(context.seasonStats["Avg Home Runs"] ?? 0).toFixed(2)
+    },
+
+    {
+        label: "Strikeouts",
+        value: Number(context.seasonStats["Avg Strikeouts"] ?? 0).toFixed(2)
+    }
+
+],
 
     seasonPanels: [],
 
