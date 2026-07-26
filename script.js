@@ -599,7 +599,12 @@ function transformRowsToGames(rows) {
 
 function buildPropsFromRows(rows) {
   return rows
-    .map((row) => {
+    .map((row, index) => {
+
+        if (index === 0) {
+          console.log(Object.keys(row));
+        }
+    
       const gameDate = normalizeDate(row["Game Date"]);
 
       const playerFirstName = safeText(row["Player First Name"], "");
