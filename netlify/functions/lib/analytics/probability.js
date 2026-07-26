@@ -1,30 +1,17 @@
 function normalCDF(z) {
-
     return 0.5 * (
-
         1 +
-
         Math.tanh(
-
             Math.sqrt(2 / Math.PI) *
-
             (
-
                 z +
-
-                0.044715 *
-
-                Math.pow(z, 3)
-
+                0.044715 * Math.pow(z, 3)
             )
-
         )
-
     );
-
 }
 
-export function calculateProbability({
+function calculateProbability({
 
     projection,
 
@@ -40,54 +27,58 @@ export function calculateProbability({
 
         sportsbookLine == null ||
 
-        standardDeviation == null
+        standardDeviation == null ||
+
+        standardDeviation === 0
 
     ) {
 
-return {
+        return {
 
-    zScore:
+            zScore: null,
 
-        Number(zScore.toFixed(2)),
+            overProbability: null,
 
-    overProbability:
+            underProbability: null
 
-        Number(
-
-            (overProbability * 100)
-
-            .toFixed(1)
-
-        ),
-
-    underProbability:
-
-        Number(
-
-            (underProbability * 100)
-
-            .toFixed(1)
-
-        )
-
-};
+        };
 
     }
 
+    const zScore =
+
+        (sportsbookLine - projection) /
+
+        standardDeviation;
+
+    const underProbability =
+
+        normalCDF(zScore);
+
+    const overProbability =
+
+        1 - underProbability;
+
+    return {
+
+        zScore:
+
+            Number(zScore.toFixed(2)),
+
+        overProbability:
+
+            Number((overProbability * 100).toFixed(1)),
+
+        underProbability:
+
+            Number((underProbability * 100).toFixed(1))
+
+    };
+
 }
 
-const zScore =
+module.exports = {
 
-    (sportsbookLine - projection)
+    calculateProbability
 
-    /
-
-    standardDeviation;
-
-const underProbability =
-
-    normalCDF(zScore);
-
-const overProbability =
-
-    1 - underProbability;
+};
