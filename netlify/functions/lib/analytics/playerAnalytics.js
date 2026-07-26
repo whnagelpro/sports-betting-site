@@ -3,6 +3,12 @@ import { calculateConsistency } from "./consistency.js";
 import { calculateMatchup } from "./matchup.js";
 import { buildPlayerReasons } from "./ruleEngine.js";
 import { calculateProjection } from "./projection.js";
+import { calculateProbability } from "./probability.js";
+import { calculateImpliedProbability } from "./impliedProbability.js";
+import { calculateEdge } from "./edge.js";
+import { calculateExpectedValue } from "./expectedValue.js";
+import { findBestProp } from "./bestProp.js";
+import { calculateRecommendation } from "./recommendation.js";
 
 export function calculatePlayerAnalytics({
 
@@ -24,75 +30,157 @@ export function calculatePlayerAnalytics({
 
     const matchupAnalysis = calculateMatchup(matchup);
 
-    const projection = calculateProjection({
+    // No sportsbook props available
+    if (props.length === 0) {
 
-    seasonAverage:
-        recentForm.last10Average,
+        return null;
 
-    recentAverage:
-        recentForm.last5Average,
+    }
 
-    matchupScore:
-        matchupAnalysis.score
+    const propAnalytics = [];
+
+    for (const prop of props) {
+
+        const sportsbookLine = prop.line;
+
+        const americanOdds = prop.odds;
+
+        const projection = calculateProjection({
+
+            seasonAverage:
+                seasonStats.seasonAverage,
+
+            recentAverage:
+                recentForm.last5Average,
+
+            matchupScore:
+                matchupAnalysis.score
+
+        });
+
+        const probability = calculateProbability({
+
+            projection:
+                projection.projectedStat,
+
+            sportsbookLine,
+
+            standardDeviation:
+                seasonStats.standardDeviation
+
+        });
+
+        const impliedProbability =
+            calculateImpliedProbability(
+                americanOdds
+            );
+
+        const edge = calculateEdge({
+
+            projectedProbability:
+                probability.overProbability / 100,
+
+            impliedProbability
+
+        });
+
+        const expectedValue =
+            calculateExpectedValue({
+
+                projectedProbability:
+                    probability.overProbability / 100,
+
+                americanOdds
+
+            });
+
+        const recommendation =
+    calculateRecommendation({
+
+        expectedValue,
+
+        edge,
+
+        probability,
+
+        consistency,
+
+        matchup: matchupAnalysis
+
+    });
+
+        propAnalytics.push({
+
+    ...prop,
+
+    projection,
+
+    probability,
+
+    impliedProbability,
+
+    edge,
+
+    expectedValue,
+
+    recommendation
 
 });
+
+    }
+
+    const bestProp = findBestProp(propAnalytics);
 
     const {
 
-    strengths,
+        strengths,
 
-    weaknesses
+        weaknesses
 
-} = buildPlayerReasons({
+    } = buildPlayerReasons({
 
-    recentForm,
+        recentForm,
 
-    consistency,
+        consistency,
 
-    matchup: matchupAnalysis
+        matchup: matchupAnalysis
 
-});
+    });
 
     const analyticsScore = Math.round(
 
-    recentForm.score * 0.35 +
+        recentForm.score * 0.35 +
 
-    consistency.score * 0.35 +
+        consistency.score * 0.35 +
 
-    matchupAnalysis.score * 0.30
+        matchupAnalysis.score * 0.30
 
     );
 
     return {
 
-    score: analyticsScore,
+        seasonStats,
 
-    matchup: matchupAnalysis,
+        score: analyticsScore,
 
-    confidence: "Unknown",
+        matchup: matchupAnalysis,
 
-    recommendation: "No Recommendation",
+        confidence: "Unknown",
 
-    bestProp: {
+        recommendation: "No Recommendation",
 
-        market: "-",
+        bestProp,
 
-        line: "-",
+        allProps: propAnalytics,
 
-        ev: "-"
+        strengths,
 
-    },
+        weaknesses,
 
-    strengths,
+        recentForm,
 
-    weaknesses,
+        consistency
 
-    recentForm,
-
-    consistency,
-
-    projection,
-
-};
+    };
 
 }

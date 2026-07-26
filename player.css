@@ -3,7 +3,7 @@
 ===================================== */
 
 .player-page {
-    background: #f7f9fc;
+    background: #0f172a;
     min-height: 100vh;
     padding-bottom: 60px;
 }
@@ -38,7 +38,7 @@
 
     align-items: center;
 
-    background: white;
+    background: #1e293b;
 
     border-radius: 18px;
 
@@ -100,7 +100,7 @@
 
 .player-meta span {
 
-    background: #f4f4f4;
+    background: #1e293b;
 
     padding: 8px 14px;
 
@@ -176,7 +176,7 @@
 
 .stat-card {
 
-    background: white;
+    background: #1e293b;
 
     border-radius: 15px;
 
@@ -232,7 +232,7 @@
 
 .matchup-card {
 
-    background: white;
+    background: #1e293b;
 
     padding: 30px;
 
@@ -350,7 +350,7 @@
 
 .featured-prop-card{
 
-    background:white;
+    background:#1e293b;
 
     border-radius:22px;
 
@@ -502,7 +502,7 @@
 
 .prop-card{
 
-    background:white;
+    background:#1e293b;
 
     border-radius:18px;
 
@@ -582,7 +582,7 @@
 
 .trend-card{
 
-    background:white;
+    background:#1e293b;
 
     border-radius:18px;
 
@@ -644,7 +644,7 @@
 
 .stats-panel{
 
-    background:white;
+    background:#1e293b;
 
     border-radius:18px;
 
@@ -686,7 +686,7 @@
 
 .game-log-card{
 
-    background:white;
+    background:#1e293b;
 
     border-radius:18px;
 
@@ -726,13 +726,13 @@
 
 .game-log-table tbody tr:nth-child(even){
 
-    background:#f8fafc;
+    background:#1e293b;
 
 }
 
 .game-log-table tbody tr:hover{
 
-    background:#eef6ff;
+    background:#1e293b;
 
 }
 
@@ -754,7 +754,7 @@
 
 .summary-card{
 
-    background:white;
+    background:#1e293b;
 
     border-radius:18px;
 
@@ -806,7 +806,7 @@
 
 .related-player-card{
 
-    background:white;
+    background:#1e293b;
 
     border-radius:18px;
 
@@ -890,7 +890,7 @@
 
     gap: 3rem;
 
-    background: #ffffff;
+    background: #1e293b;
 
     border-radius: 18px;
 

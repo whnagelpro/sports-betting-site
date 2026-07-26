@@ -4,21 +4,24 @@
 // ======================================================
 
 import { DATA_SOURCES } from "./lib/config.js";
-import { loadCSV, findPlayer } from "./lib/csv.js";
+
+import { loadCSV } from "./lib/csv.js";
+
+import { loadSeasonStats } from "./lib/seasonStats.js";
+
+import { loadPlayerContext } from "./lib/playerContext.js";
+
 import { mapPlayer } from "./lib/mappers/player.js";
-import {
-    success,
-    badRequest,
-    notFound,
-    serverError
-} from "./lib/response.js";
-import {
 
-    loadSeasonStats,
+import { success, badRequest, serverError, notFound } from "./lib/response.js";
 
-    findSeasonStats
+import { loadGameLogs } from "./lib/gameLogs.js";
 
-} from "./lib/seasonStats.js";
+import { loadTrends } from "./lib/trends.js";
+
+import { loadPlayerProps } from "./lib/playerProps.js";
+
+import { loadGameOdds } from "./lib/gameOdds.js";
 
 export async function handler(event) {
 
@@ -28,8 +31,7 @@ export async function handler(event) {
             event.queryStringParameters?.league || ""
         ).toLowerCase();
 
-        const id =
-            event.queryStringParameters?.id;
+        const id = event.queryStringParameters?.id;
 
         if (!league) {
 
@@ -57,51 +59,78 @@ export async function handler(event) {
 
         }
 
+        // ----------------------------
+        // Load CSV data
+        // ----------------------------
+
         const roster = await loadCSV(
-
             source.roster
-
         );
 
-        const seasonRows = await loadSeasonStats(
+        const seasonRows =
+            await loadSeasonStats(
+                source.seasonStats
+            );
 
-            source.seasonStats
+        const gameLogRows =
+            await loadGameLogs(
+                source.gameLogs
+            );
 
-        );
+        const trendRows =
+            await loadTrends(
+                source.trends
+            );
 
-        const row = findPlayer(
+        const gameOddsRows =
+            await loadTodayGameOdds(
+                source.gameOdds
+            );
+
+        const playerPropRows =
+            await loadTodayPlayerProps(
+                source.playerProps
+            );
+
+        // ----------------------------
+        // Load player context
+        // ----------------------------
+
+        const context = loadPlayerContext({
+
+            playerId: id,
 
             roster,
 
-            id
-
-        );
-
-        const seasonStats = findSeasonStats(
-
             seasonRows,
 
-            id
+            gameLogRows,
 
-        );
+            trendRows,
 
-        if (!row) {
+            gameOddsRows,
+
+            playerPropRows
+
+        });
+
+        if (!context) {
 
             return notFound(
-
                 "Player not found."
-
             );
 
         }
 
+        // ----------------------------
+        // Build player object
+        // ----------------------------
+
         const player = mapPlayer(
 
-            row,
+            context,
 
-            league,
-
-            seasonStats
+            league
 
         );
 
@@ -110,6 +139,8 @@ export async function handler(event) {
     }
 
     catch (error) {
+
+        console.error(error);
 
         return serverError(error);
 

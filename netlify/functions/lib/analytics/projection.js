@@ -17,13 +17,49 @@ export function calculateProjection({
     const matchupAdjustment =
         (matchupScore - 50) / 50;
 
-    const projectedStat =
+    const seasonComponent =
 
-        seasonAverage * seasonWeight +
+    seasonAverage * 0.40;
 
-        recentAverage * recentWeight +
+const recentComponent =
 
-        seasonAverage * matchupAdjustment * matchupWeight;
+    recentAverage * 0.25;
+
+const matchupComponent =
+
+    seasonAverage *
+
+    matchupAdjustment *
+
+    0.20;
+
+    const trendBonus =
+
+    recentAverage > seasonAverage
+
+        ? 0.5
+
+        : 0;
+    
+    const consistencyBonus =
+
+    confidence === "High"
+
+        ? 0.3
+
+        : 0;
+    
+const projectedStat =
+
+    seasonComponent +
+
+    recentComponent +
+
+    matchupComponent +
+
+    trendBonus +
+
+    consistencyBonus;
 
     let confidence = "Medium";
 
@@ -40,17 +76,38 @@ else if (Math.abs(recentAverage - seasonAverage) > 2) {
 
     return {
 
-        projectedStat:
-            Number(projectedStat.toFixed(1)),
+    projectedStat:
 
-        seasonAverage,
+        Number(projectedStat.toFixed(1)),
 
-        recentAverage,
+    seasonAverage,
 
-        matchupScore,
+    recentAverage,
 
-        confidence,
+    matchupScore,
 
-    };
+    confidence,
+
+    breakdown: {
+
+        seasonComponent:
+
+            Number(seasonComponent.toFixed(2)),
+
+        recentComponent:
+
+            Number(recentComponent.toFixed(2)),
+
+        matchupComponent:
+
+            Number(matchupComponent.toFixed(2)),
+
+        trendBonus,
+
+        consistencyBonus
+
+    }
+
+};
 
 }

@@ -48,6 +48,12 @@ async function initPlayerPage() {
 
         renderSeasonPanels();
 
+        renderMatchup();
+
+        renderProps();
+
+        renderTrendCards();
+
         renderGameLogs();
 
     }
@@ -190,13 +196,31 @@ function renderGameLogs() {
 
     body.innerHTML = "";
 
+    if (!player.gameLogs?.length) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="10">
+
+                    No recent games available.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
     player.gameLogs.forEach(game => {
 
         body.appendChild(
 
-            createGameLogRow(
-                game
-            )
+            createGameLogRow(game)
 
         );
 
@@ -208,25 +232,69 @@ function createGameLogRow(game) {
 
     const row = document.createElement("tr");
 
-    row.innerHTML = `
+    const isPitcher =
 
-        <td>${game.date}</td>
+        player.position === "SP" ||
 
-        <td>${game.opponent}</td>
+        player.position === "RP" ||
 
-        <td>${game.result}</td>
+        player.position === "P";
 
-        <td>${game.innings}</td>
+    if (isPitcher) {
 
-        <td>${game.strikeouts}</td>
+        row.innerHTML = `
 
-        <td>${game.walks}</td>
+            <td>${game.gameDate}</td>
 
-        <td>${game.hits}</td>
+            <td>${game.opponent}</td>
 
-        <td>${game.earnedRuns}</td>
+            <td>-</td>
 
-    `;
+            <td>${game.outs}</td>
+
+            <td>-</td>
+
+            <td>-</td>
+
+            <td>-</td>
+
+            <td>-</td>
+
+            <td>${game.walks}</td>
+
+            <td>${game.strikeouts}</td>
+
+        `;
+
+    }
+
+    else {
+
+        row.innerHTML = `
+
+            <td>${game.gameDate}</td>
+
+            <td>${game.opponent}</td>
+
+            <td>-</td>
+
+            <td>-</td>
+
+            <td>${game.hits}</td>
+
+            <td>${game.runs}</td>
+
+            <td>${game.rbis}</td>
+
+            <td>${game.homeRuns}</td>
+
+            <td>${game.walks}</td>
+
+            <td>${game.strikeouts}</td>
+
+        `;
+
+    }
 
     return row;
 
@@ -325,6 +393,118 @@ function renderAnalyticsDashboard() {
         </div>
 
     `;
+
+}
+
+function renderMatchup() {
+
+    if (!player.matchup) return;
+
+    renderFields({
+
+        "matchup-game":
+
+            `${player.matchup["Away Team"]} @ ${player.matchup["Home Team"]}`,
+
+        "matchup-time":
+
+            player.matchup["Game Date"],
+
+        "opponent-pitcher":
+
+            player.matchup["Opponent Pitcher"] ?? "-",
+
+        "opponent-handedness":
+
+            player.matchup["Opponent Throws"] ?? "-",
+
+        "lineup-position":
+
+            player.matchup["Projected Lineup Spot"] ?? "-"
+
+    });
+
+}
+
+function renderProps() {
+
+    if (!player.props?.length) return;
+
+    const topProp = player.props[0];
+
+    renderFields({
+
+        "top-prop-name":
+
+            topProp["Prop Type"],
+
+        "top-prop-line":
+
+            topProp["Line Value"],
+
+        "top-prop-odds":
+
+            topProp["Odds"],
+
+        "top-prop-book":
+
+            topProp["Vendor"],
+
+        "top-prop-ev":
+
+            topProp["EV Over/Milestone ($1 Bet)"],
+
+        "top-prop-probability":
+
+            topProp["Poisson Over"]
+
+    });
+
+}
+
+function renderTrendCards() {
+
+    const grid = document.getElementById(
+
+        "trend-grid"
+
+    );
+
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    player.trends.forEach(trend => {
+
+        const card = document.createElement("article");
+
+        card.className = "trend-card";
+
+        card.innerHTML = `
+
+            <div class="trend-icon">
+
+                📈
+
+            </div>
+
+            <h3>
+
+                ${trend.statType}
+
+            </h3>
+
+            <p>
+
+                ${trend.trendNote}
+
+            </p>
+
+        `;
+
+        grid.appendChild(card);
+
+    });
 
 }
 

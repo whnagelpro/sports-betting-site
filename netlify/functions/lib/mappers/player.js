@@ -1,23 +1,122 @@
-import { calculatePlayerAnalytics } from "../analytics/playerAnalytics.js"
+import { calculatePlayerAnalytics } from "../analytics/playerAnalytics.js";
+import { mapGameLogs } from "./gameLogs.js";
+import { mapTrends } from "./trends.js";
+import { mapInsights } from "./insights.js";
 
 // ======================================================
 // Sportacular Analytics
 // Player Mapper
 // ======================================================
 
-export function mapPlayer(row, league, seasonStats = {}) {
+export function mapPlayer(context, league) {
 
-    const gameLogs = buildGameLogs(row);
+    const {
 
-    const matchup = {};
+        profile,
 
-    const props = [];
+        seasonStats,
+
+        gameLogs,
+
+        trends,
+
+        matchup,
+
+        props
+
+    } = context;
+
+    const playerProfile = buildProfile(profile);
+
+    const season = buildSeason(
+
+        profile,
+
+        seasonStats
+
+    );
+
+    const mappedGameLogs = mapGameLogs(
+
+    gameLogs,
+
+    profile.position
+
+);
+
+const mappedTrends =
+    mapTrends(
+        trends
+    );
+
+const mappedInsights =
+    mapInsights(
+        mappedTrends
+    );
+
+const trendsData = buildTrends(
+
+    profile,
+
+    mappedGameLogs,
+
+    mappedTrends,
+
+    mappedInsights
+
+);
+
+    const analytics = calculatePlayerAnalytics({
+
+        row: profile,
+
+        seasonStats,
+
+        gameLogs: mappedGameLogs,
+
+        matchup,
+
+        props
+
+    });
+
+    return {
+
+        ...playerProfile,
+
+        league,
+
+        quickStats: season.quickStats,
+
+        season: season.raw,
+
+        seasonPanels: season.panels,
+
+        matchup,
+
+        props,
+
+        trends: trendsData.items,
+
+        gameLogs: trendsData.gameLogs,
+
+        insights: trendsData.insights,
+
+        analytics,
+
+        summary: {},
+
+        relatedPlayers: []
+
+    };
+
+}
+
+function buildProfile(row) {
 
     return {
 
         id: row.Id,
-
-        league,
 
         name: row["Full Name"],
 
@@ -43,60 +142,44 @@ export function mapPlayer(row, league, seasonStats = {}) {
 
         status: row.Status,
 
-        analyticsScore: 0,
+        analyticsScore: null,
 
-        age: "",
+        age: null,
 
-        headshot: "",
+        headshot: null
 
-        quickStats: buildQuickStats(
+    };
 
+}
+
+function buildSeason(row, seasonStats) {
+
+    return {
+
+        raw: seasonStats,
+
+        quickStats: buildQuickStats(row, seasonStats),
+
+        panels: buildSeasonPanels(row, seasonStats)
+
+    };
+
+}
+
+function buildTrends(
     row,
+    gameLogs,
+    mappedTrends,
+    mappedInsights
+) {
 
-    seasonStats
+    return {
 
-),
-
-        matchup,
-
-        props,
-
-        trends: [],
-
-        season: seasonStats,
-
-        seasonPanels: buildSeasonPanels(
-
-            row,
-
-            seasonStats
-
-        ),
-
-        insights: buildInsights(
-            row,
-            seasonStats
-        ),
-
-        analytics: calculatePlayerAnalytics({
-
-            row,
-
-            seasonStats,
-
-            gameLogs,
-
-            matchup,
-
-            props
-
-        }),
+        items: mappedTrends,
 
         gameLogs,
 
-        summary: {},
-
-        relatedPlayers: []
+        insights: mappedInsights
 
     };
 
@@ -296,36 +379,6 @@ function buildInsights(row, seasonStats) {
             icon: "⚾",
             title: "Matchup",
             text: "Today's matchup favors this hitter."
-        }
-
-    ];
-
-}
-
-function buildGameLogs(row) {
-
-    return [
-
-        {
-            date: "7/20",
-            opponent: "PIT",
-            result: "W 5-2",
-            innings: "6.0",
-            strikeouts: 8,
-            walks: 2,
-            hits: 4,
-            earnedRuns: 1
-        },
-
-        {
-            date: "7/14",
-            opponent: "CHC",
-            result: "W 4-1",
-            innings: "7.0",
-            strikeouts: 9,
-            walks: 1,
-            hits: 5,
-            earnedRuns: 0
         }
 
     ];
