@@ -63,34 +63,41 @@ export async function handler(event) {
         // Load CSV data
         // ----------------------------
 
-        const roster = await loadCSV(
-            source.roster
-        );
+        console.log("Loading roster...");
+const roster = await loadCSV(source.roster);
+console.log("✓ roster", roster.length);
 
-        const seasonRows =
-            await loadSeasonStats(
-                source.seasonStats
-            );
+console.log("Loading season stats...");
+const seasonRows = await loadSeasonStats(source.seasonStats);
+console.log("✓ season", seasonRows.length);
 
-        const gameLogRows =
-            await loadGameLogs(
-                source.gameLogs
-            );
+console.log("Loading game logs...");
+const gameLogRows = await loadGameLogs(source.gameLogs);
+console.log("✓ game logs", gameLogRows.length);
 
-        const trendRows =
-            await loadTrends(
-                source.trends
-            );
+console.log("Loading trends...");
+const trendRows = await loadTrends(source.trends);
+console.log("✓ trends", trendRows.length);
 
-        const gameOddsRows =
-            await loadGameOdds(
-                source.gameOdds
-            );
+console.log("Loading game odds...");
+const gameOddsRows = await loadGameOdds(source.gameOdds);
+console.log("✓ game odds", gameOddsRows.length);
 
-        const playerPropRows =
-            await loadPlayerProps(
-                source.playerProps
-            );
+console.log("Loading props...");
+const playerPropRows = await loadPlayerProps(source.playerProps);
+console.log("✓ props", playerPropRows.length);
+
+console.log("Building context...");
+const context = loadPlayerContext({
+    playerId: id,
+    roster,
+    seasonRows,
+    gameLogRows,
+    trendRows,
+    gameOddsRows,
+    playerPropRows
+});
+console.log("✓ context built");
 
         // ----------------------------
         // Load player context
