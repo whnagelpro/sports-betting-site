@@ -1,14 +1,14 @@
-import { findPlayerGameLogs } from "./gameLogs.js";
+// ======================================================
+// Player Context Builder
+// ======================================================
 
-import { findPlayerTrends } from "./trends.js";
+const { findPlayerGameLogs } = require("./gameLogs");
+const { findPlayerTrends } = require("./trends");
+const { findPlayerToday } = require("./today");
+const { findPlayerProps } = require("./playerProps");
+const { findPlayerGame } = require("./gameOdds");
 
-import { findPlayerToday } from "./today.js";
-
-import { findPlayerProps } from "./playerProps.js";
-
-import { findPlayerGame } from "./gameOdds.js";
-
-export function loadPlayerContext({
+function loadPlayerContext({
 
     playerId,
 
@@ -52,9 +52,7 @@ export function loadPlayerContext({
 
     );
 
-    const trends =
-
-    findPlayerTrends(
+    const trends = findPlayerTrends(
 
         trendRows,
 
@@ -62,9 +60,7 @@ export function loadPlayerContext({
 
     );
 
-    const props =
-
-    findPlayerProps(
+    const props = findPlayerProps(
 
         playerPropRows,
 
@@ -72,9 +68,7 @@ export function loadPlayerContext({
 
     );
 
-const matchup =
-
-    findPlayerGame(
+    const matchup = findPlayerGame(
 
         gameOddsRows,
 
@@ -82,8 +76,8 @@ const matchup =
 
     );
 
-    const today =
-
+    // Keep this call because we'll likely use it later,
+    // even though today's return value isn't currently used.
     findPlayerToday({
 
         player: profile,
@@ -111,3 +105,9 @@ const matchup =
     };
 
 }
+
+module.exports = {
+
+    loadPlayerContext
+
+};

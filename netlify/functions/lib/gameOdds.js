@@ -1,18 +1,16 @@
-import { loadCSV } from "./csv.js";
+// ======================================================
+// Game Odds Helper
+// ======================================================
 
-export async function loadGameOdds(url) {
+const { loadCSV } = require("./csv");
 
-    return loadCSV(url);
+async function loadGameOdds(url) {
+
+    return await loadCSV(url);
 
 }
 
-export function findPlayerGame(
-
-    rows,
-
-    team
-
-) {
+function findPlayerGame(rows, team) {
 
     if (!Array.isArray(rows)) {
 
@@ -20,12 +18,19 @@ export function findPlayerGame(
 
     }
 
-    return rows.find(game =>
-
-        game["Home Team"] === team ||
-
-        game["Away Team"] === team
-
-    ) || {};
+    return (
+        rows.find(game =>
+            game["Home Team"] === team ||
+            game["Away Team"] === team
+        ) || {}
+    );
 
 }
+
+module.exports = {
+
+    loadGameOdds,
+
+    findPlayerGame
+
+};

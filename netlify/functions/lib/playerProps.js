@@ -1,18 +1,16 @@
-import { loadCSV } from "./csv.js";
+// ======================================================
+// Player Props Helper
+// ======================================================
 
-export async function loadPlayerProps(url) {
+const { loadCSV } = require("./csv");
 
-    return loadCSV(url);
+async function loadPlayerProps(url) {
+
+    return await loadCSV(url);
 
 }
 
-export function findPlayerProps(
-
-    rows,
-
-    playerId
-
-) {
+function findPlayerProps(rows, playerId) {
 
     if (!Array.isArray(rows)) {
 
@@ -22,12 +20,16 @@ export function findPlayerProps(
 
     return rows.filter(row =>
 
-        String(
-
-            row["Player Id"]
-
-        ) === String(playerId)
+        String(row["Player Id"]) === String(playerId)
 
     );
 
 }
+
+module.exports = {
+
+    loadPlayerProps,
+
+    findPlayerProps
+
+};

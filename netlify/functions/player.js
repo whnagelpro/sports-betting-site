@@ -99,28 +99,6 @@ const context = loadPlayerContext({
 });
 console.log("✓ context built");
 
-        // ----------------------------
-        // Load player context
-        // ----------------------------
-
-        const context = loadPlayerContext({
-
-            playerId: id,
-
-            roster,
-
-            seasonRows,
-
-            gameLogRows,
-
-            trendRows,
-
-            gameOddsRows,
-
-            playerPropRows
-
-        });
-
         if (!context) {
 
             return notFound(
@@ -133,13 +111,16 @@ console.log("✓ context built");
         // Build player object
         // ----------------------------
 
-        const player = mapPlayer(
-
-            context,
-
-            league
-
-        );
+        const player = {
+  profile: context.profile,
+  season: context.seasonStats,
+  matchup: context.matchup,
+  props: context.props,
+  trends: context.trends,
+  gameLogs: context.gameLogs,
+  quickStats: [],
+  analytics: {}
+};
 
         return success(player);
 

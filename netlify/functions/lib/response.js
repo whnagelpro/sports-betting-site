@@ -10,7 +10,11 @@ const HEADERS = {
 
 };
 
-export function success(data) {
+// ------------------------------------------------------
+// Success
+// ------------------------------------------------------
+
+function success(data) {
 
     return {
 
@@ -24,7 +28,11 @@ export function success(data) {
 
 }
 
-export function badRequest(message) {
+// ------------------------------------------------------
+// Bad Request
+// ------------------------------------------------------
+
+function badRequest(message) {
 
     return {
 
@@ -42,7 +50,11 @@ export function badRequest(message) {
 
 }
 
-export function notFound(message) {
+// ------------------------------------------------------
+// Not Found
+// ------------------------------------------------------
+
+function notFound(message) {
 
     return {
 
@@ -60,7 +72,11 @@ export function notFound(message) {
 
 }
 
-export function serverError(error) {
+// ------------------------------------------------------
+// Server Error
+// ------------------------------------------------------
+
+function serverError(error) {
 
     console.error(error);
 
@@ -79,3 +95,19 @@ export function serverError(error) {
     };
 
 }
+
+// ------------------------------------------------------
+// Exports
+// ------------------------------------------------------
+
+module.exports = {
+
+    success,
+
+    badRequest,
+
+    notFound,
+
+    serverError
+
+};

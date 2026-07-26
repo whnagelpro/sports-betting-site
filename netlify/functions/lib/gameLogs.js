@@ -1,18 +1,16 @@
-import { loadCSV } from "./csv.js";
+// ======================================================
+// Game Logs Helper
+// ======================================================
 
-export async function loadGameLogs(url) {
+const { loadCSV } = require("./csv");
 
-    return loadCSV(url);
+async function loadGameLogs(url) {
+
+    return await loadCSV(url);
 
 }
 
-export function findPlayerGameLogs(
-
-    rows,
-
-    playerId
-
-) {
+function findPlayerGameLogs(rows, playerId) {
 
     if (!rows) {
 
@@ -21,23 +19,20 @@ export function findPlayerGameLogs(
     }
 
     return rows
-
-    .filter(row =>
-
-        String(
-
-            row["Player ID"]
-
-        ) === String(playerId)
-
-    )
-
-    .sort((a, b) =>
-
-        new Date(b["Game Date"]) -
-
-        new Date(a["Game Date"])
-
-    );
+        .filter(row =>
+            String(row["Player ID"]) === String(playerId)
+        )
+        .sort((a, b) =>
+            new Date(b["Game Date"]) -
+            new Date(a["Game Date"])
+        );
 
 }
+
+module.exports = {
+
+    loadGameLogs,
+
+    findPlayerGameLogs
+
+};

@@ -1,18 +1,16 @@
-import { loadCSV } from "./csv.js";
+// ======================================================
+// Trends Helper
+// ======================================================
 
-export async function loadTrends(url) {
+const { loadCSV } = require("./csv");
 
-    return loadCSV(url);
+async function loadTrends(url) {
+
+    return await loadCSV(url);
 
 }
 
-export function findPlayerTrends(
-
-    rows,
-
-    playerId
-
-) {
+function findPlayerTrends(rows, playerId) {
 
     if (!Array.isArray(rows)) {
 
@@ -22,12 +20,16 @@ export function findPlayerTrends(
 
     return rows.filter(row =>
 
-        String(
-
-            row["Player ID"]
-
-        ) === String(playerId)
+        String(row["Player ID"]) === String(playerId)
 
     );
 
 }
+
+module.exports = {
+
+    loadTrends,
+
+    findPlayerTrends
+
+};

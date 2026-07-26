@@ -2,22 +2,30 @@
 // Season Stats Helper
 // ======================================================
 
-import { loadCSV } from "./csv.js";
+const { loadCSV } = require("./csv");
 
-export async function loadSeasonStats(url) {
+async function loadSeasonStats(url) {
 
     return await loadCSV(url);
 
 }
 
-export function findSeasonStats(rows, playerId) {
+function findSeasonStats(rows, playerId) {
 
     return rows.find(
 
         row =>
 
-        String(row["Player ID"]) === String(playerId)
+            String(row["Player ID"]) === String(playerId)
 
     );
 
 }
+
+module.exports = {
+
+    loadSeasonStats,
+
+    findSeasonStats
+
+};

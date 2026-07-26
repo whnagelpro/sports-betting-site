@@ -1,18 +1,34 @@
-import { loadCSV } from "./csv.js";
+// ======================================================
+// Today's Matchup Helper
+// ======================================================
 
-export async function loadTodayGameOdds(url) {
+const { loadCSV } = require("./csv");
 
-    return loadCSV(url);
+// ------------------------------------------------------
+// Load today's game odds
+// ------------------------------------------------------
+
+async function loadTodayGameOdds(url) {
+
+    return await loadCSV(url);
 
 }
 
-export async function loadTodayPlayerProps(url) {
+// ------------------------------------------------------
+// Load today's player props
+// ------------------------------------------------------
 
-    return loadCSV(url);
+async function loadTodayPlayerProps(url) {
+
+    return await loadCSV(url);
 
 }
 
-export function findPlayerToday({
+// ------------------------------------------------------
+// Build today's player context
+// ------------------------------------------------------
+
+function findPlayerToday({
 
     player,
 
@@ -47,3 +63,17 @@ export function findPlayerToday({
     };
 
 }
+
+// ------------------------------------------------------
+// Exports
+// ------------------------------------------------------
+
+module.exports = {
+
+    loadTodayGameOdds,
+
+    loadTodayPlayerProps,
+
+    findPlayerToday
+
+};
