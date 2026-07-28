@@ -61,29 +61,35 @@ export async function handler(event) {
         // Load CSV data
         // ----------------------------
 
-        console.log("Loading roster...");
-const roster = await loadCSV(source.roster);
-console.log("✓ roster", roster.length);
+const [
 
-console.log("Loading season stats...");
-const seasonRows = await loadSeasonStats(source.seasonStats);
-console.log("✓ season", seasonRows.length);
+    roster,
 
-console.log("Loading game logs...");
-const gameLogRows = await loadGameLogs(source.gameLogs);
-console.log("✓ game logs", gameLogRows.length);
+    seasonRows,
 
-console.log("Loading trends...");
-const trendRows = await loadTrends(source.trends);
-console.log("✓ trends", trendRows.length);
+    gameLogRows,
 
-console.log("Loading game odds...");
-const gameOddsRows = await loadGameOdds(source.gameOdds);
-console.log("✓ game odds", gameOddsRows.length);
+    trendRows,
 
-console.log("Loading props...");
-const playerPropRows = await loadPlayerProps(source.playerProps);
-console.log("✓ props", playerPropRows.length);
+    gameOddsRows,
+
+    playerPropRows
+
+] = await Promise.all([
+
+    loadCSV(source.roster),
+
+    loadSeasonStats(source.seasonStats),
+
+    loadGameLogs(source.gameLogs),
+
+    loadTrends(source.trends),
+
+    loadGameOdds(source.gameOdds),
+
+    loadPlayerProps(source.playerProps)
+
+]);
 
 console.log("Building context...");
 const context = loadPlayerContext({
