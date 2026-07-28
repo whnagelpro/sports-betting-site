@@ -118,17 +118,17 @@ function renderHero() {
 
     renderFields({
 
-        "player-name": player.name,
+        "player-name": player.hero.name,
 
-        "player-team": player.team,
+        "player-team": player.hero.team,
 
-        "player-position": player.position,
+        "player-position": player.hero.position,
 
-        "player-bats": player.bats,
+        "player-bats": player.hero.bats,
 
-        "player-throws": player.throws,
+        "player-throws": player.hero.throws,
 
-        "analytics-score": player.analyticsScore
+        "analytics-score": player.hero.analyticsScore
 
     });
 
@@ -469,22 +469,22 @@ function renderMatchup() {
 
     renderFields({
 
-        "matchup-game":
-            `${player.matchup["Away Team"]} @ ${player.matchup["Home Team"]}`,
+    "matchup-game":
+        `${player.matchup.awayTeam} @ ${player.matchup.homeTeam}`,
 
-        "matchup-time":
-            player.matchup["Game Date"],
+    "matchup-time":
+        player.matchup.gameDate,
 
-        "opponent-pitcher":
-            player.matchup["Opponent Pitcher"] ?? "-",
+    "opponent-pitcher":
+        player.matchup.opponentPitcher ?? "-",
 
-        "opponent-handedness":
-            player.matchup["Opponent Throws"] ?? "-",
+    "opponent-handedness":
+        player.matchup.opponentThrows ?? "-",
 
-        "lineup-position":
-            player.matchup["Projected Lineup Spot"] ?? "-"
+    "lineup-position":
+        player.matchup.lineupSpot ?? "-"
 
-    });
+});
 
 }
 
@@ -510,31 +510,31 @@ function renderProps() {
 
     renderFields({
 
-        "top-prop-name":
+    "top-prop-name":
 
-            topProp["Prop Type"],
+        topProp.displayName,
 
-        "top-prop-line":
+    "top-prop-line":
 
-            topProp["Line Value"],
+        topProp.line,
 
-        "top-prop-odds":
+    "top-prop-odds":
 
-            topProp["Odds"],
+        topProp.odds,
 
-        "top-prop-book":
+    "top-prop-book":
 
-            topProp["Vendor"],
+        topProp.sportsbook,
 
-        "top-prop-ev":
+    "top-prop-ev":
 
-            topProp["EV Over/Milestone ($1 Bet)"],
+        topProp.ev,
 
-        "top-prop-probability":
+    "top-prop-probability":
 
-            topProp["Poisson Over"]
+        topProp.probability
 
-    });
+});
 
 }
 
@@ -570,25 +570,43 @@ function renderTrendCards() {
 
         card.innerHTML = `
 
-            <div class="trend-icon">
+    <div class="trend-icon">
 
-                📈
+        📈
 
-            </div>
+    </div>
 
-            <h3>
+    <h3>
 
-                ${trend.statType}
+        ${trend.title}
 
-            </h3>
+    </h3>
 
-            <p>
+    <p>
 
-                ${trend.trendNote}
+        ${trend.description}
 
-            </p>
+    </p>
 
-        `;
+    <div class="trend-footer">
+
+        <span>
+
+            Strength:
+            ${trend.strength}
+
+        </span>
+
+        <span>
+
+            Risk:
+            ${trend.risk}
+
+        </span>
+
+    </div>
+
+`;
 
         grid.appendChild(card);
 

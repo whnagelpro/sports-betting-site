@@ -11,8 +11,6 @@ import { loadSeasonStats } from "./lib/seasonStats.js";
 
 import { loadPlayerContext } from "./lib/playerContext.js";
 
-import { mapPlayer } from "./lib/mappers/player.js";
-
 import { success, badRequest, serverError, notFound } from "./lib/response.js";
 
 import { loadGameLogs } from "./lib/gameLogs.js";
@@ -111,119 +109,372 @@ console.log("✓ context built");
         // Build player object
         // ----------------------------
 
+function buildHero() {
+
+    return {
+
+        id: context.profile.Id,
+
+        name: context.profile["Full Name"],
+
+        firstName: context.profile["First Name"],
+
+        lastName: context.profile["Last Name"],
+
+        team: context.profile["Team Name"],
+
+        teamAbbreviation: context.profile["Team Abbreviation"],
+
+        position: context.profile.Position,
+
+        bats: context.profile.Bats,
+
+        throws: context.profile.Throws,
+
+        height: context.profile.Height,
+
+        weight: context.profile.Weight
+
+    };
+
+}
+
+const hero = buildHero();
+
+const season = context.seasonStats;
+
+const games = Number(season["Games Played"] ?? 0);
+
+const totalHits =
+    Math.round(Number(season["Avg Hits"] ?? 0) * games);
+
+const totalRuns =
+    Math.round(Number(season["Avg Runs"] ?? 0) * games);
+
+const totalRBIs =
+    Math.round(Number(season["Avg RBIs"] ?? 0) * games);
+
+const totalHomeRuns =
+    Math.round(Number(season["Avg Home Runs"] ?? 0) * games);
+
+const totalBases =
+    Math.round(Number(season["Avg Total Bases"] ?? 0) * games);
+
+const totalWalks =
+    Math.round(Number(season["Avg Walks"] ?? 0) * games);
+
+const totalStrikeouts =
+    Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
+
+function buildMatchup() {
+
+    return context.matchup
+        ? {
+
+            awayTeam: context.matchup["Away Team"],
+
+            homeTeam: context.matchup["Home Team"],
+
+            gameDate: context.matchup["Game Date"],
+
+            opponentPitcher: context.matchup["Opponent Pitcher"],
+
+            opponentThrows: context.matchup["Opponent Throws"],
+
+            lineupSpot: context.matchup["Projected Lineup Spot"]
+
+        }
+        : null;
+
+}
+
+const matchup = buildMatchup();
+
+function buildProps() {
+
+    return context.props.map(prop => ({
+
+        displayName:
+            prop["Display Name"] ||
+            prop["Prop Type"],
+
+        propType:
+            prop["Prop Type"],
+
+        line:
+            prop["Line Value"],
+
+        odds:
+            prop["Odds"],
+
+        sportsbook:
+            prop["Vendor"],
+
+        probability:
+            prop["Poisson Over"],
+
+        ev:
+            prop["EV Over/Milestone ($1 Bet)"]
+
+    }));
+
+}
+
+const props = buildProps();
+
+function buildTrends() {
+
+    return context.trends.map(trend => ({
+
+        title:
+            trend["Stat Type"],
+
+        description:
+            trend["Trend Note"],
+
+        score:
+            trend["Trend Score"],
+
+        strength:
+            trend["Trend Strength"],
+
+        consistency:
+            trend["Consistency"],
+
+        risk:
+            trend["Risk Tier"]
+
+    }));
+
+}
+
+const trends = buildTrends();
+
+function buildGameLogs() {
+
+    return context.gameLogs.map(game => ({
+
+        gameDate: game["Game Date"],
+
+        opponent: game["Opponent"],
+
+        hits: game["Hits"],
+
+        runs: game["Runs"],
+
+        rbis: game["RBIs"],
+
+        homeRuns: game["Home Runs"],
+
+        totalBases: game["Total Bases"],
+
+        strikeouts: game["Strikeouts"],
+
+        walks: game["Walks"],
+
+        pitcherStrikeouts: game["Pitcher Strikeouts"],
+
+        pitcherOuts: game["Pitcher Outs"],
+
+        pitcherEarnedRuns: game["Pitcher Earned Runs"],
+
+        pitcherHitsAllowed: game["Pitcher Hits Allowed"],
+
+        pitcherWalks: game["Pitcher Walks"]
+
+    }));
+
+}
+
+const gameLogs = buildGameLogs();
+
+function buildQuickStats() {
+
+    return [
+
+        {
+            label: "Games",
+            value: season["Games Played"] ?? "-"
+        },
+
+        {
+            label: "Hits",
+            value: Number(season["Avg Hits"] ?? 0).toFixed(2)
+        },
+
+        {
+            label: "Runs",
+            value: Number(season["Avg Runs"] ?? 0).toFixed(2)
+        },
+
+        {
+            label: "RBIs",
+            value: Number(season["Avg RBIs"] ?? 0).toFixed(2)
+        },
+
+        {
+            label: "Home Runs",
+            value: Number(season["Avg Home Runs"] ?? 0).toFixed(2)
+        },
+
+        {
+            label: "Strikeouts",
+            value: Number(season["Avg Strikeouts"] ?? 0).toFixed(2)
+        }
+
+    ];
+
+}
+
+const quickStats = buildQuickStats();
+
+function buildSeasonPanels() {
+
+    return [
+
+        {
+
+            title: "Season Production",
+
+            stats: [
+
+                {
+                    label: "Games",
+                    value: games
+                },
+
+                {
+                    label: "Hits",
+                    value: totalHits
+                },
+
+                {
+                    label: "Runs",
+                    value: totalRuns
+                },
+
+                {
+                    label: "RBIs",
+                    value: totalRBIs
+                },
+
+                {
+                    label: "Home Runs",
+                    value: totalHomeRuns
+                },
+
+                {
+                    label: "Total Bases",
+                    value: totalBases
+                },
+
+                {
+                    label: "Walks",
+                    value: totalWalks
+                },
+
+                {
+                    label: "Strikeouts",
+                    value: totalStrikeouts
+                }
+
+            ]
+
+        },
+
+        {
+
+            title: "Per Game",
+
+            stats: [
+
+                {
+                    label: "Hits / Game",
+                    value: Number(season["Avg Hits"] || 0).toFixed(2)
+                },
+
+                {
+                    label: "Runs / Game",
+                    value: Number(season["Avg Runs"] || 0).toFixed(2)
+                },
+
+                {
+                    label: "RBIs / Game",
+                    value: Number(season["Avg RBIs"] || 0).toFixed(2)
+                },
+
+                {
+                    label: "HR / Game",
+                    value: Number(season["Avg Home Runs"] || 0).toFixed(2)
+                },
+
+                {
+                    label: "TB / Game",
+                    value: Number(season["Avg Total Bases"] || 0).toFixed(2)
+                },
+
+                {
+                    label: "BB / Game",
+                    value: Number(season["Avg Walks"] || 0).toFixed(2)
+                },
+
+                {
+                    label: "SO / Game",
+                    value: Number(season["Avg Strikeouts"] || 0).toFixed(2)
+                }
+
+            ]
+
+        },
+
+        {
+
+            title: "Trend Metrics",
+
+            stats: [
+
+                {
+                    label: "Consistency",
+                    value: trends[0]?.consistency ?? "-"
+                },
+
+                {
+                    label: "Trend Strength",
+                    value: trends[0]?.strength ?? "-"
+                },
+
+                {
+                    label: "Risk Tier",
+                    value: trends[0]?.risk ?? "-"
+                }
+
+            ]
+
+        }
+
+    ];
+
+}
+
+const seasonPanels = buildSeasonPanels();
+
 const player = {
 
-    id: context.profile.Id,
+    hero,
 
-    name: context.profile["Full Name"],
+    season,
 
-    firstName: context.profile["First Name"],
+    matchup,
 
-    lastName: context.profile["Last Name"],
+    props,
 
-    team: context.profile["Team Name"],
+    trends,
 
-    teamAbbreviation: context.profile["Team Abbreviation"],
+    gameLogs,
 
-    position: context.profile.Position,
+    quickStats,
 
-    bats: context.profile.Bats,
-
-    throws: context.profile.Throws,
-
-    height: context.profile.Height,
-
-    weight: context.profile.Weight,
-
-    season: context.seasonStats,
-
-    matchup: context.matchup,
-
-    props: context.props,
-
-    trends: context.trends.map(trend => ({
-
-    statType: trend["Stat Type"],
-
-    trendNote: trend["Trend Note"],
-
-    trendScore: trend["Trend Score"],
-
-    trendStrength: trend["Trend Strength"],
-
-    consistency: trend["Consistency"],
-
-    riskTier: trend["Risk Tier"]
-
-})),
-
-    gameLogs: context.gameLogs.map(game => ({
-
-    gameDate: game["Game Date"],
-
-    opponent: game["Opponent"],
-
-    hits: game["Hits"],
-
-    runs: game["Runs"],
-
-    rbis: game["RBIs"],
-
-    homeRuns: game["Home Runs"],
-
-    totalBases: game["Total Bases"],
-
-    strikeouts: game["Strikeouts"],
-
-    walks: game["Walks"],
-
-    pitcherStrikeouts: game["Pitcher Strikeouts"],
-
-    pitcherOuts: game["Pitcher Outs"],
-
-    pitcherEarnedRuns: game["Pitcher Earned Runs"],
-
-    pitcherHitsAllowed: game["Pitcher Hits Allowed"],
-
-    pitcherWalks: game["Pitcher Walks"]
-
-})),
-
-    quickStats: [
-
-    {
-        label: "Games",
-        value: context.seasonStats["Games Played"] ?? "-"
-    },
-
-    {
-        label: "Hits",
-        value: Number(context.seasonStats["Avg Hits"] ?? 0).toFixed(2)
-    },
-
-    {
-        label: "Runs",
-        value: Number(context.seasonStats["Avg Runs"] ?? 0).toFixed(2)
-    },
-
-    {
-        label: "RBIs",
-        value: Number(context.seasonStats["Avg RBIs"] ?? 0).toFixed(2)
-    },
-
-    {
-        label: "Home Runs",
-        value: Number(context.seasonStats["Avg Home Runs"] ?? 0).toFixed(2)
-    },
-
-    {
-        label: "Strikeouts",
-        value: Number(context.seasonStats["Avg Strikeouts"] ?? 0).toFixed(2)
-    }
-
-],
-
-    seasonPanels: [],
+    seasonPanels,
 
     insights: [],
 
@@ -231,7 +482,7 @@ const player = {
 
 };
 
-        return success(player);
+return success(player);
 
     }
 
