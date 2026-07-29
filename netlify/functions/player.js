@@ -21,6 +21,8 @@ import { loadPlayerProps } from "./lib/playerProps.js";
 
 import { loadGameOdds } from "./lib/gameOdds.js";
 
+import { buildHero } from "./lib/builders/heroBuilder.js";
+
 export async function handler(event) {
 
     try {
@@ -114,36 +116,6 @@ console.log("✓ context built");
         // ----------------------------
         // Build player object
         // ----------------------------
-
-function buildHero() {
-
-    return {
-
-        id: context.profile.Id,
-
-        name: context.profile["Full Name"],
-
-        firstName: context.profile["First Name"],
-
-        lastName: context.profile["Last Name"],
-
-        team: context.profile["Team Name"],
-
-        teamAbbreviation: context.profile["Team Abbreviation"],
-
-        position: context.profile.Position,
-
-        bats: context.profile.Bats,
-
-        throws: context.profile.Throws,
-
-        height: context.profile.Height,
-
-        weight: context.profile.Weight
-
-    };
-
-}
 
 const hero = buildHero();
 
