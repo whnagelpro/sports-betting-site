@@ -117,7 +117,7 @@ console.log("✓ context built");
         // Build player object
         // ----------------------------
 
-const hero = buildHero();
+const hero = buildHero(context);
 
 const season = context.seasonStats;
 
