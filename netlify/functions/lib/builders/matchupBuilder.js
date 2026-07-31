@@ -1,4 +1,4 @@
-function buildMatchup(context) {
+export function buildMatchup(context) {
 
     return context.matchup
         ? {
