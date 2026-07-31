@@ -23,6 +23,8 @@ import { loadGameOdds } from "./lib/gameOdds.js";
 
 import { buildHero } from "./lib/builders/heroBuilder.js";
 
+import { buildMatchup } from "./lib/builders/matchupBuilder.js";
+
 export async function handler(event) {
 
     try {
@@ -119,6 +121,8 @@ console.log("✓ context built");
 
 const hero = buildHero(context);
 
+const matchup = buildMatchup(context);
+
 const season = context.seasonStats;
 
 const games = Number(season["Games Played"] ?? 0);
@@ -143,28 +147,6 @@ const totalWalks =
 
 const totalStrikeouts =
     Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
-
-function buildMatchup() {
-
-    return context.matchup
-        ? {
-
-            awayTeam: context.matchup["Away Team"],
-
-            homeTeam: context.matchup["Home Team"],
-
-            gameDate: context.matchup["Game Date"],
-
-            opponentPitcher: context.matchup["Opponent Pitcher"],
-
-            opponentThrows: context.matchup["Opponent Throws"],
-
-            lineupSpot: context.matchup["Projected Lineup Spot"]
-
-        }
-        : null;
-
-}
 
 const matchup = buildMatchup();
 
