@@ -148,8 +148,6 @@ const totalWalks =
 const totalStrikeouts =
     Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
 
-const matchup = buildMatchup();
-
 function buildProps() {
 
     return context.props.map(prop => ({

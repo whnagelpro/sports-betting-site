@@ -1,4 +1,4 @@
-function buildMatchup() {
+function buildMatchup(context) {
 
     return context.matchup
         ? {
