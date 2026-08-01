@@ -496,22 +496,28 @@ function renderMatchup() {
 
     renderFields({
 
-    "matchup-game":
-        `${player.matchup.awayTeam} @ ${player.matchup.homeTeam}`,
+        "matchup-game":
+            player.matchup.title,
 
-    "matchup-time":
-        player.matchup.gameDate,
+        "matchup-time":
+            player.matchup.subtitle
 
-    "opponent-pitcher":
-        player.matchup.opponentPitcher ?? "-",
+    });
 
-    "opponent-handedness":
-        player.matchup.opponentThrows ?? "-",
+    const details = player.matchup.details ?? [];
 
-    "lineup-position":
-        player.matchup.lineupSpot ?? "-"
+    renderFields({
 
-});
+        "opponent-pitcher":
+            details[0]?.value ?? "-",
+
+        "opponent-handedness":
+            details[1]?.value ?? "-",
+
+        "lineup-position":
+            details[2]?.value ?? "-"
+
+    });
 
 }
 

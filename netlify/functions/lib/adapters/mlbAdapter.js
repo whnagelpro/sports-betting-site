@@ -117,7 +117,46 @@ const games = Number(
 
         trends,
 
-        matchup,
+        matchup: matchup && Object.keys(matchup).length
+            ? {
+
+                title: `${matchup["Away Team"]} @ ${matchup["Home Team"]}`,
+
+                subtitle: matchup["Game Date"],
+
+                details: [
+
+                    {
+
+                        label: "Opponent Pitcher",
+
+                        value:
+                            matchup["Opponent Pitcher"] ?? "-"
+
+                    },
+
+                    {
+
+                        label: "Throws",
+
+                        value:
+                            matchup["Opponent Throws"] ?? "-"
+
+                    },
+
+                    {
+
+                        label: "Lineup Spot",
+
+                        value:
+                            matchup["Projected Lineup Spot"] ?? "-"
+
+                    }
+
+                ]
+
+            }
+            : null,
 
         props,
 
