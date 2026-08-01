@@ -186,7 +186,9 @@ const seasonPanels = buildSeasonPanels({
 
     totalStrikeouts,
 
-    trends
+    trends,
+
+    isPitcher: context.isPitcher
 
 });
 

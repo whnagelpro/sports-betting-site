@@ -18,9 +18,201 @@ export function buildSeasonPanels({
 
     totalStrikeouts,
 
-    trends
+    trends,
+
+    isPitcher
 
 }) {
+
+if (isPitcher) {
+
+    const totalOuts =
+        Math.round(
+            Number(season["Avg Pitcher Outs"] || 0) * games
+        );
+
+    const innings =
+        Math.floor(totalOuts / 3);
+
+    const remainingOuts =
+        totalOuts % 3;
+
+    const inningsPitched =
+        `${innings}.${remainingOuts}`;
+
+    return [
+
+        {
+
+            title: "Season Production",
+
+            stats: [
+
+                {
+
+                    label: "Games",
+
+                    value: games
+
+                },
+
+                {
+
+                    label: "Innings Pitched",
+
+                    value: inningsPitched
+
+                },
+
+                {
+
+                    label: "Strikeouts",
+
+                    value: Math.round(
+                        Number(
+                            season["Avg Pitcher Strikeouts"] || 0
+                        ) * games
+                    )
+
+                },
+
+                {
+
+                    label: "Earned Runs",
+
+                    value: Math.round(
+                        Number(
+                            season["Avg Pitcher Earned Runs"] || 0
+                        ) * games
+                    )
+
+                },
+
+                {
+
+                    label: "Hits Allowed",
+
+                    value: Math.round(
+                        Number(
+                            season["Avg Pitcher Hits Allowed"] || 0
+                        ) * games
+                    )
+
+                },
+
+                {
+
+                    label: "Walks",
+
+                    value: Math.round(
+                        Number(
+                            season["Avg Pitcher Walks"] || 0
+                        ) * games
+                    )
+
+                }
+
+            ]
+
+        },
+
+        {
+
+            title: "Per Game",
+
+            stats: [
+
+                {
+
+                    label: "Strikeouts / Game",
+
+                    value: Number(
+                        season["Avg Pitcher Strikeouts"] || 0
+                    ).toFixed(2)
+
+                },
+
+                {
+
+                    label: "Outs / Game",
+
+                    value: Number(
+                        season["Avg Pitcher Outs"] || 0
+                    ).toFixed(2)
+
+                },
+
+                {
+
+                    label: "ER / Game",
+
+                    value: Number(
+                        season["Avg Pitcher Earned Runs"] || 0
+                    ).toFixed(2)
+
+                },
+
+                {
+
+                    label: "Hits Allowed / Game",
+
+                    value: Number(
+                        season["Avg Pitcher Hits Allowed"] || 0
+                    ).toFixed(2)
+
+                },
+
+                {
+
+                    label: "Walks / Game",
+
+                    value: Number(
+                        season["Avg Pitcher Walks"] || 0
+                    ).toFixed(2)
+
+                }
+
+            ]
+
+        },
+
+        {
+
+            title: "Trend Metrics",
+
+            stats: [
+
+                {
+
+                    label: "Consistency",
+
+                    value: trends[0]?.consistency ?? "-"
+
+                },
+
+                {
+
+                    label: "Trend Strength",
+
+                    value: trends[0]?.strength ?? "-"
+
+                },
+
+                {
+
+                    label: "Risk Tier",
+
+                    value: trends[0]?.risk ?? "-"
+
+                }
+
+            ]
+
+        }
+
+    ];
+
+}
 
     return [
 

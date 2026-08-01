@@ -1,5 +1,40 @@
 export function buildGameLogs(context) {
 
+    if (context.isPitcher) {
+
+        return context.gameLogs.map(game => {
+
+            const outs =
+                Number(game["Pitcher Outs"] ?? 0);
+
+            const innings =
+                Math.floor(outs / 3);
+
+            const remainingOuts =
+                outs % 3;
+
+            return {
+
+                gameDate: game["Game Date"],
+
+                opponent: game["Opponent"],
+
+                inningsPitched: `${innings}.${remainingOuts}`,
+
+                strikeouts: game["Pitcher Strikeouts"],
+
+                earnedRuns: game["Pitcher Earned Runs"],
+
+                hitsAllowed: game["Pitcher Hits Allowed"],
+
+                walks: game["Pitcher Walks"]
+
+            };
+
+        });
+
+    }
+
     return context.gameLogs.map(game => ({
 
         gameDate: game["Game Date"],
@@ -16,19 +51,9 @@ export function buildGameLogs(context) {
 
         totalBases: game["Total Bases"],
 
-        strikeouts: game["Strikeouts"],
-
         walks: game["Walks"],
 
-        pitcherStrikeouts: game["Pitcher Strikeouts"],
-
-        pitcherOuts: game["Pitcher Outs"],
-
-        pitcherEarnedRuns: game["Pitcher Earned Runs"],
-
-        pitcherHitsAllowed: game["Pitcher Hits Allowed"],
-
-        pitcherWalks: game["Pitcher Walks"]
+        strikeouts: game["Strikeouts"]
 
     }));
 
