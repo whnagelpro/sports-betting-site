@@ -17,6 +17,8 @@ const { findPlayerGame } = require("./gameOdds");
 
 function loadPlayerContext({
 
+    league,
+    
     playerId,
 
     roster,
@@ -104,7 +106,7 @@ const isPitcher = [
 
 ].includes(profile.Position);
 
-return buildMLBContext({
+const context = {
 
     profile,
 
@@ -120,7 +122,35 @@ return buildMLBContext({
 
     isPitcher
 
-});
+};
+
+switch (league) {
+
+    case "mlb":
+
+        return buildMLBContext(context);
+
+    case "nba":
+
+        return buildNBAContext(context);
+
+    case "nhl":
+
+        return buildNHLContext(context);
+
+    case "nfl":
+
+        return buildNFLContext(context);
+
+    default:
+
+        throw new Error(
+
+            `Unsupported league: ${league}`
+
+        );
+
+}
 
 }
 

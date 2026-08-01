@@ -107,6 +107,7 @@ const [
 
 console.log("Building context...");
 const context = loadPlayerContext({
+    league,
     playerId: id,
     roster,
     seasonRows,

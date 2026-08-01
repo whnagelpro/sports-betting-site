@@ -220,9 +220,47 @@ if (!player.gameLogs?.length) {
 
 section.hidden = false;
 
-    const body = document.getElementById(
-        "game-log-body"
-    );
+    const body = document.getElementById("game-log-body");
+
+    const header = document.getElementById("game-log-header");
+
+if (header) {
+
+    if (player.isPitcher) {
+
+        header.innerHTML = `
+
+            <th>Date</th>
+            <th>Opponent</th>
+            <th>IP</th>
+            <th>SO</th>
+            <th>ER</th>
+            <th>H</th>
+            <th>BB</th>
+
+        `;
+
+    }
+
+    else {
+
+        header.innerHTML = `
+
+            <th>Date</th>
+            <th>Opponent</th>
+            <th>H</th>
+            <th>R</th>
+            <th>RBI</th>
+            <th>HR</th>
+            <th>TB</th>
+            <th>BB</th>
+            <th>SO</th>
+
+        `;
+
+    }
+
+}
 
     if (!body) return;
 
@@ -264,13 +302,7 @@ function createGameLogRow(game) {
 
     const row = document.createElement("tr");
 
-    const isPitcher =
-
-        player.position === "SP" ||
-
-        player.position === "RP" ||
-
-        player.position === "P";
+    const isPitcher = player.isPitcher;
 
     if (isPitcher) {
 
@@ -280,21 +312,15 @@ function createGameLogRow(game) {
 
             <td>${game.opponent}</td>
 
-            <td>-</td>
-
-            <td>${game.outs}</td>
-
-            <td>-</td>
-
-            <td>-</td>
-
-            <td>-</td>
-
-            <td>-</td>
-
-            <td>${game.walks}</td>
+            <td>${game.inningsPitched}</td>
 
             <td>${game.strikeouts}</td>
+
+            <td>${game.earnedRuns}</td>
+
+            <td>${game.hitsAllowed}</td>
+
+            <td>${game.walks}</td>
 
         `;
 
@@ -308,10 +334,6 @@ function createGameLogRow(game) {
 
             <td>${game.opponent}</td>
 
-            <td>-</td>
-
-            <td>-</td>
-
             <td>${game.hits}</td>
 
             <td>${game.runs}</td>
@@ -319,6 +341,8 @@ function createGameLogRow(game) {
             <td>${game.rbis}</td>
 
             <td>${game.homeRuns}</td>
+
+            <td>${game.totalBases}</td>
 
             <td>${game.walks}</td>
 
