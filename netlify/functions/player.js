@@ -31,6 +31,8 @@ import { buildTrends } from "./lib/builders/trendsBuilder.js";
 
 import { buildGameLogs } from "./lib/builders/gameLogsBuilder.js";
 
+import { buildQuickStats } from "./lib/builders/quickStatsBuilder.js";
+
 export async function handler(event) {
 
     try {
@@ -135,6 +137,8 @@ const trends = buildTrends(context);
 
 const gameLogs = buildGameLogs(context);
 
+const quickStats = buildQuickStats(season);
+
 const season = context.seasonStats;
 
 const games = Number(season["Games Played"] ?? 0);
@@ -159,46 +163,6 @@ const totalWalks =
 
 const totalStrikeouts =
     Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
-
-function buildQuickStats() {
-
-    return [
-
-        {
-            label: "Games",
-            value: season["Games Played"] ?? "-"
-        },
-
-        {
-            label: "Hits",
-            value: Number(season["Avg Hits"] ?? 0).toFixed(2)
-        },
-
-        {
-            label: "Runs",
-            value: Number(season["Avg Runs"] ?? 0).toFixed(2)
-        },
-
-        {
-            label: "RBIs",
-            value: Number(season["Avg RBIs"] ?? 0).toFixed(2)
-        },
-
-        {
-            label: "Home Runs",
-            value: Number(season["Avg Home Runs"] ?? 0).toFixed(2)
-        },
-
-        {
-            label: "Strikeouts",
-            value: Number(season["Avg Strikeouts"] ?? 0).toFixed(2)
-        }
-
-    ];
-
-}
-
-const quickStats = buildQuickStats();
 
 function buildSeasonPanels() {
 
