@@ -1,183 +1,147 @@
-import { calculateRecentForm } from "./recentForm.js";
 import { calculateConsistency } from "./consistency.js";
-import { calculateMatchup } from "./matchup.js";
-import { buildPlayerReasons } from "./ruleEngine.js";
-import { calculateProjection } from "./projection.js";
-import { calculateProbability } from "./probability.js";
-import { calculateImpliedProbability } from "./impliedProbability.js";
-import { calculateEdge } from "./edge.js";
-import { calculateExpectedValue } from "./expectedValue.js";
+import { scoreProp } from "./scoreProp.js";
 import { findBestProp } from "./bestProp.js";
-import { calculateRecommendation } from "./recommendation.js";
+
+function buildRecommendation(score) {
+
+    if (score >= 90) {
+
+        return "Elite Play";
+
+    }
+
+    if (score >= 80) {
+
+        return "Excellent Play";
+
+    }
+
+    if (score >= 70) {
+
+        return "Strong Play";
+
+    }
+
+    if (score >= 60) {
+
+        return "Solid Play";
+
+    }
+
+    if (score >= 50) {
+
+        return "Lean";
+
+    }
+
+    return "Pass";
+
+}
+
+function buildConfidence(score) {
+
+    if (score >= 80) {
+
+        return "High";
+
+    }
+
+    if (score >= 60) {
+
+        return "Medium";
+
+    }
+
+    return "Low";
+
+}
+
+function buildStars(score) {
+
+    if (score >= 90) return 5;
+
+    if (score >= 80) return 4.5;
+
+    if (score >= 70) return 4;
+
+    if (score >= 60) return 3;
+
+    if (score >= 50) return 2;
+
+    return 1;
+
+}
 
 export function calculatePlayerAnalytics({
 
-    row,
-
-    seasonStats,
-
     gameLogs = [],
-
-    matchup = null,
 
     props = []
 
 }) {
 
-    const recentForm = calculateRecentForm(gameLogs);
-
-    const consistency = calculateConsistency(gameLogs);
-
-    const matchupAnalysis = calculateMatchup(matchup);
-
-    // No sportsbook props available
-    if (props.length === 0) {
+    if (!props.length) {
 
         return null;
 
     }
 
-    const propAnalytics = [];
+    const consistency =
 
-    for (const prop of props) {
+        calculateConsistency(gameLogs);
 
-        const sportsbookLine = prop.line;
+    const propAnalytics =
 
-        const americanOdds = prop.odds;
+        props.map(prop =>
 
-        const projection = calculateProjection({
+            scoreProp({
 
-            seasonAverage:
-                seasonStats.seasonAverage,
+                prop,
 
-            recentAverage:
-                recentForm.last5Average,
+                model: {
 
-            matchupScore:
-                matchupAnalysis.score
+                    // Temporary placeholder until
+                    // the probability model is connected.
 
-        });
+                    projectedProbability: 0.55,
 
-        const probability = calculateProbability({
+                    consistencyScore:
 
-            projection:
-                projection.projectedStat,
+                        consistency.score
 
-            sportsbookLine,
+                }
 
-            standardDeviation:
-                seasonStats.standardDeviation
+            })
 
-        });
+        );
 
-        const impliedProbability =
-            calculateImpliedProbability(
-                americanOdds
-            );
+    const bestProp =
 
-        const edge = calculateEdge({
+        findBestProp(propAnalytics);
 
-            projectedProbability:
-                probability.overProbability / 100,
+    const score =
 
-            impliedProbability
-
-        });
-
-        const expectedValue =
-            calculateExpectedValue({
-
-                projectedProbability:
-                    probability.overProbability / 100,
-
-                americanOdds
-
-            });
-
-        const recommendation =
-    calculateRecommendation({
-
-        expectedValue,
-
-        edge,
-
-        probability,
-
-        consistency,
-
-        matchup: matchupAnalysis
-
-    });
-
-        propAnalytics.push({
-
-    ...prop,
-
-    projection,
-
-    probability,
-
-    impliedProbability,
-
-    edge,
-
-    expectedValue,
-
-    recommendation
-
-});
-
-    }
-
-    const bestProp = findBestProp(propAnalytics);
-
-    const {
-
-        strengths,
-
-        weaknesses
-
-    } = buildPlayerReasons({
-
-        recentForm,
-
-        consistency,
-
-        matchup: matchupAnalysis
-
-    });
-
-    const analyticsScore = Math.round(
-
-        recentForm.score * 0.35 +
-
-        consistency.score * 0.35 +
-
-        matchupAnalysis.score * 0.30
-
-    );
+        bestProp?.score ?? 0;
 
     return {
 
-        seasonStats,
+        score,
 
-        score: analyticsScore,
+        stars:
 
-        matchup: matchupAnalysis,
+            buildStars(score),
 
-        confidence: "Unknown",
+        confidence:
 
-        recommendation: "No Recommendation",
+            buildConfidence(score),
+
+        recommendation:
+
+            buildRecommendation(score),
 
         bestProp,
 
-        allProps: propAnalytics,
-
-        strengths,
-
-        weaknesses,
-
-        recentForm,
+        propAnalytics,
 
         consistency
 

@@ -35,6 +35,8 @@ import { buildQuickStats } from "./lib/builders/quickStatsBuilder.js";
 
 import { buildSeasonPanels } from "./lib/builders/seasonPanelsBuilder.js";
 
+import { calculatePlayerAnalytics } from "./lib/analytics/playerAnalytics.js";
+
 export async function handler(event) {
 
     try {
@@ -142,7 +144,7 @@ const gameLogs = buildGameLogs(context);
 
 const season = context.seasonStats;
 
-const quickStats = context.quickStats;
+const quickStats = buildQuickStats(context);
 
 const games = Number(season["Games Played"] ?? 0);
 
@@ -193,6 +195,18 @@ const seasonPanels = buildSeasonPanels({
 
 });
 
+const analytics = calculatePlayerAnalytics({
+
+    seasonStats: season,
+
+    gameLogs: context.gameLogs,
+
+    matchup: context.matchup,
+
+    props: context.props
+
+});
+
 const player = {
 
     hero,
@@ -213,7 +227,7 @@ const player = {
 
     insights: [],
 
-    analytics: null
+    analytics
 
 };
 
