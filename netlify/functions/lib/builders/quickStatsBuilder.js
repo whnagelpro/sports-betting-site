@@ -8,6 +8,56 @@ export function buildQuickStats(context) {
 
     } = context;
 
+if (isPitcher) {
+
+    const outs = Number(season["Avg Pitcher Outs"] ?? 0);
+
+    const inningsPitched = (outs / 3).toFixed(1);
+
+    return [
+
+        {
+            label: "Games",
+            value: season["Games Played"] ?? "-"
+        },
+
+        {
+            label: "IP",
+            value: inningsPitched
+        },
+
+        {
+            label: "Strikeouts",
+            value: Number(
+                season["Avg Pitcher Strikeouts"] ?? 0
+            ).toFixed(1)
+        },
+
+        {
+            label: "Earned Runs",
+            value: Number(
+                season["Avg Pitcher Earned Runs"] ?? 0
+            ).toFixed(1)
+        },
+
+        {
+            label: "Hits Allowed",
+            value: Number(
+                season["Avg Pitcher Hits Allowed"] ?? 0
+            ).toFixed(1)
+        },
+
+        {
+            label: "Walks",
+            value: Number(
+                season["Avg Pitcher Walks"] ?? 0
+            ).toFixed(1)
+        }
+
+    ];
+
+}
+
     return [
 
         {
