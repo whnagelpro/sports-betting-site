@@ -29,6 +29,8 @@ import { buildProps } from "./lib/builders/propsBuilder.js";
 
 import { buildTrends } from "./lib/builders/trendsBuilder.js";
 
+import { buildGameLogs } from "./lib/builders/gameLogsBuilder.js";
+
 export async function handler(event) {
 
     try {
@@ -131,6 +133,8 @@ const props = buildProps(context);
 
 const trends = buildTrends(context);
 
+const gameLogs = buildGameLogs(context);
+
 const season = context.seasonStats;
 
 const games = Number(season["Games Played"] ?? 0);
@@ -155,44 +159,6 @@ const totalWalks =
 
 const totalStrikeouts =
     Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
-
-function buildGameLogs() {
-
-    return context.gameLogs.map(game => ({
-
-        gameDate: game["Game Date"],
-
-        opponent: game["Opponent"],
-
-        hits: game["Hits"],
-
-        runs: game["Runs"],
-
-        rbis: game["RBIs"],
-
-        homeRuns: game["Home Runs"],
-
-        totalBases: game["Total Bases"],
-
-        strikeouts: game["Strikeouts"],
-
-        walks: game["Walks"],
-
-        pitcherStrikeouts: game["Pitcher Strikeouts"],
-
-        pitcherOuts: game["Pitcher Outs"],
-
-        pitcherEarnedRuns: game["Pitcher Earned Runs"],
-
-        pitcherHitsAllowed: game["Pitcher Hits Allowed"],
-
-        pitcherWalks: game["Pitcher Walks"]
-
-    }));
-
-}
-
-const gameLogs = buildGameLogs();
 
 function buildQuickStats() {
 
