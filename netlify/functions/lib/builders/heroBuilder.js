@@ -2,27 +2,27 @@ export function buildHero(context) {
 
     return {
 
-        id: context.profile.Id,
+        id: context.profile.id,
 
-        name: context.profile["Full Name"],
+        name: context.profile.name,
 
-        firstName: context.profile["First Name"],
+        firstName: context.profile.firstName,
 
-        lastName: context.profile["Last Name"],
+        lastName: context.profile.lastName,
 
-        team: context.profile["Team Name"],
+        team: context.profile.team,
 
-        teamAbbreviation: context.profile["Team Abbreviation"],
+        teamAbbreviation: context.profile.teamAbbreviation,
 
-        position: context.profile.Position,
+        position: context.profile.position,
 
-        bats: context.profile.Bats,
+        bats: context.profile.bats ?? "",
 
-        throws: context.profile.Throws,
+        throws: context.profile.throws ?? "",
 
-        height: context.profile.Height,
+        height: context.profile.height,
 
-        weight: context.profile.Weight
+        weight: context.profile.weight
 
     };
 
