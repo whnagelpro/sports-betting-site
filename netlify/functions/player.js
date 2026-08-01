@@ -25,6 +25,8 @@ import { buildHero } from "./lib/builders/heroBuilder.js";
 
 import { buildMatchup } from "./lib/builders/matchupBuilder.js";
 
+import { buildProps } from "./lib/builders/propsBuilder.js";
+
 export async function handler(event) {
 
     try {
@@ -123,6 +125,8 @@ const hero = buildHero(context);
 
 const matchup = buildMatchup(context);
 
+const props = buildProps(context);
+
 const season = context.seasonStats;
 
 const games = Number(season["Games Played"] ?? 0);
@@ -147,38 +151,6 @@ const totalWalks =
 
 const totalStrikeouts =
     Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
-
-function buildProps() {
-
-    return context.props.map(prop => ({
-
-        displayName:
-            prop["Display Name"] ||
-            prop["Prop Type"],
-
-        propType:
-            prop["Prop Type"],
-
-        line:
-            prop["Line Value"],
-
-        odds:
-            prop["Odds"],
-
-        sportsbook:
-            prop["Vendor"],
-
-        probability:
-            prop["Poisson Over"],
-
-        ev:
-            prop["EV Over/Milestone ($1 Bet)"]
-
-    }));
-
-}
-
-const props = buildProps();
 
 function buildTrends() {
 
