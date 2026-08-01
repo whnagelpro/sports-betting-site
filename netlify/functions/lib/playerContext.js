@@ -95,7 +95,16 @@ function loadPlayerContext({
 
     });
 
-    return buildMLBContext({
+const isPitcher = [
+
+    "P",
+    "SP",
+    "RP",
+    "CL"
+
+].includes(profile.Position);
+
+return buildMLBContext({
 
     profile,
 
@@ -107,7 +116,9 @@ function loadPlayerContext({
 
     matchup,
 
-    props
+    props,
+
+    isPitcher
 
 });
 

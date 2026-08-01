@@ -15,7 +15,9 @@ export function buildMLBContext({
 
     matchup,
 
-    props
+    props,
+
+    isPitcher
 
 }) {
 
@@ -31,7 +33,9 @@ export function buildMLBContext({
 
         matchup,
 
-        props
+        props,
+
+        isPitcher
 
     };
 
