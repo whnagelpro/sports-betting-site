@@ -27,6 +27,8 @@ import { buildMatchup } from "./lib/builders/matchupBuilder.js";
 
 import { buildProps } from "./lib/builders/propsBuilder.js";
 
+import { buildTrends } from "./lib/builders/trendsBuilder.js";
+
 export async function handler(event) {
 
     try {
@@ -127,6 +129,8 @@ const matchup = buildMatchup(context);
 
 const props = buildProps(context);
 
+const trends = buildTrends(context);
+
 const season = context.seasonStats;
 
 const games = Number(season["Games Played"] ?? 0);
@@ -151,34 +155,6 @@ const totalWalks =
 
 const totalStrikeouts =
     Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
-
-function buildTrends() {
-
-    return context.trends.map(trend => ({
-
-        title:
-            trend["Stat Type"],
-
-        description:
-            trend["Trend Note"],
-
-        score:
-            trend["Trend Score"],
-
-        strength:
-            trend["Trend Strength"],
-
-        consistency:
-            trend["Consistency"],
-
-        risk:
-            trend["Risk Tier"]
-
-    }));
-
-}
-
-const trends = buildTrends();
 
 function buildGameLogs() {
 
