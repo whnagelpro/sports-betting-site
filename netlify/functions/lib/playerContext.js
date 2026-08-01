@@ -2,6 +2,13 @@
 // Player Context Builder
 // ======================================================
 
+import {
+    buildMLBContext,
+    buildNBAContext,
+    buildNHLContext,
+    buildNFLContext
+} from "./adapters/index.js";
+
 const { findPlayerGameLogs } = require("./gameLogs");
 const { findPlayerTrends } = require("./trends");
 const { findPlayerToday } = require("./today");
@@ -88,21 +95,21 @@ function loadPlayerContext({
 
     });
 
-    return {
+    return buildMLBContext({
 
-        profile,
+    profile,
 
-        seasonStats,
+    seasonStats,
 
-        gameLogs,
+    gameLogs,
 
-        trends,
+    trends,
 
-        matchup,
+    matchup,
 
-        props
+    props
 
-    };
+});
 
 }
 
