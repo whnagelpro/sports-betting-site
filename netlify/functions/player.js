@@ -142,7 +142,7 @@ const gameLogs = buildGameLogs(context);
 
 const season = context.seasonStats;
 
-const quickStats = buildQuickStats(context);
+const quickStats = context.quickStats;
 
 const games = Number(season["Games Played"] ?? 0);
 
