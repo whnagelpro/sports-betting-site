@@ -1,4 +1,12 @@
-export function buildQuickStats(season) {
+export function buildQuickStats(context) {
+
+    const {
+
+        seasonStats: season,
+
+        isPitcher
+
+    } = context;
 
     return [
 
