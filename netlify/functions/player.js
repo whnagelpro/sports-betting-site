@@ -33,6 +33,8 @@ import { buildGameLogs } from "./lib/builders/gameLogsBuilder.js";
 
 import { buildQuickStats } from "./lib/builders/quickStatsBuilder.js";
 
+import { buildSeasonPanels } from "./lib/builders/seasonPanelsBuilder.js";
+
 export async function handler(event) {
 
     try {
@@ -137,9 +139,9 @@ const trends = buildTrends(context);
 
 const gameLogs = buildGameLogs(context);
 
-const quickStats = buildQuickStats(season);
-
 const season = context.seasonStats;
+
+const quickStats = buildQuickStats(season);
 
 const games = Number(season["Games Played"] ?? 0);
 
@@ -164,135 +166,29 @@ const totalWalks =
 const totalStrikeouts =
     Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
 
-function buildSeasonPanels() {
+const seasonPanels = buildSeasonPanels({
 
-    return [
+    season,
 
-        {
+    games,
 
-            title: "Season Production",
+    totalHits,
 
-            stats: [
+    totalRuns,
 
-                {
-                    label: "Games",
-                    value: games
-                },
+    totalRBIs,
 
-                {
-                    label: "Hits",
-                    value: totalHits
-                },
+    totalHomeRuns,
 
-                {
-                    label: "Runs",
-                    value: totalRuns
-                },
+    totalBases,
 
-                {
-                    label: "RBIs",
-                    value: totalRBIs
-                },
+    totalWalks,
 
-                {
-                    label: "Home Runs",
-                    value: totalHomeRuns
-                },
+    totalStrikeouts,
 
-                {
-                    label: "Total Bases",
-                    value: totalBases
-                },
+    trends
 
-                {
-                    label: "Walks",
-                    value: totalWalks
-                },
-
-                {
-                    label: "Strikeouts",
-                    value: totalStrikeouts
-                }
-
-            ]
-
-        },
-
-        {
-
-            title: "Per Game",
-
-            stats: [
-
-                {
-                    label: "Hits / Game",
-                    value: Number(season["Avg Hits"] || 0).toFixed(2)
-                },
-
-                {
-                    label: "Runs / Game",
-                    value: Number(season["Avg Runs"] || 0).toFixed(2)
-                },
-
-                {
-                    label: "RBIs / Game",
-                    value: Number(season["Avg RBIs"] || 0).toFixed(2)
-                },
-
-                {
-                    label: "HR / Game",
-                    value: Number(season["Avg Home Runs"] || 0).toFixed(2)
-                },
-
-                {
-                    label: "TB / Game",
-                    value: Number(season["Avg Total Bases"] || 0).toFixed(2)
-                },
-
-                {
-                    label: "BB / Game",
-                    value: Number(season["Avg Walks"] || 0).toFixed(2)
-                },
-
-                {
-                    label: "SO / Game",
-                    value: Number(season["Avg Strikeouts"] || 0).toFixed(2)
-                }
-
-            ]
-
-        },
-
-        {
-
-            title: "Trend Metrics",
-
-            stats: [
-
-                {
-                    label: "Consistency",
-                    value: trends[0]?.consistency ?? "-"
-                },
-
-                {
-                    label: "Trend Strength",
-                    value: trends[0]?.strength ?? "-"
-                },
-
-                {
-                    label: "Risk Tier",
-                    value: trends[0]?.risk ?? "-"
-                }
-
-            ]
-
-        }
-
-    ];
-
-}
-
-const seasonPanels = buildSeasonPanels();
+});
 
 const player = {
 
