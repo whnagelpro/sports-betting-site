@@ -146,19 +146,22 @@ function renderQuickStats() {
 
     grid.innerHTML = "";
 
-    player.quickStats.forEach(stat => {
+    const cards =
+        player.quickStats?.cards ?? [];
+
+    cards.forEach(stat => {
 
         grid.appendChild(
 
-    createStatCard(
+            createStatCard(
 
-        stat.label,
+                stat.label,
 
-        stat.value
+                stat.value
 
-    )
+            )
 
-);
+        );
 
     });
 
