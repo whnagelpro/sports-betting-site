@@ -137,46 +137,58 @@ const propAnalytics = props.map(prop => {
 
         bestProp?.score ?? 0;
 
-const dashboardBestProp = bestProp
-    ? {
+    const stars =
 
-        market:
-            bestProp.displayName ??
-            bestProp.market ??
-            "-",
+        buildStars(score);
 
-        line:
-            bestProp.line ??
-            "-",
+    const confidence =
 
-        sportsbook:
-            bestProp.sportsbook ??
-            "-",
+        buildConfidence(score);
 
-        ev:
-            bestProp.expectedValue?.expectedValuePercent != null
-                ? `${bestProp.expectedValue.expectedValuePercent.toFixed(1)}%`
-                : "-"
+    const recommendation =
 
-    }
-    : null;
+        buildRecommendation(score);
 
-return {
+    const dashboardBestProp = bestProp
+        ? {
 
-    score,
+            market:
+                bestProp.displayName ??
+                bestProp.market ??
+                "-",
 
-    stars,
+            line:
+                bestProp.line ??
+                "-",
 
-    confidence,
+            sportsbook:
+                bestProp.sportsbook ??
+                "-",
 
-    recommendation,
+            ev:
+                bestProp.expectedValue?.expectedValuePercent != null
+                    ? `${bestProp.expectedValue.expectedValuePercent.toFixed(1)}%`
+                    : "-"
 
-    bestProp: dashboardBestProp,
+        }
+        : null;
 
-    propAnalytics,
+    return {
 
-    consistency
+        score,
 
-};
+        stars,
+
+        confidence,
+
+        recommendation,
+
+        bestProp: dashboardBestProp,
+
+        propAnalytics,
+
+        consistency
+
+    };
 
 }
