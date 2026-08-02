@@ -567,6 +567,9 @@ function renderProps() {
 
     const topProp = player.props[0];
 
+    console.log("Top Prop");
+    console.log(topProp);
+
     renderFields({
 
     "top-prop-name":

@@ -111,23 +111,7 @@ const propAnalytics = props.map(prop =>
 
         findBestProp(propAnalytics);
 
-    const edge = bestProp
-        ? buildEdgeResult({
-
-            probability:
-                bestProp.model?.projectedProbability,
-
-            impliedProbability:
-                bestProp.impliedProbability,
-
-            consistency:
-                consistency.score,
-
-            sampleSize:
-                bestProp.projection?.sampleSize ?? 0
-
-        })
-        : null;
+    const edge = bestProp?.edge ?? null;
 
     const score =
 
@@ -168,7 +152,7 @@ const propAnalytics = props.map(prop =>
                 bestProp.edge?.impliedProbability ?? null,
 
             edge:
-                bestProp.edge?.edgePercent ?? null,
+                bestProp.edge ?? null,
 
             ev:
                 bestProp.expectedValue?.expectedValuePercent ?? null,
