@@ -18,9 +18,9 @@ export function findBestProp(propAnalytics) {
 
         if (
 
-            prop.expectedValue.expectedValue >
+            (prop.score ?? 0) >
 
-            bestProp.expectedValue.expectedValue
+            (bestProp.score ?? 0)
 
         ) {
 

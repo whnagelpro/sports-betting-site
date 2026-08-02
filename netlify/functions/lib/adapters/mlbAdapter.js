@@ -158,7 +158,35 @@ const games = Number(
             }
             : null,
 
-        props,
+        props: props.map(prop => ({
+
+            id:
+                prop.Id,
+
+            market:
+                String(
+                    prop["Prop Type"] ?? ""
+                ).toLowerCase(),
+
+            line:
+                Number(
+                    prop["Line Value"] ?? 0
+                ),
+
+            odds:
+                Number(
+                    prop["Over Odds"] ?? 0
+                ),
+
+            sportsbook:
+                prop.Vendor ?? "",
+
+            side:
+                "over",
+
+            raw: prop
+
+        })),
 
         isPitcher
 

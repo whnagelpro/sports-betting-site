@@ -3,26 +3,27 @@ export function buildProps(context) {
     return context.props.map(prop => ({
 
         displayName:
-            prop["Display Name"] ||
-            prop["Prop Type"],
+            prop.displayName ??
+            prop.market ??
+            "-",
 
         propType:
-            prop["Prop Type"],
+            prop.market ?? "",
 
         line:
-            prop["Line Value"],
+            prop.line ?? "-",
 
         odds:
-            prop["Odds"],
+            prop.odds ?? "-",
 
         sportsbook:
-            prop["Vendor"],
+            prop.sportsbook ?? "-",
 
         probability:
-            prop["Poisson Over"],
+            prop.probability ?? "-",
 
         ev:
-            prop["EV Over/Milestone ($1 Bet)"]
+            prop.ev ?? "-"
 
     }));
 

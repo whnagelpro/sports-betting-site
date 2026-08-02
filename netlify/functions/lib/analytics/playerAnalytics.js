@@ -1,6 +1,7 @@
 import { calculateConsistency } from "./consistency.js";
 import { scoreProp } from "./scoreProp.js";
 import { findBestProp } from "./bestProp.js";
+import { calculateProjectedProbability } from "./projectedProbability.js";
 
 function buildRecommendation(score) {
 
@@ -90,30 +91,43 @@ export function calculatePlayerAnalytics({
 
         calculateConsistency(gameLogs);
 
-    const propAnalytics =
+const propAnalytics = props.map(prop => {
 
-        props.map(prop =>
+    const projection = calculateProjectedProbability({
 
-            scoreProp({
+        gameLogs,
 
-                prop,
+        prop
 
-                model: {
+    });
 
-                    // Temporary placeholder until
-                    // the probability model is connected.
+    const scoredProp = scoreProp({
 
-                    projectedProbability: 0.55,
+        prop,
 
-                    consistencyScore:
+        model: {
 
-                        consistency.score
+            projectedProbability:
 
-                }
+                projection.probability,
 
-            })
+            consistencyScore:
 
-        );
+                consistency.score
+
+        }
+
+    });
+
+    return {
+
+        ...scoredProp,
+
+        projection
+
+    };
+
+});
 
     const bestProp =
 
@@ -123,28 +137,46 @@ export function calculatePlayerAnalytics({
 
         bestProp?.score ?? 0;
 
-    return {
+const dashboardBestProp = bestProp
+    ? {
 
-        score,
+        market:
+            bestProp.displayName ??
+            bestProp.market ??
+            "-",
 
-        stars:
+        line:
+            bestProp.line ??
+            "-",
 
-            buildStars(score),
+        sportsbook:
+            bestProp.sportsbook ??
+            "-",
 
-        confidence:
+        ev:
+            bestProp.expectedValue?.expectedValuePercent != null
+                ? `${bestProp.expectedValue.expectedValuePercent.toFixed(1)}%`
+                : "-"
 
-            buildConfidence(score),
+    }
+    : null;
 
-        recommendation:
+return {
 
-            buildRecommendation(score),
+    score,
 
-        bestProp,
+    stars,
 
-        propAnalytics,
+    confidence,
 
-        consistency
+    recommendation,
 
-    };
+    bestProp: dashboardBestProp,
+
+    propAnalytics,
+
+    consistency
+
+};
 
 }
