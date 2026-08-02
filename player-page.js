@@ -289,6 +289,10 @@ if (header) {
 
     }
 
+    console.log("Rendered Game Logs");
+
+    console.table(player.gameLogs);
+
     player.gameLogs.forEach(game => {
 
         body.appendChild(
