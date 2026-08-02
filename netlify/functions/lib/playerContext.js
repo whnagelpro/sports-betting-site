@@ -10,6 +10,7 @@ import {
 } from "./adapters/index.js";
 
 const { findPlayerGameLogs } = require("./gameLogs");
+const { mapGameLogs } = require("./gameLogsMapper");
 const { findPlayerTrends } = require("./trends");
 const { findPlayerToday } = require("./today");
 const { findPlayerProps } = require("./playerProps");
@@ -53,11 +54,19 @@ function loadPlayerContext({
 
     ) || {};
 
-    const gameLogs = findPlayerGameLogs(
+    const rawGameLogs = findPlayerGameLogs(
 
         gameLogRows,
 
         playerId
+
+    );
+
+    const gameLogs = mapGameLogs(
+
+        rawGameLogs,
+
+        profile.Position
 
     );
 
