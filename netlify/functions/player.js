@@ -205,9 +205,14 @@ const analytics = calculatePlayerAnalytics({
 
 });
 
-context.props = analytics.propAnalytics;
+// Build props from the evaluated analytics WITHOUT modifying context
+const props = buildProps({
 
-const props = buildProps(context);
+    ...context,
+
+    props: analytics.propAnalytics
+
+});
 
 const player = {
 
