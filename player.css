@@ -858,6 +858,40 @@
 
 }
 
+.analytics-title{
+
+    font-size:.8rem;
+
+    letter-spacing:.18em;
+
+    text-transform:uppercase;
+
+    color:#94a3b8;
+
+    font-weight:700;
+
+}
+
+.analytics-item strong{
+
+    color:#94a3b8;
+
+}
+
+.positive-ev{
+
+    color:#22c55e;
+
+    font-weight:700;
+
+}
+
+.analytics-right{
+
+    min-width:300px;
+
+}
+
 .analytics-left {
 
     text-align: center;

@@ -12,24 +12,31 @@ export function findBestProp(propAnalytics) {
 
     }
 
-    let bestProp = propAnalytics[0];
+    return [...propAnalytics].sort((a, b) => {
 
-    for (const prop of propAnalytics) {
+        const scoreA = a.edge?.score ?? a.score ?? 0;
+        const scoreB = b.edge?.score ?? b.score ?? 0;
 
-        if (
+        if (scoreA !== scoreB) {
 
-            (prop.score ?? 0) >
-
-            (bestProp.score ?? 0)
-
-        ) {
-
-            bestProp = prop;
+            return scoreB - scoreA;
 
         }
 
-    }
+        const edgeA = a.edge?.edgePercent ?? 0;
+        const edgeB = b.edge?.edgePercent ?? 0;
 
-    return bestProp;
+        if (edgeA !== edgeB) {
+
+            return edgeB - edgeA;
+
+        }
+
+        const evA = a.expectedValue?.expectedValuePercent ?? 0;
+        const evB = b.expectedValue?.expectedValuePercent ?? 0;
+
+        return evB - evA;
+
+    })[0];
 
 }

@@ -2,6 +2,8 @@ import { calculateConsistency } from "./consistency.js";
 import { scoreProp } from "./scoreProp.js";
 import { findBestProp } from "./bestProp.js";
 import { calculateProjectedProbability } from "./projectedProbability.js";
+import { buildEdgeResult } from "./edge/buildEdgeResult.js";
+import { evaluateProp } from "./evaluateProp.js";
 
 function buildRecommendation(score) {
 
@@ -91,47 +93,41 @@ export function calculatePlayerAnalytics({
 
         calculateConsistency(gameLogs);
 
-const propAnalytics = props.map(prop => {
+const propAnalytics = props.map(prop =>
 
-    const projection = calculateProjectedProbability({
-
-        gameLogs,
-
-        prop
-
-    });
-
-    const scoredProp = scoreProp({
+    evaluateProp({
 
         prop,
 
-        model: {
+        gameLogs,
 
-            projectedProbability:
+        consistency
 
-                projection.probability,
+    })
 
-            consistencyScore:
-
-                consistency.score
-
-        }
-
-    });
-
-    return {
-
-        ...scoredProp,
-
-        projection
-
-    };
-
-});
+);
 
     const bestProp =
 
         findBestProp(propAnalytics);
+
+    const edge = bestProp
+        ? buildEdgeResult({
+
+            probability:
+                bestProp.model?.projectedProbability,
+
+            impliedProbability:
+                bestProp.impliedProbability,
+
+            consistency:
+                consistency.score,
+
+            sampleSize:
+                bestProp.projection?.sampleSize ?? 0
+
+        })
+        : null;
 
     const score =
 
@@ -165,10 +161,28 @@ const propAnalytics = props.map(prop => {
                 bestProp.sportsbook ??
                 "-",
 
+            probability:
+                bestProp.edge?.probability ?? null,
+
+            impliedProbability:
+                bestProp.edge?.impliedProbability ?? null,
+
+            edge:
+                bestProp.edge?.edgePercent ?? null,
+
             ev:
-                bestProp.expectedValue?.expectedValuePercent != null
-                    ? `${bestProp.expectedValue.expectedValuePercent.toFixed(1)}%`
-                    : "-"
+                bestProp.expectedValue?.expectedValuePercent ?? null,
+
+            score:
+                bestProp.edge?.score ??
+                bestProp.score ??
+                null,
+
+            confidence:
+                bestProp.edge?.confidence ?? null,
+
+            recommendation:
+                bestProp.edge?.recommendation ?? null
 
         }
         : null;
@@ -183,11 +197,17 @@ const propAnalytics = props.map(prop => {
 
         recommendation,
 
+        edge,
+
         bestProp: dashboardBestProp,
 
         propAnalytics,
 
-        consistency
+        consistency,
+
+        modelEdge: edge,
+
+        analyticsVersion: 2
 
     };
 

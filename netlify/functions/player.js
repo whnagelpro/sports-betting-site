@@ -136,8 +136,6 @@ const hero = buildHero(context);
 
 const matchup = buildMatchup(context);
 
-const props = buildProps(context);
-
 const trends = buildTrends(context);
 
 const gameLogs = buildGameLogs(context);
@@ -206,6 +204,10 @@ const analytics = calculatePlayerAnalytics({
     props: context.props
 
 });
+
+context.props = analytics.propAnalytics;
+
+const props = buildProps(context);
 
 const player = {
 

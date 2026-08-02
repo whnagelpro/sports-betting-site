@@ -396,85 +396,102 @@ function renderAnalyticsDashboard() {
 
     dashboard.innerHTML = `
 
-        <div class="analytics-left">
+    <div class="analytics-left">
 
-            <span class="analytics-title">
+        <div class="analytics-title">
 
-                Analytics Score
+            SPORTACULAR SCORE
+
+        </div>
+
+        <div class="analytics-score-large">
+
+            ${analytics.score}
+
+        </div>
+
+        <div class="analytics-rating">
+
+            ★★★★★
+
+        </div>
+
+        <div class="analytics-recommendation">
+
+            ${analytics.recommendation}
+
+        </div>
+
+    </div>
+
+    <div class="analytics-right">
+
+        <div class="analytics-item">
+
+            <strong>Model Edge</strong>
+
+            <span class="positive-ev">
+
+                ${
+                    analytics.modelEdge?.edgePercent != null
+                        ? `${analytics.modelEdge.edgePercent.toFixed(1)}%`
+                        : "-"
+
+                }
 
             </span>
 
-            <div class="analytics-score-large">
+        </div>
 
-                ${analytics.score}
+        <div class="analytics-item">
 
-            </div>
+            <strong>Confidence</strong>
 
-            <div class="analytics-rating">
+            <span>
 
-                ★★★★★
+                ${analytics.confidence}
 
-            </div>
-
-            <div class="analytics-recommendation">
-
-                ${analytics.recommendation}
-
-            </div>
+            </span>
 
         </div>
 
-        <div class="analytics-right">
+        <div class="analytics-item">
 
-            <div class="analytics-item">
+            <strong>Best Prop</strong>
 
-                <strong>Confidence</strong>
+            <span>
 
-                <span>
+                ${analytics.bestProp.market}
 
-                    ${analytics.confidence}
-
-                </span>
-
-            </div>
-
-            <div class="analytics-item">
-
-                <strong>Best Prop</strong>
-
-                <span>
-
-                    ${analytics.bestProp.market}
-
-                </span>
-
-            </div>
-
-            <div class="analytics-item">
-
-                <strong>Suggested Line</strong>
-
-                <span>
-
-                    ${analytics.bestProp.line}
-
-                </span>
-
-            </div>
-
-            <div class="analytics-item">
-
-                <strong>Expected Value</strong>
-
-                <span class="positive-ev">
-
-                    ${analytics.bestProp.ev}
-
-                </span>
-
-            </div>
+            </span>
 
         </div>
+
+        <div class="analytics-item">
+
+            <strong>Suggested Line</strong>
+
+            <span>
+
+                ${analytics.bestProp.line}
+
+            </span>
+
+        </div>
+
+        <div class="analytics-item">
+
+            <strong>Sportsbook</strong>
+
+            <span>
+
+                ${analytics.bestProp.sportsbook}
+
+            </span>
+
+        </div>
+
+    </div>
 
     `;
 

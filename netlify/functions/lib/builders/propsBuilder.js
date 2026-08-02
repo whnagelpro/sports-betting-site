@@ -20,10 +20,35 @@ export function buildProps(context) {
             prop.sportsbook ?? "-",
 
         probability:
-            prop.probability ?? "-",
+            prop.edge?.probability ??
+            prop.probability ??
+            "-",
+
+        impliedProbability:
+            prop.edge?.impliedProbability ??
+            null,
+
+        modelEdge:
+            prop.edge?.edgePercent ??
+            null,
+
+        sportacularScore:
+            prop.edge?.score ??
+            prop.score ??
+            null,
+
+        confidence:
+            prop.edge?.confidence ??
+            null,
+
+        recommendation:
+            prop.edge?.recommendation ??
+            null,
 
         ev:
-            prop.ev ?? "-"
+            prop.expectedValue?.expectedValuePercent ??
+            prop.ev ??
+            "-"
 
     }));
 
