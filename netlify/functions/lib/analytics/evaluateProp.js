@@ -1,5 +1,6 @@
 import { calculateProjectedProbability } from "./projectedProbability.js";
 import { scoreProp } from "./scoreProp.js";
+import { buildEdgeResult } from "./edge/buildEdgeResult.js";
 
 export function evaluateProp({
 
