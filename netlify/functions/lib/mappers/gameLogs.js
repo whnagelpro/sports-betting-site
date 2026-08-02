@@ -3,7 +3,7 @@
 // Game Log Mapper
 // ======================================================
 
-export function mapGameLogs(gameLogs, position) {
+function mapGameLogs(gameLogs, position) {
 
     if (!Array.isArray(gameLogs)) {
 
@@ -104,3 +104,9 @@ export function mapGameLogs(gameLogs, position) {
     });
 
 }
+
+module.exports = {
+
+    mapGameLogs
+
+};

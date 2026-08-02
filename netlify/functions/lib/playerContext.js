@@ -10,7 +10,7 @@ import {
 } from "./adapters/index.js";
 
 const { findPlayerGameLogs } = require("./gameLogs");
-const { mapGameLogs } = require("./gameLogsMapper");
+const { mapGameLogs } = require("./mappers/gameLogs");
 const { findPlayerTrends } = require("./trends");
 const { findPlayerToday } = require("./today");
 const { findPlayerProps } = require("./playerProps");
