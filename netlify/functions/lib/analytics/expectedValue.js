@@ -2,13 +2,41 @@ export function calculateExpectedValue({
 
     projectedProbability,
 
-    americanOdds
+    odds,
+
+    format = "american"
 
 }) {
 
+    if (
+
+        projectedProbability == null ||
+
+        odds == null
+
+    ) {
+
+        return {
+
+            expectedValue: null,
+
+            expectedValuePercent: null
+
+        };
+
+    }
+
+    const value = Number(odds);
+
     let decimalOdds;
 
-    if (americanOdds > 0) {
+    if (format === "decimal") {
+
+        decimalOdds = value;
+
+    }
+
+    else if (value > 0) {
 
         decimalOdds =
 
@@ -16,7 +44,7 @@ export function calculateExpectedValue({
 
             (
 
-                americanOdds /
+                value /
 
                 100
 
@@ -34,7 +62,7 @@ export function calculateExpectedValue({
 
                 100 /
 
-                Math.abs(americanOdds)
+                Math.abs(value)
 
             );
 
@@ -74,9 +102,7 @@ export function calculateExpectedValue({
 
                     100
 
-                )
-
-                .toFixed(2)
+                ).toFixed(2)
 
             )
 

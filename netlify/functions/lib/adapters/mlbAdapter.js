@@ -158,35 +158,79 @@ const games = Number(
             }
             : null,
 
-        props: props.map(prop => ({
+        props: (props ?? []).map(prop => {
 
-            id:
-                prop.Id,
+            const type =
 
-            market:
                 String(
-                    prop["Prop Type"] ?? ""
-                ).toLowerCase(),
+                    prop.Type ?? ""
+                ).toLowerCase();
 
-            line:
-                Number(
-                    prop["Line Value"] ?? 0
-                ),
+            const oddsFormat =
 
-            odds:
-                Number(
-                    prop["Over Odds"] ?? 0
-                ),
+                type === "milestone"
 
-            sportsbook:
-                prop.Vendor ?? "",
+                    ? "decimal"
 
-            side:
-                "over",
+                    : "american";
 
-            raw: prop
+            const odds =
 
-        })),
+                oddsFormat === "decimal"
+
+                    ? Number(
+                        prop["Decimal Odds"] ?? 0
+                    )
+
+                    : Number(
+                        prop["Over Odds"] ?? 0
+                    );
+
+            return {
+
+                id:
+                    prop.Id,
+
+                type,
+
+                market:
+                    String(
+                        prop["Prop Type"] ?? ""
+                    ).toLowerCase(),
+
+                displayName:
+                    String(
+                        prop["Prop Type"] ?? ""
+                    )
+                        .replaceAll("_", " "),
+
+                line:
+                    Number(
+                        prop["Line Value"] ?? 0
+                    ),
+
+                odds,
+
+                oddsFormat,
+
+                sportsbook:
+                    prop.Vendor ?? "",
+
+                probability:
+                    Number(
+                        prop["Poisson Over"] ?? 0
+                    ),
+
+                expectedValue:
+                    Number(
+                        prop["EV Over/Milestone ($1 Bet)"] ?? 0
+                    ),
+
+                raw: prop
+
+            };
+
+        }),
 
         isPitcher
 

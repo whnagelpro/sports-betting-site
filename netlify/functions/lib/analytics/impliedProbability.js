@@ -1,32 +1,50 @@
-export function calculateImpliedProbability(
-    americanOdds
-) {
+export function calculateImpliedProbability({
 
-    if (americanOdds > 0) {
+    odds,
 
-        return (
+    format = "american"
 
-            100 /
+}) {
 
-            (americanOdds + 100)
+    if (
 
-        );
+        odds == null ||
+
+        Number.isNaN(Number(odds))
+
+    ) {
+
+        return null;
+
+    }
+
+    const value = Number(odds);
+
+    if (format === "decimal") {
+
+        if (value <= 1) {
+
+            return null;
+
+        }
+
+        return 1 / value;
+
+    }
+
+    if (value > 0) {
+
+        return 100 / (value + 100);
 
     }
 
     return (
 
-        Math.abs(americanOdds)
+        Math.abs(value)
 
         /
 
-        (
-
-            Math.abs(americanOdds)
-
-            + 100
-
-        )
+        (Math.abs(value) + 100)
 
     );
 

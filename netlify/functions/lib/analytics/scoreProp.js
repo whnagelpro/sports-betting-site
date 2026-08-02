@@ -30,15 +30,21 @@ export function scoreProp({
 
     }
 
-    const americanOdds = Number(prop.odds);
+    const odds = Number(prop.odds);
 
     const impliedProbability =
 
-        calculateImpliedProbability(
+        calculateImpliedProbability({
 
-            americanOdds
+            odds,
 
-        );
+            format:
+
+                prop.oddsFormat ??
+
+                "american"
+
+        });
 
     const edge = calculateEdge({
 
@@ -54,7 +60,13 @@ export function scoreProp({
 
             projectedProbability,
 
-            americanOdds
+            odds,
+
+            format:
+
+                prop.oddsFormat ??
+
+                "american"
 
         });
 
