@@ -1,18 +1,28 @@
 const MARKET_FIELDS = {
 
-    Hits: "Hits",
+    hits: "Hits",
 
-    Runs: "Runs",
+    runs: "Runs",
 
-    RBIs: "RBIs",
+    rbis: "RBIs",
 
-    "Home Runs": "Home Runs",
+    home_runs: "Home Runs",
 
-    "Total Bases": "Total Bases",
+    total_bases: "Total Bases",
 
-    Walks: "Walks",
+    walks: "Walks",
 
-    Strikeouts: "Strikeouts"
+    strikeouts: "Strikeouts",
+
+    pitcher_outs: "Outs",
+
+    pitcher_strikeouts: "Strikeouts",
+
+    pitcher_hits_allowed: "Hits Allowed",
+
+    pitcher_walks: "Walks",
+
+    pitcher_earned_runs: "Earned Runs"
 
 };
 
