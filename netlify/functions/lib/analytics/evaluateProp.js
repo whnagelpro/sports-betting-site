@@ -64,7 +64,23 @@ export function evaluateProp({
 
         projection,
 
-        edge
+        edge,
+
+        evaluation: {
+
+            sportacularScore:
+                edge?.score ?? scoredProp.score ?? 0,
+
+            modelEdge:
+                edge?.edgePercent ?? 0,
+
+            confidence:
+                edge?.confidence ?? "Unknown",
+
+            recommendation:
+                edge?.recommendation ?? "None"
+
+        }
 
     };
 

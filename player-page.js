@@ -394,6 +394,11 @@ function renderAnalyticsDashboard() {
 
     const analytics = player.analytics;
 
+    console.log("Analytics Dashboard Object");
+    console.log(analytics);
+    console.log("Model Edge:", analytics.modelEdge);
+    console.log("Best Prop:", analytics.bestProp);
+
     dashboard.innerHTML = `
 
     <div class="analytics-left">

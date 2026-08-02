@@ -14,8 +14,17 @@ export function findBestProp(propAnalytics) {
 
     return [...propAnalytics].sort((a, b) => {
 
-        const scoreA = a.edge?.score ?? a.score ?? 0;
-        const scoreB = b.edge?.score ?? b.score ?? 0;
+        const scoreA =
+            a.evaluation?.sportacularScore ??
+            a.edge?.score ??
+            a.score ??
+            0;
+
+        const scoreB =
+            b.evaluation?.sportacularScore ??
+            b.edge?.score ??
+            b.score ??
+            0;
 
         if (scoreA !== scoreB) {
 
