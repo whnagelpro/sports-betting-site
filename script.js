@@ -694,6 +694,18 @@ function transformRowsToGames(rows) {
 }
 
 function buildPropsFromRows(rows) {
+  if (index === 0) {
+      console.log("FIRST ROW", row);
+
+      console.log({
+          gameDate,
+          vendor,
+          propType,
+          lineValue,
+          playerName,
+          ev
+      });
+  }
   return rows
     .map((row, index) => {
 
