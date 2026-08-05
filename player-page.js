@@ -644,6 +644,126 @@ function renderProps() {
 
 });
 
+    const grid =
+        document.getElementById(
+            "props-grid"
+        );
+
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    player.props.forEach(prop => {
+
+        const card =
+            document.createElement("article");
+
+        card.className =
+            "prop-card";
+
+        card.innerHTML = `
+
+        <div class="prop-card-header">
+
+            <div>
+
+                <h3>${prop.displayName}</h3>
+
+                <div class="prop-subtitle">
+
+                    ${prop.sportsbook}
+
+                </div>
+
+            </div>
+
+            <div class="prop-score">
+
+                ${prop.sportacularScore}
+
+            </div>
+
+        </div>
+
+        <div class="prop-grid">
+
+            <div>
+
+                <span>Line</span>
+
+                <strong>${prop.line}</strong>
+
+            </div>
+
+            <div>
+
+                <span>Odds</span>
+
+                <strong>${prop.odds}</strong>
+
+            </div>
+
+            <div>
+
+                <span>Model Edge</span>
+
+                <strong>
+
+                    ${
+                        Number.isFinite(Number(prop.modelEdge))
+                            ? `${Number(prop.modelEdge).toFixed(1)}%`
+                            : "-"
+
+                    }
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>Confidence</span>
+
+                <strong>
+
+                    ${prop.confidence}
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>Recommendation</span>
+
+                <strong>
+
+                    ${prop.recommendation}
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>Probability</span>
+
+                <strong>
+
+                    ${prop.probability}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+        grid.appendChild(card);
+
+    });
+
 }
 
 function renderTrendCards() {
