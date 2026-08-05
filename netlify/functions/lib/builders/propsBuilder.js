@@ -2,6 +2,10 @@ export function buildProps(context) {
 
     return context.props.map(prop => ({
 
+        id:
+            prop.id ??
+            null,
+
         displayName:
             prop.displayName ??
             prop.market ??

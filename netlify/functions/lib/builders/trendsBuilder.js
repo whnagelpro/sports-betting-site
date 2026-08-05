@@ -14,6 +14,18 @@ export function buildTrends(context) {
 
             trend["Trend Score"],
 
+        modelEdge:
+    
+            Number(trend["Trend Score"]) || 0,
+
+        confidence:
+    
+            trend["Consistency"] || "Unknown",
+
+        recommendation:
+    
+            trend["Trend Strength"] || "Neutral",
+
         strength:
 
             trend["Trend Strength"],

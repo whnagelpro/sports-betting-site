@@ -132,6 +132,10 @@ const propAnalytics = props.map(prop =>
     const dashboardBestProp = bestProp
         ? {
 
+            id:
+                bestProp.id ??
+                null,
+
             market:
                 bestProp.displayName ??
                 bestProp.market ??

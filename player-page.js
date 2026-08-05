@@ -394,6 +394,20 @@ function renderAnalyticsDashboard() {
 
     const analytics = player.analytics;
 
+    const dashboardProp =
+        player.props.find(
+            prop =>
+                prop.id != null &&
+                String(prop.id) ===
+                String(analytics.bestProp?.id)
+        ) ||
+        player.props.find(
+            prop =>
+                prop.sportacularScore ===
+                analytics.bestProp?.score
+        ) ||
+        analytics.bestProp;
+
     console.log("Analytics Dashboard Object");
     console.log(analytics);
     console.log("Model Edge:", analytics.modelEdge);
@@ -411,7 +425,9 @@ function renderAnalyticsDashboard() {
 
         <div class="analytics-score-large">
 
-            ${analytics.score}
+            ${analytics?.sportacularScore ??
+                dashboardProp.sportacularScore ??
+                player.analytics.score}
 
         </div>
 
@@ -423,7 +439,9 @@ function renderAnalyticsDashboard() {
 
         <div class="analytics-recommendation">
 
-            ${analytics.recommendation}
+            ${analytics?.recommendation ??
+                dashboardProp.recommendation ??
+                player.analytics.recommendation}
 
         </div>
 
@@ -438,10 +456,11 @@ function renderAnalyticsDashboard() {
             <span class="positive-ev">
 
                 ${
-                    analytics.modelEdge?.edgePercent != null
-                        ? `${analytics.modelEdge.edgePercent.toFixed(1)}%`
-                        : "-"
-
+                    analytics?.modelEdge != null
+                        ? `${analytics.modelEdge.toFixed(1)}%`
+                        : dashboardProp.modelEdge != null
+                            ? `${dashboardProp.modelEdge.toFixed(1)}%`
+                            : "-"
                 }
 
             </span>
@@ -454,7 +473,9 @@ function renderAnalyticsDashboard() {
 
             <span>
 
-                ${analytics.confidence}
+                ${analytics?.confidence ??
+                    dashboardProp.confidence ??
+                    player.analytics.confidence}
 
             </span>
 
@@ -466,7 +487,7 @@ function renderAnalyticsDashboard() {
 
             <span>
 
-                ${analytics.bestProp.market}
+                ${dashboardProp.displayName}
 
             </span>
 
@@ -478,7 +499,7 @@ function renderAnalyticsDashboard() {
 
             <span>
 
-                ${analytics.bestProp.line}
+                ${dashboardProp.line}
 
             </span>
 
@@ -490,7 +511,7 @@ function renderAnalyticsDashboard() {
 
             <span>
 
-                ${analytics.bestProp.sportsbook}
+                ${dashboardProp.sportsbook}
 
             </span>
 
@@ -565,7 +586,24 @@ function renderProps() {
 
     section.hidden = false;
 
-    const topProp = player.props[0];
+    const topProp =
+        player.props.find(
+            prop =>
+                prop.id != null &&
+                String(prop.id) ===
+                String(player.analytics.bestProp?.id)
+        ) ||
+        player.props.find(
+            prop =>
+                prop.sportacularScore ===
+                player.analytics.bestProp?.score
+        ) ||
+        player.props[0];
+
+    const analytics = topProp?.analytics ?? null;
+
+    console.log("Dashboard Best Prop:", player.analytics.bestProp);
+    console.log("Displayed Top Prop:", topProp);
 
     console.log("Top Prop");
     console.log(topProp);

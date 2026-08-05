@@ -1,6 +1,7 @@
 import { calculateImpliedProbability } from "./impliedProbability.js";
 import { calculateExpectedValue } from "./expectedValue.js";
 import { calculateEdge } from "./edge.js";
+import { buildAnalytics } from "./buildAnalytics.js";
 
 function clamp(value, min = 0, max = 100) {
 
@@ -94,6 +95,18 @@ export function scoreProp({
 
     );
 
+    const analytics = buildAnalytics({
+
+        score: overallScore,
+
+        modelEdge: edge.edgePercent,
+
+        probability: projectedProbability,
+
+        impliedProbability
+
+    });
+
     return {
 
         ...prop,
@@ -104,7 +117,9 @@ export function scoreProp({
 
         edge,
 
-        score: overallScore
+        score: overallScore,
+
+        analytics
 
     };
 

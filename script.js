@@ -516,43 +516,139 @@ function buildRankingsFromRow(row) {
 
   if (!Number.isNaN(overEV) && totalValue) {
     rankings.push({
-      bet: `Over ${totalValue}`,
-      ev: overEV
+        bet: `Over ${totalValue}`,
+        ev: overEV,
+
+        modelEdge: overEV,
+
+        sportacularScore: Math.round(Math.max(0, Math.min(100, overEV * 100))),
+
+        confidence:
+            overEV >= 0.25
+                ? "High"
+                : overEV >= 0.10
+                    ? "Medium"
+                    : "Low",
+
+        recommendation:
+            overEV >= 0
+                ? "Consider"
+                : "Pass"
     });
   }
 
   if (!Number.isNaN(underEV) && totalValue) {
     rankings.push({
-      bet: `Under ${totalValue}`,
-      ev: underEV
+        bet: `Under ${totalValue}`,
+        ev: underEV,
+
+        modelEdge: underEV,
+
+        sportacularScore: Math.round(Math.max(0, Math.min(100, underEV * 100))),
+
+        confidence:
+            underEV >= 0.25
+                ? "High"
+                : underEV >= 0.10
+                    ? "Medium"
+                    : "Low",
+
+        recommendation:
+            underEV >= 0
+                ? "Consider"
+                : "Pass"
     });
   }
 
   if (!Number.isNaN(awayML)) {
     rankings.push({
-      bet: `${awayTeam} ML`,
-      ev: awayML
+        bet: `${awayTeam} ML`,
+        ev: awayML,
+
+        modelEdge: toNumber(row["Moneyline Edge Away"]),
+
+        sportacularScore: Math.round(Math.max(0, Math.min(100, awayML * 100))),
+
+        confidence:
+            awayML >= 0.25
+                ? "High"
+                : awayML >= 0.10
+                    ? "Medium"
+                    : "Low",
+
+        recommendation:
+            awayML >= 0
+                ? "Consider"
+                : "Pass"
     });
   }
 
   if (!Number.isNaN(homeML)) {
     rankings.push({
-      bet: `${homeTeam} ML`,
-      ev: homeML
+        bet: `${homeTeam} ML`,
+        ev: homeML,
+
+        modelEdge: toNumber(row["Moneyline Edge Home"]),
+
+        sportacularScore: Math.round(Math.max(0, Math.min(100, homeML * 100))),
+
+        confidence:
+            homeML >= 0.25
+                ? "High"
+                : homeML >= 0.10
+                    ? "Medium"
+                    : "Low",
+
+        recommendation:
+            homeML >= 0
+                ? "Consider"
+                : "Pass"
     });
   }
 
   if (!Number.isNaN(awaySpreadEV)) {
     rankings.push({
-      bet: `${awayTeam} ${safeText(row["Spread Away Value"], "")}`,
-      ev: awaySpreadEV
+        bet: `${awayTeam} ${safeText(row["Spread Away Value"], "")}`,
+        ev: awaySpreadEV,
+
+        modelEdge: awaySpreadEV,
+
+        sportacularScore: Math.round(Math.max(0, Math.min(100, awaySpreadEV * 100))),
+
+        confidence:
+            awaySpreadEV >= 0.25
+                ? "High"
+                : awaySpreadEV >= 0.10
+                    ? "Medium"
+                    : "Low",
+
+        recommendation:
+            awaySpreadEV >= 0
+                ? "Consider"
+                : "Pass"
     });
   }
 
   if (!Number.isNaN(homeSpreadEV)) {
     rankings.push({
-      bet: `${homeTeam} ${safeText(row["Spread Home Value"], "")}`,
-      ev: homeSpreadEV
+        bet: `${homeTeam} ${safeText(row["Spread Home Value"], "")}`,
+        ev: homeSpreadEV,
+
+        modelEdge: homeSpreadEV,
+
+        sportacularScore: Math.round(Math.max(0, Math.min(100, homeSpreadEV * 100))),
+
+        confidence:
+            homeSpreadEV >= 0.25
+                ? "High"
+                : homeSpreadEV >= 0.10
+                    ? "Medium"
+                    : "Low",
+
+        recommendation:
+            homeSpreadEV >= 0
+                ? "Consider"
+                : "Pass"
     });
   }
 
@@ -809,7 +905,52 @@ function createBetCard(game, tierName = "Rookie") {
           <h3>${game.awayTeam} at ${game.homeTeam}</h3>
           <p class="bet-subtext">Sportsbook: ${game.vendor} | Game Date: ${game.gameDate}</p>
         </div>
-        <div class="ev-badge">Top EV: ${topEV ? formatEV(topEV.ev) : "N/A"}</div>
+        <div class="bet-card-analytics">
+
+          <div class="analytics-row">
+              <span class="analytics-label">⭐ Score</span>
+              <span class="analytics-value">
+                  ${topEV?.sportacularScore ?? "N/A"}
+              </span>
+          </div>
+
+          <div class="analytics-row">
+              <span class="analytics-label">📈 Model Edge</span>
+              <span class="analytics-value">
+                  ${
+                      topEV?.modelEdge != null
+                          ? `${topEV.modelEdge.toFixed(2)}%`
+                          : "N/A"
+                  }
+              </span>
+          </div>
+
+          <div class="analytics-row">
+              <span class="analytics-label">🟢 Confidence</span>
+              <span class="analytics-value">
+                  ${topEV?.confidence ?? "N/A"}
+              </span>
+          </div>
+
+          <div class="analytics-row">
+              <span class="analytics-label">🏆 Recommendation</span>
+              <span class="analytics-value">
+                  ${topEV?.recommendation ?? "N/A"}
+              </span>
+          </div>
+
+        </div>
+
+            <div style="margin-top:6px;">
+                <strong>Model Edge</strong><br>
+                ${
+                    topEV?.modelEdge != null
+                        ? formatEV(topEV.modelEdge)
+                        : "N/A"
+                }
+            </div>
+
+        </div>
       </div>
 
       <div class="market-grid">
@@ -2451,6 +2592,35 @@ function createNBATrendCard(player) {
 
         <div class="trend-strength-badge">
           ${player["Trend Strength"] || "N/A"}
+        </div>
+
+        <div class="trend-analytics">
+
+          <div class="trend-analytics-item">
+            <span class="trend-analytics-label">Model Edge</span>
+            <span class="trend-analytics-value">
+              ${
+                Number.isFinite(aboveSeason)
+                  ? `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`
+                  : "N/A"
+              }
+            </span>
+          </div>
+
+          <div class="trend-analytics-item">
+            <span class="trend-analytics-label">Confidence</span>
+            <span class="trend-analytics-value">
+              ${player["Consistency"] || "N/A"}
+            </span>
+          </div>
+
+          <div class="trend-analytics-item">
+            <span class="trend-analytics-label">Recommendation</span>
+            <span class="trend-analytics-value">
+              ${player["Trend Strength"] || "N/A"}
+            </span>
+          </div>
+
         </div>
       </div>
 
