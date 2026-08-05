@@ -694,18 +694,6 @@ function transformRowsToGames(rows) {
 }
 
 function buildPropsFromRows(rows) {
-  if (index === 0) {
-      console.log("FIRST ROW", row);
-
-      console.log({
-          gameDate,
-          vendor,
-          propType,
-          lineValue,
-          playerName,
-          ev
-      });
-  }
   return rows
     .map((row, index) => {
 
@@ -1222,6 +1210,9 @@ if (
 
   const text = await response.text();
   const rows = parseCSV(text);
+
+  console.log("CSV Headers:", Object.keys(rows[0]));
+  console.log("First CSV Row:", rows[0]);
 
   const props =
     csvUrl === NFL_PROPS_PREMIUM_URL
