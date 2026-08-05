@@ -408,6 +408,16 @@ function renderAnalyticsDashboard() {
         ) ||
         analytics.bestProp;
 
+    const dashboardAnalytics =
+        dashboardProp?.analytics ??
+        null;
+
+    const modelEdgeValue =
+        dashboardAnalytics?.modelEdge ??
+        dashboardProp?.modelEdge ??
+        player.analytics?.modelEdge?.edgePercent ??
+        null;
+
     console.log("Analytics Dashboard Object");
     console.log(analytics);
     console.log("Model Edge:", analytics.modelEdge);
@@ -456,11 +466,9 @@ function renderAnalyticsDashboard() {
             <span class="positive-ev">
 
                 ${
-                    analytics?.modelEdge != null
-                        ? `${analytics.modelEdge.toFixed(1)}%`
-                        : dashboardProp.modelEdge != null
-                            ? `${dashboardProp.modelEdge.toFixed(1)}%`
-                            : "-"
+                    Number.isFinite(Number(modelEdgeValue))
+                        ? `${Number(modelEdgeValue).toFixed(1)}%`
+                        : "-"
                 }
 
             </span>
