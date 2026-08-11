@@ -635,12 +635,25 @@ function renderProps() {
         topProp.sportsbook,
 
     "top-prop-ev":
-
-        topProp.ev,
+        Number.isFinite(Number(analytics?.modelEdge))
+            ? `${Number(analytics.modelEdge).toFixed(1)}%`
+            : Number.isFinite(Number(topProp.modelEdge))
+                ? `${Number(topProp.modelEdge).toFixed(1)}%`
+                : topProp.ev,
 
     "top-prop-probability":
+        analytics?.probability ??
+        topProp.probability,
 
-        topProp.probability
+    "top-prop-confidence":
+        analytics?.confidence ??
+        topProp.confidence ??
+        "-",
+
+    "top-prop-recommendation":
+        analytics?.recommendation ??
+        topProp.recommendation ??
+        "-"
 
 });
 
@@ -654,6 +667,9 @@ function renderProps() {
     grid.innerHTML = "";
 
     player.props.forEach(prop => {
+
+        const analytics =
+            prop.analytics ?? {};
 
         const card =
             document.createElement("article");
@@ -679,7 +695,11 @@ function renderProps() {
 
             <div class="prop-score">
 
-                ${prop.sportacularScore}
+                ${analytics.sportacularScore ??
+                    prop.sportacularScore ??
+                    analytics.score ??
+                    prop.score ??
+                    "-"}
 
             </div>
 
@@ -710,10 +730,11 @@ function renderProps() {
                 <strong>
 
                     ${
-                        Number.isFinite(Number(prop.modelEdge))
-                            ? `${Number(prop.modelEdge).toFixed(1)}%`
-                            : "-"
-
+                        Number.isFinite(Number(analytics.modelEdge))
+                            ? `${Number(analytics.modelEdge).toFixed(1)}%`
+                            : Number.isFinite(Number(prop.modelEdge))
+                                ? `${Number(prop.modelEdge).toFixed(1)}%`
+                                : "-"
                     }
 
                 </strong>
@@ -726,7 +747,9 @@ function renderProps() {
 
                 <strong>
 
-                    ${prop.confidence}
+                    ${analytics.confidence ??
+                        prop.confidence ??
+                        "-"}
 
                 </strong>
 
@@ -738,7 +761,9 @@ function renderProps() {
 
                 <strong>
 
-                    ${prop.recommendation}
+                    ${analytics.recommendation ??
+                        prop.recommendation ??
+                        "-"}
 
                 </strong>
 
@@ -750,7 +775,9 @@ function renderProps() {
 
                 <strong>
 
-                    ${prop.probability}
+                    ${analytics.probability ??
+                        prop.probability ??
+                        "-"}
 
                 </strong>
 
@@ -792,6 +819,23 @@ function renderTrendCards() {
 
     player.trends.forEach(trend => {
 
+        const analytics =
+            trend.analytics ?? {
+
+                score:
+                    trend.score,
+
+                modelEdge:
+                    trend.modelEdge,
+
+                confidence:
+                    trend.confidence,
+
+                recommendation:
+                    trend.recommendation
+
+            };
+
         const card = document.createElement("article");
 
         card.className = "trend-card";
@@ -820,15 +864,79 @@ function renderTrendCards() {
 
         <span>
 
-            Strength:
-            ${trend.strength}
+            ⭐
+            ${
+                analytics.score ??
+                trend.score ??
+                "-"
+
+            }
+
+        </span>
+
+        <span>
+
+            📈
+            ${
+                Number.isFinite(Number(
+                    analytics.modelEdge ??
+                    trend.modelEdge
+                ))
+                    ? `${Number(
+                        analytics.modelEdge ??
+                        trend.modelEdge
+                    ).toFixed(1)}%`
+                    : "-"
+
+            }
+
+        </span>
+
+    </div>
+
+    <div class="trend-footer">
+
+        <span>
+
+            🟢
+            ${
+                analytics.confidence ??
+                trend.confidence ??
+                trend.strength ??
+                "-"
+
+            }
+
+        </span>
+
+        <span>
+
+            🏆
+            ${
+                analytics.recommendation ??
+                trend.recommendation ??
+                trend.risk ??
+                "-"
+
+            }
+
+        </span>
+
+    </div>
+
+    <div class="trend-footer">
+
+        <span>
+
+            Trend:
+            ${trend.strength ?? "-"}
 
         </span>
 
         <span>
 
             Risk:
-            ${trend.risk}
+            ${trend.risk ?? "-"}
 
         </span>
 

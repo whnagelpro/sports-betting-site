@@ -52,7 +52,16 @@ export function buildProps(context) {
         ev:
             prop.expectedValue?.expectedValuePercent ??
             prop.ev ??
-            "-"
+            "-",
+
+        analytics: prop.analytics ?? {
+            sportacularScore: prop.sportacularScore ?? null,
+            modelEdge: prop.modelEdge ?? null,
+            probability: prop.probability ?? null,
+            impliedProbability: prop.impliedProbability ?? null,
+            confidence: prop.confidence ?? null,
+            recommendation: prop.recommendation ?? null
+        },
 
     }));
 

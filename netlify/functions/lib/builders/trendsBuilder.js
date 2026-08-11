@@ -1,43 +1,49 @@
 export function buildTrends(context) {
 
-    return context.trends.map(trend => ({
+    return context.trends.map(trend => {
 
-        title:
+        const analytics =
+            trend.analytics ?? {};
 
-            trend["Stat Type"],
+        return {
 
-        description:
+            title:
+                trend["Stat Type"],
 
-            trend["Trend Note"],
+            description:
+                trend["Trend Note"],
 
-        score:
+            score:
+                analytics.sportacularScore ??
+                trend["Trend Score"],
 
-            trend["Trend Score"],
+            modelEdge:
+                analytics.modelEdge ??
+                Number(trend["Trend Score"]) ||
+                0,
 
-        modelEdge:
-    
-            Number(trend["Trend Score"]) || 0,
+            confidence:
+                analytics.confidence ??
+                trend["Consistency"] ??
+                "Unknown",
 
-        confidence:
-    
-            trend["Consistency"] || "Unknown",
+            recommendation:
+                analytics.recommendation ??
+                trend["Trend Strength"] ??
+                "Neutral",
 
-        recommendation:
-    
-            trend["Trend Strength"] || "Neutral",
+            strength:
+                trend["Trend Strength"] ??
+                "N/A",
 
-        strength:
+            consistency:
+                trend["Consistency"],
 
-            trend["Trend Strength"],
+            risk:
+                trend["Risk Tier"]
 
-        consistency:
+        };
 
-            trend["Consistency"],
-
-        risk:
-
-            trend["Risk Tier"]
-
-    }));
+    });
 
 }
