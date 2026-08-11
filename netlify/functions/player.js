@@ -132,13 +132,37 @@ console.log("✓ context built");
         // Build player object
         // ----------------------------
 
+console.log("Building hero...");
 const hero = buildHero(context);
+console.log("✓ hero");
 
+console.log("Building matchup...");
 const matchup = buildMatchup(context);
+console.log("✓ matchup");
 
+console.log("Building trends...");
 const trends = buildTrends(context);
+console.log("✓ trends");
 
+console.log("Building game logs...");
 const gameLogs = buildGameLogs(context);
+console.log("✓ game logs");
+
+console.log("Calculating analytics...");
+const analytics = calculatePlayerAnalytics({
+    seasonStats: season,
+    gameLogs: context.gameLogs,
+    matchup: context.matchup,
+    props: context.props
+});
+console.log("✓ analytics");
+
+console.log("Building props...");
+const props = buildProps({
+    ...context,
+    props: analytics.propAnalytics
+});
+console.log("✓ props");
 
 const season = context.seasonStats;
 
