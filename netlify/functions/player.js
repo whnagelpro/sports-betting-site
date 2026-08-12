@@ -148,22 +148,6 @@ console.log("Building game logs...");
 const gameLogs = buildGameLogs(context);
 console.log("✓ game logs");
 
-console.log("Calculating analytics...");
-const analytics = calculatePlayerAnalytics({
-    seasonStats: season,
-    gameLogs: context.gameLogs,
-    matchup: context.matchup,
-    props: context.props
-});
-console.log("✓ analytics");
-
-console.log("Building props...");
-const props = buildProps({
-    ...context,
-    props: analytics.propAnalytics
-});
-console.log("✓ props");
-
 const season = context.seasonStats;
 
 const quickStats = buildQuickStats(context);

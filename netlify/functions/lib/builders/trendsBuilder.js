@@ -19,8 +19,7 @@ export function buildTrends(context) {
 
             modelEdge:
                 analytics.modelEdge ??
-                Number(trend["Trend Score"]) ||
-                0,
+                (Number(trend["Trend Score"]) || 0),
 
             confidence:
                 analytics.confidence ??
