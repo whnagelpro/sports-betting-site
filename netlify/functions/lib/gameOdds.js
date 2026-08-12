@@ -2,20 +2,23 @@
 // Game Odds Helper
 // ======================================================
 
-const { loadCSV } = require("./csv");
+import { loadCSV } from "./csv.js";
+
+// ------------------------------------------------------
+// Load Game Odds
+// ------------------------------------------------------
 
 async function loadGameOdds(url) {
-
     return await loadCSV(url);
-
 }
 
+// ------------------------------------------------------
+// Find Player Game
+// ------------------------------------------------------
+
 function findPlayerGame(rows, team) {
-
     if (!Array.isArray(rows)) {
-
         return {};
-
     }
 
     return (
@@ -24,13 +27,13 @@ function findPlayerGame(rows, team) {
             game["Away Team"] === team
         ) || {}
     );
-
 }
 
-module.exports = {
+// ------------------------------------------------------
+// ES Module Exports
+// ------------------------------------------------------
 
+export {
     loadGameOdds,
-
     findPlayerGame
-
 };

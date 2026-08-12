@@ -6,9 +6,7 @@
 function mapGameLogs(gameLogs, position) {
 
     if (!Array.isArray(gameLogs)) {
-
         return [];
-
     }
 
     const isPitcher = ["SP", "RP", "P"].includes(
@@ -20,11 +18,8 @@ function mapGameLogs(gameLogs, position) {
         if (isPitcher) {
 
             return {
-
                 gameDate: log["Game Date"],
-
                 gameId: log["Game ID"],
-
                 opponent: log["Opponent"],
 
                 strikeouts: Number(
@@ -48,17 +43,12 @@ function mapGameLogs(gameLogs, position) {
                 ),
 
                 raw: log
-
             };
-
         }
 
         return {
-
             gameDate: log["Game Date"],
-
             gameId: log["Game ID"],
-
             opponent: log["Opponent"],
 
             hits: Number(
@@ -98,15 +88,10 @@ function mapGameLogs(gameLogs, position) {
             ),
 
             raw: log
-
         };
-
     });
-
 }
 
-module.exports = {
-
+export {
     mapGameLogs
-
 };
