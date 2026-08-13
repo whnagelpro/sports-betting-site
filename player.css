@@ -943,3 +943,46 @@
     gap: 2rem;
 
 }
+
+/* ======================================================
+   PROFILE ACCORDION
+====================================================== */
+
+.profile-accordion {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.03);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.profile-accordion-summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 20px 24px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.profile-accordion-summary::-webkit-details-marker {
+    display: none;
+}
+
+.profile-accordion-summary::after {
+    content: "▶";
+    font-size: 0.9rem;
+    transition: transform .25s ease;
+}
+
+.profile-accordion[open] .profile-accordion-summary::after {
+    transform: rotate(90deg);
+}
+
+.profile-accordion-content {
+    padding: 0 24px 24px;
+}

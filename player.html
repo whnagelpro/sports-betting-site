@@ -227,9 +227,18 @@
 
     <div class="container">
 
-        <h2>Today's Matchup</h2>
+        <details
+            class="profile-accordion"
+            name="player-profile"
+            open>
 
-        <div class="matchup-card">
+            <summary class="profile-accordion-summary">
+                Today's Matchup
+            </summary>
+
+            <div class="profile-accordion-content">
+
+                <div class="matchup-card">
 
             <h3 id="matchup-game">
 
@@ -283,7 +292,11 @@
 
             </div>
 
-        </div>
+                </div>
+
+            </div>
+
+        </details>
 
     </div>
 
