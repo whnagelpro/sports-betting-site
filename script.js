@@ -1083,6 +1083,8 @@ async function fetchLeagueGames(csvUrl) {
 
   const text = await response.text();
   const rows = parseCSV(text);
+  console.log("Headers:", rows[0]);
+  console.log("First data row:", rows[1]);
   const games = transformRowsToGames(rows);
   const today = getTodayDateString();
   console.log("CSV rows:", rows.length);
