@@ -1084,11 +1084,11 @@ async function fetchLeagueGames(csvUrl) {
   const text = await response.text();
   const rows = parseCSV(text);
   const games = transformRowsToGames(rows);
+  const today = getTodayDateString();
   console.log("CSV rows:", rows.length);
   console.log("Games built:", games.length);
   console.log("Today's date:", today);
   console.log("First game date:", games[0]?.gameDate);
-  const today = getTodayDateString();
 
   const todaysGames = games
     .filter((game) => game.gameDate === today)
