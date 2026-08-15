@@ -1092,6 +1092,8 @@ async function fetchLeagueGames(csvUrl) {
   console.log("Today's date:", today);
   console.log("First game date:", games[0]?.gameDate);
 
+  console.log("First 10 game dates:");
+  games.slice(0,10).forEach(g => console.log(g.gameDate));
   const todaysGames = games
     .filter((game) => game.gameDate === today)
     .sort((a, b) => {
@@ -1099,6 +1101,8 @@ async function fetchLeagueGames(csvUrl) {
       const bTopEV = Math.max(...b.rankings.map((item) => item.ev));
       return bTopEV - aTopEV;
     });
+  console.log("Today's games:", todaysGames.length);
+  console.log(todaysGames);
 
   DATA_CACHE.games[csvUrl] = todaysGames;
   return todaysGames;
