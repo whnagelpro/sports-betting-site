@@ -2267,12 +2267,38 @@ function refreshMLBTeamGameLogsForDateRange_(startDate, endDate) {
 function isMLBTrendEligibleGame_(game) {
   if (!game) return false;
 
-  const homeTeam = getMLBTeamName_(game.home_team || {});
-  const awayTeam = getMLBTeamName_(
-    game.away_team ||
-    game.visitor_team ||
-    {}
-  );
+  const gameId =
+    String(game.id || "").trim();
+
+  const gameDate =
+    getMLBGameAZDate_(game);
+
+  /*
+   * Permanently exclude the 2026 MLB All-Star Game.
+   */
+  if (
+    gameId === "8712499" ||
+    gameDate === "2026-07-14"
+  ) {
+    Logger.log(
+      `Excluded 2026 MLB All-Star Game: ` +
+      `Game ID ${gameId}, date ${gameDate}`
+    );
+
+    return false;
+  }
+
+  const homeTeam =
+    getMLBTeamName_(
+      game.home_team || {}
+    );
+
+  const awayTeam =
+    getMLBTeamName_(
+      game.away_team ||
+      game.visitor_team ||
+      {}
+    );
 
   const searchableText = [
     homeTeam,
@@ -2300,13 +2326,14 @@ function isMLBTrendEligibleGame_(game) {
     "spring training"
   ];
 
-  const isExcluded = excludedTerms.some(term =>
-    searchableText.includes(term)
-  );
+  const isExcluded =
+    excludedTerms.some(term =>
+      searchableText.includes(term)
+    );
 
   if (isExcluded) {
     Logger.log(
-      `Excluded non-trend MLB game ${game.id || ""}: ` +
+      `Excluded non-trend MLB game ${gameId}: ` +
       `${awayTeam} at ${homeTeam}`
     );
 
@@ -2462,74 +2489,6 @@ function normalizeMLBLogDateForCleanup_(value) {
   }
 
   return raw;
-}
-
-function removeMLBLogRowsByGameIds_(
-  sheet,
-  excludedGameIds
-) {
-  if (
-    !sheet ||
-    sheet.getLastRow() < 2
-  ) {
-    return;
-  }
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-  const headers = values[0];
-  const gameIdIndex =
-    headers.indexOf("Game ID");
-
-  if (gameIdIndex === -1) {
-    Logger.log(
-      `${sheet.getName()} does not contain a Game ID column.`
-    );
-
-    return;
-  }
-
-  const remainingRows =
-    values
-      .slice(1)
-      .filter(row =>
-        !excludedGameIds.has(
-          String(row[gameIdIndex] || "")
-        )
-      );
-
-  sheet.clearContents();
-
-  sheet
-    .getRange(
-      1,
-      1,
-      1,
-      headers.length
-    )
-    .setValues([headers]);
-
-  if (remainingRows.length) {
-    sheet
-      .getRange(
-        2,
-        1,
-        remainingRows.length,
-        headers.length
-      )
-      .setValues(remainingRows);
-  }
-
-  sheet.setFrozenRows(1);
-
-  Logger.log(
-    `Removed ${
-      values.length - 1 - remainingRows.length
-    } rows from ${sheet.getName()}.`
-  );
 }
 
 function getMLBCompletedGamesForDateRange_(startDate, endDate) {

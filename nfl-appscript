@@ -82,6 +82,9 @@ function fetchApi_(endpoint, params = {}) {
     muteHttpExceptions: true
   };
 
+Logger.log("REQUEST URL:");
+Logger.log(url);
+
   const response = UrlFetchApp.fetch(url, options);
   const statusCode = response.getResponseCode();
 
@@ -198,25 +201,193 @@ function fetchAllNFLGamesForDate_(dateString) {
       per_page: 100
     };
 
-    if (cursor) params.cursor = cursor;
+    if (cursor) {
+      params.cursor = cursor;
+    }
 
     const response = fetchApi_("/nfl/v1/games", params);
     const games = Array.isArray(response.data) ? response.data : [];
 
     allGames.push(...games);
 
-    cursor = response.meta && response.meta.next_cursor
-      ? response.meta.next_cursor
-      : null;
+    cursor =
+      response.meta && response.meta.next_cursor
+        ? response.meta.next_cursor
+        : null;
 
   } while (cursor);
 
   return allGames;
 }
 
+function fetchNFLGamesBySeasonWeek_(season, week, seasonType) {
+
+  const response = fetchApi_("/nfl/v1/games", {
+
+    "seasons[]": season,
+    "weeks[]": week,
+    season_type: seasonType,
+    per_page: 100
+
+  });
+
+  return response.data || [];
+
+}
+
+function formatNFLDate_(rawValue) {
+  if (!rawValue) return "";
+
+  try {
+    return Utilities.formatDate(
+      new Date(rawValue),
+      "America/Phoenix",
+      "MM/dd/yyyy"
+    );
+  } catch (e) {
+    return String(rawValue);
+  }
+}
+
+function getNFLHomeTeamNameFromGame_(game) {
+  return getNFLTeamName_(game.home_team || null);
+}
+
+function getNFLAwayTeamNameFromGame_(game) {
+  return getNFLTeamName_(game.away_team || game.visitor_team || null);
+}
+
+function getTomorrowString_() {
+
+  const tomorrow = new Date();
+
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  return Utilities.formatDate(
+    tomorrow,
+    "America/Phoenix",
+    "yyyy-MM-dd"
+  );
+
+}
+
+function getTodayDisplayString_() {
+  return Utilities.formatDate(
+    new Date(),
+    "America/Phoenix",
+    "MM/dd/yyyy"
+  );
+}
+
+function clearScheduleSheet_(sheet, columnCount) {
+  const maxRows = sheet.getMaxRows();
+
+  if (maxRows > 0) {
+    sheet.getRange(1, 1, maxRows, columnCount).clearContent();
+  }
+}
+
 function refreshNFLScheduleSheet() {
-  const today = getTodayString_();
-  refreshNFLScheduleForDate_(today);
+
+  const sheetName = "Schedule";
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found.`);
+  }
+
+  // ------------------------------------------
+  // TEMPORARY VALUES
+  // ------------------------------------------
+
+  const season = 2026;
+  const week = 2;
+  const seasonType = 1; // 1 = Preseason
+
+  Logger.log(
+    `Refreshing NFL Season ${season}, Week ${week}...`
+  );
+
+  const games = fetchNFLGamesBySeasonWeek_(
+    season,
+    week,
+    seasonType
+  );
+
+  Logger.log(`Loaded ${games.length} games.`);
+
+  const headers = [
+    "Game Id",
+    "Week",
+    "Away Team",
+    "Home Team",
+    "Status",
+    "Home Score",
+    "Away Score",
+    "Season",
+    "Postseason",
+    "Kickoff",
+    "Home Team Id",
+    "Away Team Id"
+  ];
+
+  const rows = games.map(game => [
+
+    game.id || "",
+
+    game.week || "",
+
+    getNFLAwayTeamNameFromGame_(game),
+
+    getNFLHomeTeamNameFromGame_(game),
+
+    game.status || "",
+
+    game.home_team_score ?? "",
+
+    game.visitor_team_score ??
+    game.away_team_score ??
+    "",
+
+    game.season || "",
+
+    game.postseason || "",
+
+    game.date || "",
+
+    (game.home_team && game.home_team.id) || "",
+
+    (game.visitor_team && game.visitor_team.id) ||
+    (game.away_team && game.away_team.id) ||
+    ""
+
+  ]);
+
+  clearScheduleSheet_(sheet, headers.length);
+
+  sheet.getRange(
+    1,
+    1,
+    1,
+    headers.length
+  ).setValues([headers]);
+
+  if (rows.length > 0) {
+
+    sheet.getRange(
+      2,
+      1,
+      rows.length,
+      headers.length
+    ).setValues(rows);
+
+  }
+
+  Logger.log(
+    `Wrote ${rows.length} NFL games to "${sheetName}".`
+  );
+
 }
 
 function refreshNFLScheduleForDate_(dateString) {
@@ -499,19 +670,43 @@ function clearNFLGameOddsSheet_(sheet) {
 }
 
 function getNFLGamesFromScheduleSheet_(scheduleSheet) {
+
   const lastRow = scheduleSheet.getLastRow();
   if (lastRow < 2) return [];
 
-  const values = scheduleSheet.getRange(2, 1, lastRow - 1, 11).getValues();
+  const values = scheduleSheet
+    .getRange(2, 1, lastRow - 1, 12)
+    .getValues();
 
   return values
     .filter(row => row[0])
     .map(row => ({
+
       id: row[0],
-      game_date: row[1],
+
+      week: row[1],
+
       away_team: row[2],
-      home_team: row[3]
-    }));
+
+      home_team: row[3],
+
+      status: row[4],
+
+      home_team_score: row[5],
+
+      visitor_team_score: row[6],
+
+      season: row[7],
+
+      postseason: row[8],
+
+      game_date: row[9],
+
+      home_team_id: row[10],
+
+      away_team_id: row[11]
+
+  }));
 }
 
 function fetchAllNFLOddsForGameIds_(gameIds) {
@@ -677,29 +872,18 @@ function clearNFLPlayerPropsSheet_(sheet) {
 }
 
 function fetchAllNFLPlayerPropsForGame_(gameId) {
-  const allProps = [];
-  let cursor = null;
 
-  do {
-    const params = {
-      game_id: gameId,
-      per_page: 100
-    };
+  const response = fetchApi_("/nfl/v1/odds/player_props", {
+    game_id: gameId
+  });
 
-    if (cursor) params.cursor = cursor;
+  Logger.log("Props response for game " + gameId);
+  Logger.log(JSON.stringify(response, null, 2));
 
-    const response = fetchApi_("/nfl/v1/odds/player_props", params);
-    const props = Array.isArray(response.data) ? response.data : [];
+  return Array.isArray(response.data)
+    ? response.data
+    : [];
 
-    allProps.push(...props);
-
-    cursor = response.meta && response.meta.next_cursor
-      ? response.meta.next_cursor
-      : null;
-
-  } while (cursor);
-
-  return allProps;
 }
 
 function copyNFLPlayerPropsFormulasDown_(sheet, rowCount) {
@@ -831,12 +1015,15 @@ function fetchAllNFLStatsForGameIds_(gameIds) {
     do {
       const params = {
         "game_ids[]": gameId,
+        "seasons[]": 2026,
+        season_type: 1,
         per_page: 100
       };
-
       if (cursor) params.cursor = cursor;
 
       const response = fetchApi_("/nfl/v1/stats", params);
+      Logger.log("Stats response for game " + gameId);
+      Logger.log(JSON.stringify(response, null, 2));
       const stats = Array.isArray(response.data) ? response.data : [];
 
       allStats.push(...stats);
@@ -957,8 +1144,13 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
     "Receiving TDs"
   ];
 
-  const games = getNFLGamesFromScheduleSheet_(scheduleSheet)
-    .filter(game => String(game.game_date) >= startDate && String(game.game_date) <= endDate);
+  const games = getNFLGamesFromScheduleSheet_(scheduleSheet);
+
+  Logger.log("Schedule games found: " + games.length);
+
+  if (games.length > 0) {
+    Logger.log(JSON.stringify(games[0], null, 2));
+  }
 
   if (!games.length) {
     Logger.log(`No NFL Schedule games found from ${startDate} to ${endDate}`);
@@ -1057,8 +1249,24 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
     "Sacks"
   ];
 
-  const games = getNFLGamesFromScheduleSheet_(scheduleSheet)
-    .filter(game => String(game.game_date) >= startDate && String(game.game_date) <= endDate);
+  const allGames = getNFLGamesFromScheduleSheet_(scheduleSheet);
+
+  Logger.log("Schedule games found: " + allGames.length);
+
+  if (allGames.length > 0) {
+    Logger.log(JSON.stringify(allGames[0], null, 2));
+  }
+
+  const games = allGames.filter(game => {
+    const gameDate = game.game_date;
+
+    Logger.log(
+      `Comparing "${gameDate}" against ${startDate} -> ${endDate}`
+    );
+
+    return String(gameDate) >= startDate &&
+          String(gameDate) <= endDate;
+  });
 
   if (!games.length) {
     Logger.log(`No NFL Schedule games found from ${startDate} to ${endDate}`);
@@ -1066,7 +1274,13 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
   }
 
   const gameIds = games.map(game => game.id);
+
   const statRows = fetchAllNFLStatsForGameIds_(gameIds);
+  Logger.log(`Team stat rows: ${statRows.length}`);
+
+  if (statRows.length) {
+    Logger.log(JSON.stringify(statRows[0], null, 2));
+  }
   const rows = [];
 
   games.forEach(game => {
@@ -1075,33 +1289,73 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
     );
 
     const buildTeamRow = (teamName, opponentName) => {
-      const teamStats = gameStats.filter(stat => {
-        const statTeam = getNFLTeamName_(stat.team || {}) || stat.team_name || "";
+
+      const teamStats = gameStats.filter(s => {
+        const statTeam =
+          getNFLTeamName_(s.team || {}) ||
+          s.team_name ||
+          "";
+
         return statTeam === teamName;
       });
 
-      const sum = keys => teamStats.reduce((total, stat) => total + getNFLStatNumber_(stat, keys), 0);
+      const sum = keys =>
+        teamStats.reduce((total, stat) => {
+          return total + getNFLStatNumber_(stat, keys);
+        }, 0);
 
-      const pointsFor = teamName === game.home_team
-        ? Number(game.home_score || game.home_team_score || 0)
-        : Number(game.away_score || game.visitor_score || game.away_team_score || 0);
+      const isHome =
+        teamName === game.home_team;
 
-      const pointsAllowed = teamName === game.home_team
-        ? Number(game.away_score || game.visitor_score || game.away_team_score || 0)
-        : Number(game.home_score || game.home_team_score || 0);
+      const pointsFor = isHome
+        ? Number(game.home_team_score || game.home_score || 0)
+        : Number(game.visitor_team_score || game.away_team_score || 0);
+
+      const pointsAllowed = isHome
+        ? Number(game.visitor_team_score || game.away_team_score || 0)
+        : Number(game.home_team_score || game.home_score || 0);
 
       return [
+
         game.game_date,
+
         game.id,
+
         teamName,
+
         opponentName,
+
         pointsFor,
+
         pointsAllowed,
-        sum(["passing_yards", "pass_yards", "passing.yds", "passing.yards"]),
-        sum(["rushing_yards", "rush_yards", "rushing.yds", "rushing.yards"]),
-        sum(["turnovers", "fumbles_lost", "interceptions"]),
-        sum(["sacks", "defensive_sacks"])
+
+        sum([
+          "passing_yards",
+          "pass_yards",
+          "passing.yds",
+          "passing.yards"
+        ]),
+
+        sum([
+          "rushing_yards",
+          "rush_yards",
+          "rushing.yds",
+          "rushing.yards"
+        ]),
+
+        sum([
+          "turnovers",
+          "fumbles_lost",
+          "interceptions"
+        ]),
+
+        sum([
+          "sacks",
+          "defensive_sacks"
+        ])
+
       ];
+
     };
 
     rows.push(buildTeamRow(game.away_team, game.home_team));
@@ -1586,6 +1840,53 @@ function refreshNFLPlayerTrendsSheet() {
   Logger.log(`Wrote ${rows.length} NFL player trend rows.`);
 }
 
+function fetchAllNFLTeamStatsForGameIds_(gameIds) {
+
+  const allStats = [];
+
+  gameIds.forEach((gameId, index) => {
+
+    Logger.log(
+      `Fetching NFL team stats for game ${index + 1}/${gameIds.length}: ${gameId}`
+    );
+
+    let cursor = null;
+
+    do {
+
+      const params = {
+        "game_ids[]": gameId,
+        per_page: 100
+      };
+
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      const response = fetchApi_("/nfl/v1/team_stats", params);
+
+      const stats = Array.isArray(response.data)
+        ? response.data
+        : [];
+
+      allStats.push(...stats);
+
+      cursor =
+        response.meta &&
+        response.meta.next_cursor
+          ? response.meta.next_cursor
+          : null;
+
+    } while (cursor);
+
+    Utilities.sleep(150);
+
+  });
+
+  return allStats;
+
+}
+
 function refreshNFLTeamTrendsOutputSheet() {
   ensureNFLTrendTabs_();
 
@@ -1887,36 +2188,49 @@ function refreshNFLTopTeamTrendsSheet() {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("Sports Data")
+
+    // Daily slate
     .addItem("Refresh NFL Schedule", "refreshNFLScheduleSheet")
-    .addItem("Refresh NFL Rosters", "refreshNFLRostersSheet")
     .addItem("Refresh NFL Game Odds", "refreshNFLGameOddsSheet")
     .addItem("Refresh NFL Player Props", "refreshNFLPlayerPropsSheet")
+    .addItem("Refresh NFL Rosters", "refreshNFLRostersSheet")
 
     .addSeparator()
-    .addItem("Clear NFL Player Game Logs", "clearNFLPlayerGameLogsSheetOnly")
-    .addItem("Clear NFL Team Game Logs", "clearNFLTeamGameLogsSheetOnly")
 
-    .addSeparator()
-    .addItem("Refresh NFL Player Logs August", "refreshNFLPlayerGameLogsAugust")
-    .addItem("Refresh NFL Team Logs August", "refreshNFLTeamGameLogsAugust")
-    .addItem("Refresh NFL Player Logs September", "refreshNFLPlayerGameLogsSeptember")
-    .addItem("Refresh NFL Team Logs September", "refreshNFLTeamGameLogsSeptember")
-    .addItem("Refresh NFL Player Logs October", "refreshNFLPlayerGameLogsOctober")
-    .addItem("Refresh NFL Team Logs October", "refreshNFLTeamGameLogsOctober")
-    .addItem("Refresh NFL Player Logs November", "refreshNFLPlayerGameLogsNovember")
-    .addItem("Refresh NFL Team Logs November", "refreshNFLTeamGameLogsNovember")
-    .addItem("Refresh NFL Player Logs December", "refreshNFLPlayerGameLogsDecember")
-    .addItem("Refresh NFL Team Logs December", "refreshNFLTeamGameLogsDecember")
-    .addItem("Refresh NFL Player Logs January", "refreshNFLPlayerGameLogsJanuary")
-    .addItem("Refresh NFL Team Logs January", "refreshNFLTeamGameLogsJanuary")
-    .addItem("Refresh NFL Player Logs February", "refreshNFLPlayerGameLogsFebruary")
-    .addItem("Refresh NFL Team Logs February", "refreshNFLTeamGameLogsFebruary")
-
-    .addSeparator()
+    // Trend pipelines
     .addItem("Refresh NFL Player Trend Pipeline", "refreshNFLPlayerTrendPipeline")
     .addItem("Refresh NFL Team Trend Pipeline", "refreshNFLTeamTrendPipeline")
     .addItem("Refresh NFL Top Player Trend Pipeline", "refreshNFLTopPlayerTrendPipeline")
     .addItem("Refresh NFL Top Team Trend Pipeline", "refreshNFLTopTeamTrendPipeline")
+
+    .addSeparator()
+
+    // Manual clear helpers
+    .addItem("Clear NFL Player Game Logs", "clearNFLPlayerGameLogsSheetOnly")
+    .addItem("Clear NFL Team Game Logs", "clearNFLTeamGameLogsSheetOnly")
+
+    .addSeparator()
+
+    // Monthly player logs
+    .addItem("Refresh NFL Player Logs August", "refreshNFLPlayerGameLogsAugust")
+    .addItem("Refresh NFL Player Logs September", "refreshNFLPlayerGameLogsSeptember")
+    .addItem("Refresh NFL Player Logs October", "refreshNFLPlayerGameLogsOctober")
+    .addItem("Refresh NFL Player Logs November", "refreshNFLPlayerGameLogsNovember")
+    .addItem("Refresh NFL Player Logs December", "refreshNFLPlayerGameLogsDecember")
+    .addItem("Refresh NFL Player Logs January", "refreshNFLPlayerGameLogsJanuary")
+    .addItem("Refresh NFL Player Logs February", "refreshNFLPlayerGameLogsFebruary")
+
+    .addSeparator()
+
+    // Monthly team logs
+    .addItem("Refresh NFL Team Logs August", "refreshNFLTeamGameLogsAugust")
+    .addItem("Refresh NFL Team Logs September", "refreshNFLTeamGameLogsSeptember")
+    .addItem("Refresh NFL Team Logs October", "refreshNFLTeamGameLogsOctober")
+    .addItem("Refresh NFL Team Logs November", "refreshNFLTeamGameLogsNovember")
+    .addItem("Refresh NFL Team Logs December", "refreshNFLTeamGameLogsDecember")
+    .addItem("Refresh NFL Team Logs January", "refreshNFLTeamGameLogsJanuary")
+    .addItem("Refresh NFL Team Logs February", "refreshNFLTeamGameLogsFebruary")
+
     .addToUi();
 }
 
