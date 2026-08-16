@@ -4708,6 +4708,8 @@ async function initTeamProfilePage() {
     row => row.Team === decodeURIComponent(team)
   );
 
+  console.log("First Team Trend:", teamTrends[0]);
+
   console.log("All Trends:", trends);
 
   console.log("Team Trends:", teamTrends);
