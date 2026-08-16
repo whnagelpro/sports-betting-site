@@ -4627,23 +4627,23 @@ function createTeamTrendCard(trend) {
 
 <div class="team-trend-card">
 
-  <h4>${trend["Trend Category"]}</h4>
+  <h4>${trend["Metric"]}</h4>
 
   <div class="team-trend-grid">
 
     <div>
       <strong>Last 5 Avg</strong><br>
-      ${trend["Last 5 Average"]}
+      ${trend["Last 5 Avg"]}
     </div>
 
     <div>
       <strong>Season Avg</strong><br>
-      ${trend["Season Average"]}
+      ${trend["Season Avg"]}
     </div>
 
     <div>
       <strong>Above Season</strong><br>
-      ${trend["Above Season"]}
+      ${trend["Above Season %"]}%
     </div>
 
     <div>
@@ -4658,9 +4658,13 @@ function createTeamTrendCard(trend) {
 
     <div>
       <strong>Hit Rate</strong><br>
-      ${trend["Hit Rate"]}
+      ${trend["Hit Rate Last 5"]}
     </div>
 
+  </div>
+
+  <div class="team-trend-note">
+    ${trend["Trend Note"]}
   </div>
 
 </div>
