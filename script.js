@@ -4550,3 +4550,9 @@ document.addEventListener("DOMContentLoaded", () => {
   updateNavAuthState();
   initAuthPage();
 });
+
+async function initTeamProfilePage() {
+
+  console.log("Initializing Team Profile Page...");
+
+}
