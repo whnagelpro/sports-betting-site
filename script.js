@@ -45,19 +45,23 @@ const NFL_PROPS_TEASER_URL = "/.netlify/functions/nfl-props-teaser";
 const TEAM_PROFILE_CONFIG = {
 
   nfl: {
-    seasonStats: NFL_TEAM_SEASON_STATS_CSV_URL
-  },
-
-  mlb: {
-    seasonStats: MLB_TEAM_SEASON_STATS_CSV_URL
+    seasonStats: NFL_TEAM_SEASON_STATS_CSV_URL,
+    trends: NFL_TEAM_TRENDS_CSV_URL
   },
 
   nba: {
-    seasonStats: NBA_TEAM_SEASON_STATS_CSV_URL
+    seasonStats: NBA_TEAM_SEASON_STATS_CSV_URL,
+    trends: NBA_TEAM_TRENDS_CSV_URL
   },
 
   nhl: {
-    seasonStats: NHL_TEAM_SEASON_STATS_CSV_URL
+    seasonStats: NHL_TEAM_SEASON_STATS_CSV_URL,
+    trends: NHL_TEAM_TRENDS_CSV_URL
+  },
+
+  mlb: {
+    seasonStats: MLB_TEAM_SEASON_STATS_CSV_URL,
+    trends: MLB_TEAM_TRENDS_CSV_URL
   }
 
 };
@@ -236,6 +240,20 @@ async function fetchTeamSeasonStats(league) {
   if (!config) return [];
 
   const response = await fetch(config.seasonStats);
+
+  const csv = await response.text();
+
+  return parseCSV(csv);
+
+}
+
+async function fetchTeamTrends(league) {
+
+  const config = TEAM_PROFILE_CONFIG[league];
+
+  if (!config) return [];
+
+  const response = await fetch(config.trends);
 
   const csv = await response.text();
 
@@ -4635,6 +4653,12 @@ async function initTeamProfilePage() {
   //-------------------------------------------------------
 
   const stats = await fetchTeamSeasonStats(league);
+
+  const trends = await fetchTeamTrends(league);
+
+  const teamTrends = trends.filter(
+    row => row.Team === decodeURIComponent(team)
+  );
 
   const teamStats = stats.find(row => row.Team === decodeURIComponent(team));
 
