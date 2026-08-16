@@ -3453,6 +3453,20 @@ function renderTrendsLockedState(container, summaryId, currentTier, leagueLabel,
   `;
 }
 
+function getTeamProfileParameters() {
+
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+
+    league: (params.get("league") || "").toLowerCase(),
+
+    team: params.get("team") || ""
+
+  };
+
+}
+
 async function initNBATrendsPage() {
   await updateSessionStatus();
   await renderNBATrends();
@@ -4554,5 +4568,28 @@ document.addEventListener("DOMContentLoaded", () => {
 async function initTeamProfilePage() {
 
   console.log("Initializing Team Profile Page...");
+
+  const { league, team } = getTeamProfileParameters();
+
+  console.log("League:", league);
+  console.log("Team:", team);
+
+  if (!league || !team) {
+
+    document.getElementById("team-name").textContent =
+      "No Team Selected";
+
+    document.getElementById("team-subtitle").textContent =
+      "Please choose a team.";
+
+    return;
+
+  }
+
+  document.getElementById("team-name").textContent =
+    decodeURIComponent(team);
+
+  document.getElementById("team-subtitle").textContent =
+    league.toUpperCase();
 
 }
