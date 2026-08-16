@@ -8,6 +8,7 @@ console.log("SCRIPT VERSION TEST - 7:50 AM");
 let CURRENT_USER = null;
 let CURRENT_USER_PROFILE = null;
 let CURRENT_USER_TIER = "Rookie";
+let CURRENT_TEAM_TRENDS = [];
 
 const DATA_CACHE = {
   games: {},
@@ -4647,7 +4648,10 @@ function createTeamTrendCard(trend) {
 
   return `
 
-<div class="team-trend-card clickable" data-metric="${trend["Metric"]}">
+<div
+  class="team-trend-card"
+  data-metric="${trend.Metric}"
+>
 
   <h4>${trend["Metric"]}</h4>
 
@@ -4921,6 +4925,53 @@ ${trend["Trend Note"]}
 
 }
 
+function initializeTrendCardInteractions() {
+
+  const cards =
+    document.querySelectorAll(".team-trend-card");
+
+  cards.forEach(card => {
+
+    card.addEventListener("mouseenter", () => {
+
+      const metric =
+        card.dataset.metric;
+
+      updateModelEdge(metric);
+
+      highlightTrendCard(card);
+
+    });
+
+    card.addEventListener("click", () => {
+
+      const metric =
+        card.dataset.metric;
+
+      updateModelEdge(metric);
+
+      highlightTrendCard(card);
+
+    });
+
+  });
+
+}
+
+function highlightTrendCard(activeCard) {
+
+  document
+    .querySelectorAll(".team-trend-card")
+    .forEach(card => {
+
+      card.classList.remove("active");
+
+    });
+
+  activeCard.classList.add("active");
+
+}
+
 async function initTeamProfilePage() {
 
   console.log("Initializing Team Profile Page...");
@@ -4973,6 +5024,8 @@ async function initTeamProfilePage() {
   const teamTrends = trends.filter(
     row => row.Team === decodeURIComponent(team)
   );
+
+  CURRENT_TEAM_TRENDS = teamTrends;
 
   console.log("First Team Trend:", teamTrends[0]);
 

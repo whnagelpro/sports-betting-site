@@ -2450,3 +2450,15 @@ font-weight:400;
 color:#9ca3af;
 
 }
+
+.team-trend-card.active{
+
+border:2px solid #2f80ff;
+
+box-shadow:0 0 16px rgba(47,128,255,.35);
+
+transform:translateY(-2px);
+
+transition:.2s;
+
+}
