@@ -2317,3 +2317,53 @@ a[href^="mailto:"]:focus {
     color:#ffffff;
 
 }
+
+.team-trend-card{
+
+background:#1a1f2c;
+
+border:1px solid rgba(255,255,255,.08);
+
+border-radius:12px;
+
+padding:18px;
+
+margin-bottom:18px;
+
+}
+
+.team-trend-grid{
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:16px;
+
+margin-top:14px;
+
+}
+
+.team-trend-grid div{
+
+background:#111827;
+
+padding:14px;
+
+border-radius:8px;
+
+text-align:center;
+
+}
+
+.team-trend-grid strong{
+
+display:block;
+
+margin-bottom:6px;
+
+color:#ffffff;
+
+font-size:.85rem;
+
+}

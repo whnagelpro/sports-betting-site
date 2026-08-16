@@ -4621,6 +4621,54 @@ document.addEventListener("DOMContentLoaded", () => {
   initAuthPage();
 });
 
+function createTeamTrendCard(trend) {
+
+  return `
+
+<div class="team-trend-card">
+
+  <h4>${trend["Trend Category"]}</h4>
+
+  <div class="team-trend-grid">
+
+    <div>
+      <strong>Last 5 Avg</strong><br>
+      ${trend["Last 5 Average"]}
+    </div>
+
+    <div>
+      <strong>Season Avg</strong><br>
+      ${trend["Season Average"]}
+    </div>
+
+    <div>
+      <strong>Above Season</strong><br>
+      ${trend["Above Season"]}
+    </div>
+
+    <div>
+      <strong>Trend Strength</strong><br>
+      ${trend["Trend Strength"]}
+    </div>
+
+    <div>
+      <strong>Risk Tier</strong><br>
+      ${trend["Risk Tier"]}
+    </div>
+
+    <div>
+      <strong>Hit Rate</strong><br>
+      ${trend["Hit Rate"]}
+    </div>
+
+  </div>
+
+</div>
+
+`;
+
+}
+
 async function initTeamProfilePage() {
 
   console.log("Initializing Team Profile Page...");
@@ -4726,5 +4774,20 @@ ${teamStats["Sacks"]}
 </div>
 
 `;
+
+const trendsContainer =
+  document.getElementById("team-trends-content");
+
+if (!teamTrends.length) {
+
+  trendsContainer.innerHTML =
+    "<p>No team trends available.</p>";
+
+} else {
+
+  trendsContainer.innerHTML =
+    teamTrends.map(createTeamTrendCard).join("");
+
+}
 
 }
