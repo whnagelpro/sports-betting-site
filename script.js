@@ -261,7 +261,7 @@ async function fetchTeamTrends(league) {
 
   if (!config) return [];
 
-  const response = await fetch(config.trends);
+  const response = await fetch(config.teamTrends);
 
   const csv = await response.text();
 
