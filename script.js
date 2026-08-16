@@ -1245,9 +1245,7 @@ if (
   console.log("Built props count:", props.length);
   console.log("First 5 props before date filter:", props.slice(0, 5));
 
-  const todaysProps = props
-    .filter((prop) => prop.gameDate === today)
-    .sort((a, b) => b.ev - a.ev);
+  const todaysProps = props.sort((a, b) => b.ev - a.ev);
 
   console.log("Today props count:", todaysProps.length);
   console.log("First 5 today props:", todaysProps.slice(0, 5));
