@@ -4695,6 +4695,104 @@ function createTeamTrendCard(trend) {
 
 }
 
+function showTeamTrendDetails(metric, trends) {
+
+    const trend =
+        trends.find(t => t["Metric"] === metric);
+
+    if (!trend) return;
+
+    const container =
+        document.getElementById(
+            "team-detail-content"
+        );
+
+    container.innerHTML = `
+
+<div class="team-detail-card">
+
+<h3>${trend["Metric"]}</h3>
+
+<p>
+
+${trend["Trend Note"]}
+
+</p>
+
+<div class="team-detail-grid">
+
+<div>
+
+<strong>Season Average</strong><br>
+
+${trend["Season Avg"]}
+
+</div>
+
+<div>
+
+<strong>Last 3</strong><br>
+
+${trend["Last 3 Avg"]}
+
+</div>
+
+<div>
+
+<strong>Last 5</strong><br>
+
+${trend["Last 5 Avg"]}
+
+</div>
+
+<div>
+
+<strong>Last 10</strong><br>
+
+${trend["Last 10 Avg"]}
+
+</div>
+
+<div>
+
+<strong>Hit Rate</strong><br>
+
+${trend["Hit Rate Last 10"]}
+
+</div>
+
+<div>
+
+<strong>Trend Strength</strong><br>
+
+${trend["Trend Strength"]}
+
+</div>
+
+<div>
+
+<strong>Risk Tier</strong><br>
+
+${trend["Risk Tier"]}
+
+</div>
+
+<div>
+
+<strong>Direction</strong><br>
+
+${trend["Trend Direction"]}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
 function buildTeamModelEdge(teamStats, teamTrends) {
 
   const offenseMetrics = [
@@ -4738,26 +4836,84 @@ function buildTeamModelEdge(teamStats, teamTrends) {
 
 }
 
-function renderModelEdge(model) {
+function renderModelEdge(trend) {
 
-  return `
+  const container =
+    document.getElementById(
+      "team-model-edge-content"
+    );
+
+  container.innerHTML = `
+
+<div class="team-model-card">
+
+<h3>
+
+Sportacular Edge
+
+<span class="edge-metric">
+
+${trend["Metric"]}
+
+</span>
+
+</h3>
 
 <div class="team-stat-grid">
 
 <div class="team-stat-card">
-<strong>Offensive Edge</strong><br>
-${model.offenseScore}/3
+
+<strong>Trend Strength</strong><br>
+
+${trend["Trend Strength"]}
+
 </div>
 
 <div class="team-stat-card">
-<strong>Defensive Edge</strong><br>
-${model.defenseScore}/3
+
+<strong>Risk Tier</strong><br>
+
+${trend["Risk Tier"]}
+
 </div>
 
 <div class="team-stat-card">
-<strong>Momentum</strong><br>
-${model.momentum}
+
+<strong>Hit Rate</strong><br>
+
+${trend["Hit Rate Last 5"]}
+
 </div>
+
+<div class="team-stat-card">
+
+<strong>Last 5 Avg</strong><br>
+
+${trend["Last 5 Avg"]}
+
+</div>
+
+<div class="team-stat-card">
+
+<strong>Season Avg</strong><br>
+
+${trend["Season Avg"]}
+
+</div>
+
+<div class="team-stat-card">
+
+<strong>Above Season</strong><br>
+
+${trend["Above Season %"]}%
+
+</div>
+
+</div>
+
+<div class="team-model-note">
+
+${trend["Trend Note"]}
 
 </div>
 
@@ -4951,13 +5107,32 @@ if (!teamTrends.length) {
 
         card.addEventListener("click", () => {
 
+          document
+            .querySelectorAll(".team-trend-card")
+            .forEach(c => c.classList.remove("selected"));
+
+          card.classList.add("selected");
+
           const metric = card.dataset.metric;
 
-          alert(metric);
+          const trend =
+            teamTrends.find(
+              t => t["Metric"] === metric
+            );
+
+          if (!trend) return;
+
+          renderModelEdge(trend);
 
         });
 
       });
+
+      if (teamTrends.length > 0) {
+
+          renderModelEdge(teamTrends[0]);
+
+      }
 }
 
 }

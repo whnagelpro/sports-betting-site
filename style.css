@@ -2378,3 +2378,75 @@ font-size:.85rem;
     border-color: #3b82f6;
     box-shadow: 0 8px 20px rgba(59,130,246,.25);
 }
+
+.team-model-card{
+
+background:#111827;
+
+border:1px solid rgba(255,255,255,.08);
+
+border-radius:12px;
+
+padding:24px;
+
+animation:fadeModel .25s ease;
+
+}
+
+.team-model-note{
+
+margin-top:20px;
+
+padding-top:20px;
+
+border-top:1px solid rgba(255,255,255,.08);
+
+font-size:.95rem;
+
+line-height:1.6;
+
+}
+
+@keyframes fadeModel{
+
+from{
+
+opacity:0;
+
+transform:translateY(8px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+.team-trend-card.selected{
+
+border:2px solid #22c55e;
+
+box-shadow:0 0 18px rgba(34,197,94,.35);
+
+transform:translateY(-4px);
+
+}
+
+.edge-metric{
+
+display:block;
+
+margin-top:8px;
+
+font-size:.95rem;
+
+font-weight:400;
+
+color:#9ca3af;
+
+}
