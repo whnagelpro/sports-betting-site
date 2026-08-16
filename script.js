@@ -15,20 +15,24 @@ const DATA_CACHE = {
 };
 
 const NBA_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1553479471&single=true&output=csv";
+const NBA_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1724367340&single=true&output=csv";
 const NBA_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1458653646&single=true&output=csv";
 const NBA_TEAM_SEASON_STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1732528649&single=true&output=csv";
 const NBA_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=133740316&single=true&output=csv";
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
+const NHL_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=2048323486&single=true&output=csv";
 const NHL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=620239444&single=true&output=csv";
 const NHL_TEAM_SEASON_STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1859902621&single=true&output=csv";
 const NHL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=482198043&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
+const MLB_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=314629327&single=true&output=csv";
 const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1443511953&single=true&output=csv";
 const MLB_TEAM_SEASON_STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1542865210&single=true&output=csv";
 const MLB_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=2103952049&single=true&output=csv";
 const MLB_TOP_PLAYER_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=111828453&single=true&output=csv";
 const MLB_TOP_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1644397014&single=true&output=csv";
 const NFL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1933017030&single=true&output=csv";
+const NFL_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1131205016&single=true&output=csv";
 const NFL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1953623841&single=true&output=csv";
 const NFL_TEAM_SEASON_STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1207032232&single=true&output=csv";
 const NFL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=40257281&single=true&output=csv";
@@ -46,22 +50,26 @@ const TEAM_PROFILE_CONFIG = {
 
   nfl: {
     seasonStats: NFL_TEAM_SEASON_STATS_CSV_URL,
-    trends: NFL_TEAM_TRENDS_CSV_URL
+    teamTrends: NFL_TEAM_TRENDS_CSV_URL,
+    schedule: NFL_SCHEDULE_CSV_URL
   },
 
   nba: {
     seasonStats: NBA_TEAM_SEASON_STATS_CSV_URL,
-    trends: NBA_TEAM_TRENDS_CSV_URL
+    teamTrends: NBA_TEAM_TRENDS_CSV_URL,
+    schedule: NBA_SCHEDULE_CSV_URL
   },
 
   nhl: {
     seasonStats: NHL_TEAM_SEASON_STATS_CSV_URL,
-    trends: NHL_TEAM_TRENDS_CSV_URL
+    teamTrends: NHL_TEAM_TRENDS_CSV_URL,
+    schedule: NHL_SCHEDULE_CSV_URL
   },
 
   mlb: {
     seasonStats: MLB_TEAM_SEASON_STATS_CSV_URL,
-    trends: MLB_TEAM_TRENDS_CSV_URL
+    teamTrends: MLB_TEAM_TRENDS_CSV_URL,
+    schedule: MLB_SCHEDULE_CSV_URL
   }
 
 };
@@ -254,6 +262,20 @@ async function fetchTeamTrends(league) {
   if (!config) return [];
 
   const response = await fetch(config.trends);
+
+  const csv = await response.text();
+
+  return parseCSV(csv);
+
+}
+
+async function fetchTeamSchedule(league) {
+
+  const config = TEAM_PROFILE_CONFIG[league];
+
+  if (!config) return [];
+
+  const response = await fetch(config.schedule);
 
   const csv = await response.text();
 
@@ -4707,6 +4729,20 @@ async function initTeamProfilePage() {
   const stats = await fetchTeamSeasonStats(league);
 
   const trends = await fetchTeamTrends(league);
+
+  const schedule = await fetchTeamSchedule(league);
+
+  console.log("Schedule:", schedule);
+
+  const teamGames = schedule.filter(game =>
+
+      game["Home Team"] === decodeURIComponent(team) ||
+
+      game["Away Team"] === decodeURIComponent(team)
+
+  );
+
+  console.log("Team Games:", teamGames);
 
   const teamTrends = trends.filter(
     row => row.Team === decodeURIComponent(team)
