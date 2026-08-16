@@ -2367,3 +2367,14 @@ color:#ffffff;
 font-size:.85rem;
 
 }
+
+.team-trend-card {
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.team-trend-card:hover {
+    transform: translateY(-3px);
+    border-color: #3b82f6;
+    box-shadow: 0 8px 20px rgba(59,130,246,.25);
+}

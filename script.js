@@ -4647,7 +4647,7 @@ function createTeamTrendCard(trend) {
 
   return `
 
-<div class="team-trend-card">
+<div class="team-trend-card clickable" data-metric="${trend["Metric"]}">
 
   <h4>${trend["Metric"]}</h4>
 
@@ -4688,6 +4688,76 @@ function createTeamTrendCard(trend) {
   <div class="team-trend-note">
     ${trend["Trend Note"]}
   </div>
+
+</div>
+
+`;
+
+}
+
+function buildTeamModelEdge(teamStats, teamTrends) {
+
+  const offenseMetrics = [
+    "Points For",
+    "Passing Yards",
+    "Rushing Yards"
+  ];
+
+  const defenseMetrics = [
+    "Points Allowed",
+    "Turnovers",
+    "Sacks"
+  ];
+
+  const offense =
+    teamTrends.filter(t =>
+      offenseMetrics.includes(t["Metric"])
+    );
+
+  const defense =
+    teamTrends.filter(t =>
+      defenseMetrics.includes(t["Metric"])
+    );
+
+  return {
+
+    offenseScore: offense.length,
+
+    defenseScore: defense.length,
+
+    momentum:
+      offense.filter(t =>
+        t["Trend Direction"] === "Improving"
+      ).length -
+
+      defense.filter(t =>
+        t["Trend Direction"] === "Declining"
+      ).length
+
+  };
+
+}
+
+function renderModelEdge(model) {
+
+  return `
+
+<div class="team-stat-grid">
+
+<div class="team-stat-card">
+<strong>Offensive Edge</strong><br>
+${model.offenseScore}/3
+</div>
+
+<div class="team-stat-card">
+<strong>Defensive Edge</strong><br>
+${model.defenseScore}/3
+</div>
+
+<div class="team-stat-card">
+<strong>Momentum</strong><br>
+${model.momentum}
+</div>
 
 </div>
 
@@ -4762,6 +4832,51 @@ async function initTeamProfilePage() {
 
   console.log("Season Stats:", teamStats);
 
+  const model =
+    buildTeamModelEdge(teamStats, teamTrends);
+
+  document.getElementById(
+    "team-model-edge-content"
+  ).innerHTML =
+    renderModelEdge(model);
+
+document.getElementById(
+  "team-summary-content"
+).innerHTML = `
+
+<p>
+
+${team}
+currently has
+
+<strong>${teamTrends.length}</strong>
+
+active trends.
+
+The offense is producing
+
+<strong>${teamStats["Points For"]}</strong>
+
+points per game while allowing
+
+<strong>${teamStats["Points Allowed"]}</strong>.
+
+Passing:
+
+${teamStats["Passing Yards"]}
+
+yards.
+
+Rushing:
+
+${teamStats["Rushing Yards"]}
+
+yards.
+
+</p>
+
+`;
+
   const statsContainer =
     document.getElementById("team-season-stats-content");
 
@@ -4830,6 +4945,19 @@ if (!teamTrends.length) {
   trendsContainer.innerHTML =
     teamTrends.map(createTeamTrendCard).join("");
 
+    document
+      .querySelectorAll(".team-trend-card")
+      .forEach(card => {
+
+        card.addEventListener("click", () => {
+
+          const metric = card.dataset.metric;
+
+          alert(metric);
+
+        });
+
+      });
 }
 
 }
