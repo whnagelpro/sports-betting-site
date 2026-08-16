@@ -4660,6 +4660,14 @@ async function initTeamProfilePage() {
     row => row.Team === decodeURIComponent(team)
   );
 
+  console.log("All Trends:", trends);
+
+  console.log("Team Trends:", teamTrends);
+
+  console.log("Trend Count:", teamTrends.length);
+
+  console.table(teamTrends);
+
   const teamStats = stats.find(row => row.Team === decodeURIComponent(team));
 
   console.log("Season Stats:", teamStats);
