@@ -242,6 +242,22 @@ const PROPS_PAGE_CONFIG = {
   }
 };
 
+async function fetchSchedule(league) {
+
+  const config = TEAM_PROFILE_CONFIG[league];
+
+  if (!config) return [];
+
+  const response =
+    await fetch(config.schedule);
+
+  const csv =
+    await response.text();
+
+  return parseCSV(csv);
+
+}
+
 async function fetchTeamSeasonStats(league) {
 
   const config = TEAM_PROFILE_CONFIG[league];
@@ -281,6 +297,30 @@ async function fetchTeamSchedule(league) {
   const csv = await response.text();
 
   return parseCSV(csv);
+
+}
+
+function renderTeamGameLog(games) {
+
+    const container =
+        document.getElementById("team-game-log-content");
+
+    if (!container) return;
+
+    if (!games.length) {
+
+        container.innerHTML =
+            "<p>No games found.</p>";
+
+        return;
+
+    }
+
+    container.innerHTML = `
+        <p>
+            Found ${games.length} games.
+        </p>
+    `;
 
 }
 
@@ -5005,6 +5045,8 @@ async function initTeamProfilePage() {
 
   const stats = await fetchTeamSeasonStats(league);
 
+  const schedule = await fetchSchedule(league);
+
   const trends = await fetchTeamTrends(league);
 
   const schedule = await fetchTeamSchedule(league);
@@ -5038,6 +5080,17 @@ async function initTeamProfilePage() {
   console.table(teamTrends);
 
   const teamStats = stats.find(row => row.Team === decodeURIComponent(team));
+
+  const teamGames = schedule.filter(game => {
+
+      return (
+          game["Home Team"] === decodeURIComponent(team) ||
+          game["Away Team"] === decodeURIComponent(team)
+      );
+
+  });
+
+  console.log("Team Games:", teamGames);
 
   console.log("Season Stats:", teamStats);
 
@@ -5187,5 +5240,7 @@ if (!teamTrends.length) {
 
       }
 }
+
+renderTeamGameLog(teamGames);
 
 }
