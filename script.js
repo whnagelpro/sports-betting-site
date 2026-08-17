@@ -5224,7 +5224,7 @@ if (!teamTrends.length) {
 
       if (teamTrends.length > 0) {
 
-          renderModelEdge(teamTrends[0]);
+          // renderModelEdge(teamTrends[0]);
 
       }
 }
