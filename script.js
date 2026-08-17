@@ -5045,8 +5045,6 @@ async function initTeamProfilePage() {
 
   const stats = await fetchTeamSeasonStats(league);
 
-  const schedule = await fetchSchedule(league);
-
   const trends = await fetchTeamTrends(league);
 
   const schedule = await fetchTeamSchedule(league);
