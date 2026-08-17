@@ -4887,6 +4887,8 @@ function renderModelEdge(trend) {
       "team-model-edge-content"
     );
 
+  if (!container) return;
+
   container.innerHTML = `
 
 <div class="team-model-card">
@@ -5082,6 +5084,8 @@ async function initTeamProfilePage() {
 
   console.log("Season Stats:", teamStats);
 
+  /*
+
   const model =
     buildTeamModelEdge(teamStats, teamTrends);
 
@@ -5089,6 +5093,8 @@ async function initTeamProfilePage() {
     "team-model-edge-content"
   ).innerHTML =
     renderModelEdge(model);
+
+  */
 
 document.getElementById(
   "team-summary-content"
@@ -5216,7 +5222,7 @@ if (!teamTrends.length) {
 
           if (!trend) return;
 
-          renderModelEdge(trend);
+          // renderModelEdge(trend);
 
         });
 
