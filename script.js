@@ -5051,16 +5051,6 @@ async function initTeamProfilePage() {
 
   console.log("Schedule:", schedule);
 
-  const teamGames = schedule.filter(game =>
-
-      game["Home Team"] === decodeURIComponent(team) ||
-
-      game["Away Team"] === decodeURIComponent(team)
-
-  );
-
-  console.log("Team Games:", teamGames);
-
   const teamTrends = trends.filter(
     row => row.Team === decodeURIComponent(team)
   );
