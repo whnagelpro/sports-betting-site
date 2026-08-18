@@ -310,17 +310,65 @@ function renderTeamGameLog(games) {
     if (!games.length) {
 
         container.innerHTML =
-            "<p>No games found.</p>";
+            "<p>No recent games found.</p>";
 
         return;
 
     }
 
     container.innerHTML = `
-        <p>
-            Found ${games.length} games.
-        </p>
-    `;
+
+<table class="game-log-table">
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Opponent</th>
+
+<th>Result</th>
+
+<th>PF</th>
+
+<th>PA</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+${games.map(createTeamGameLogRow).join("")}
+
+</tbody>
+
+</table>
+
+`;
+
+}
+
+function createTeamGameLogRow(game) {
+
+    return `
+
+<tr>
+
+<td>${game["Game Date"]}</td>
+
+<td>${game["Opponent"]}</td>
+
+<td>${game["Result"]}</td>
+
+<td>${game["Points For"]}</td>
+
+<td>${game["Points Allowed"]}</td>
+
+</tr>
+
+`;
 
 }
 
@@ -5234,6 +5282,9 @@ if (!teamTrends.length) {
 
       }
 }
+
+console.log(teamGames);
+console.log(teamGames[0]);
 
 renderTeamGameLog(teamGames);
 
