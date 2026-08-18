@@ -352,19 +352,30 @@ ${games.map(createTeamGameLogRow).join("")}
 
 function createTeamGameLogRow(game) {
 
+    const isHome =
+        game["Home Team"] === decodeURIComponent(
+            getTeamProfileParameters().team
+        );
+
+    const opponent =
+        isHome
+            ? game["Away Team"]
+            : game["Home Team"];
+
+    const location =
+        isHome ? "vs" : "@";
+
     return `
 
 <tr>
 
-<td>${game["Game Date"]}</td>
+<td>Week ${game["Week"]}</td>
 
-<td>${game["Opponent"]}</td>
+<td>${location} ${opponent}</td>
 
-<td>${game["Result"]}</td>
+<td>${game["Game Date"] || "-"}</td>
 
-<td>${game["Points For"]}</td>
-
-<td>${game["Points Allowed"]}</td>
+<td>${game["Status"] || "-"}</td>
 
 </tr>
 
