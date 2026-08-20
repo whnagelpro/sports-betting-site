@@ -4,19 +4,26 @@ import { buildEdgeResult } from "./edge/buildEdgeResult.js";
 
 export function evaluateProp({
 
-    prop,
+    seasonStats,
 
     gameLogs,
+
+    trends,
+
+    prop,
 
     consistency
 
 }) {
 
     const projection =
-
         calculateProjectedProbability({
 
+            seasonStats,
+
             gameLogs,
+
+            trends,
 
             prop
 

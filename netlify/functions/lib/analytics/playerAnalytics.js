@@ -93,19 +93,22 @@ export function calculatePlayerAnalytics({
 
         calculateConsistency(gameLogs);
 
-const propAnalytics = props.map(prop =>
+    const propAnalytics =
+        props.map(prop =>
+            evaluateProp({
 
-    evaluateProp({
+                prop,
 
-        prop,
+                seasonStats,
 
-        gameLogs,
+                gameLogs,
 
-        consistency
+                trends,
 
-    })
+                consistency
 
-);
+            })
+        );
 
     const bestProp =
 

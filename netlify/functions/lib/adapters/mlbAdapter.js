@@ -3,6 +3,49 @@
 // MLB Adapter
 // ======================================================
 
+function buildMLBHitterQuickStats(seasonStats = {}) {
+
+    return [
+
+        {
+            label: "Hits",
+            value: Number(
+                seasonStats["Avg Hits"] ?? 0
+            ).toFixed(2)
+        },
+
+        {
+            label: "Runs",
+            value: Number(
+                seasonStats["Avg Runs"] ?? 0
+            ).toFixed(2)
+        },
+
+        {
+            label: "RBIs",
+            value: Number(
+                seasonStats["Avg RBIs"] ?? 0
+            ).toFixed(2)
+        },
+
+        {
+            label: "Home Runs",
+            value: Number(
+                seasonStats["Avg Home Runs"] ?? 0
+            ).toFixed(2)
+        },
+
+        {
+            label: "Strikeouts",
+            value: Number(
+                seasonStats["Avg Strikeouts"] ?? 0
+            ).toFixed(2)
+        }
+
+    ];
+
+}
+
 export function buildMLBContext({
 
     profile,
@@ -55,59 +98,10 @@ const games = Number(
 
             games,
 
-            cards: [
-
-                {
-
-                    label: "Hits",
-
-                    value: Number(
-                        seasonStats["Avg Hits"] ?? 0
-                    ).toFixed(2)
-
-                },
-
-                {
-
-                    label: "Runs",
-
-                    value: Number(
-                        seasonStats["Avg Runs"] ?? 0
-                    ).toFixed(2)
-
-                },
-
-                {
-
-                    label: "RBIs",
-
-                    value: Number(
-                        seasonStats["Avg RBIs"] ?? 0
-                    ).toFixed(2)
-
-                },
-
-                {
-
-                    label: "Home Runs",
-
-                    value: Number(
-                        seasonStats["Avg Home Runs"] ?? 0
-                    ).toFixed(2)
-
-                },
-
-                {
-
-                    label: "Strikeouts",
-
-                    value: Number(
-                        seasonStats["Avg Strikeouts"] ?? 0
-                    ).toFixed(2)
-
-                }
-
-            ]
+            cards:
+                buildMLBHitterQuickStats(
+                    seasonStats
+                )
 
         },
 
