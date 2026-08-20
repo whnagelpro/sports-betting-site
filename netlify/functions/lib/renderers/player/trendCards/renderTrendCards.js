@@ -1,0 +1,2 @@
+window.renderPlayerTrendCards =
+    renderTrendCards;
