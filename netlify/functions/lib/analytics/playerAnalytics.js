@@ -99,11 +99,7 @@ export function calculatePlayerAnalytics({
 
                 prop,
 
-                seasonStats,
-
                 gameLogs,
-
-                trends,
 
                 consistency
 

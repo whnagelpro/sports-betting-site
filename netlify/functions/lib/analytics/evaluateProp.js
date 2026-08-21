@@ -4,13 +4,9 @@ import { buildEdgeResult } from "./edge/buildEdgeResult.js";
 
 export function evaluateProp({
 
-    seasonStats,
+    prop,
 
     gameLogs,
-
-    trends,
-
-    prop,
 
     consistency
 
