@@ -15,11 +15,7 @@ export function evaluateProp({
     const projection =
         calculateProjectedProbability({
 
-            seasonStats,
-
             gameLogs,
-
-            trends,
 
             prop
 
