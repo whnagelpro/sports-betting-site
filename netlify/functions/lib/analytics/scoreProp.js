@@ -117,9 +117,17 @@ export function scoreProp({
 
         edge,
 
-        score: overallScore,
+        score: overallScore,               // temporary alias
 
-        analytics
+        sportacularScore: overallScore,
+
+        analytics: {
+
+            ...analytics,
+
+            sportacularScore: overallScore
+
+        }
 
     };
 

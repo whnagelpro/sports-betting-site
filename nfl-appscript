@@ -302,7 +302,7 @@ function refreshNFLScheduleSheet() {
   // ------------------------------------------
 
   const season = 2026;
-  const week = 2;
+  const week = 3;
   const seasonType = 1; // 1 = Preseason
 
   Logger.log(
@@ -315,7 +315,8 @@ function refreshNFLScheduleSheet() {
     seasonType
   );
 
-  Logger.log(`Loaded ${games.length} games.`);
+  Logger.log(JSON.stringify(games[0], null, 2));
+  Logger.log(`Returned ${games.length} games`);
 
   const headers = [
     "Game Id",
@@ -478,6 +479,19 @@ function getNFLGameRawDate_(game) {
   );
 }
 
+function addDaysToDateString_(dateString, days) {
+
+  const date = new Date(dateString + "T00:00:00");
+
+  date.setDate(date.getDate() + days);
+
+  return Utilities.formatDate(
+    date,
+    SPORTACULAR_TIMEZONE,
+    "yyyy-MM-dd"
+  );
+}
+
 function getNFLGameAZDate_(game) {
   const rawDate = getNFLGameRawDate_(game);
   if (!rawDate) return "";
@@ -492,6 +506,105 @@ function getNFLGameAZDate_(game) {
     new Date(rawDate),
     SPORTACULAR_TIMEZONE,
     "yyyy-MM-dd"
+  );
+}
+
+function isCompletedNFLGame_(game) {
+
+  const status =
+    String(
+      game.status ||
+      game.game_state ||
+      ""
+    ).toLowerCase();
+
+  return (
+    status.includes("final") ||
+    status.includes("completed") ||
+    status === "ft"
+  );
+}
+
+function getNFLCompletedGamesForDateRange_(
+  startDate,
+  endDate
+) {
+
+  const selectedGamesMap = {};
+
+  const fetchStartDate =
+    addDaysToDateString_(
+      startDate,
+      -1
+    );
+
+  const fetchEndDate =
+    addDaysToDateString_(
+      endDate,
+      1
+    );
+
+  let current =
+    new Date(
+      fetchStartDate + "T00:00:00"
+    );
+
+  const end =
+    new Date(
+      fetchEndDate + "T00:00:00"
+    );
+
+  while (current <= end) {
+
+    const apiDateString =
+      Utilities.formatDate(
+        current,
+        SPORTACULAR_TIMEZONE,
+        "yyyy-MM-dd"
+      );
+
+    Logger.log(
+      `Checking NFL API games for ${apiDateString}`
+    );
+
+    const games =
+      fetchAllNFLGamesForDate_(
+        apiDateString
+      )
+        .filter(isCompletedNFLGame_)
+        .filter(game => {
+
+          const azDate =
+            getNFLGameAZDate_(game);
+
+          return (
+            azDate >= startDate &&
+            azDate <= endDate
+          );
+
+        });
+
+    games.forEach(game => {
+
+      if (game.id) {
+
+        selectedGamesMap[
+          String(game.id)
+        ] = game;
+
+      }
+
+    });
+
+    current.setDate(
+      current.getDate() + 1
+    );
+
+    Utilities.sleep(100);
+  }
+
+  return Object.values(
+    selectedGamesMap
   );
 }
 
@@ -648,7 +761,7 @@ function ensureNFLGameOddsHeadersAndFormulas_(sheet) {
   sheet.getRange("S2").setFormula(`=IF(I2>0,1+I2/100,1+100/ABS(I2))`);
   sheet.getRange("T2").setFormula(`=IF(E2>0,1+E2/100,1+100/ABS(E2))`);
   sheet.getRange("U2").setFormula(`=IF(G2>0,1+G2/100,1+100/ABS(G2))`);
-  sheet.getRange("V2").setFormula(`=IFERROR(INDEX(Schedule!B:B,MATCH(B2,Schedule!A:A,0)),"")`);
+  sheet.getRange("V2").setFormula(`=IFERROR(INDEX(Schedule!J:J,MATCH(B2,Schedule!A:A,0)),"")`);
   sheet.getRange("W2").setFormula(`=IFERROR(INDEX(Schedule!C:C,MATCH(B2,Schedule!A:A,0)),"")`);
   sheet.getRange("X2").setFormula(`=IFERROR(INDEX(Schedule!D:D,MATCH(B2,Schedule!A:A,0)),"")`);
   sheet.getRange("Y2").setFormula(`=IF(H2<0,ABS(H2)/(ABS(H2)+100),100/(H2+100))`);
@@ -1120,9 +1233,13 @@ function normalizeNFLSheetDateForCompare_(value) {
 function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
   ensureNFLTrendTabs_();
 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("NFL Player Game Logs");
-  const scheduleSheet = ss.getSheetByName("Schedule");
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet =
+    ss.getSheetByName(
+      "NFL Player Game Logs"
+    );
 
   const headers = [
     "Game Date",
@@ -1144,31 +1261,80 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
     "Receiving TDs"
   ];
 
-  const games = getNFLGamesFromScheduleSheet_(scheduleSheet);
+  Logger.log(
+    `Refreshing NFL Player Game Logs from ${startDate} to ${endDate}`
+  );
 
-  Logger.log("Schedule games found: " + games.length);
+  const games =
+    getNFLCompletedGamesForDateRange_(
+      startDate,
+      endDate
+    );
+
+  Logger.log(
+    `Completed NFL games found: ${games.length}`
+  );
 
   if (games.length > 0) {
-    Logger.log(JSON.stringify(games[0], null, 2));
+
+    Logger.log(
+      JSON.stringify(
+        games[0],
+        null,
+        2
+      )
+    );
+
   }
 
   if (!games.length) {
-    Logger.log(`No NFL Schedule games found from ${startDate} to ${endDate}`);
+
+    Logger.log(
+      `No completed NFL games found from ${startDate} to ${endDate}`
+    );
+
     return;
   }
 
   const gameMap = {};
-  const gameIds = games.map(game => {
-    gameMap[String(game.id)] = game;
-    return game.id;
-  });
+
+  const gameIds =
+    games
+      .map(game => {
+
+        const gameId =
+          String(
+            game.id || ""
+          );
+
+        gameMap[gameId] = {
+
+          date:
+            getNFLGameAZDate_(game),
+
+          homeTeam:
+            getNFLHomeTeamNameFromGame_(
+              game
+            ),
+
+          awayTeam:
+            getNFLAwayTeamNameFromGame_(
+              game
+            )
+
+        };
+
+        return gameId;
+
+      })
+      .filter(Boolean);
 
   const statRows = fetchAllNFLStatsForGameIds_(gameIds);
   const rows = [];
 
   statRows.forEach(stat => {
     const gameId = String(stat.game_id || (stat.game && stat.game.id) || "");
-    const game = gameMap[gameId] || {};
+    const gameInfo = gameMap[gameId] || {};
 
     const playerId = stat.player_id || (stat.player && stat.player.id) || "";
     const playerName = getNFLPlayerNameFromStat_(stat);
@@ -1177,8 +1343,11 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
     const teamName = getNFLTeamName_(team) || stat.team_name || "";
 
     const opponent =
-      teamName === game.home_team ? game.away_team :
-      teamName === game.away_team ? game.home_team : "";
+      teamName === gameInfo.homeTeam
+        ? gameInfo.awayTeam
+        : teamName === gameInfo.awayTeam
+          ? gameInfo.homeTeam
+          : "";
 
     const passingYards = getNFLStatNumber_(stat, ["passing_yards", "pass_yards", "passing.yds", "passing.yards"]);
     const passingTDs = getNFLStatNumber_(stat, ["passing_touchdowns", "passing_tds", "pass_tds", "passing.td"]);
@@ -1204,7 +1373,7 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
     if (!played) return;
 
     rows.push([
-      game.game_date,
+      gameInfo.date,
       gameId,
       playerId,
       playerName,
@@ -1621,56 +1790,80 @@ function refreshNFLPlayerSeasonStatsSheet() {
         playerId,
         playerName: row["Player Name"] || "",
         team: row["Team"] || "",
-        games: 0,
-        passingYards: 0,
-        passingTDs: 0,
-        interceptions: 0,
-        completions: 0,
-        passAttempts: 0,
-        rushingYards: 0,
-        rushingAttempts: 0,
-        rushingTDs: 0,
-        receptions: 0,
-        receivingYards: 0,
-        receivingTDs: 0
+        games: []
       };
     }
 
-    const p = grouped[playerId];
-    p.games += 1;
-    p.passingYards += Number(row["Passing Yards"] || 0);
-    p.passingTDs += Number(row["Passing TDs"] || 0);
-    p.interceptions += Number(row["Interceptions"] || 0);
-    p.completions += Number(row["Completions"] || 0);
-    p.passAttempts += Number(row["Pass Attempts"] || 0);
-    p.rushingYards += Number(row["Rushing Yards"] || 0);
-    p.rushingAttempts += Number(row["Rushing Attempts"] || 0);
-    p.rushingTDs += Number(row["Rushing TDs"] || 0);
-    p.receptions += Number(row["Receptions"] || 0);
-    p.receivingYards += Number(row["Receiving Yards"] || 0);
-    p.receivingTDs += Number(row["Receiving TDs"] || 0);
+    grouped[playerId].games.push({
+
+        passingYards:
+            Number(row["Passing Yards"] || 0),
+
+        passingTDs:
+            Number(row["Passing TDs"] || 0),
+
+        interceptions:
+            Number(row["Interceptions"] || 0),
+
+        completions:
+            Number(row["Completions"] || 0),
+
+        passAttempts:
+            Number(row["Pass Attempts"] || 0),
+
+        rushingYards:
+            Number(row["Rushing Yards"] || 0),
+
+        rushingAttempts:
+            Number(row["Rushing Attempts"] || 0),
+
+        rushingTDs:
+            Number(row["Rushing TDs"] || 0),
+
+        receptions:
+            Number(row["Receptions"] || 0),
+
+        receivingYards:
+            Number(row["Receiving Yards"] || 0),
+
+        receivingTDs:
+            Number(row["Receiving TDs"] || 0)
+
+    });
+
   });
 
   const now = new Date();
 
-  const rows = Object.values(grouped).map(p => [
-    p.playerId,
-    p.playerName,
-    p.team,
-    p.games,
-    p.passingYards / p.games,
-    p.passingTDs / p.games,
-    p.interceptions / p.games,
-    p.completions / p.games,
-    p.passAttempts / p.games,
-    p.rushingYards / p.games,
-    p.rushingAttempts / p.games,
-    p.rushingTDs / p.games,
-    p.receptions / p.games,
-    p.receivingYards / p.games,
-    p.receivingTDs / p.games,
-    now
-  ]);
+  const rows = Object.values(grouped).map(player => {
+
+    const games = player.games;
+
+    return [
+
+      player.playerId,
+      player.playerName,
+      player.team,
+
+      games.length,
+
+      avgNFL_(games.map(g => g.passingYards)),
+      avgNFL_(games.map(g => g.passingTDs)),
+      avgNFL_(games.map(g => g.interceptions)),
+      avgNFL_(games.map(g => g.completions)),
+      avgNFL_(games.map(g => g.passAttempts)),
+      avgNFL_(games.map(g => g.rushingYards)),
+      avgNFL_(games.map(g => g.rushingAttempts)),
+      avgNFL_(games.map(g => g.rushingTDs)),
+      avgNFL_(games.map(g => g.receptions)),
+      avgNFL_(games.map(g => g.receivingYards)),
+      avgNFL_(games.map(g => g.receivingTDs)),
+
+      now
+
+    ];
+
+});
 
   rows.sort((a, b) => String(a[1] || "").localeCompare(String(b[1] || "")));
 

@@ -152,54 +152,76 @@ const season = context.seasonStats;
 
 const quickStats = buildQuickStats(context);
 
-const games = Number(season["Games Played"] ?? 0);
+let seasonPanels = [];
 
-const totalHits =
-    Math.round(Number(season["Avg Hits"] ?? 0) * games);
+if (league === "mlb") {
 
-const totalRuns =
-    Math.round(Number(season["Avg Runs"] ?? 0) * games);
+    const games = Number(
+        season["Games Played"] ?? 0
+    );
 
-const totalRBIs =
-    Math.round(Number(season["Avg RBIs"] ?? 0) * games);
+    const totalHits =
+        Math.round(
+            Number(season["Avg Hits"] ?? 0) * games
+        );
 
-const totalHomeRuns =
-    Math.round(Number(season["Avg Home Runs"] ?? 0) * games);
+    const totalRuns =
+        Math.round(
+            Number(season["Avg Runs"] ?? 0) * games
+        );
 
-const totalBases =
-    Math.round(Number(season["Avg Total Bases"] ?? 0) * games);
+    const totalRBIs =
+        Math.round(
+            Number(season["Avg RBIs"] ?? 0) * games
+        );
 
-const totalWalks =
-    Math.round(Number(season["Avg Walks"] ?? 0) * games);
+    const totalHomeRuns =
+        Math.round(
+            Number(season["Avg Home Runs"] ?? 0) * games
+        );
 
-const totalStrikeouts =
-    Math.round(Number(season["Avg Strikeouts"] ?? 0) * games);
+    const totalBases =
+        Math.round(
+            Number(season["Avg Total Bases"] ?? 0) * games
+        );
 
-const seasonPanels = buildSeasonPanels({
+    const totalWalks =
+        Math.round(
+            Number(season["Avg Walks"] ?? 0) * games
+        );
 
-    season,
+    const totalStrikeouts =
+        Math.round(
+            Number(season["Avg Strikeouts"] ?? 0) * games
+        );
 
-    games,
+    seasonPanels = buildSeasonPanels({
 
-    totalHits,
+        season,
 
-    totalRuns,
+        games,
 
-    totalRBIs,
+        totalHits,
 
-    totalHomeRuns,
+        totalRuns,
 
-    totalBases,
+        totalRBIs,
 
-    totalWalks,
+        totalHomeRuns,
 
-    totalStrikeouts,
+        totalBases,
 
-    trends,
+        totalWalks,
 
-    isPitcher: context.isPitcher
+        totalStrikeouts,
 
-});
+        trends,
+
+        isPitcher: context.isPitcher
+
+    });
+
+}
 
 console.log("Building analytics...");
 

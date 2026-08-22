@@ -13,9 +13,19 @@ export function mapInsights(trends) {
 
     return trends
 
-        .filter(trend =>
+        .filter(
+            trend => trend.trendNote
+        )
 
-            trend.trendNote
+        .sort((a, b) =>
+
+            Number(
+                b.trendScore ?? 0
+            ) -
+
+            Number(
+                a.trendScore ?? 0
+            )
 
         )
 

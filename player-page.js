@@ -436,8 +436,11 @@ function renderAnalyticsDashboard() {
         <div class="analytics-score-large">
 
             ${analytics?.sportacularScore ??
-                dashboardProp.sportacularScore ??
-                player.analytics.score}
+                dashboardProp?.sportacularScore ??
+                dashboardAnalytics?.score ??
+                player.analytics?.sportacularScore ??
+                player.analytics?.score ??
+                "-"}
 
         </div>
 
@@ -807,7 +810,35 @@ function renderTrendCards() {
 
     if (!player.trends?.length) {
 
-        section.hidden = true;
+        section.hidden = false;
+
+        grid.innerHTML = `
+
+            <article class="trend-card empty-state">
+
+                <div class="trend-icon">
+
+                    📊
+
+                </div>
+
+                <h3>
+
+                    No Trends Available
+
+                </h3>
+
+                <p>
+
+                    Sportacular has not generated any qualifying trends
+                    for this player yet. Check back after additional games
+                    have been played.
+
+                </p>
+
+            </article>
+
+        `;
 
         return;
 
@@ -1068,6 +1099,32 @@ function createInsightCard(insight) {
             ${insight.text}
 
         </p>
+
+        <div class="trend-footer">
+
+            <span>
+
+                ⭐ ${insight.trendScore ?? "-"}
+
+            </span>
+
+            <span>
+
+                ${insight.trendStrength ?? "-"}
+
+            </span>
+
+        </div>
+
+        <div class="trend-footer">
+
+            <span>
+
+                ${insight.riskTier ?? "-"}
+
+            </span>
+
+        </div>
 
     `;
 

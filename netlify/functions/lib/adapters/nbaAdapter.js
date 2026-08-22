@@ -121,6 +121,26 @@ export function buildNBAContext({
 
         props,
 
+        insights: [],
+
+        analytics: {
+
+            score: null,
+
+            recommendation: "-",
+
+            confidence: "-",
+
+            modelEdge: {
+
+                edgePercent: null
+
+            },
+
+            bestProp: null
+
+        },
+
         isPitcher: false
 
     };

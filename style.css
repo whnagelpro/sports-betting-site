@@ -2135,6 +2135,26 @@ a[href^="mailto:"]:focus {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
 }
 
+.trend-card.empty-state {
+
+    opacity: 0.85;
+
+    border-style: dashed;
+
+}
+
+.trend-card.empty-state h3 {
+
+    margin-bottom: 10px;
+
+}
+
+.trend-card.empty-state p {
+
+    line-height: 1.6;
+
+}
+
 .trend-card-header {
   display: flex;
   justify-content: space-between;
