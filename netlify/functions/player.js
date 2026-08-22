@@ -226,6 +226,8 @@ const player = {
 
     hero,
 
+    isPitcher: context.isPitcher,
+
     season,
 
     matchup,
