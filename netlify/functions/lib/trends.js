@@ -21,9 +21,21 @@ function findPlayerTrends(rows, playerId) {
         return [];
     }
 
-    return rows.filter(row =>
-        String(row["Player ID"]) === String(playerId)
-    );
+    return rows
+        .filter(row =>
+            String(row["Player ID"]) === String(playerId)
+        )
+        .sort((a, b) => {
+
+            const scoreA =
+                Number(a["Trend Score"] ?? 0);
+
+            const scoreB =
+                Number(b["Trend Score"] ?? 0);
+
+            return scoreB - scoreA;
+
+        });
 }
 
 // ------------------------------------------------------

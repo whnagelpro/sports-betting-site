@@ -46,6 +46,49 @@ function buildMLBHitterQuickStats(seasonStats = {}) {
 
 }
 
+function buildMLBPitcherQuickStats(seasonStats = {}) {
+
+    return [
+
+        {
+            label: "IP",
+            value: Number(
+                seasonStats["Avg Pitcher Outs"] ?? 0
+            ).toFixed(1)
+        },
+
+        {
+            label: "Strikeouts",
+            value: Number(
+                seasonStats["Avg Pitcher Strikeouts"] ?? 0
+            ).toFixed(2)
+        },
+
+        {
+            label: "ER",
+            value: Number(
+                seasonStats["Avg Pitcher Earned Runs"] ?? 0
+            ).toFixed(2)
+        },
+
+        {
+            label: "Hits Allowed",
+            value: Number(
+                seasonStats["Avg Pitcher Hits Allowed"] ?? 0
+            ).toFixed(2)
+        },
+
+        {
+            label: "Walks",
+            value: Number(
+                seasonStats["Avg Pitcher Walks"] ?? 0
+            ).toFixed(2)
+        }
+
+    ];
+
+}
+
 export function buildMLBContext({
 
     profile,
@@ -98,8 +141,11 @@ const games = Number(
 
             games,
 
-            cards:
-                buildMLBHitterQuickStats(
+            cards: context.isPitcher
+                ? buildMLBPitcherQuickStats(
+                    seasonStats
+                )
+                : buildMLBHitterQuickStats(
                     seasonStats
                 )
 
