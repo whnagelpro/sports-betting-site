@@ -12,6 +12,8 @@ export function evaluateProp({
 
 }) {
 
+    console.log("evaluateProp START");
+
     const projection =
         calculateProjectedProbability({
 
@@ -20,6 +22,8 @@ export function evaluateProp({
             prop
 
         });
+
+    console.log("✓ projection");
 
     const scoredProp =
 
@@ -41,6 +45,8 @@ export function evaluateProp({
 
         });
 
+    console.log("✓ scoreProp");
+
     const edge = buildEdgeResult({
 
         probability:
@@ -56,6 +62,8 @@ export function evaluateProp({
             gameLogs.length
 
     });
+
+    console.log("✓ buildEdgeResult");
 
     return {
 

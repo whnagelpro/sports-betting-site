@@ -141,7 +141,7 @@ const games = Number(
 
             games,
 
-            cards: context.isPitcher
+            cards: isPitcher
                 ? buildMLBPitcherQuickStats(
                     seasonStats
                 )
