@@ -376,7 +376,17 @@ section.hidden = false;
 
     const header = document.getElementById("game-log-header");
 
+    if (header) {
+
+        header.innerHTML = headers
+            .map(text => `<th>${text}</th>`)
+            .join("");
+
+    }
+
     const createRow = getGameLogRenderer(currentLeague);
+
+    const headers = getGameLogHeaders(currentLeague);
 
     if (!body) return;
 
