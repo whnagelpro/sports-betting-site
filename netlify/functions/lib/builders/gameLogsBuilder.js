@@ -4,6 +4,8 @@ export function buildGameLogs(context) {
 
     if (league === "nfl") {
 
+        console.log("Raw NFL Game Log:", context.gameLogs[0]);
+
         return context.gameLogs.map(game => ({
 
             gameDate: game.gameDate,
