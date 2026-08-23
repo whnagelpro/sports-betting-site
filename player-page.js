@@ -207,6 +207,8 @@ section.hidden = false;
 
 function renderGameLogs() {
 
+    const currentLeague = getLeague();
+
     const section = document.getElementById(
     "game-log-section"
 );
@@ -227,39 +229,20 @@ section.hidden = false;
 
     const header = document.getElementById("game-log-header");
 
+    let createRow;
+
 if (header) {
 
-    if (player.isPitcher) {
+    switch (currentLeague) {
 
-        header.innerHTML = `
+        case "nfl":
+            createRow = createNFLGameLogRow;
+            break;
 
-            <th>Date</th>
-            <th>Opponent</th>
-            <th>IP</th>
-            <th>SO</th>
-            <th>ER</th>
-            <th>H</th>
-            <th>BB</th>
-
-        `;
-
-    }
-
-    else {
-
-        header.innerHTML = `
-
-            <th>Date</th>
-            <th>Opponent</th>
-            <th>H</th>
-            <th>R</th>
-            <th>RBI</th>
-            <th>HR</th>
-            <th>TB</th>
-            <th>BB</th>
-            <th>SO</th>
-
-        `;
+        case "mlb":
+        default:
+            createRow = createMLBGameLogRow;
+            break;
 
     }
 
@@ -297,7 +280,7 @@ if (header) {
 
         body.appendChild(
 
-            createGameLogRow(game)
+            createRow(game, player)
 
         );
 
@@ -305,7 +288,7 @@ if (header) {
 
 }
 
-function createGameLogRow(game) {
+function createMLBGameLogRow(game) {
 
     const row = document.createElement("tr");
 
@@ -361,6 +344,26 @@ function createGameLogRow(game) {
 
     return row;
 
+}
+
+function createNFLGameLogRow(game) {
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+        <td>${formatGameDate(game.gameDate || game.date)}</td>
+        <td>${game.opponent || "-"}</td>
+        <td>${game.passingYards ?? 0}</td>
+        <td>${game.passingTDs ?? 0}</td>
+        <td>${game.interceptions ?? 0}</td>
+        <td>${game.rushingYards ?? 0}</td>
+        <td>${game.rushingTDs ?? 0}</td>
+        <td>${game.receptions ?? 0}</td>
+        <td>${game.receivingYards ?? 0}</td>
+        <td>${game.receivingTDs ?? 0}</td>
+    `;
+
+    return tr;
 }
 
 function renderAnalyticsDashboard() {
