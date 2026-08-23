@@ -70,15 +70,20 @@ async function initPlayerPage() {
 
 function applyLeagueLabels(labels) {
 
-    setText("profile-title", labels.profileTitle);
+    document.getElementById("profileTitle").textContent =
+        labels.profileTitle;
 
-    setText("back-link", labels.backText);
+    document.getElementById("backLink").textContent =
+        labels.backText;
 
-    setText("continue-title", labels.continueTitle);
+    document.getElementById("footerTitle").textContent =
+        labels.footerTitle;
 
-    setText("continue-subtitle", labels.continueSubtitle);
+    document.getElementById("footerSubtitle").textContent =
+        labels.footerSubtitle;
 
-    setText("continue-button", labels.buttonText);
+    document.getElementById("footerButton").textContent =
+        labels.footerButton;
 
 }
 
@@ -96,48 +101,55 @@ function formatGameDate(dateString) {
 }
 
 function getLeagueLabels(league) {
-  switch ((league || "").toLowerCase()) {
 
-    case "nfl":
-      return {
-        profileTitle: "NFL PLAYER PROFILE",
-        backText: "← Back to NFL Player Props",
-        continueTitle: "Continue Exploring NFL Player Props",
-        continueSubtitle:
-          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
-        buttonText: "← Back to NFL Player Props"
-      };
+    switch ((league || "").toLowerCase()) {
 
-    case "nba":
-      return {
-        profileTitle: "NBA PLAYER PROFILE",
-        backText: "← Back to NBA Player Props",
-        continueTitle: "Continue Exploring NBA Player Props",
-        continueSubtitle:
-          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
-        buttonText: "← Back to NBA Player Props"
-      };
+        case "nfl":
+            return {
+                profileTitle: "NFL PLAYER PROFILE",
+                backText: "← Back to NFL Player Props",
+                footerTitle: "Continue Exploring NFL Player Props",
+                footerSubtitle:
+                    "View every available NFL player prop, sportsbook, expected value, and trend from today's slate.",
+                footerButton:
+                    "← Back to NFL Player Props"
+            };
 
-    case "nhl":
-      return {
-        profileTitle: "NHL PLAYER PROFILE",
-        backText: "← Back to NHL Player Props",
-        continueTitle: "Continue Exploring NHL Player Props",
-        continueSubtitle:
-          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
-        buttonText: "← Back to NHL Player Props"
-      };
+        case "nba":
+            return {
+                profileTitle: "NBA PLAYER PROFILE",
+                backText: "← Back to NBA Player Props",
+                footerTitle: "Continue Exploring NBA Player Props",
+                footerSubtitle:
+                    "View every available NBA player prop, sportsbook, expected value, and trend from today's slate.",
+                footerButton:
+                    "← Back to NBA Player Props"
+            };
 
-    default:
-      return {
-        profileTitle: "MLB PLAYER PROFILE",
-        backText: "← Back to MLB Player Props",
-        continueTitle: "Continue Exploring MLB Player Props",
-        continueSubtitle:
-          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
-        buttonText: "← Back to MLB Player Props"
-      };
-  }
+        case "nhl":
+            return {
+                profileTitle: "NHL PLAYER PROFILE",
+                backText: "← Back to NHL Player Props",
+                footerTitle: "Continue Exploring NHL Player Props",
+                footerSubtitle:
+                    "View every available NHL player prop, sportsbook, expected value, and trend from today's slate.",
+                footerButton:
+                    "← Back to NHL Player Props"
+            };
+
+        default:
+            return {
+                profileTitle: "MLB PLAYER PROFILE",
+                backText: "← Back to MLB Player Props",
+                footerTitle: "Continue Exploring MLB Player Props",
+                footerSubtitle:
+                    "View every available MLB player prop, sportsbook, expected value, and trend from today's slate.",
+                footerButton:
+                    "← Back to MLB Player Props"
+            };
+
+    }
+
 }
 
 // ------------------------------------------------------
