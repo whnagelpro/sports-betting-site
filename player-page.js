@@ -28,14 +28,13 @@ document.addEventListener(
 
 async function initPlayerPage() {
 
-    const league = getLeague();
-    const labels = getLeagueLabels(league);
+    getUrlParameters();
+
+    const labels = getLeagueLabels(currentLeague);
 
     applyLeagueLabels(labels);
 
     try {
-
-        getUrlParameters();
 
         player = await fetchPlayer();
 
@@ -277,6 +276,41 @@ section.hidden = false;
         dashboard.appendChild(section);
 
     });
+
+}
+
+function getGameLogHeaders(league) {
+
+    switch ((league || "").toLowerCase()) {
+
+        case "nfl":
+            return [
+                "Date",
+                "Opponent",
+                "Pass Yds",
+                "Pass TD",
+                "INT",
+                "Rush Yds",
+                "Rush TD",
+                "Rec",
+                "Rec Yds",
+                "Rec TD"
+            ];
+
+        case "mlb":
+        default:
+            return [
+                "Date",
+                "Opponent",
+                "H",
+                "R",
+                "RBI",
+                "HR",
+                "TB",
+                "BB",
+                "SO"
+            ];
+    }
 
 }
 
