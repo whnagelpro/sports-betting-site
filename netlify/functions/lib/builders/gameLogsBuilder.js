@@ -1,5 +1,41 @@
 export function buildGameLogs(context) {
 
+    const league = context.league?.toLowerCase() ?? "mlb";
+
+    if (league === "nfl") {
+
+        return context.gameLogs.map(game => ({
+
+            gameDate: game.gameDate,
+
+            opponent: game.opponent,
+
+            passingYards: Number(game.passingYards ?? 0),
+
+            passingTDs: Number(game.passingTDs ?? 0),
+
+            interceptions: Number(game.interceptions ?? 0),
+
+            completions: Number(game.completions ?? 0),
+
+            passAttempts: Number(game.passAttempts ?? 0),
+
+            rushingYards: Number(game.rushingYards ?? 0),
+
+            rushingAttempts: Number(game.rushingAttempts ?? 0),
+
+            rushingTDs: Number(game.rushingTDs ?? 0),
+
+            receptions: Number(game.receptions ?? 0),
+
+            receivingYards: Number(game.receivingYards ?? 0),
+
+            receivingTDs: Number(game.receivingTDs ?? 0)
+
+        }));
+
+    }
+
     if (context.isPitcher) {
 
         return context.gameLogs.map(game => {
