@@ -34,6 +34,8 @@ async function initPlayerPage() {
 
     applyLeagueLabels(labels);
 
+    setupBackButtons();
+
     try {
 
         player = await fetchPlayer();
@@ -1290,5 +1292,34 @@ function renderInsights() {
         );
 
     });
+
+}
+
+function setupBackButtons() {
+
+    const page =
+        `${currentLeague}-props.html`;
+
+    const top =
+        document.getElementById("backLink");
+
+    const bottom =
+        document.getElementById("footerButton");
+
+    if (top) {
+
+        top.href = page;
+
+    }
+
+    if (bottom) {
+
+        bottom.onclick = () => {
+
+            window.location.href = page;
+
+        };
+
+    }
 
 }
