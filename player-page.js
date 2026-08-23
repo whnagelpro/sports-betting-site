@@ -70,20 +70,23 @@ async function initPlayerPage() {
 
 function applyLeagueLabels(labels) {
 
-    document.getElementById("profileTitle").textContent =
-        labels.profileTitle;
+    const ids = {
+        profileTitle: "profileTitle",
+        backText: "backLink",
+        footerTitle: "footerTitle",
+        footerSubtitle: "footerSubtitle",
+        footerButton: "footerButton"
+    };
 
-    document.getElementById("backLink").textContent =
-        labels.backText;
+    Object.entries(ids).forEach(([key, id]) => {
 
-    document.getElementById("footerTitle").textContent =
-        labels.footerTitle;
+        const el = document.getElementById(id);
 
-    document.getElementById("footerSubtitle").textContent =
-        labels.footerSubtitle;
+        if (el) {
+            el.textContent = labels[key];
+        }
 
-    document.getElementById("footerButton").textContent =
-        labels.footerButton;
+    });
 
 }
 
