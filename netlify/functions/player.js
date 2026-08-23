@@ -153,81 +153,77 @@ const season = context.seasonStats;
 
 const quickStats = buildQuickStats(context);
 
-let seasonPanels = [];
+const games = Number(
+    season["Games Played"] ?? 0
+);
 
-if (league === "mlb") {
-
-    const games = Number(
-        season["Games Played"] ?? 0
+const totalHits =
+    Math.round(
+        Number(season["Avg Hits"] ?? 0) * games
     );
 
-    const totalHits =
-        Math.round(
-            Number(season["Avg Hits"] ?? 0) * games
-        );
+const totalRuns =
+    Math.round(
+        Number(season["Avg Runs"] ?? 0) * games
+    );
 
-    const totalRuns =
-        Math.round(
-            Number(season["Avg Runs"] ?? 0) * games
-        );
+const totalRBIs =
+    Math.round(
+        Number(season["Avg RBIs"] ?? 0) * games
+    );
 
-    const totalRBIs =
-        Math.round(
-            Number(season["Avg RBIs"] ?? 0) * games
-        );
+const totalHomeRuns =
+    Math.round(
+        Number(season["Avg Home Runs"] ?? 0) * games
+    );
 
-    const totalHomeRuns =
-        Math.round(
-            Number(season["Avg Home Runs"] ?? 0) * games
-        );
+const totalBases =
+    Math.round(
+        Number(season["Avg Total Bases"] ?? 0) * games
+    );
 
-    const totalBases =
-        Math.round(
-            Number(season["Avg Total Bases"] ?? 0) * games
-        );
+const totalWalks =
+    Math.round(
+        Number(season["Avg Walks"] ?? 0) * games
+    );
 
-    const totalWalks =
-        Math.round(
-            Number(season["Avg Walks"] ?? 0) * games
-        );
+const totalStrikeouts =
+    Math.round(
+        Number(season["Avg Strikeouts"] ?? 0) * games
+    );
 
-    const totalStrikeouts =
-        Math.round(
-            Number(season["Avg Strikeouts"] ?? 0) * games
-        );
+const seasonPanels = buildSeasonPanels({
 
-    seasonPanels = buildSeasonPanels({
+    season,
 
-            season,
+    games,
 
-            games,
+    totalHits,
 
-            totalHits,
+    totalRuns,
 
-            totalRuns,
+    totalRBIs,
 
-            totalRBIs,
+    totalHomeRuns,
 
-            totalHomeRuns,
+    totalBases,
 
-            totalBases,
+    totalWalks,
 
-            totalWalks,
+    totalStrikeouts,
 
-            totalStrikeouts,
+    trends,
 
-            trends,
+    isPitcher: context.isPitcher,
 
-            isPitcher: context.isPitcher,
+    league,
 
-            league,
+    position:
+        context.profile?.Position ??
+        context.profile?.position ??
+        ""
 
-            position:
-                context.profile?.position
-
-        });
-
-}
+});
 
 console.log("Building analytics...");
 

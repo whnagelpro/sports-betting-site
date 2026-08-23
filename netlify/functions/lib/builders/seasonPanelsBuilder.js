@@ -325,10 +325,12 @@ export function buildSeasonPanels({
     position
 }) {
 
-if (
-    league === "nfl" &&
-    String(position).toUpperCase() === "QB"
-) {
+    if (
+        league === "nfl" &&
+        ["QB", "QUARTERBACK"].includes(
+            String(position).toUpperCase()
+        )
+    ) {
     return buildNFLQBSeasonPanels({
         season,
         games,
