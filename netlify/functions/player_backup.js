@@ -3,17 +3,17 @@
 // Universal Player Endpoint
 // ======================================================
 
-import { DATA_SOURCES } from "./lib/config.js";
+/* import { DATA_SOURCES } from "./lib/config.js";
 
 import { loadCSV } from "./lib/csv.js";
 
 import { loadSeasonStats } from "./lib/seasonStats.js";
 
-import { loadPlayerContext } from "./lib/playerContext.js";
+import { loadPlayerContext } from "./lib/playerContext.js"; */
 
 import { success, badRequest, serverError, notFound } from "./lib/response.js";
 
-import { loadGameLogs } from "./lib/gameLogs.js";
+/* import { loadGameLogs } from "./lib/gameLogs.js";
 
 import { loadTrends } from "./lib/trends.js";
 
@@ -35,9 +35,13 @@ import { buildQuickStats } from "./lib/builders/quickStatsBuilder.js";
 
 import { buildSeasonPanels } from "./lib/builders/seasonPanelsBuilder.js";
 
-import { calculatePlayerAnalytics } from "./lib/analytics/playerAnalytics.js";
+import { calculatePlayerAnalytics } from "./lib/analytics/playerAnalytics.js"; */
 
 export async function handler(event) {
+
+    return success({
+        stage: 1
+    });
 
     try {
 
