@@ -84,9 +84,18 @@ export function calculatePlayerAnalytics({
 }) {
 
     if (!props.length) {
-
-        return null;
-
+        return {
+            score: 0,
+            stars: 0,
+            confidence: "N/A",
+            recommendation: "No Props Available",
+            edge: null,
+            bestProp: null,
+            propAnalytics: [],
+            consistency: calculateConsistency(gameLogs),
+            modelEdge: null,
+            analyticsVersion: 2
+        };
     }
 
     const consistency =

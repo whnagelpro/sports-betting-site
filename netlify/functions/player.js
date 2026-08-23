@@ -245,7 +245,7 @@ console.log("Building props...");
 
 const props = buildProps({
     ...context,
-    props: analytics.propAnalytics
+    props: analytics?.propAnalytics ?? []
 });
 
 console.log("✓ props");
@@ -272,7 +272,19 @@ const player = {
 
     insights: [],
 
-    analytics
+    analytics: analytics ?? {
+        score: 0,
+        sportacularScore: 0,
+        stars: 0,
+        confidence: "N/A",
+        recommendation: "No Props Available",
+        edge: null,
+        bestProp: null,
+        propAnalytics: [],
+        consistency: 0,
+        modelEdge: null,
+        analyticsVersion: 2
+    }
 
 };
 
