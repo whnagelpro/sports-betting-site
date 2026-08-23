@@ -309,50 +309,32 @@ function buildNFLQBSeasonPanels({
 
 }
 
-const league =
-    (arguments[0].league || "")
-        .toLowerCase();
-
-const position =
-    (arguments[0].position || "")
-        .toUpperCase();
+export function buildSeasonPanels({
+    season,
+    games,
+    totalHits,
+    totalRuns,
+    totalRBIs,
+    totalHomeRuns,
+    totalBases,
+    totalWalks,
+    totalStrikeouts,
+    trends,
+    isPitcher,
+    league,
+    position
+}) {
 
 if (
     league === "nfl" &&
-    position === "QB"
+    String(position).toUpperCase() === "QB"
 ) {
-
-    return buildNFLQBSeasonPanels(
-        arguments[0]
-    );
-
+    return buildNFLQBSeasonPanels({
+        season,
+        games,
+        trends
+    });
 }
-
-export function buildSeasonPanels({
-
-    season,
-
-    games,
-
-    totalHits,
-
-    totalRuns,
-
-    totalRBIs,
-
-    totalHomeRuns,
-
-    totalBases,
-
-    totalWalks,
-
-    totalStrikeouts,
-
-    trends,
-
-    isPitcher
-
-}) {
 
 if (isPitcher) {
 

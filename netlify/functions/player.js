@@ -198,29 +198,34 @@ if (league === "mlb") {
 
     seasonPanels = buildSeasonPanels({
 
-        season,
+            season,
 
-        games,
+            games,
 
-        totalHits,
+            totalHits,
 
-        totalRuns,
+            totalRuns,
 
-        totalRBIs,
+            totalRBIs,
 
-        totalHomeRuns,
+            totalHomeRuns,
 
-        totalBases,
+            totalBases,
 
-        totalWalks,
+            totalWalks,
 
-        totalStrikeouts,
+            totalStrikeouts,
 
-        trends,
+            trends,
 
-        isPitcher: context.isPitcher
+            isPitcher: context.isPitcher,
 
-    });
+            league,
+
+            position:
+                context.profile?.position
+
+        });
 
 }
 
