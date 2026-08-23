@@ -28,6 +28,11 @@ document.addEventListener(
 
 async function initPlayerPage() {
 
+    const league = getLeague();
+    const labels = getLeagueLabels(league);
+
+    applyLeagueLabels(labels);
+
     try {
 
         getUrlParameters();
@@ -62,6 +67,78 @@ async function initPlayerPage() {
 
     }
 
+}
+
+function applyLeagueLabels(labels) {
+
+    setText("profile-title", labels.profileTitle);
+
+    setText("back-link", labels.backText);
+
+    setText("continue-title", labels.continueTitle);
+
+    setText("continue-subtitle", labels.continueSubtitle);
+
+    setText("continue-button", labels.buttonText);
+
+}
+
+function formatGameDate(dateString) {
+    if (!dateString) return "-";
+
+    const date = new Date(dateString);
+
+    if (isNaN(date)) return dateString;
+
+    return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric"
+    });
+}
+
+function getLeagueLabels(league) {
+  switch ((league || "").toLowerCase()) {
+
+    case "nfl":
+      return {
+        profileTitle: "NFL PLAYER PROFILE",
+        backText: "← Back to NFL Player Props",
+        continueTitle: "Continue Exploring NFL Player Props",
+        continueSubtitle:
+          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
+        buttonText: "← Back to NFL Player Props"
+      };
+
+    case "nba":
+      return {
+        profileTitle: "NBA PLAYER PROFILE",
+        backText: "← Back to NBA Player Props",
+        continueTitle: "Continue Exploring NBA Player Props",
+        continueSubtitle:
+          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
+        buttonText: "← Back to NBA Player Props"
+      };
+
+    case "nhl":
+      return {
+        profileTitle: "NHL PLAYER PROFILE",
+        backText: "← Back to NHL Player Props",
+        continueTitle: "Continue Exploring NHL Player Props",
+        continueSubtitle:
+          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
+        buttonText: "← Back to NHL Player Props"
+      };
+
+    default:
+      return {
+        profileTitle: "MLB PLAYER PROFILE",
+        backText: "← Back to MLB Player Props",
+        continueTitle: "Continue Exploring MLB Player Props",
+        continueSubtitle:
+          "View every available player prop, sportsbook, expected value, and trend for today's slate.",
+        buttonText: "← Back to MLB Player Props"
+      };
+  }
 }
 
 // ------------------------------------------------------
@@ -203,6 +280,27 @@ section.hidden = false;
 
 }
 
+function getGameLogRenderer(league) {
+
+    switch ((league || "").toLowerCase()) {
+
+        case "nfl":
+            return createNFLGameLogRow;
+
+        case "nba":
+            return createNBAGameLogRow;
+
+        case "nhl":
+            return createNHLGameLogRow;
+
+        case "mlb":
+        default:
+            return createMLBGameLogRow;
+
+    }
+
+}
+
 function renderGameLogs() {
 
     const currentLeague =
@@ -229,24 +327,7 @@ section.hidden = false;
 
     const header = document.getElementById("game-log-header");
 
-    let createRow;
-
-if (header) {
-
-    switch (currentLeague) {
-
-        case "nfl":
-            createRow = createNFLGameLogRow;
-            break;
-
-        case "mlb":
-        default:
-            createRow = createMLBGameLogRow;
-            break;
-
-    }
-
-}
+    const createRow = getGameLogRenderer(currentLeague);
 
     if (!body) return;
 
@@ -534,51 +615,6 @@ function renderAnalyticsDashboard() {
     </div>
 
     `;
-
-}
-
-function renderMatchup() {
-
-    const section = document.getElementById(
-        "matchup-section"
-    );
-
-    if (!section) return;
-
-    if (!player.matchup) {
-
-        section.hidden = true;
-
-        return;
-
-    }
-
-    section.hidden = false;
-
-    renderFields({
-
-        "matchup-game":
-            player.matchup.title,
-
-        "matchup-time":
-            player.matchup.subtitle
-
-    });
-
-    const details = player.matchup.details ?? [];
-
-    renderFields({
-
-        "opponent-pitcher":
-            details[0]?.value ?? "-",
-
-        "opponent-handedness":
-            details[1]?.value ?? "-",
-
-        "lineup-position":
-            details[2]?.value ?? "-"
-
-    });
 
 }
 
