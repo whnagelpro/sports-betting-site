@@ -232,6 +232,12 @@ const analytics = calculatePlayerAnalytics({
     props: context.props
 });
 
+console.log("Analytics object:");
+console.log(analytics);
+
+console.log("Context props:");
+console.log(context.props);
+
 console.log("✓ analytics");
 
 // Build props from the evaluated analytics WITHOUT modifying context
