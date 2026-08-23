@@ -146,7 +146,8 @@ console.log("✓ trends");
 
 console.log("Building game logs...");
 const gameLogs = buildGameLogs(context);
-console.log("✓ game logs");
+console.log("Built Game Logs:");
+console.log(gameLogs[0]);
 
 const season = context.seasonStats;
 
