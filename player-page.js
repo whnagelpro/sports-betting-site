@@ -274,6 +274,9 @@ if (!player.seasonPanels?.length) {
 
 section.hidden = false;
 
+console.log("Season Panels:");
+console.log(player.seasonPanels);
+
     const dashboard = document.getElementById(
 
         "season-dashboard"
@@ -285,6 +288,8 @@ section.hidden = false;
     dashboard.innerHTML = "";
 
     player.seasonPanels.forEach(panel => {
+
+        console.log("Appending panel:", panel.title);
 
         const section = createSeasonPanel(panel);
 
