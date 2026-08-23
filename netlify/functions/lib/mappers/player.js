@@ -2,7 +2,6 @@ import { calculatePlayerAnalytics } from "../analytics/playerAnalytics.js";
 import { mapGameLogs } from "./gameLogs.js";
 import { mapTrends } from "./trends.js";
 import { mapInsights } from "./insights.js";
-import { buildSeasonPanels } from "./builders/seasonPanelsBuilder.js";
 
 // ======================================================
 // Sportacular Analytics
@@ -33,11 +32,7 @@ export function mapPlayer(context, league) {
 
         profile,
 
-        seasonStats,
-
-        mappedGameLogs,
-
-        mappedTrends
+        seasonStats
 
     );
 
@@ -157,54 +152,15 @@ function buildProfile(row) {
 
 }
 
-function buildSeason(
-    row,
-    seasonStats,
-    gameLogs = [],
-    trends = []
-) {
-
-    const games =
-        Number(
-            seasonStats["Games Played"] || 0
-        );
+function buildSeason(row, seasonStats) {
 
     return {
 
         raw: seasonStats,
 
-        quickStats:
-            buildQuickStats(
-                row,
-                seasonStats
-            ),
+        quickStats: buildQuickStats(row, seasonStats),
 
-        panels:
-            buildSeasonPanels({
-
-                league:
-                    row.League ??
-                    row.league,
-
-                position:
-                    row.Position,
-
-                season:
-                    seasonStats,
-
-                games,
-
-                trends,
-
-                isPitcher:
-                    ["SP","RP","P"]
-                        .includes(
-                            (
-                                row.Position || ""
-                            ).toUpperCase()
-                        )
-
-            })
+        panels: buildSeasonPanels(row, seasonStats)
 
     };
 
@@ -306,6 +262,72 @@ function buildQuickStats(row, seasonStats) {
         }
 
     ];
+
+}
+
+function buildSeasonPanels(row, seasonStats) {
+
+    const position = (row.Position || "").toUpperCase();
+
+    if (["SP", "RP", "P"].includes(position)) {
+
+        return [
+
+            {
+                title: "Pitching",
+
+                stats: [
+
+                    {
+                        label: "Games",
+                        value: seasonStats["Games Played"] || "-"
+                    },
+
+                    {
+                        label: "Strikeouts",
+                        value: seasonStats["Avg Pitcher Strikeouts"] || "-"
+                    },
+
+                    {
+                        label: "Walks",
+                        value: seasonStats["Avg Pitcher Walks"] || "-"
+                    },
+
+                    {
+                        label: "ERA",
+                        value: seasonStats["Avg Pitcher Earned Runs"] || "-"
+                    }
+
+                ]
+
+            },
+
+            {
+                title: "Advanced",
+
+                stats: [
+
+                    {
+                        label: "Hits Allowed",
+                        value: seasonStats["Avg Pitcher Hits Allowed"] || "-"
+                    },
+
+                    {
+                        label: "Consistency",
+                        value: seasonStats["Consistency Score"] || "-"
+                    }
+
+                ]
+
+            }
+
+        ];
+
+    }
+
+    // Temporary hitter placeholder
+
+    return [];
 
 }
 
