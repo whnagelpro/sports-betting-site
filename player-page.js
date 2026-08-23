@@ -503,19 +503,27 @@ function createNFLGameLogRow(game) {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-        <td>${formatGameDate(game.gameDate || game.date)}</td>
-        <td>${game.opponent || "-"}</td>
+        <td>${formatGameDate(game.gameDate)}</td>
+        <td>${game.opponent ?? "-"}</td>
+
         <td>${game.passingYards ?? 0}</td>
         <td>${game.passingTDs ?? 0}</td>
         <td>${game.interceptions ?? 0}</td>
+
+        <td>${game.completions ?? 0}</td>
+        <td>${game.passAttempts ?? 0}</td>
+
         <td>${game.rushingYards ?? 0}</td>
+        <td>${game.rushingAttempts ?? 0}</td>
         <td>${game.rushingTDs ?? 0}</td>
+
         <td>${game.receptions ?? 0}</td>
         <td>${game.receivingYards ?? 0}</td>
         <td>${game.receivingTDs ?? 0}</td>
     `;
 
     return tr;
+
 }
 
 function renderAnalyticsDashboard() {
