@@ -79,6 +79,10 @@ export function buildNFLContext({
             profile.Position
         );
 
+    console.log("Raw position:", profile.Position);
+    console.log("Profile:", profile);
+    console.log("Position group:", positionGroup);
+
     let quickStatCards = [];
 
     if (positionGroup === "QB") {

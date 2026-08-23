@@ -48,8 +48,6 @@ async function initPlayerPage() {
 
         renderSeasonPanels();
 
-        renderMatchup();
-
         renderProps();
 
         renderTrendCards();
@@ -207,7 +205,9 @@ section.hidden = false;
 
 function renderGameLogs() {
 
-    const currentLeague = getLeague();
+    const currentLeague =
+        new URLSearchParams(window.location.search)
+            .get("league") || "mlb";
 
     const section = document.getElementById(
     "game-log-section"
