@@ -257,6 +257,8 @@ export function buildNFLContext({
 
     }
 
+    console.log("Quick Stat Cards:", quickStatCards);
+
     return {
 
         league: "nfl",
