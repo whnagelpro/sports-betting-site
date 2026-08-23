@@ -46,6 +46,48 @@ function mapGameLogs(gameLogs, position) {
             };
         }
 
+        if (
+            log["Passing Yards"] !== undefined ||
+            log["Rushing Yards"] !== undefined ||
+            log["Receiving Yards"] !== undefined
+        ) {
+
+            return {
+
+                gameDate: log["Game Date"],
+
+                gameId: log["Game ID"],
+
+                opponent: log["Opponent"],
+
+                passingYards: Number(log["Passing Yards"] || 0),
+
+                passingTDs: Number(log["Passing TDs"] || 0),
+
+                interceptions: Number(log["Interceptions"] || 0),
+
+                completions: Number(log["Completions"] || 0),
+
+                passAttempts: Number(log["Pass Attempts"] || 0),
+
+                rushingYards: Number(log["Rushing Yards"] || 0),
+
+                rushingAttempts: Number(log["Rushing Attempts"] || 0),
+
+                rushingTDs: Number(log["Rushing TDs"] || 0),
+
+                receptions: Number(log["Receptions"] || 0),
+
+                receivingYards: Number(log["Receiving Yards"] || 0),
+
+                receivingTDs: Number(log["Receiving TDs"] || 0),
+
+                raw: log
+
+            };
+
+        }
+
         return {
             gameDate: log["Game Date"],
             gameId: log["Game ID"],

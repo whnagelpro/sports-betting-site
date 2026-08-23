@@ -4,37 +4,42 @@ export function buildGameLogs(context) {
 
     if (league === "nfl") {
 
-        console.log("Raw NFL Game Log:", context.gameLogs[0]);
+        return context.gameLogs.map((game, index) => {
 
-        return context.gameLogs.map(game => {
+            if (index === 0) {
+                console.log("Object inside map:");
+                console.log(game);
+            }
 
             const mapped = {
 
-                gameDate: game["Game Date"],
+                gameDate: game.gameDate,
 
-                opponent: game["Opponent"],
+                gameId: game.gameId,
 
-                passingYards: Number(game["Passing Yards"] ?? 0),
+                opponent: game.opponent,
 
-                passingTDs: Number(game["Passing TDs"] ?? 0),
+                passingYards: game.passingYards,
 
-                interceptions: Number(game["Interceptions"] ?? 0),
+                passingTDs: game.passingTDs,
 
-                completions: Number(game["Completions"] ?? 0),
+                interceptions: game.interceptions,
 
-                passAttempts: Number(game["Pass Attempts"] ?? 0),
+                completions: game.completions,
 
-                rushingYards: Number(game["Rushing Yards"] ?? 0),
+                passAttempts: game.passAttempts,
 
-                rushingAttempts: Number(game["Rushing Attempts"] ?? 0),
+                rushingYards: game.rushingYards,
 
-                rushingTDs: Number(game["Rushing TDs"] ?? 0),
+                rushingAttempts: game.rushingAttempts,
 
-                receptions: Number(game["Receptions"] ?? 0),
+                rushingTDs: game.rushingTDs,
 
-                receivingYards: Number(game["Receiving Yards"] ?? 0),
+                receptions: game.receptions,
 
-                receivingTDs: Number(game["Receiving TDs"] ?? 0)
+                receivingYards: game.receivingYards,
+
+                receivingTDs: game.receivingTDs
 
             };
 
