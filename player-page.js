@@ -356,6 +356,13 @@ function renderGameLogs() {
         new URLSearchParams(window.location.search)
             .get("league") || "mlb";
 
+    console.log("Game Log League:", currentLeague);
+
+    console.log(
+        "Headers:",
+        getGameLogHeaders(currentLeague)
+    );
+
     const section = document.getElementById(
     "game-log-section"
 );
@@ -374,7 +381,13 @@ section.hidden = false;
 
     const body = document.getElementById("game-log-body");
 
+    const body = document.getElementById("game-log-body");
+
     const header = document.getElementById("game-log-header");
+
+    const headers = getGameLogHeaders(currentLeague);
+
+    const createRow = getGameLogRenderer(currentLeague);
 
     if (header) {
 
@@ -383,10 +396,6 @@ section.hidden = false;
             .join("");
 
     }
-
-    const createRow = getGameLogRenderer(currentLeague);
-
-    const headers = getGameLogHeaders(currentLeague);
 
     if (!body) return;
 
