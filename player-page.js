@@ -381,8 +381,6 @@ section.hidden = false;
 
     const body = document.getElementById("game-log-body");
 
-    const body = document.getElementById("game-log-body");
-
     const header = document.getElementById("game-log-header");
 
     const headers = getGameLogHeaders(currentLeague);
