@@ -155,6 +155,179 @@ function buildMLBPitcherSeasonPanels({
 
 }
 
+function buildNFLQBSeasonPanels({
+
+    season,
+
+    games,
+
+    trends
+
+}) {
+
+    return [
+
+        {
+
+            title: "Passing",
+
+            stats: [
+
+                {
+
+                    label: "Games",
+
+                    value: games
+
+                },
+
+                {
+
+                    label: "Passing Yards",
+
+                    value:
+                        season["Passing Yards"] ??
+                        "-"
+
+                },
+
+                {
+
+                    label: "Passing TDs",
+
+                    value:
+                        season["Passing TDs"] ??
+                        "-"
+
+                },
+
+                {
+
+                    label: "Completions",
+
+                    value:
+                        season["Completions"] ??
+                        "-"
+
+                },
+
+                {
+
+                    label: "Attempts",
+
+                    value:
+                        season["Pass Attempts"] ??
+                        "-"
+
+                }
+
+            ]
+
+        },
+
+        {
+
+            title: "Rushing",
+
+            stats: [
+
+                {
+
+                    label: "Rush Yards",
+
+                    value:
+                        season["Rushing Yards"] ??
+                        "-"
+
+                },
+
+                {
+
+                    label: "Rush Attempts",
+
+                    value:
+                        season["Rushing Attempts"] ??
+                        "-"
+
+                },
+
+                {
+
+                    label: "Rush TDs",
+
+                    value:
+                        season["Rushing TDs"] ??
+                        "-"
+
+                }
+
+            ]
+
+        },
+
+        {
+
+            title: "Trend Metrics",
+
+            stats: [
+
+                {
+
+                    label: "Consistency",
+
+                    value:
+                        trends?.[0]?.consistency ??
+                        "-"
+
+                },
+
+                {
+
+                    label: "Trend Strength",
+
+                    value:
+                        trends?.[0]?.strength ??
+                        "-"
+
+                },
+
+                {
+
+                    label: "Risk Tier",
+
+                    value:
+                        trends?.[0]?.risk ??
+                        "-"
+
+                }
+
+            ]
+
+        }
+
+    ];
+
+}
+
+const league =
+    (arguments[0].league || "")
+        .toLowerCase();
+
+const position =
+    (arguments[0].position || "")
+        .toUpperCase();
+
+if (
+    league === "nfl" &&
+    position === "QB"
+) {
+
+    return buildNFLQBSeasonPanels(
+        arguments[0]
+    );
+
+}
+
 export function buildSeasonPanels({
 
     season,
