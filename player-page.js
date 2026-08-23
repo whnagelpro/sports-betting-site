@@ -302,14 +302,17 @@ function getGameLogHeaders(league) {
             return [
                 "Date",
                 "Opponent",
-                "Pass Yds",
-                "Pass TD",
-                "INT",
-                "Rush Yds",
-                "Rush TD",
-                "Rec",
-                "Rec Yds",
-                "Rec TD"
+                "Passing Yards",
+                "Passing TDs",
+                "Interceptions",
+                "Completions",
+                "Pass Attempts",
+                "Rushing Yards",
+                "Rushing Attempts",
+                "Rushing TDs",
+                "Receptions",
+                "Receiving Yards",
+                "Receiving TDs"
             ];
 
         case "mlb":
@@ -422,6 +425,8 @@ section.hidden = false;
     console.log("Rendered Game Logs");
 
     console.table(player.gameLogs);
+
+    console.log("First NFL Game Log:", player.gameLogs[0]);
 
     player.gameLogs.forEach(game => {
 
