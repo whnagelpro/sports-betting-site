@@ -35,6 +35,7 @@ const MLB_TOP_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2P
 const NFL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1933017030&single=true&output=csv";
 const NFL_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1131205016&single=true&output=csv";
 const NFL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1953623841&single=true&output=csv";
+const NFL_TEAM_GAME_LOGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1231176215&single=true&output=csv";
 const NFL_TEAM_SEASON_STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1207032232&single=true&output=csv";
 const NFL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=40257281&single=true&output=csv";
 
@@ -52,7 +53,8 @@ const TEAM_PROFILE_CONFIG = {
   nfl: {
     seasonStats: NFL_TEAM_SEASON_STATS_CSV_URL,
     teamTrends: NFL_TEAM_TRENDS_CSV_URL,
-    schedule: NFL_SCHEDULE_CSV_URL
+    schedule: NFL_SCHEDULE_CSV_URL,
+    teamGameLogs: NFL_TEAM_GAME_LOGS_CSV_URL
   },
 
   nba: {
@@ -300,87 +302,168 @@ async function fetchTeamSchedule(league) {
 
 }
 
-function renderTeamGameLog(games) {
+async function fetchTeamGameLogs(league) {
 
-    const container =
-        document.getElementById("team-game-log-content");
+  const config = TEAM_PROFILE_CONFIG[league];
 
-    if (!container) return;
+  if (!config || !config.teamGameLogs) return [];
 
-    if (!games.length) {
+  const response = await fetch(config.teamGameLogs);
 
-        container.innerHTML =
-            "<p>No recent games found.</p>";
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch ${league.toUpperCase()} team game logs: ${response.status}`
+    );
+  }
 
-        return;
+  const csv = await response.text();
 
-    }
+  return parseCSV(csv);
+}
+
+function renderTeamGameLog(games, league = "nfl") {
+
+  const container =
+    document.getElementById("team-game-log-content");
+
+  if (!container) return;
+
+  if (!games || !games.length) {
+
+    container.innerHTML = `
+      <div class="team-performance-empty">
+        No recent games found.
+      </div>
+    `;
+
+    return;
+  }
+
+  const sortedGames = [...games]
+    .sort((a, b) => {
+      return (
+        new Date(b["Game Date"]).getTime() -
+        new Date(a["Game Date"]).getTime()
+      );
+    })
+    .slice(0, 10);
+
+  if (league === "nfl") {
 
     container.innerHTML = `
 
-<table class="game-log-table">
+      <div class="team-performance-table-wrap">
 
-<thead>
+        <table class="team-performance-table">
 
-<tr>
+          <thead>
 
-<th>Date</th>
+            <tr>
+              <th>Date</th>
+              <th>Opponent</th>
+              <th>Result</th>
+              <th>PF</th>
+              <th>PA</th>
+              <th>Pass Yds</th>
+              <th>Rush Yds</th>
+              <th>TO</th>
+              <th>Sacks</th>
+            </tr>
 
-<th>Opponent</th>
+          </thead>
 
-<th>Result</th>
+          <tbody>
 
-<th>PF</th>
+            ${sortedGames
+              .map(createNFLTeamGameLogRow)
+              .join("")}
 
-<th>PA</th>
+          </tbody>
 
-</tr>
+        </table>
 
-</thead>
+      </div>
 
-<tbody>
+    `;
 
-${games.map(createTeamGameLogRow).join("")}
+    return;
+  }
 
-</tbody>
-
-</table>
-
-`;
-
+  container.innerHTML =
+    "<p>Recent-performance table not configured for this league yet.</p>";
 }
 
-function createTeamGameLogRow(game) {
 
-    const isHome =
-        game["Home Team"] === decodeURIComponent(
-            getTeamProfileParameters().team
-        );
+function createNFLTeamGameLogRow(game) {
 
-    const opponent =
-        isHome
-            ? game["Away Team"]
-            : game["Home Team"];
+  const pointsFor =
+    Number(game["Points For"] || 0);
 
-    const location =
-        isHome ? "vs" : "@";
+  const pointsAllowed =
+    Number(game["Points Allowed"] || 0);
 
-    return `
+  let result = "T";
 
-<tr>
+  if (pointsFor > pointsAllowed) {
+    result = "W";
+  }
 
-<td>Week ${game["Week"]}</td>
+  if (pointsFor < pointsAllowed) {
+    result = "L";
+  }
 
-<td>${location} ${opponent}</td>
+  const resultClass =
+    result === "W"
+      ? "team-result-win"
+      : result === "L"
+        ? "team-result-loss"
+        : "team-result-tie";
 
-<td>${game["Game Date"] || "-"}</td>
+  return `
 
-<td>${game["Status"] || "-"}</td>
+    <tr>
 
-</tr>
+      <td>
+        ${game["Game Date"] || "-"}
+      </td>
 
-`;
+      <td>
+        ${game["Opponent"] || "-"}
+      </td>
 
+      <td>
+        <span class="${resultClass}">
+          ${result} ${pointsFor}-${pointsAllowed}
+        </span>
+      </td>
+
+      <td>
+        ${game["Points For"] || "0"}
+      </td>
+
+      <td>
+        ${game["Points Allowed"] || "0"}
+      </td>
+
+      <td>
+        ${game["Passing Yards"] || "0"}
+      </td>
+
+      <td>
+        ${game["Rushing Yards"] || "0"}
+      </td>
+
+      <td>
+        ${game["Turnovers"] || "0"}
+      </td>
+
+      <td>
+        ${game["Sacks"] || "0"}
+      </td>
+
+    </tr>
+
+  `;
 }
 
 function getSelectedTier(selectId) {
@@ -5108,9 +5191,13 @@ async function initTeamProfilePage() {
 
   const trends = await fetchTeamTrends(league);
 
-  const schedule = await fetchTeamSchedule(league);
+  const teamGameLogs =
+    await fetchTeamGameLogs(league);
 
-  console.log("Schedule:", schedule);
+  console.log(
+    "Team Game Logs:",
+    teamGameLogs
+  );
 
   const teamTrends = trends.filter(
     row => row.Team === decodeURIComponent(team)
@@ -5130,14 +5217,23 @@ async function initTeamProfilePage() {
 
   const teamStats = stats.find(row => row.Team === decodeURIComponent(team));
 
-  const teamGames = schedule.filter(game => {
+  const selectedTeam =
+    decodeURIComponent(team);
+
+  const teamGames =
+    teamGameLogs.filter(game => {
 
       return (
-          game["Home Team"] === decodeURIComponent(team) ||
-          game["Away Team"] === decodeURIComponent(team)
+        String(game["Team"] || "").trim() ===
+        selectedTeam
       );
 
-  });
+    });
+
+  console.log(
+    "Filtered Team Game Logs:",
+    teamGames
+  );
 
   console.log("Team Games:", teamGames);
 
@@ -5297,6 +5393,9 @@ if (!teamTrends.length) {
 console.log(teamGames);
 console.log(teamGames[0]);
 
-renderTeamGameLog(teamGames);
+renderTeamGameLog(
+  teamGames,
+  league
+);
 
 }

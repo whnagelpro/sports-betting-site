@@ -2482,3 +2482,76 @@ transform:translateY(-2px);
 transition:.2s;
 
 }
+
+/* ==========================================================
+   TEAM PROFILE - RECENT PERFORMANCE
+========================================================== */
+
+.section-eyebrow{
+    margin-bottom:10px;
+    color:#7d8799;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+.team-performance-table-wrap{
+    width:100%;
+    overflow-x:auto;
+    border-radius:14px;
+}
+
+.team-performance-table{
+    width:100%;
+    min-width:950px;
+    border-collapse:collapse;
+    background:#1c2433;
+    border-radius:14px;
+    overflow:hidden;
+}
+
+.team-performance-table thead{
+    background:#111827;
+}
+
+.team-performance-table th{
+    padding:22px 18px;
+    font-size:14px;
+    font-weight:700;
+    text-align:center;
+    white-space:nowrap;
+}
+
+.team-performance-table td{
+    padding:22px 18px;
+    text-align:center;
+    border-top:1px solid rgba(255,255,255,.05);
+    white-space:nowrap;
+}
+
+.team-performance-table tbody tr:hover{
+    background:rgba(255,255,255,.03);
+}
+
+.team-result-win{
+    color:#3ddc84;
+    font-weight:700;
+}
+
+.team-result-loss{
+    color:#ff6565;
+    font-weight:700;
+}
+
+.team-result-tie{
+    color:#f7d154;
+    font-weight:700;
+}
+
+.team-performance-empty{
+    padding:30px;
+    text-align:center;
+    background:#1c2433;
+    border-radius:14px;
+}

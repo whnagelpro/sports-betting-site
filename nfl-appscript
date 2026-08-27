@@ -85,8 +85,14 @@ function fetchApi_(endpoint, params = {}) {
 Logger.log("REQUEST URL:");
 Logger.log(url);
 
-  const response = UrlFetchApp.fetch(url, options);
-  const statusCode = response.getResponseCode();
+const response = UrlFetchApp.fetch(url, options);
+const statusCode = response.getResponseCode();
+
+Logger.log("STATUS CODE:");
+Logger.log(statusCode);
+
+Logger.log("RAW RESPONSE:");
+Logger.log(response.getContentText());
 
   if (statusCode === 401) {
     throw new Error('Invalid API key. Check your key at app.balldontlie.io');
@@ -198,6 +204,13 @@ function fetchAllNFLGamesForDate_(dateString) {
   do {
     const params = {
       "dates[]": dateString,
+
+      // Include ALL NFL season types:
+      // 1 = preseason
+      // 2 = regular season
+      // 3 = postseason
+      "season_type[]": [1, 2, 3],
+
       per_page: 100
     };
 
@@ -206,12 +219,28 @@ function fetchAllNFLGamesForDate_(dateString) {
     }
 
     const response = fetchApi_("/nfl/v1/games", params);
-    const games = Array.isArray(response.data) ? response.data : [];
+
+    const games =
+      Array.isArray(response.data)
+        ? response.data
+        : [];
+
+    Logger.log(
+      `Games returned for ${dateString}: ${games.length}`
+    );
+
+    if (games.length) {
+      Logger.log(
+        "First game returned: " +
+        JSON.stringify(games[0])
+      );
+    }
 
     allGames.push(...games);
 
     cursor =
-      response.meta && response.meta.next_cursor
+      response.meta &&
+      response.meta.next_cursor
         ? response.meta.next_cursor
         : null;
 
@@ -511,6 +540,12 @@ function getNFLGameAZDate_(game) {
 
 function isCompletedNFLGame_(game) {
 
+  const statusState =
+    String(
+      game.status_state ||
+      ""
+    ).toLowerCase();
+
   const status =
     String(
       game.status ||
@@ -519,8 +554,10 @@ function isCompletedNFLGame_(game) {
     ).toLowerCase();
 
   return (
+    statusState === "final" ||
     status.includes("final") ||
     status.includes("completed") ||
+    status === "post" ||
     status === "ft"
   );
 }
@@ -567,12 +604,18 @@ function getNFLCompletedGamesForDateRange_(
       `Checking NFL API games for ${apiDateString}`
     );
 
+    const allGames =
+      fetchAllNFLGamesForDate_(apiDateString);
+
+    Logger.log(`Total games before filter: ${allGames.length}`);
+
+    const completedGames =
+      allGames.filter(isCompletedNFLGame_);
+
+    Logger.log(`Completed games: ${completedGames.length}`);
+
     const games =
-      fetchAllNFLGamesForDate_(
-        apiDateString
-      )
-        .filter(isCompletedNFLGame_)
-        .filter(game => {
+      completedGames.filter(game => {
 
           const azDate =
             getNFLGameAZDate_(game);
@@ -1591,6 +1634,24 @@ function clearNFLTeamGameLogsSheetOnly() {
   writeNFLOutputSheet_(sheet, headers, []);
 }
 
+function refreshNFLPlayerGameLogsSheet() {
+
+  refreshNFLPlayerGameLogsForDateRange_(
+    "2026-08-01",
+    getTodayString_()
+  );
+
+}
+
+function refreshNFLTeamGameLogsSheet() {
+
+  refreshNFLTeamGameLogsForDateRange_(
+    "2026-08-01",
+    getTodayString_()
+  );
+
+}
+
 function refreshNFLPlayerGameLogsAugust() {
   refreshNFLPlayerGameLogsForDateRange_("2026-08-01", "2026-08-31");
 }
@@ -2166,21 +2227,41 @@ function refreshNFLTeamTrendsOutputSheet() {
 }
 
 function refreshNFLPlayerTrendPipeline() {
+
   ensureNFLTrendTabs_();
 
+  Logger.log("Starting NFL player trend pipeline...");
+
+  Logger.log("Step 1: Refreshing NFL Player Game Logs...");
+  refreshNFLPlayerGameLogsSheet();
+
+  Logger.log("Step 2: Refreshing NFL Player Season Stats...");
   refreshNFLPlayerSeasonStatsSheet();
+
+  Logger.log("Step 3: Refreshing NFL Player Trends...");
   refreshNFLPlayerTrendsSheet();
 
   Logger.log("NFL player trend pipeline complete.");
+
 }
 
 function refreshNFLTeamTrendPipeline() {
+
   ensureNFLTrendTabs_();
 
+  Logger.log("Starting NFL team trend pipeline...");
+
+  Logger.log("Step 1: Refreshing NFL Team Game Logs...");
+  refreshNFLTeamGameLogsSheet();
+
+  Logger.log("Step 2: Refreshing NFL Team Season Stats...");
   refreshNFLTeamSeasonStatsSheet();
+
+  Logger.log("Step 3: Refreshing NFL Team Trends...");
   refreshNFLTeamTrendsOutputSheet();
 
   Logger.log("NFL team trend pipeline complete.");
+
 }
 
 function refreshNFLTopPlayerTrendPipeline() {
@@ -2403,6 +2484,17 @@ function onOpen() {
     .addItem("Clear NFL Team Game Logs", "clearNFLTeamGameLogsSheetOnly")
 
     .addSeparator()
+
+    .addItem(
+      "Refresh ALL NFL Player Game Logs",
+      "refreshNFLPlayerGameLogsSheet"
+    )
+    .addItem(
+      "Refresh ALL NFL Team Game Logs",
+      "refreshNFLTeamGameLogsSheet"
+    )
+
+.addSeparator()
 
     // Monthly player logs
     .addItem("Refresh NFL Player Logs August", "refreshNFLPlayerGameLogsAugust")
