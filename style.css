@@ -2555,3 +2555,21 @@ transition:.2s;
     background:#1c2433;
     border-radius:14px;
 }
+
+/* ===========================
+   NFL TEAM PROFILE HEADERS
+=========================== */
+
+#team-season-stats h2,
+#team-trends h2,
+#team-game-log h2{
+    text-align:center;
+}
+
+.section-eyebrow{
+    text-align:center;
+}
+
+#team-trends h2{
+    margin-bottom:32px;
+}
