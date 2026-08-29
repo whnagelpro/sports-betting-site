@@ -1155,6 +1155,34 @@ function renderFields(fields) {
 
 }
 
+function formatStatValue(value, label = "") {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return value ?? "-";
+    }
+
+    const lower = String(label).toLowerCase();
+
+    // Games should always be whole numbers
+    if (lower.includes("game")) {
+        return Math.round(number);
+    }
+
+    // Integer stats
+    if (
+        Number.isInteger(number) ||
+        Math.abs(number - Math.round(number)) < 0.001
+    ) {
+        return Math.round(number);
+    }
+
+    // Everything else gets one decimal
+    return number.toFixed(1);
+
+}
+
 function createStatCard(label, value) {
 
     const card = document.createElement("article");
@@ -1171,7 +1199,7 @@ function createStatCard(label, value) {
 
         <span class="stat-value">
 
-            ${value}
+            ${formatStatValue(value, label)}
 
         </span>
 
@@ -1193,7 +1221,14 @@ function createSeasonPanel(panel) {
 
             <span>${stat.label}</span>
 
-            <strong>${stat.value}</strong>
+            <strong>
+
+                ${formatStatValue(
+                    stat.value,
+                    stat.label
+                )}
+
+            </strong>
 
         </div>
 
