@@ -44,15 +44,17 @@ export function mapPlayer(context, league) {
 
 );
 
-const mappedTrends =
-    mapTrends(
-        trends
-    );
+const mappedTrends = mapTrends(trends);
 
-const mappedInsights =
-    mapInsights(
-        mappedTrends
-    );
+console.log(
+
+    "mappedTrends[0]",
+
+    mappedTrends[0]
+
+);
+
+const mappedInsights = mapInsights(mappedTrends);
 
 const trendsData = buildTrends(
 
@@ -64,6 +66,11 @@ const trendsData = buildTrends(
 
     mappedInsights
 
+);
+
+console.log(
+    "trendsData.items[0]",
+    trendsData.items[0]
 );
 
     const analytics = calculatePlayerAnalytics({
@@ -79,6 +86,11 @@ const trendsData = buildTrends(
         props
 
     });
+
+console.log(
+    "Returning player.trends[0]",
+    trendsData.items[0]
+);
 
     return {
 

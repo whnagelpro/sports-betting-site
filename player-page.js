@@ -937,6 +937,11 @@ function renderProps() {
 }
 
 function renderTrendCards() {
+    
+    console.log(
+        "renderTrendCards player.trends[0]",
+        player.trends?.[0]
+    );
 
     const section = document.getElementById(
         "player-trends-section"
