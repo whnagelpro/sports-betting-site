@@ -3,8 +3,6 @@
 // NFL Adapter
 // ======================================================
 
-import { buildTrends } from "../builders/trendsBuilder.js";
-
 const POSITION_GROUPS = {
 
     // Quarterbacks
@@ -295,19 +293,60 @@ export function buildNFLContext({
 
     console.log("Quick Stat Cards:", quickStatCards);
 
-    const filteredTrends = buildTrends({
+    let allowedTrendStats = [];
 
-        league: "nfl",
+    if (positionGroup === "QB") {
 
-        profile: {
-            position: profile.Position
-        },
+        allowedTrendStats = [
+            "Passing Yards",
+            "Passing TDs",
+            "Interceptions",
+            "Completions",
+            "Pass Attempts",
+            "Rushing Yards",
+            "Rushing Attempts",
+            "Rushing TDs"
+        ];
 
-        trends
+    } else if (positionGroup === "RB") {
 
-    });
+        allowedTrendStats = [
+            "Rushing Yards",
+            "Rushing Attempts",
+            "Rushing TDs",
+            "Receptions",
+            "Receiving Yards",
+            "Receiving TDs"
+        ];
 
-    console.log("Filtered NFL Trends:", filteredTrends);
+    } else if (
+        positionGroup === "WR" ||
+        positionGroup === "TE"
+    ) {
+
+        allowedTrendStats = [
+            "Receptions",
+            "Receiving Yards",
+            "Receiving TDs"
+        ];
+
+    }
+
+    const filteredTrends =
+        allowedTrendStats.length
+            ? (trends || []).filter(trend =>
+                allowedTrendStats.includes(
+                    trend["Stat Type"]
+                )
+            )
+            : trends || [];
+
+    console.log(
+        "Filtered NFL Raw Trends:",
+        filteredTrends.map(
+            trend => trend["Stat Type"]
+        )
+    );
 
     return {
 
