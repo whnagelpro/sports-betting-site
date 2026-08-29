@@ -188,6 +188,10 @@ const player = {
 
     isPitcher: context.isPitcher,
 
+    positionGroup:
+        context.positionGroup ??
+        (context.isPitcher ? "PITCHER" : "HITTER"),
+
     season,
 
     matchup,

@@ -516,7 +516,11 @@ function createMLBGameLogRow(game) {
 
     const row = document.createElement("tr");
 
-    const isPitcher = player.isPitcher;
+    const isPitcher =
+        player.positionGroup === "PITCHER";
+
+    const isHitter =
+        player.positionGroup === "HITTER";
 
     if (isPitcher) {
 
@@ -540,7 +544,7 @@ function createMLBGameLogRow(game) {
 
     }
 
-    else {
+    else if (isHitter) {
 
         row.innerHTML = `
 
@@ -561,6 +565,18 @@ function createMLBGameLogRow(game) {
             <td>${game.walks}</td>
 
             <td>${game.strikeouts}</td>
+
+        `;
+
+    }
+
+    else {
+
+        row.innerHTML = `
+
+            <td>${game.gameDate}</td>
+
+            <td>${game.opponent}</td>
 
         `;
 

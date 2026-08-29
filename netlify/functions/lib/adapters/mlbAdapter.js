@@ -272,7 +272,11 @@ const games = Number(
 
         }),
 
-        isPitcher
+        isPitcher,
+
+        positionGroup: isPitcher
+            ? "PITCHER"
+            : "HITTER",
 
     };
 

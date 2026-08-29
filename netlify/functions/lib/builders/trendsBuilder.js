@@ -71,6 +71,62 @@ export function buildTrends(context) {
 
     }
 
+    if (context.league === "mlb") {
+
+        const positionGroup =
+            String(context.positionGroup || "")
+                .trim()
+                .toUpperCase();
+
+        let allowedStats = [];
+
+        if (positionGroup === "HITTER") {
+
+            allowedStats = [
+
+                "Hits",
+                "Runs",
+                "RBIs",
+                "Home Runs",
+                "Strikeouts",
+                "Walks",
+                "Total Bases",
+                "Stolen Bases"
+
+            ];
+
+        }
+
+        else if (positionGroup === "PITCHER") {
+
+            allowedStats = [
+
+                "Pitcher Strikeouts",
+                "Pitcher Earned Runs",
+                "Pitcher Hits Allowed",
+                "Pitcher Walks",
+                "Pitcher Outs",
+                "Innings Pitched"
+
+            ];
+
+        }
+
+        if (allowedStats.length) {
+
+            trends = trends.filter(trend =>
+                allowedStats.includes(trend["Stat Type"])
+            );
+
+        }
+
+        console.log(
+            "MLB Filtered Trends:",
+            trends.map(t => t["Stat Type"])
+        );
+
+    }
+
     return trends.map(trend => {
 
         const analytics =
