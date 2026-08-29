@@ -276,7 +276,7 @@ function buildNFLQBSeasonPanels({
                     label: "Consistency",
 
                     value:
-                        trends?.[0]?.consistency ??
+                        trends?.[0]?.["Consistency"] ??
                         "-"
 
                 },
@@ -286,7 +286,7 @@ function buildNFLQBSeasonPanels({
                     label: "Trend Strength",
 
                     value:
-                        trends?.[0]?.strength ??
+                        trends?.[0]?.["Trend Strength"] ??
                         "-"
 
                 },
@@ -296,7 +296,7 @@ function buildNFLQBSeasonPanels({
                     label: "Risk Tier",
 
                     value:
-                        trends?.[0]?.risk ??
+                        trends?.[0]?.["Risk Tier"] ??
                         "-"
 
                 }
@@ -318,7 +318,8 @@ function buildNFLRBSeasonPanels({
     return [
 
         {
-            title: "Season Snapshot",
+            title: "Rushing",
+
             stats: [
 
                 {
@@ -327,18 +328,24 @@ function buildNFLRBSeasonPanels({
                 },
 
                 {
-                    label: "Rush Yds",
-                    value: season["Rush Yards"] ?? "-"
+                    label: "Rush Attempts",
+                    value:
+                        season["Rushing Attempts"] ??
+                        "-"
                 },
 
                 {
-                    label: "Rush TD",
-                    value: season["Rush TD"] ?? "-"
+                    label: "Rush Yards",
+                    value:
+                        season["Rushing Yards"] ??
+                        "-"
                 },
 
                 {
-                    label: "Yards/Carry",
-                    value: season["Yards Per Carry"] ?? "-"
+                    label: "Rush TDs",
+                    value:
+                        season["Rushing TDs"] ??
+                        "-"
                 }
 
             ]
@@ -351,22 +358,23 @@ function buildNFLRBSeasonPanels({
 
                 {
                     label: "Receptions",
-                    value: season["Receptions"] ?? "-"
+                    value:
+                        season["Receptions"] ??
+                        "-"
                 },
 
                 {
-                    label: "Rec Yds",
-                    value: season["Receiving Yards"] ?? "-"
+                    label: "Receiving Yards",
+                    value:
+                        season["Receiving Yards"] ??
+                        "-"
                 },
 
                 {
-                    label: "Rec TD",
-                    value: season["Receiving TD"] ?? "-"
-                },
-
-                {
-                    label: "Targets",
-                    value: season["Targets"] ?? "-"
+                    label: "Receiving TDs",
+                    value:
+                        season["Receiving TDs"] ??
+                        "-"
                 }
 
             ]
@@ -378,23 +386,23 @@ function buildNFLRBSeasonPanels({
             stats: [
 
                 {
-                    label: "Last 5 Avg",
+                    label: "Consistency",
                     value:
-                        trends?.[0]?.value ??
+                        trends?.[0]?.["Consistency"] ??
                         "-"
                 },
 
                 {
-                    label: "Hit Rate",
+                    label: "Trend Strength",
                     value:
-                        trends?.[0]?.hitRate ??
+                        trends?.[0]?.["Trend Strength"] ??
                         "-"
                 },
 
                 {
-                    label: "Current Streak",
+                    label: "Risk Tier",
                     value:
-                        trends?.[0]?.streak ??
+                        trends?.[0]?.["Risk Tier"] ??
                         "-"
                 }
 
@@ -414,7 +422,7 @@ function buildNFLReceiverSeasonPanels({
     return [
 
         {
-            title: "Season Snapshot",
+            title: "Receiving",
 
             stats: [
 
@@ -425,81 +433,84 @@ function buildNFLReceiverSeasonPanels({
 
                 {
                     label: "Receptions",
-                    value: season["Receptions"] ?? "-"
+                    value:
+                        season["Receptions"] ??
+                        "-"
                 },
 
                 {
                     label: "Receiving Yards",
-                    value: season["Receiving Yards"] ?? "-"
+                    value:
+                        season["Receiving Yards"] ??
+                        "-"
                 },
 
                 {
-                    label: "Receiving TD",
-                    value: season["Receiving TD"] ?? "-"
+                    label: "Receiving TDs",
+                    value:
+                        season["Receiving TDs"] ??
+                        "-"
                 }
 
             ]
         },
 
         {
-
-            title: "Usage",
+            title: "Rushing",
 
             stats: [
 
                 {
-                    label: "Targets",
-                    value: season["Targets"] ?? "-"
+                    label: "Rush Attempts",
+                    value:
+                        season["Rushing Attempts"] ??
+                        "-"
                 },
 
                 {
-                    label: "Yards / Catch",
-                    value: season["Yards Per Reception"] ?? "-"
+                    label: "Rush Yards",
+                    value:
+                        season["Rushing Yards"] ??
+                        "-"
                 },
 
                 {
-                    label: "Longest Catch",
-                    value: season["Long Reception"] ?? "-"
-                },
-
-                {
-                    label: "Catch Rate",
-                    value: season["Catch Rate"] ?? "-"
+                    label: "Rush TDs",
+                    value:
+                        season["Rushing TDs"] ??
+                        "-"
                 }
 
             ]
-
         },
 
         {
-
             title: "Trend Metrics",
 
             stats: [
 
                 {
-                    label: "Last 5 Avg",
+                    label: "Consistency",
                     value:
-                        trends?.[0]?.value ??
+                        trends?.[0]?.["Consistency"] ??
                         "-"
                 },
 
                 {
-                    label: "Hit Rate",
+                    label: "Trend Strength",
                     value:
-                        trends?.[0]?.hitRate ??
+                        trends?.[0]?.["Trend Strength"] ??
                         "-"
                 },
 
                 {
-                    label: "Current Streak",
+                    label: "Risk Tier",
                     value:
-                        trends?.[0]?.streak ??
+                        trends?.[0]?.["Risk Tier"] ??
                         "-"
                 }
 
             ]
-
         }
 
     ];
@@ -562,49 +573,45 @@ export function buildSeasonPanels(context) {
             Number(season["Avg Strikeouts"] || 0) * games
         );
 
-    if (
-        league === "nfl" &&
-        ["QB", "QUARTERBACK"].includes(
-            String(position).toUpperCase()
-        )
-    ) {
-    return buildNFLQBSeasonPanels({
-        season,
-        games,
-        trends
-    });
+    const positionGroup =
+        context.positionGroup ||
+        String(position).trim().toUpperCase();
+
+    if (league === "nfl" && positionGroup === "QB") {
+
+        return buildNFLQBSeasonPanels({
+            season,
+            games,
+            trends
+        });
+
+    }
+
+    if (league === "nfl" && positionGroup === "RB") {
+
+        return buildNFLRBSeasonPanels({
+            season,
+            games,
+            trends
+        });
+
+    }
 
     if (
-    league === "nfl" &&
-    ["RB","RUNNING BACK"].includes(
-        String(position).toUpperCase()
-    )
-) {
-    return buildNFLRBSeasonPanels({
-        season,
-        games,
-        trends
-    });
-
-    if (
         league === "nfl" &&
-        [
-            "WR",
-            "WIDE RECEIVER",
-            "TE",
-            "TIGHT END"
-        ].includes(
-            String(position).toUpperCase()
+        (
+            positionGroup === "WR" ||
+            positionGroup === "TE"
         )
     ) {
+
         return buildNFLReceiverSeasonPanels({
             season,
             games,
             trends
         });
+
     }
-}
-}
 
 if (isPitcher) {
 

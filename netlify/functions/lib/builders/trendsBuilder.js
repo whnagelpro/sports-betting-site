@@ -5,7 +5,8 @@ export function buildTrends(context) {
     if (context.league === "nfl") {
 
         const position =
-            (context.player?.position || "")
+            String(context.profile?.position || "")
+                .trim()
                 .toUpperCase();
 
         let allowedStats = [];
