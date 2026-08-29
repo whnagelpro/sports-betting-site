@@ -320,22 +320,59 @@ function getGameLogHeaders(league) {
 
     switch ((league || "").toLowerCase()) {
 
-        case "nfl":
+        case "nfl": {
+
+            const position =
+                (player?.hero?.position || "")
+                    .toUpperCase();
+
+            if (position === "QB") {
+
+                return [
+
+                    "Date",
+                    "Opponent",
+                    "Passing Yards",
+                    "Passing TDs",
+                    "Interceptions",
+                    "Completions",
+                    "Pass Attempts",
+                    "Rushing Yards",
+                    "Rushing Attempts",
+                    "Rushing TDs"
+
+                ];
+
+            }
+
+            if (position === "RB") {
+
+                return [
+
+                    "Date",
+                    "Opponent",
+                    "Rushing Yards",
+                    "Rushing Attempts",
+                    "Rushing TDs",
+                    "Receptions",
+                    "Receiving Yards",
+                    "Receiving TDs"
+
+                ];
+
+            }
+
             return [
+
                 "Date",
                 "Opponent",
-                "Passing Yards",
-                "Passing TDs",
-                "Interceptions",
-                "Completions",
-                "Pass Attempts",
-                "Rushing Yards",
-                "Rushing Attempts",
-                "Rushing TDs",
                 "Receptions",
                 "Receiving Yards",
                 "Receiving TDs"
+
             ];
+
+        }
 
         case "mlb":
         default:
@@ -524,24 +561,64 @@ function createNFLGameLogRow(game) {
 
     const tr = document.createElement("tr");
 
+    const position =
+        (player?.hero?.position || "")
+            .toUpperCase();
+
+    if (position === "QB") {
+
+        tr.innerHTML = `
+
+            <td>${formatGameDate(game.gameDate)}</td>
+            <td>${game.opponent ?? "-"}</td>
+
+            <td>${game.passingYards ?? 0}</td>
+            <td>${game.passingTDs ?? 0}</td>
+            <td>${game.interceptions ?? 0}</td>
+
+            <td>${game.completions ?? 0}</td>
+            <td>${game.passAttempts ?? 0}</td>
+
+            <td>${game.rushingYards ?? 0}</td>
+            <td>${game.rushingAttempts ?? 0}</td>
+            <td>${game.rushingTDs ?? 0}</td>
+
+        `;
+
+        return tr;
+
+    }
+
+    if (position === "RB") {
+
+        tr.innerHTML = `
+
+            <td>${formatGameDate(game.gameDate)}</td>
+            <td>${game.opponent ?? "-"}</td>
+
+            <td>${game.rushingYards ?? 0}</td>
+            <td>${game.rushingAttempts ?? 0}</td>
+            <td>${game.rushingTDs ?? 0}</td>
+
+            <td>${game.receptions ?? 0}</td>
+            <td>${game.receivingYards ?? 0}</td>
+            <td>${game.receivingTDs ?? 0}</td>
+
+        `;
+
+        return tr;
+
+    }
+
     tr.innerHTML = `
+
         <td>${formatGameDate(game.gameDate)}</td>
         <td>${game.opponent ?? "-"}</td>
-
-        <td>${game.passingYards ?? 0}</td>
-        <td>${game.passingTDs ?? 0}</td>
-        <td>${game.interceptions ?? 0}</td>
-
-        <td>${game.completions ?? 0}</td>
-        <td>${game.passAttempts ?? 0}</td>
-
-        <td>${game.rushingYards ?? 0}</td>
-        <td>${game.rushingAttempts ?? 0}</td>
-        <td>${game.rushingTDs ?? 0}</td>
 
         <td>${game.receptions ?? 0}</td>
         <td>${game.receivingYards ?? 0}</td>
         <td>${game.receivingTDs ?? 0}</td>
+
     `;
 
     return tr;
