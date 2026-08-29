@@ -3,6 +3,8 @@
 // NFL Adapter
 // ======================================================
 
+import { buildTrends } from "../builders/trendsBuilder.js";
+
 const POSITION_GROUPS = {
 
     // Quarterbacks
@@ -293,6 +295,20 @@ export function buildNFLContext({
 
     console.log("Quick Stat Cards:", quickStatCards);
 
+    const filteredTrends = buildTrends({
+
+        league: "nfl",
+
+        profile: {
+            position: profile.Position
+        },
+
+        trends
+
+    });
+
+    console.log("Filtered NFL Trends:", filteredTrends);
+
     return {
 
         league: "nfl",
@@ -337,7 +353,7 @@ export function buildNFLContext({
 
         gameLogs,
 
-        trends,
+        trends: filteredTrends,
 
         matchup,
 
