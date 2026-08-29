@@ -2,6 +2,14 @@ export function buildTrends(context) {
 
     let trends = context.trends || [];
 
+    console.log("========== BUILD TRENDS ==========");
+    console.log("Player:", context.profile?.name);
+    console.log("Position:", context.profile?.position);
+    console.log(
+        "Incoming:",
+        trends.map(t => t["Stat Type"])
+    );
+
     if (context.league === "nfl") {
 
         const position =
@@ -55,6 +63,11 @@ export function buildTrends(context) {
             );
 
         }
+
+        console.log(
+            "Filtered:",
+            trends.map(t => t["Stat Type"])
+        );
 
     }
 
