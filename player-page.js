@@ -387,9 +387,29 @@ function getGameLogHeaders(league) {
             ];
         }
 
-        case "mlb":
-        default:
+        case "mlb": {
+
+            const isPitcher =
+                player.positionGroup === "PITCHER";
+
+            if (isPitcher) {
+
+                return [
+
+                    "Date",
+                    "Opponent",
+                    "IP",
+                    "SO",
+                    "ER",
+                    "H",
+                    "BB"
+
+                ];
+
+            }
+
             return [
+
                 "Date",
                 "Opponent",
                 "H",
@@ -399,6 +419,18 @@ function getGameLogHeaders(league) {
                 "TB",
                 "BB",
                 "SO"
+
+            ];
+
+        }
+
+        default:
+
+            return [
+
+                "Date",
+                "Opponent"
+
             ];
     }
 
