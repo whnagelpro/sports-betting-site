@@ -323,13 +323,28 @@ function getGameLogHeaders(league) {
         case "nfl": {
 
             const position =
-                (player?.hero?.position || "")
+                String(player?.hero?.position || "")
+                    .trim()
                     .toUpperCase();
 
-            if (position === "QB") {
+            const isQB =
+                position === "QB" ||
+                position === "QUARTERBACK";
 
+            const isRB =
+                position === "RB" ||
+                position === "RUNNING BACK";
+
+            const isWR =
+                position === "WR" ||
+                position === "WIDE RECEIVER";
+
+            const isTE =
+                position === "TE" ||
+                position === "TIGHT END";
+
+            if (isQB) {
                 return [
-
                     "Date",
                     "Opponent",
                     "Passing Yards",
@@ -340,15 +355,11 @@ function getGameLogHeaders(league) {
                     "Rushing Yards",
                     "Rushing Attempts",
                     "Rushing TDs"
-
                 ];
-
             }
 
-            if (position === "RB") {
-
+            if (isRB) {
                 return [
-
                     "Date",
                     "Opponent",
                     "Rushing Yards",
@@ -357,21 +368,23 @@ function getGameLogHeaders(league) {
                     "Receptions",
                     "Receiving Yards",
                     "Receiving TDs"
-
                 ];
+            }
 
+            if (isWR || isTE) {
+                return [
+                    "Date",
+                    "Opponent",
+                    "Receptions",
+                    "Receiving Yards",
+                    "Receiving TDs"
+                ];
             }
 
             return [
-
                 "Date",
-                "Opponent",
-                "Receptions",
-                "Receiving Yards",
-                "Receiving TDs"
-
+                "Opponent"
             ];
-
         }
 
         case "mlb":
@@ -562,10 +575,27 @@ function createNFLGameLogRow(game) {
     const tr = document.createElement("tr");
 
     const position =
-        (player?.hero?.position || "")
+        String(player?.hero?.position || "")
+            .trim()
             .toUpperCase();
 
-    if (position === "QB") {
+    const isQB =
+        position === "QB" ||
+        position === "QUARTERBACK";
+
+    const isRB =
+        position === "RB" ||
+        position === "RUNNING BACK";
+
+    const isWR =
+        position === "WR" ||
+        position === "WIDE RECEIVER";
+
+    const isTE =
+        position === "TE" ||
+        position === "TIGHT END";
+
+    if (isQB) {
 
         tr.innerHTML = `
 
@@ -589,7 +619,7 @@ function createNFLGameLogRow(game) {
 
     }
 
-    if (position === "RB") {
+    if (isRB) {
 
         tr.innerHTML = `
 
@@ -610,15 +640,25 @@ function createNFLGameLogRow(game) {
 
     }
 
-    tr.innerHTML = `
+    if (isWR || isTE) {
 
+        tr.innerHTML = `
+
+            <td>${formatGameDate(game.gameDate)}</td>
+            <td>${game.opponent ?? "-"}</td>
+
+            <td>${game.receptions ?? 0}</td>
+            <td>${game.receivingYards ?? 0}</td>
+            <td>${game.receivingTDs ?? 0}</td>
+
+        `;
+
+        return tr;
+    }
+
+    tr.innerHTML = `
         <td>${formatGameDate(game.gameDate)}</td>
         <td>${game.opponent ?? "-"}</td>
-
-        <td>${game.receptions ?? 0}</td>
-        <td>${game.receivingYards ?? 0}</td>
-        <td>${game.receivingTDs ?? 0}</td>
-
     `;
 
     return tr;
