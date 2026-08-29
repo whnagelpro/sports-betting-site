@@ -309,21 +309,258 @@ function buildNFLQBSeasonPanels({
 
 }
 
-export function buildSeasonPanels({
+function buildNFLRBSeasonPanels({
     season,
     games,
-    totalHits,
-    totalRuns,
-    totalRBIs,
-    totalHomeRuns,
-    totalBases,
-    totalWalks,
-    totalStrikeouts,
-    trends,
-    isPitcher,
-    league,
-    position
+    trends
 }) {
+
+    return [
+
+        {
+            title: "Season Snapshot",
+            stats: [
+
+                {
+                    label: "Games",
+                    value: games
+                },
+
+                {
+                    label: "Rush Yds",
+                    value: season["Rush Yards"] ?? "-"
+                },
+
+                {
+                    label: "Rush TD",
+                    value: season["Rush TD"] ?? "-"
+                },
+
+                {
+                    label: "Yards/Carry",
+                    value: season["Yards Per Carry"] ?? "-"
+                }
+
+            ]
+        },
+
+        {
+            title: "Receiving",
+
+            stats: [
+
+                {
+                    label: "Receptions",
+                    value: season["Receptions"] ?? "-"
+                },
+
+                {
+                    label: "Rec Yds",
+                    value: season["Receiving Yards"] ?? "-"
+                },
+
+                {
+                    label: "Rec TD",
+                    value: season["Receiving TD"] ?? "-"
+                },
+
+                {
+                    label: "Targets",
+                    value: season["Targets"] ?? "-"
+                }
+
+            ]
+        },
+
+        {
+            title: "Trend Metrics",
+
+            stats: [
+
+                {
+                    label: "Last 5 Avg",
+                    value:
+                        trends?.[0]?.value ??
+                        "-"
+                },
+
+                {
+                    label: "Hit Rate",
+                    value:
+                        trends?.[0]?.hitRate ??
+                        "-"
+                },
+
+                {
+                    label: "Current Streak",
+                    value:
+                        trends?.[0]?.streak ??
+                        "-"
+                }
+
+            ]
+        }
+
+    ];
+
+}
+
+function buildNFLReceiverSeasonPanels({
+    season,
+    games,
+    trends
+}) {
+
+    return [
+
+        {
+            title: "Season Snapshot",
+
+            stats: [
+
+                {
+                    label: "Games",
+                    value: games
+                },
+
+                {
+                    label: "Receptions",
+                    value: season["Receptions"] ?? "-"
+                },
+
+                {
+                    label: "Receiving Yards",
+                    value: season["Receiving Yards"] ?? "-"
+                },
+
+                {
+                    label: "Receiving TD",
+                    value: season["Receiving TD"] ?? "-"
+                }
+
+            ]
+        },
+
+        {
+
+            title: "Usage",
+
+            stats: [
+
+                {
+                    label: "Targets",
+                    value: season["Targets"] ?? "-"
+                },
+
+                {
+                    label: "Yards / Catch",
+                    value: season["Yards Per Reception"] ?? "-"
+                },
+
+                {
+                    label: "Longest Catch",
+                    value: season["Long Reception"] ?? "-"
+                },
+
+                {
+                    label: "Catch Rate",
+                    value: season["Catch Rate"] ?? "-"
+                }
+
+            ]
+
+        },
+
+        {
+
+            title: "Trend Metrics",
+
+            stats: [
+
+                {
+                    label: "Last 5 Avg",
+                    value:
+                        trends?.[0]?.value ??
+                        "-"
+                },
+
+                {
+                    label: "Hit Rate",
+                    value:
+                        trends?.[0]?.hitRate ??
+                        "-"
+                },
+
+                {
+                    label: "Current Streak",
+                    value:
+                        trends?.[0]?.streak ??
+                        "-"
+                }
+
+            ]
+
+        }
+
+    ];
+
+}
+
+export function buildSeasonPanels(context) {
+
+    const season = context.seasonStats || {};
+
+    const games = Number(
+        season["Games Played"] ??
+        season.games ??
+        0
+    );
+
+    const trends = context.trends || [];
+
+    const isPitcher = context.isPitcher;
+
+    const league = context.league;
+
+    const position =
+        context.profile?.Position ??
+        context.profile?.position ??
+        "";
+
+    const totalHits =
+        Math.round(
+            Number(season["Avg Hits"] || 0) * games
+        );
+
+    const totalRuns =
+        Math.round(
+            Number(season["Avg Runs"] || 0) * games
+        );
+
+    const totalRBIs =
+        Math.round(
+            Number(season["Avg RBIs"] || 0) * games
+        );
+
+    const totalHomeRuns =
+        Math.round(
+            Number(season["Avg Home Runs"] || 0) * games
+        );
+
+    const totalBases =
+        Math.round(
+            Number(season["Avg Total Bases"] || 0) * games
+        );
+
+    const totalWalks =
+        Math.round(
+            Number(season["Avg Walks"] || 0) * games
+        );
+
+    const totalStrikeouts =
+        Math.round(
+            Number(season["Avg Strikeouts"] || 0) * games
+        );
 
     if (
         league === "nfl" &&
@@ -336,6 +573,37 @@ export function buildSeasonPanels({
         games,
         trends
     });
+
+    if (
+    league === "nfl" &&
+    ["RB","RUNNING BACK"].includes(
+        String(position).toUpperCase()
+    )
+) {
+    return buildNFLRBSeasonPanels({
+        season,
+        games,
+        trends
+    });
+
+    if (
+        league === "nfl" &&
+        [
+            "WR",
+            "WIDE RECEIVER",
+            "TE",
+            "TIGHT END"
+        ].includes(
+            String(position).toUpperCase()
+        )
+    ) {
+        return buildNFLReceiverSeasonPanels({
+            season,
+            games,
+            trends
+        });
+    }
+}
 }
 
 if (isPitcher) {

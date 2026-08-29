@@ -54,7 +54,20 @@ async function initPlayerPage() {
 
         renderSeasonPanels();
 
-        renderProps();
+        if (currentLeague !== "mlb") {
+
+            const propsSection =
+                document.getElementById("player-props-section");
+
+            if (propsSection) {
+                propsSection.hidden = true;
+            }
+
+        }
+
+        if (currentLeague === "mlb") {
+            renderProps();
+        }
 
         renderTrendCards();
 
@@ -238,7 +251,9 @@ function renderQuickStats() {
     grid.innerHTML = "";
 
     const cards =
-        player.quickStats?.cards ?? [];
+        player.quickStats?.cards ??
+        player.quickStats ??
+        [];
 
     cards.forEach(stat => {
 
@@ -289,7 +304,7 @@ console.log(player.seasonPanels);
 
     dashboard.innerHTML = "";
 
-    player.seasonPanels.forEach(panel => {
+    (player.seasonPanels || []).forEach(panel => {
 
         console.log("Appending panel:", panel.title);
 
@@ -415,7 +430,7 @@ section.hidden = false;
 
             <tr>
 
-                <td colspan="10">
+                <td colspan="${headers.length}">
 
                     No recent games available.
 
@@ -973,7 +988,7 @@ function renderTrendCards() {
 
     grid.innerHTML = "";
 
-    player.trends.forEach(trend => {
+    (player.trends || []).forEach(trend => {
 
         const analytics =
             trend.analytics ?? {

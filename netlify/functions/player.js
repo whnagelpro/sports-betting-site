@@ -153,77 +153,7 @@ const season = context.seasonStats;
 
 const quickStats = buildQuickStats(context);
 
-const games = Number(
-    season["Games Played"] ?? 0
-);
-
-const totalHits =
-    Math.round(
-        Number(season["Avg Hits"] ?? 0) * games
-    );
-
-const totalRuns =
-    Math.round(
-        Number(season["Avg Runs"] ?? 0) * games
-    );
-
-const totalRBIs =
-    Math.round(
-        Number(season["Avg RBIs"] ?? 0) * games
-    );
-
-const totalHomeRuns =
-    Math.round(
-        Number(season["Avg Home Runs"] ?? 0) * games
-    );
-
-const totalBases =
-    Math.round(
-        Number(season["Avg Total Bases"] ?? 0) * games
-    );
-
-const totalWalks =
-    Math.round(
-        Number(season["Avg Walks"] ?? 0) * games
-    );
-
-const totalStrikeouts =
-    Math.round(
-        Number(season["Avg Strikeouts"] ?? 0) * games
-    );
-
-const seasonPanels = buildSeasonPanels({
-
-    season,
-
-    games,
-
-    totalHits,
-
-    totalRuns,
-
-    totalRBIs,
-
-    totalHomeRuns,
-
-    totalBases,
-
-    totalWalks,
-
-    totalStrikeouts,
-
-    trends,
-
-    isPitcher: context.isPitcher,
-
-    league,
-
-    position:
-        context.profile?.Position ??
-        context.profile?.position ??
-        ""
-
-});
+const seasonPanels = buildSeasonPanels(context);
 
 console.log("Building analytics...");
 

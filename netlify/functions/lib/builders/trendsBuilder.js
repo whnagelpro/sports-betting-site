@@ -1,6 +1,63 @@
 export function buildTrends(context) {
 
-    return context.trends.map(trend => {
+    let trends = context.trends || [];
+
+    if (context.league === "nfl") {
+
+        const position =
+            (context.player?.position || "")
+                .toUpperCase();
+
+        let allowedStats = [];
+
+        if (position === "QB") {
+
+            allowedStats = [
+                "Passing Yards",
+                "Passing TDs",
+                "Interceptions",
+                "Completions",
+                "Pass Attempts",
+                "Rushing Yards",
+                "Rushing Attempts",
+                "Rushing TDs"
+            ];
+
+        } else if (position === "RB") {
+
+            allowedStats = [
+                "Rushing Yards",
+                "Rushing Attempts",
+                "Rushing TDs",
+                "Receptions",
+                "Receiving Yards",
+                "Receiving TDs"
+            ];
+
+        } else if (
+            position === "WR" ||
+            position === "TE"
+        ) {
+
+            allowedStats = [
+                "Receptions",
+                "Receiving Yards",
+                "Receiving TDs"
+            ];
+
+        }
+
+        if (allowedStats.length) {
+
+            trends = trends.filter(trend =>
+                allowedStats.includes(trend["Stat Type"])
+            );
+
+        }
+
+    }
+
+    return trends.map(trend => {
 
         const analytics =
             trend.analytics ?? {};
