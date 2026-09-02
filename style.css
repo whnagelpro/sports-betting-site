@@ -2583,3 +2583,99 @@ transition:.2s;
 #team-trends h2{
     margin-bottom:32px;
 }
+
+.team-directory {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 30px;
+}
+
+.team-directory a {
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.team-directory a:hover {
+    text-decoration: underline;
+}
+
+/* =====================================================
+   MLB TEAM HERO
+===================================================== */
+
+.mlb-team-hero {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:40px;
+
+    flex-wrap:wrap;
+
+}
+
+.mlb-team-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:22px;
+
+}
+
+.mlb-team-right{
+
+    flex:1;
+
+    min-width:520px;
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(180px,1fr));
+
+    gap:14px;
+
+}
+
+.hero-stat-card{
+
+    background:rgba(255,255,255,.05);
+
+    border-radius:12px;
+
+    padding:14px 16px;
+
+}
+
+.hero-stat-label{
+
+    font-size:.82rem;
+
+    opacity:.7;
+
+    margin-bottom:6px;
+
+    font-weight:600;
+
+}
+
+.hero-stat-card div:last-child{
+
+    font-size:1.2rem;
+
+    font-weight:700;
+
+}
+
+.hero-stat-wide{
+
+    grid-column:span 2;
+
+}

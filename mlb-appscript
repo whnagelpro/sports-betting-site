@@ -570,9 +570,9 @@ function copyFormulaTemplatesDown_(sheet, rowCount) {
     false
   );
 
-  // Copy formulas only for V:X
+  // Copy formulas only for V:W
   sheet.getRange("V2:W2").copyTo(
-    sheet.getRange(3, 22, rowCount, 3),
+    sheet.getRange(3, 22, rowCount, 2),
     SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
     false
   );
@@ -1618,6 +1618,72 @@ const MLB_PLAYER_TREND_STATS = [
   { label: "Pitcher Walks", key: "pitcherWalks" }
 ];
 
+function normalizeMLBStatType_(stat) {
+
+  if (!stat) return "";
+
+  const value = String(stat)
+    .trim()
+    .toLowerCase();
+
+  const map = {
+
+    "hits": "hits",
+
+    "runs": "runs",
+
+    "rbis": "rbis",
+
+    "rbi": "rbis",
+
+    "hits + runs + rbis": "hits_runs_rbis",
+
+    "hits+runs+rbis": "hits_runs_rbis",
+
+    "hits_runs_rbis": "hits_runs_rbis",
+
+    "home runs": "home_runs",
+
+    "home_runs": "home_runs",
+
+    "total bases": "total_bases",
+
+    "total_bases": "total_bases",
+
+    "walks": "walks",
+
+    "strikeouts": "strikeouts",
+
+    "stolen bases": "stolen_bases",
+
+    "stolen_bases": "stolen_bases",
+
+    "pitcher outs": "pitcher_outs",
+
+    "pitcher_outs": "pitcher_outs",
+
+    "pitcher strikeouts": "pitcher_strikeouts",
+
+    "pitcher_strikeouts": "pitcher_strikeouts",
+
+    "pitcher earned runs": "pitcher_earned_runs",
+
+    "pitcher_earned_runs": "pitcher_earned_runs",
+
+    "pitcher hits allowed": "pitcher_hits_allowed",
+
+    "pitcher_hits_allowed": "pitcher_hits_allowed",
+
+    "pitcher walks": "pitcher_walks",
+
+    "pitcher_walks": "pitcher_walks"
+
+  };
+
+  return map[value] || value;
+
+}
+
 const MLB_TEAM_TREND_STATS = [
   { label: "Runs For", key: "runsFor" },
   { label: "Runs Allowed", key: "runsAllowed" },
@@ -2103,7 +2169,11 @@ function refreshMLBPlayerTrendsSheet() {
     "Above Season %",
     "Trend Strength",
     "Trend Note",
-    "Last Updated"
+    "Last Updated",
+    "Normalized Trend Score",
+    "Trend Strength Score",
+    "Risk Score",
+    "Sportacular Score"
   ];
 
   const logs = getMLBObjectsFromSheet_(logSheet);
@@ -2149,6 +2219,8 @@ function refreshMLBPlayerTrendsSheet() {
 
     MLB_PLAYER_TREND_STATS.forEach(stat => {
       const values = games.map(g => Number(g[stat.key] || 0));
+      const hasAnyData =
+        values.some(v => Number(v) > 0);
 
       const seasonAvg = avgMLB_(values);
       const last3 = avgMLB_(values.slice(0, 3));
@@ -2162,14 +2234,49 @@ function refreshMLBPlayerTrendsSheet() {
       const hitRateLast10 = hitRateMLB_(values.slice(0, 10), 1);
       const aboveSeasonPct = aboveSeasonPctMLB_(last5, seasonAvg);
       const strength = trendStrengthMLB_(hitRateLast5, aboveSeasonPct, score);
+
+      const riskTier =
+        riskTierMLB_(
+          consistency,
+          Math.abs(score)
+        );
+
+      const normalizedTrendScore =
+        normalizedTrendScoreMLB_(score);
+
+      const trendStrengthScore =
+        trendStrengthScoreMLB_(strength);
+
+      const riskScore =
+        riskScoreMLB_(riskTier);
+
+      const hasSample =
+        seasonAvg > 0 ||
+        last3 > 0 ||
+        last5 > 0 ||
+        last10 > 0;
+
+      const sportacularScore =
+        hasSample
+          ? sportacularScoreMLB_({
+              normalizedTrendScore,
+              consistency,
+              hitRateLast5,
+              hitRateLast10
+            })
+          : "";
       const note = buildMLBTrendNote_(
         player.playerName,
-        stat.label,
+        normalizeMLBStatType_(stat.label),
         seasonAvg,
         last5,
         hitRateLast5,
         score
       );
+
+      if (!hasAnyData) {
+        return;
+      }
 
       rows.push([
         player.playerId,
@@ -2183,14 +2290,18 @@ function refreshMLBPlayerTrendsSheet() {
         trendDirectionMLB_(score),
         score,
         consistency,
-        riskTierMLB_(consistency, Math.abs(score)),
+        riskTier,
         hitRateLast3,
         hitRateLast5,
         hitRateLast10,
         aboveSeasonPct,
         strength,
         note,
-        now
+        now,
+        normalizedTrendScore,
+        trendStrengthScore,
+        riskScore,
+        sportacularScore
       ]);
     });
   });
@@ -2204,6 +2315,8 @@ function refreshMLBPlayerTrendsSheet() {
 
   sheet.getRange("M:O").setNumberFormat("0%");
   sheet.getRange("P:P").setNumberFormat("0.0");
+  sheet.getRange("T:V").setNumberFormat("0.0");
+  sheet.getRange("W:W").setNumberFormat("0.0");
 
   Logger.log(`Wrote ${rows.length} rows to MLB Player Trends with hit-rate metrics.`);
 }
@@ -2724,7 +2837,13 @@ function refreshMLBTeamTrendsOutputSheet() {
     "Above Season %",
     "Trend Strength",
     "Trend Note",
-    "Last Updated"
+    "Last Updated",
+    "League Rank",
+    "Rank Score",
+    "Offensive Rating",
+    "Pitching Rating",
+    "Rating Tier",
+    "Rating Notes"
   ];
 
   const logs = getMLBObjectsFromSheet_(logSheet);
@@ -2779,23 +2898,31 @@ function refreshMLBTeamTrendsOutputSheet() {
       );
 
       rows.push([
-        team,
-        metric.label,
-        seasonAvg,
-        last3,
-        last5,
-        last10,
-        trendDirectionMLB_(score),
-        score,
-        consistency,
-        riskTierMLB_(consistency, Math.abs(score)),
-        hitRateLast3,
-        hitRateLast5,
-        hitRateLast10,
-        aboveSeasonPct,
-        strength,
-        note,
-        now
+          team,
+          metric.label,
+          seasonAvg,
+          last3,
+          last5,
+          last10,
+          trendDirectionMLB_(score),
+          score,
+          consistency,
+          riskTierMLB_(consistency, Math.abs(score)),
+          hitRateLast3,
+          hitRateLast5,
+          hitRateLast10,
+          aboveSeasonPct,
+          strength,
+          note,
+          now,
+
+          "", // League Rank
+          "", // Rank Score
+          "", // Offensive Rating
+          "", // Pitching Rating
+          "", // Overall Rating
+          "", // Rating Tier
+          "", // Rating Notes
       ]);
     });
   });
@@ -2805,10 +2932,19 @@ function refreshMLBTeamTrendsOutputSheet() {
     String(a[1] || "").localeCompare(String(b[1] || ""))
   );
 
+  populateMLBTeamMetricRanks_(rows);
+
+  populateMLBTeamRatings_(rows);
+
   writeMLBOutputSheet_(sheet, headers, rows);
+
+  populateOverallTeamRatings_(sheet);
 
   sheet.getRange("K:M").setNumberFormat("0%");
   sheet.getRange("N:N").setNumberFormat("0.0");
+
+  sheet.getRange("R:R").setNumberFormat("0");
+  sheet.getRange("S:S").setNumberFormat("0.0");
 
   Logger.log(`Wrote ${rows.length} rows to MLB Team Trends with hit-rate metrics.`);
 }
@@ -2869,6 +3005,260 @@ function strengthRank_(strength) {
   if (value.includes("weak")) return 35;
   if (value.includes("cold")) return 15;
   return 0;
+}
+
+function populateMLBTeamMetricRanks_(rows) {
+
+  const metricGroups = {};
+
+  rows.forEach(row => {
+
+    const metric = row[1];
+
+    if (!metricGroups[metric]) {
+
+      metricGroups[metric] = [];
+
+    }
+
+    metricGroups[metric].push(row);
+
+  });
+
+  const higherIsBetter = {
+
+    "Hits": true,
+
+    "Home Runs": true,
+
+    "Runs For": true,
+
+    "Strikeouts": true,
+
+    "Total Bases": true,
+
+    "Runs Allowed": false
+
+  };
+
+  Object.keys(metricGroups).forEach(metric => {
+
+    const group = metricGroups[metric];
+
+    group.sort((a, b) => {
+
+      const aValue = Number(a[2]) || 0;
+      const bValue = Number(b[2]) || 0;
+
+      return higherIsBetter[metric]
+        ? bValue - aValue
+        : aValue - bValue;
+
+    });
+
+    const totalTeams = group.length;
+
+    group.forEach((row, index) => {
+
+      const rank = index + 1;
+
+      const rankScore =
+        totalTeams <= 1
+          ? 100
+          : 100 - ((rank - 1) / (totalTeams - 1)) * 100;
+
+      row[17] = rank;
+
+      row[18] = Number(rankScore.toFixed(1));
+
+    });
+
+  });
+
+}
+
+function populateMLBTeamRatings_(rows) {
+
+  const teams = {};
+
+  rows.forEach(row => {
+
+    const team = row[0];
+    const metric = row[1];
+    const rankScore = Number(row[18]) || 0;
+
+    if (!teams[team]) {
+      teams[team] = {};
+    }
+
+    teams[team][metric] = rankScore;
+
+  });
+
+  Object.keys(teams).forEach(team => {
+
+    const t = teams[team];
+
+    const offenseScores = [
+      t["Hits"],
+      t["Home Runs"],
+      t["Runs For"],
+      t["Total Bases"]
+    ].filter(v => v !== undefined);
+
+    const pitchingScores = [
+      t["Runs Allowed"],
+      t["Strikeouts"]
+    ].filter(v => v !== undefined);
+
+    t.offense =
+      offenseScores.length
+        ? offenseScores.reduce((a,b)=>a+b,0) /
+          offenseScores.length
+        : 0;
+
+    t.pitching =
+      pitchingScores.length
+        ? pitchingScores.reduce((a,b)=>a+b,0) /
+          pitchingScores.length
+        : 0;
+
+  });
+
+  rows.forEach(row => {
+
+    const t = teams[row[0]];
+
+    row[19] = Number(t.offense.toFixed(1));
+
+    row[20] = Number(t.pitching.toFixed(1));
+
+  });
+
+}
+
+function populateOverallTeamRatings_(sheet) {
+
+  const values = sheet.getDataRange().getValues();
+
+  if (values.length < 2) return;
+
+  const header = values[0];
+
+  const teamCol =
+    header.indexOf("Team");
+
+  const offenseCol =
+    header.indexOf("Offensive Rating");
+
+  const pitchingCol =
+    header.indexOf("Pitching Rating");
+
+  const overallCol =
+    header.indexOf("Overall Rating");
+
+  const tierCol =
+    header.indexOf("Team Tier");
+
+  const notesCol =
+    header.indexOf("Rating Notes");
+
+  const teamRatings = {};
+
+  for (let i = 1; i < values.length; i++) {
+
+    const row = values[i];
+
+    const team = row[teamCol];
+
+    if (!teamRatings[team]) {
+
+      const offense =
+        Number(row[offenseCol]) || 0;
+
+      const pitching =
+        Number(row[pitchingCol]) || 0;
+
+      /*
+       60% offense
+       40% pitching
+      */
+
+      const overall =
+        offense * 0.60 +
+        pitching * 0.40;
+
+      let tier = "";
+
+      if (overall >= 90)
+        tier = "Elite";
+
+      else if (overall >= 75)
+        tier = "Strong";
+
+      else if (overall >= 55)
+        tier = "Average";
+
+      else if (overall >= 40)
+        tier = "Below Average";
+
+      else
+        tier = "Weak";
+
+      let note = "";
+
+      if (offense > pitching + 20)
+        note =
+          "Offense carrying the team.";
+
+      else if (pitching > offense + 20)
+        note =
+          "Pitching carrying the team.";
+
+      else
+        note =
+          "Balanced team profile.";
+
+      teamRatings[team] = {
+        overall,
+        tier,
+        note
+      };
+
+    }
+
+  }
+
+  for (let i = 1; i < values.length; i++) {
+
+    const row = values[i];
+
+    const team =
+      row[teamCol];
+
+    const rating =
+      teamRatings[team];
+
+    row[overallCol] =
+      Math.round(rating.overall * 10) / 10;
+
+    row[tierCol] =
+      rating.tier;
+
+    row[notesCol] =
+      rating.note;
+
+  }
+
+  sheet
+    .getRange(
+      2,
+      1,
+      values.length - 1,
+      values[0].length
+    )
+    .setValues(values.slice(1));
+
 }
 
 function clampScore_(value, min, max) {
@@ -3153,6 +3543,91 @@ function riskTierMLB_(consistency, absTrendScore) {
   return "High";
 }
 
+function normalizedTrendScoreMLB_(trendScore) {
+  const score = Number(trendScore || 0);
+
+  // Cap raw trend movement at +/- 50%
+  // -50 = 0
+  //   0 = 50
+  // +50 = 100
+  const capped = Math.max(-50, Math.min(50, score));
+
+  return Math.max(
+    0,
+    Math.min(
+      100,
+      capped + 50
+    )
+  );
+}
+
+
+function trendStrengthScoreMLB_(strength) {
+  const value = String(strength || "")
+    .trim()
+    .toLowerCase();
+
+  if (value.includes("elite")) return 100;
+  if (value.includes("strong")) return 80;
+  if (value.includes("moderate")) return 60;
+  if (value.includes("weak")) return 35;
+  if (value.includes("cold")) return 15;
+
+  return 0;
+}
+
+
+function riskScoreMLB_(riskTier) {
+  const value = String(riskTier || "")
+    .trim()
+    .toLowerCase();
+
+  if (value === "low") return 100;
+  if (value === "medium") return 70;
+  if (value === "high") return 35;
+
+  return 50;
+}
+
+
+function sportacularScoreMLB_({
+  normalizedTrendScore,
+  consistency,
+  hitRateLast5,
+  hitRateLast10
+}) {
+
+  const trend = Math.max(
+    0,
+    Math.min(100, Number(normalizedTrendScore || 0))
+  );
+
+  const consistencyScore = Math.max(
+    0,
+    Math.min(100, Number(consistency || 0))
+  );
+
+  const hit5 = Math.max(
+    0,
+    Math.min(100, Number(hitRateLast5 || 0) * 100)
+  );
+
+  const hit10 = Math.max(
+    0,
+    Math.min(100, Number(hitRateLast10 || 0) * 100)
+  );
+
+  const score =
+    trend * 0.30 +
+    consistencyScore * 0.30 +
+    hit5 * 0.20 +
+    hit10 * 0.20;
+
+  return Math.round(
+    Math.max(0, Math.min(100, score)) * 10
+  ) / 10;
+}
+
 function getMLBOpponentFromStat_(stat) {
   const game = stat.game || {};
   const team = stat.team || {};
@@ -3184,6 +3659,13 @@ function refreshMLBPlayerPropsSheet() {
   const sheet = ss.getSheetByName(sheetName);
   const scheduleSheet = ss.getSheetByName(scheduleSheetName);
 
+  const trendsSheet =
+    ss.getSheetByName("MLB Player Trends");
+
+  if (!trendsSheet) {
+    throw new Error('Sheet "MLB Player Trends" not found.');
+  }
+
   if (!sheet) {
     throw new Error(`Sheet "${sheetName}" not found.`);
   }
@@ -3194,6 +3676,59 @@ function refreshMLBPlayerPropsSheet() {
 
   ensurePropFormulaTemplates_(sheet);
   ensureNameFormulaTemplates_(sheet);
+
+  const trendValues =
+    trendsSheet.getDataRange().getValues();
+
+  const trendHeader =
+    trendValues[0];
+
+  const trendMap = {};
+
+  const playerIdCol =
+    trendHeader.indexOf("Player ID");
+
+  const statTypeCol =
+    trendHeader.indexOf("Stat Type");
+
+  const trendScoreCol =
+    trendHeader.indexOf("Normalized Trend Score");
+
+  const trendStrengthCol =
+    trendHeader.indexOf("Trend Strength Score");
+
+  const riskScoreCol =
+    trendHeader.indexOf("Risk Score");
+
+  const sportacularScoreCol =
+    trendHeader.indexOf("Sportacular Score");
+
+  for (let i = 1; i < trendValues.length; i++) {
+
+    const row = trendValues[i];
+
+    const key =
+      row[playerIdCol] +
+      "|" +
+      normalizeMLBStatType_(row[statTypeCol]);
+
+    trendMap[key] = {
+
+      trendScore:
+        Number(row[trendScoreCol]) || 0,
+
+      trendStrength:
+        Number(row[trendStrengthCol]) || 0,
+
+      riskScore:
+        Number(row[riskScoreCol]) || 0,
+
+      sportacularScore:
+        Number(row[sportacularScoreCol]) || 0
+
+    };
+
+  }
 
   Logger.log("Refreshing MLB player props using Schedule tab game IDs...");
 
@@ -3239,6 +3774,26 @@ function refreshMLBPlayerPropsSheet() {
         prop.market ||
         "";
 
+      const trendKey =
+        playerId +
+        "|" +
+        normalizeMLBStatType_(propType);
+
+      const trend =
+        trendMap[trendKey] || null;
+
+      const trendScore =
+        trend ? trend.trendScore : "";
+
+      const trendStrength =
+        trend ? trend.trendStrength : "";
+
+      const riskScore =
+        trend ? trend.riskScore : "";
+
+      const sportacularScore =
+        trend ? trend.sportacularScore : "";
+
       const lineValue =
         prop.line ||
         prop.line_value ||
@@ -3265,20 +3820,39 @@ function refreshMLBPlayerPropsSheet() {
         "";
 
       allRows.push([
-        game.id,                  // A Game Id
-        gameInfo.game_date,       // B Game Date
-        gameInfo.away_team,       // C Away Team
-        gameInfo.home_team,       // D Home Team
-        prop.id || "",            // E Id
-        playerId,                 // F Player Id
-        vendor,                   // G Vendor
-        propType,                 // H Prop Type
-        lineValue,                // I Line Value
-        typeValue,                // J Type
-        odds,                     // K Odds
-        updatedAt,                // L Updated At
-        overOdds,                 // M Over Odds
-        underOdds                 // N Under Odds
+      game.id,
+      gameInfo.game_date,
+      gameInfo.away_team,
+      gameInfo.home_team,
+      prop.id || "",
+      playerId,
+      vendor,
+      propType,
+      lineValue,
+      typeValue,
+      odds,
+      updatedAt,
+      overOdds,
+      underOdds,
+
+      "",     // O Decimal Odds
+      "",     // P Implied Probability
+      "",     // Q Vig-Free Probability
+      "",     // R Lambda
+      "",     // S Poisson Over
+      "",     // T Poisson Milestone
+      "",     // U EV
+
+      "",     // V First Name
+      "",     // W Last Name
+
+      trendScore,
+      trendStrength,
+      riskScore,
+      sportacularScore,
+
+      "",
+      ""
       ]);
     });
 
@@ -3292,9 +3866,11 @@ function refreshMLBPlayerPropsSheet() {
     return;
   }
 
-  sheet.getRange(3, 1, allRows.length, 14).setValues(allRows);
+  sheet.getRange(3, 1, allRows.length, 29).setValues(allRows);
 
   copyFormulaTemplatesDown_(sheet, allRows.length);
+
+  sheet.getRange(3, 24, allRows.length, 4).setNumberFormat("0.0");
 
   Logger.log(`Wrote ${allRows.length} MLB player props rows to "${sheetName}"`);
 }

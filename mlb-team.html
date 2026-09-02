@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Team Profile | Sportacular Analytics</title>
+
+  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">
+        <a href="/">
+          <img
+            src="/logo.png"
+            alt="Sportacular Analytics Logo"
+          />
+        </a>
+      </div>
+
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+
+      <nav id="site-nav">
+        <ul class="nav-links">
+          <li>
+            <a href="index.html">Home</a>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NBA</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="nba-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="nba-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="nba-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="nba-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NHL</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="nhl-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="nhl-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="nhl-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="nhl-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">MLB</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="mlb-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="mlb-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="mlb-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="mlb-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">NFL</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="nfl-odds.html">Game Odds</a>
+              </li>
+
+              <li>
+                <a href="nfl-props.html">Player Props</a>
+              </li>
+
+              <li>
+                <a href="nfl-trends.html">Player Trends</a>
+              </li>
+
+              <li>
+                <a href="nfl-team-trends.html">Team Trends</a>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="pricing.html">Pricing</a>
+          </li>
+
+          <li>
+            <a href="index.html#about">About</a>
+          </li>
+
+          <li class="dropdown">
+            <a href="#">Legal</a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href="privacy.html">Privacy Policy</a>
+              </li>
+
+              <li>
+                <a href="terms.html">Terms of Service</a>
+              </li>
+
+              <li>
+                <a href="disclaimer.html">Disclaimer</a>
+              </li>
+
+              <li>
+                <a href="contact.html">Contact</a>
+              </li>
+            </ul>
+          </li>
+
+          <li id="nav-login-item">
+            <a href="auth.html">Login</a>
+          </li>
+
+          <li
+            id="nav-account-item"
+            style="display: none;"
+          >
+            <a href="auth.html">Account</a>
+          </li>
+
+          <li
+            id="nav-logout-item"
+            style="display: none;"
+          >
+            <a href="#" id="nav-logout-link">
+              Logout
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+    <main class="team-profile-page">
+
+    <section id="team-header" class="team-section">
+
+        <div class="container">
+
+            <div class="mlb-team-hero">
+
+                <!-- LEFT SIDE -->
+
+                <div class="mlb-team-left">
+
+                    <div class="team-logo-placeholder">
+                        ⚾
+                    </div>
+
+                    <div class="team-header-text">
+
+                        <h1 id="team-name">
+                            Team Name
+                        </h1>
+
+                        <p id="team-subtitle">
+                            MLB
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT SIDE -->
+
+                <div class="mlb-team-right">
+
+                    <div class="hero-stat-card">
+
+                        <div class="hero-stat-label">
+                            League Rank
+                        </div>
+
+                        <div id="league-rank">
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="hero-stat-card">
+
+                        <div class="hero-stat-label">
+                            Rank Score
+                        </div>
+
+                        <div id="rank-score">
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="hero-stat-card">
+
+                        <div class="hero-stat-label">
+                            Overall Rating
+                        </div>
+
+                        <div id="overall-rating">
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="hero-stat-card">
+
+                        <div class="hero-stat-label">
+                            Offensive Rating
+                        </div>
+
+                        <div id="offensive-rating">
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="hero-stat-card">
+
+                        <div class="hero-stat-label">
+                            Pitching Rating
+                        </div>
+
+                        <div id="pitching-rating">
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="hero-stat-card">
+
+                        <div class="hero-stat-label">
+                            Rating Tier
+                        </div>
+
+                        <div id="rating-tier">
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="hero-stat-card hero-stat-wide">
+
+                        <div class="hero-stat-label">
+                            Rating Notes
+                        </div>
+
+                        <div id="rating-notes">
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="hero-stat-card hero-stat-wide">
+
+                        <div class="hero-stat-label">
+                            Last Updated
+                        </div>
+
+                        <div id="last-updated">
+                            --
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section id="team-season-stats" class="team-section">
+        <div class="container">
+
+        <h2>Season Snapshot</h2>
+
+        <div id="team-season-stats-content">
+
+            Loading season statistics...
+
+        </div>
+
+        </div>
+    </section>
+
+    <section id="team-trends" class="team-section">
+        <div class="container">
+
+            <h2>Current Team Trends</h2>
+
+            <div id="team-trends-content">
+
+                Loading team trends...
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="team-game-log" class="team-section">
+
+    <div class="container">
+
+        <h2>Recent Performance</h2>
+
+        <div id="team-game-log-content">
+
+        Loading recent games...
+
+        </div>
+
+    </div>
+
+    </section>
+
+    </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        <strong>Disclaimer:</strong>
+        Data provided by BallDontLie API. This website is for
+        informational and educational purposes only. Nothing on this
+        site guarantees results or should be considered financial
+        advice. If you sports bet, always bet responsibly.
+      </p>
+
+      <p class="support-email">
+        We would love to hear from you! Contact us at
+        support@sportacularanalytics.com.
+      </p>
+
+      <p>
+        &copy; 2026 Sportacular Analytics. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        initTeamProfilePage();
+    });
+    </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle =
+        document.getElementById("mobile-menu-toggle");
+
+      const nav =
+        document.getElementById("site-nav");
+
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          nav.classList.toggle("mobile-open");
+
+          const isOpen =
+            nav.classList.contains("mobile-open");
+
+          toggle.setAttribute(
+            "aria-expanded",
+            isOpen ? "true" : "false"
+          );
+
+          toggle.textContent =
+            isOpen ? "✕" : "☰";
+        });
+      }
+
+      if (window.innerWidth <= 768) {
+        document
+          .querySelectorAll(".dropdown > a")
+          .forEach((link) => {
+            link.addEventListener(
+              "click",
+              (event) => {
+                event.preventDefault();
+
+                const parent =
+                  link.parentElement;
+
+                if (parent) {
+                  parent.classList.toggle("open");
+                }
+              }
+            );
+          });
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isMobile =
+        window
+          .matchMedia("(max-width: 768px)")
+          .matches;
+
+      if (!isMobile) return;
+
+      document
+        .querySelectorAll(
+          ".guide-panel .hover-guide-term"
+        )
+        .forEach((term) => {
+          term.addEventListener(
+            "click",
+            (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              const item =
+                term.closest(".hover-guide-item");
+
+              if (!item) return;
+
+              document
+                .querySelectorAll(
+                  ".guide-panel .hover-guide-item.tooltip-open"
+                )
+                .forEach((openItem) => {
+                  if (openItem !== item) {
+                    openItem.classList.remove(
+                      "tooltip-open"
+                    );
+                  }
+                });
+
+              item.classList.toggle(
+                "tooltip-open"
+              );
+            }
+          );
+        });
+
+      document.addEventListener("click", () => {
+        document
+          .querySelectorAll(
+            ".guide-panel .hover-guide-item.tooltip-open"
+          )
+          .forEach((item) => {
+            item.classList.remove(
+              "tooltip-open"
+            );
+          });
+      });
+    });
+  </script>
+</body>
+</html>

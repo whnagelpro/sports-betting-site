@@ -5107,6 +5107,63 @@ async function initTeamProfilePage() {
 
   CURRENT_TEAM_TRENDS = teamTrends;
 
+  // =====================================================
+  // MLB TEAM HERO RATINGS
+  // =====================================================
+
+  if (league === "mlb" && teamTrends.length) {
+
+    const ratingRow = teamTrends[0];
+
+    const setHeroValue = (id, value) => {
+
+      const element =
+        document.getElementById(id);
+
+      if (!element) return;
+
+      element.textContent =
+        value !== undefined &&
+        value !== null &&
+        String(value).trim() !== ""
+          ? value
+          : "--";
+
+    };
+
+
+    setHeroValue(
+      "offensive-rating",
+      ratingRow["Offensive Rating"]
+    );
+
+    setHeroValue(
+      "pitching-rating",
+      ratingRow["Pitching Rating"]
+    );
+
+    setHeroValue(
+      "overall-rating",
+      ratingRow["Overall Rating"]
+    );
+
+    setHeroValue(
+      "rating-tier",
+      ratingRow["Rating Tier"]
+    );
+
+    setHeroValue(
+      "rating-notes",
+      ratingRow["Rating Notes"]
+    );
+
+    setHeroValue(
+      "last-updated",
+      ratingRow["Last Updated"]
+    );
+
+  }
+
   console.log("First Team Trend:", teamTrends[0]);
 
   console.log("All Trends:", trends);
