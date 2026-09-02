@@ -5230,6 +5230,71 @@ async function initTeamProfilePage() {
 
     const ratingRow = teamTrends[0];
 
+    // -----------------------------------------------------
+    // MLB OVERALL TEAM RANKING
+    // -----------------------------------------------------
+
+    const mlbTeamRatingsMap = new Map();
+
+    trends.forEach(row => {
+
+      const teamName =
+        String(row["Team"] || "").trim();
+
+      const overallRating =
+        Number(row["Overall Rating"]);
+
+      if (
+        teamName &&
+        !Number.isNaN(overallRating) &&
+        !mlbTeamRatingsMap.has(teamName)
+      ) {
+        mlbTeamRatingsMap.set(
+          teamName,
+          overallRating
+        );
+      }
+
+    });
+
+    const mlbOverallRankings =
+      [...mlbTeamRatingsMap.entries()]
+        .map(([teamName, overallRating]) => ({
+          teamName,
+          overallRating
+        }))
+        .sort(
+          (a, b) =>
+            b.overallRating - a.overallRating
+        );
+
+    const currentTeamName =
+      decodeURIComponent(team);
+
+    const currentTeamRankIndex =
+      mlbOverallRankings.findIndex(
+        item =>
+          item.teamName === currentTeamName
+      );
+
+    const overallLeagueRank =
+      currentTeamRankIndex >= 0
+        ? currentTeamRankIndex + 1
+        : null;
+
+    const overallRankScore =
+      overallLeagueRank !== null &&
+      mlbOverallRankings.length > 1
+        ? (
+            100 *
+            (
+              1 -
+              (overallLeagueRank - 1) /
+              (mlbOverallRankings.length - 1)
+            )
+          ).toFixed(1)
+        : null;
+
     const setHeroValue = (id, value) => {
 
       const element =
@@ -5245,6 +5310,18 @@ async function initTeamProfilePage() {
           : "--";
 
     };
+
+    setHeroValue(
+      "league-rank",
+      overallLeagueRank !== null
+        ? `#${overallLeagueRank}`
+        : "--"
+    );
+
+    setHeroValue(
+      "rank-score",
+      overallRankScore
+    );
 
 
     setHeroValue(
