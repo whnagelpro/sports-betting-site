@@ -5222,48 +5222,132 @@ async function initTeamProfilePage() {
 
   }
 
+if (league === "mlb") {
+
+  const formatMLBSnapshotValue = (value, decimals = 1) => {
+
+    const num = Number(value);
+
+    if (
+      value === undefined ||
+      value === null ||
+      value === "" ||
+      Number.isNaN(num)
+    ) {
+      return "--";
+    }
+
+    return decimals === 0
+      ? Math.round(num)
+      : num.toFixed(decimals);
+
+  };
+
+
   statsContainer.innerHTML = `
 
-<div class="team-stat-grid">
+    <div class="team-stat-grid">
 
-<div class="team-stat-card">
-<strong>Games Played</strong><br>
-${teamStats["Games Played"]}
-</div>
+      <div class="team-stat-card">
+        <strong>Games Played</strong><br>
+        ${formatMLBSnapshotValue(
+          teamStats["Games Played"],
+          0
+        )}
+      </div>
 
-<div class="team-stat-card">
-<strong>Points For</strong><br>
-${teamStats["Points For"]}
-</div>
+      <div class="team-stat-card">
+        <strong>Runs / Game</strong><br>
+        ${formatMLBSnapshotValue(
+          teamStats["Avg Runs For"]
+        )}
+      </div>
 
-<div class="team-stat-card">
-<strong>Points Allowed</strong><br>
-${teamStats["Points Allowed"]}
-</div>
+      <div class="team-stat-card">
+        <strong>Runs Allowed / Game</strong><br>
+        ${formatMLBSnapshotValue(
+          teamStats["Avg Runs Allowed"]
+        )}
+      </div>
 
-<div class="team-stat-card">
-<strong>Passing Yards</strong><br>
-${teamStats["Passing Yards"]}
-</div>
+      <div class="team-stat-card">
+        <strong>Hits / Game</strong><br>
+        ${formatMLBSnapshotValue(
+          teamStats["Avg Hits"]
+        )}
+      </div>
 
-<div class="team-stat-card">
-<strong>Rushing Yards</strong><br>
-${teamStats["Rushing Yards"]}
-</div>
+      <div class="team-stat-card">
+        <strong>Home Runs / Game</strong><br>
+        ${formatMLBSnapshotValue(
+          teamStats["Avg Home Runs"]
+        )}
+      </div>
 
-<div class="team-stat-card">
-<strong>Turnovers</strong><br>
-${teamStats["Turnovers"]}
-</div>
+      <div class="team-stat-card">
+        <strong>Total Bases / Game</strong><br>
+        ${formatMLBSnapshotValue(
+          teamStats["Avg Total Bases"]
+        )}
+      </div>
 
-<div class="team-stat-card">
-<strong>Sacks</strong><br>
-${teamStats["Sacks"]}
-</div>
+      <div class="team-stat-card">
+        <strong>Strikeouts / Game</strong><br>
+        ${formatMLBSnapshotValue(
+          teamStats["Avg Strikeouts"]
+        )}
+      </div>
 
-</div>
+    </div>
 
-`;
+  `;
+
+} else {
+
+  statsContainer.innerHTML = `
+
+    <div class="team-stat-grid">
+
+      <div class="team-stat-card">
+        <strong>Games Played</strong><br>
+        ${teamStats["Games Played"]}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Points For</strong><br>
+        ${teamStats["Points For"]}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Points Allowed</strong><br>
+        ${teamStats["Points Allowed"]}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Passing Yards</strong><br>
+        ${teamStats["Passing Yards"]}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Rushing Yards</strong><br>
+        ${teamStats["Rushing Yards"]}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Turnovers</strong><br>
+        ${teamStats["Turnovers"]}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Sacks</strong><br>
+        ${teamStats["Sacks"]}
+      </div>
+
+    </div>
+
+  `;
+
+}
 
 const trendsContainer =
   document.getElementById("team-trends-content");
