@@ -2842,6 +2842,7 @@ function refreshMLBTeamTrendsOutputSheet() {
     "Rank Score",
     "Offensive Rating",
     "Pitching Rating",
+    "Overall Rating",
     "Rating Tier",
     "Rating Notes"
   ];
