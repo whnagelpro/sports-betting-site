@@ -28,6 +28,7 @@ const NHL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
 const MLB_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=314629327&single=true&output=csv";
 const MLB_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1443511953&single=true&output=csv";
+const MLB_TEAM_GAME_LOGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1820985984&single=true&output=csv";
 const MLB_TEAM_SEASON_STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1542865210&single=true&output=csv";
 const MLB_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=2103952049&single=true&output=csv";
 const MLB_TOP_PLAYER_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=111828453&single=true&output=csv";
@@ -72,7 +73,8 @@ const TEAM_PROFILE_CONFIG = {
   mlb: {
     seasonStats: MLB_TEAM_SEASON_STATS_CSV_URL,
     teamTrends: MLB_TEAM_TRENDS_CSV_URL,
-    schedule: MLB_SCHEDULE_CSV_URL
+    schedule: MLB_SCHEDULE_CSV_URL,
+    teamGameLogs: MLB_TEAM_GAME_LOGS_CSV_URL
   }
 
 };
@@ -389,6 +391,47 @@ function renderTeamGameLog(games, league = "nfl") {
     return;
   }
 
+  if (league === "mlb") {
+
+    container.innerHTML = `
+
+      <div class="team-performance-table-wrap">
+
+        <table class="team-performance-table">
+
+          <thead>
+
+            <tr>
+              <th>Date</th>
+              <th>Opponent</th>
+              <th>Result</th>
+              <th>R</th>
+              <th>RA</th>
+              <th>Hits</th>
+              <th>HR</th>
+              <th>TB</th>
+              <th>SO</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${sortedGames
+              .map(createMLBTeamGameLogRow)
+              .join("")}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
   container.innerHTML =
     "<p>Recent-performance table not configured for this league yet.</p>";
 }
@@ -459,6 +502,78 @@ function createNFLTeamGameLogRow(game) {
 
       <td>
         ${game["Sacks"] || "0"}
+      </td>
+
+    </tr>
+
+  `;
+}
+
+function createMLBTeamGameLogRow(game) {
+
+  const runsFor =
+    Number(game["Runs For"] || 0);
+
+  const runsAllowed =
+    Number(game["Runs Allowed"] || 0);
+
+  let result = "T";
+
+  if (runsFor > runsAllowed) {
+    result = "W";
+  }
+
+  if (runsFor < runsAllowed) {
+    result = "L";
+  }
+
+  const resultClass =
+    result === "W"
+      ? "team-result-win"
+      : result === "L"
+        ? "team-result-loss"
+        : "team-result-tie";
+
+  return `
+
+    <tr>
+
+      <td>
+        ${game["Game Date"] || "-"}
+      </td>
+
+      <td>
+        ${game["Opponent"] || "-"}
+      </td>
+
+      <td>
+        <span class="${resultClass}">
+          ${result} ${runsFor}-${runsAllowed}
+        </span>
+      </td>
+
+      <td>
+        ${game["Runs For"] || "0"}
+      </td>
+
+      <td>
+        ${game["Runs Allowed"] || "0"}
+      </td>
+
+      <td>
+        ${game["Hits"] || "0"}
+      </td>
+
+      <td>
+        ${game["Home Runs"] || "0"}
+      </td>
+
+      <td>
+        ${game["Total Bases"] || "0"}
+      </td>
+
+      <td>
+        ${game["Strikeouts"] || "0"}
       </td>
 
     </tr>
