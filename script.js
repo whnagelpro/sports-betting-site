@@ -434,6 +434,47 @@ function renderTeamGameLog(games, league = "nfl") {
     return;
   }
 
+  if (league === "nba") {
+
+    container.innerHTML = `
+
+      <div class="team-performance-table-wrap">
+
+        <table class="team-performance-table">
+
+          <thead>
+
+            <tr>
+              <th>Date</th>
+              <th>Opponent</th>
+              <th>Result</th>
+              <th>PF</th>
+              <th>PA</th>
+              <th>REB</th>
+              <th>AST</th>
+              <th>3PM</th>
+              <th>TO</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${sortedGames
+              .map(createNBATeamGameLogRow)
+              .join("")}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
   container.innerHTML =
     "<p>Recent-performance table not configured for this league yet.</p>";
 }
@@ -576,6 +617,78 @@ function createMLBTeamGameLogRow(game) {
 
       <td>
         ${game["Strikeouts"] || "0"}
+      </td>
+
+    </tr>
+
+  `;
+}
+
+function createNBATeamGameLogRow(game) {
+
+  const pointsFor =
+    Number(game["Points For"] || 0);
+
+  const pointsAllowed =
+    Number(game["Points Allowed"] || 0);
+
+  let result = "T";
+
+  if (pointsFor > pointsAllowed) {
+    result = "W";
+  }
+
+  if (pointsFor < pointsAllowed) {
+    result = "L";
+  }
+
+  const resultClass =
+    result === "W"
+      ? "team-result-win"
+      : result === "L"
+        ? "team-result-loss"
+        : "team-result-tie";
+
+  return `
+
+    <tr>
+
+      <td>
+        ${game["Game Date"] || "-"}
+      </td>
+
+      <td>
+        ${game["Opponent"] || "-"}
+      </td>
+
+      <td>
+        <span class="${resultClass}">
+          ${result} ${pointsFor}-${pointsAllowed}
+        </span>
+      </td>
+
+      <td>
+        ${game["Points For"] || "0"}
+      </td>
+
+      <td>
+        ${game["Points Allowed"] || "0"}
+      </td>
+
+      <td>
+        ${game["Rebounds"] || "0"}
+      </td>
+
+      <td>
+        ${game["Assists"] || "0"}
+      </td>
+
+      <td>
+        ${game["Threes"] || "0"}
+      </td>
+
+      <td>
+        ${game["Turnovers"] || "0"}
       </td>
 
     </tr>
