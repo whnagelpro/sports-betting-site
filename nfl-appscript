@@ -331,7 +331,7 @@ function refreshNFLScheduleSheet() {
   // ------------------------------------------
 
   const season = 2026;
-  const week = 3;
+  const week = 4;
   const seasonType = 1; // 1 = Preseason
 
   Logger.log(
@@ -1446,7 +1446,6 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName("NFL Team Game Logs");
-  const scheduleSheet = ss.getSheetByName("Schedule");
 
   const headers = [
     "Game Date",
@@ -1461,31 +1460,38 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
     "Sacks"
   ];
 
-  const allGames = getNFLGamesFromScheduleSheet_(scheduleSheet);
+  Logger.log(
+    `Refreshing NFL Team Game Logs from ${startDate} to ${endDate}`
+  );
 
-  Logger.log("Schedule games found: " + allGames.length);
-
-  if (allGames.length > 0) {
-    Logger.log(JSON.stringify(allGames[0], null, 2));
-  }
-
-  const games = allGames.filter(game => {
-    const gameDate = game.game_date;
-
-    Logger.log(
-      `Comparing "${gameDate}" against ${startDate} -> ${endDate}`
+  const games =
+    getNFLCompletedGamesForDateRange_(
+      startDate,
+      endDate
     );
 
-    return String(gameDate) >= startDate &&
-          String(gameDate) <= endDate;
-  });
+  Logger.log(
+    `Completed NFL games found: ${games.length}`
+  );
+
+  if (games.length > 0) {
+    Logger.log(
+      JSON.stringify(
+        games[0],
+        null,
+        2
+      )
+    );
+  }
 
   if (!games.length) {
-    Logger.log(`No NFL Schedule games found from ${startDate} to ${endDate}`);
+    Logger.log(
+      `No completed NFL games found from ${startDate} to ${endDate}`
+    );
     return;
   }
 
-  const gameIds = games.map(game => game.id);
+  const gameIds = games.map(game => String(game.id));
 
   const statRows = fetchAllNFLStatsForGameIds_(gameIds);
   Logger.log(`Team stat rows: ${statRows.length}`);
@@ -1517,7 +1523,8 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
         }, 0);
 
       const isHome =
-        teamName === game.home_team;
+        teamName ===
+        getNFLHomeTeamNameFromGame_(game);
 
       const pointsFor = isHome
         ? Number(game.home_team_score || game.home_score || 0)
@@ -1529,7 +1536,7 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
 
       return [
 
-        game.game_date,
+        getNFLGameAZDate_(game),
 
         game.id,
 
@@ -1570,8 +1577,25 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
 
     };
 
-    rows.push(buildTeamRow(game.away_team, game.home_team));
-    rows.push(buildTeamRow(game.home_team, game.away_team));
+    const homeTeam =
+      getNFLHomeTeamNameFromGame_(game);
+
+    const awayTeam =
+      getNFLAwayTeamNameFromGame_(game);
+
+    rows.push(
+      buildTeamRow(
+        awayTeam,
+        homeTeam
+      )
+    );
+
+    rows.push(
+      buildTeamRow(
+        homeTeam,
+        awayTeam
+      )
+    );
   });
 
   upsertNFLRowsByKeyForDateRange_(sheet, headers, rows, [1, 2], startDate, endDate);

@@ -24,6 +24,7 @@ const NBA_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-
 const NHL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=959803781&single=true&output=csv";
 const NHL_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=2048323486&single=true&output=csv";
 const NHL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=620239444&single=true&output=csv";
+const NHL_TEAM_GAME_LOGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=593607447&single=true&output=csv";
 const NHL_TEAM_SEASON_STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1859902621&single=true&output=csv";
 const NHL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=482198043&single=true&output=csv";
 const MLB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=989861231&single=true&output=csv";
@@ -69,7 +70,8 @@ const TEAM_PROFILE_CONFIG = {
   nhl: {
     seasonStats: NHL_TEAM_SEASON_STATS_CSV_URL,
     teamTrends: NHL_TEAM_TRENDS_CSV_URL,
-    schedule: NHL_SCHEDULE_CSV_URL
+    schedule: NHL_SCHEDULE_CSV_URL,
+    teamGameLogs: NHL_TEAM_GAME_LOGS_CSV_URL
   },
 
   mlb: {
@@ -475,6 +477,47 @@ function renderTeamGameLog(games, league = "nfl") {
     return;
   }
 
+  if (league === "nhl") {
+
+    container.innerHTML = `
+
+      <div class="team-performance-table-wrap">
+
+        <table class="team-performance-table">
+
+          <thead>
+
+            <tr>
+              <th>Date</th>
+              <th>Opponent</th>
+              <th>Result</th>
+              <th>GF</th>
+              <th>GA</th>
+              <th>SOG</th>
+              <th>AST</th>
+              <th>PTS</th>
+              <th>SV</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${sortedGames
+              .map(createNHLTeamGameLogRow)
+              .join("")}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
   container.innerHTML =
     "<p>Recent-performance table not configured for this league yet.</p>";
 }
@@ -617,6 +660,78 @@ function createMLBTeamGameLogRow(game) {
 
       <td>
         ${game["Strikeouts"] || "0"}
+      </td>
+
+    </tr>
+
+  `;
+}
+
+function createNHLTeamGameLogRow(game) {
+
+  const goalsFor =
+    Number(game["Goals For"] || 0);
+
+  const goalsAllowed =
+    Number(game["Goals Allowed"] || 0);
+
+  let result = "T";
+
+  if (goalsFor > goalsAllowed) {
+    result = "W";
+  }
+
+  if (goalsFor < goalsAllowed) {
+    result = "L";
+  }
+
+  const resultClass =
+    result === "W"
+      ? "team-result-win"
+      : result === "L"
+        ? "team-result-loss"
+        : "team-result-tie";
+
+  return `
+
+    <tr>
+
+      <td>
+        ${game["Game Date"] || "-"}
+      </td>
+
+      <td>
+        ${game["Opponent"] || "-"}
+      </td>
+
+      <td>
+        <span class="${resultClass}">
+          ${result} ${goalsFor}-${goalsAllowed}
+        </span>
+      </td>
+
+      <td>
+        ${game["Goals For"] || "0"}
+      </td>
+
+      <td>
+        ${game["Goals Allowed"] || "0"}
+      </td>
+
+      <td>
+        ${game["Shots On Goal"] || "0"}
+      </td>
+
+      <td>
+        ${game["Assists"] || "0"}
+      </td>
+
+      <td>
+        ${game["Points"] || "0"}
+      </td>
+
+      <td>
+        ${game["Saves"] || "0"}
       </td>
 
     </tr>
@@ -5607,6 +5722,278 @@ async function initTeamProfilePage() {
 
   }
 
+  // =====================================================
+  // NHL TEAM HERO RATINGS
+  // =====================================================
+
+  if (league === "nhl" && teamTrends.length) {
+
+    const ratingRow = teamTrends[0];
+
+    // -----------------------------------------------------
+    // NHL OVERALL TEAM RANKING
+    // -----------------------------------------------------
+
+    const nhlTeamRatingsMap = new Map();
+
+    trends.forEach(row => {
+
+      const teamName =
+        String(row["Team"] || "").trim();
+
+      const overallRating =
+        Number(row["Overall Rating"]);
+
+      if (
+        teamName &&
+        !Number.isNaN(overallRating) &&
+        String(row["Overall Rating"] || "").trim() !== "" &&
+        !nhlTeamRatingsMap.has(teamName)
+      ) {
+
+        nhlTeamRatingsMap.set(
+          teamName,
+          overallRating
+        );
+
+      }
+
+    });
+
+    const nhlOverallRankings =
+      [...nhlTeamRatingsMap.entries()]
+        .map(([teamName, overallRating]) => ({
+          teamName,
+          overallRating
+        }))
+        .sort(
+          (a, b) =>
+            b.overallRating - a.overallRating
+        );
+
+    const currentTeamName =
+      decodeURIComponent(team);
+
+    const currentTeamRankIndex =
+      nhlOverallRankings.findIndex(
+        item =>
+          item.teamName === currentTeamName
+      );
+
+    const overallLeagueRank =
+      currentTeamRankIndex >= 0
+        ? currentTeamRankIndex + 1
+        : null;
+
+    const overallRankScore =
+      overallLeagueRank !== null &&
+      nhlOverallRankings.length > 1
+        ? (
+            100 *
+            (
+              1 -
+              (overallLeagueRank - 1) /
+              (nhlOverallRankings.length - 1)
+            )
+          ).toFixed(1)
+        : null;
+
+    const setHeroValue = (id, value) => {
+
+      const element =
+        document.getElementById(id);
+
+      if (!element) return;
+
+      element.textContent =
+        value !== undefined &&
+        value !== null &&
+        String(value).trim() !== ""
+          ? value
+          : "--";
+
+    };
+
+    setHeroValue(
+      "league-rank",
+      overallLeagueRank !== null
+        ? `#${overallLeagueRank}`
+        : "--"
+    );
+
+    setHeroValue(
+      "rank-score",
+      overallRankScore
+    );
+
+    setHeroValue(
+      "offensive-rating",
+      ratingRow["Offensive Rating"]
+    );
+
+    setHeroValue(
+      "defensive-rating",
+      ratingRow["Defensive Rating"]
+    );
+
+    setHeroValue(
+      "overall-rating",
+      ratingRow["Overall Rating"]
+    );
+
+    setHeroValue(
+      "rating-tier",
+      ratingRow["Rating Tier"]
+    );
+
+    setHeroValue(
+      "rating-notes",
+      ratingRow["Rating Notes"]
+    );
+
+    setHeroValue(
+      "last-updated",
+      ratingRow["Last Updated"]
+    );
+
+  }
+
+  // =====================================================
+  // NFL TEAM HERO RATINGS
+  // =====================================================
+
+  if (league === "nfl" && teamTrends.length) {
+
+    const ratingRow = teamTrends[0];
+
+    // -----------------------------------------------------
+    // NFL OVERALL TEAM RANKING
+    // -----------------------------------------------------
+
+    const nflTeamRatingsMap = new Map();
+
+    trends.forEach(row => {
+
+      const teamName =
+        String(row["Team"] || "").trim();
+
+      const overallRating =
+        Number(row["Overall Rating"]);
+
+      if (
+        teamName &&
+        !Number.isNaN(overallRating) &&
+        String(row["Overall Rating"] || "").trim() !== "" &&
+        !nflTeamRatingsMap.has(teamName)
+      ) {
+
+        nflTeamRatingsMap.set(
+          teamName,
+          overallRating
+        );
+
+      }
+
+    });
+
+    const nflOverallRankings =
+      [...nflTeamRatingsMap.entries()]
+        .map(([teamName, overallRating]) => ({
+          teamName,
+          overallRating
+        }))
+        .sort(
+          (a, b) =>
+            b.overallRating - a.overallRating
+        );
+
+    const currentTeamName =
+      decodeURIComponent(team);
+
+    const currentTeamRankIndex =
+      nflOverallRankings.findIndex(
+        item =>
+          item.teamName === currentTeamName
+      );
+
+    const overallLeagueRank =
+      currentTeamRankIndex >= 0
+        ? currentTeamRankIndex + 1
+        : null;
+
+    const overallRankScore =
+      overallLeagueRank !== null &&
+      nflOverallRankings.length > 1
+        ? (
+            100 *
+            (
+              1 -
+              (overallLeagueRank - 1) /
+              (nflOverallRankings.length - 1)
+            )
+          ).toFixed(1)
+        : null;
+
+    const setHeroValue = (id, value) => {
+
+      const element =
+        document.getElementById(id);
+
+      if (!element) return;
+
+      element.textContent =
+        value !== undefined &&
+        value !== null &&
+        String(value).trim() !== ""
+          ? value
+          : "--";
+
+    };
+
+    setHeroValue(
+      "league-rank",
+      overallLeagueRank !== null
+        ? `#${overallLeagueRank}`
+        : "--"
+    );
+
+    setHeroValue(
+      "rank-score",
+      overallRankScore
+    );
+
+    setHeroValue(
+      "overall-rating",
+      ratingRow["Overall Rating"]
+    );
+
+    setHeroValue(
+      "offensive-rating",
+      ratingRow["Offensive Rating"]
+    );
+
+    setHeroValue(
+      "defensive-rating",
+      ratingRow["Defensive Rating"]
+    );
+
+    setHeroValue(
+      "rating-tier",
+      ratingRow["Rating Tier"]
+    );
+
+    setHeroValue(
+      "rating-notes",
+      ratingRow["Rating Notes"]
+    );
+
+    setHeroValue(
+      "last-updated",
+      ratingRow["Last Updated"]
+    );
+
+  }
+
   console.log("First Team Trend:", teamTrends[0]);
 
   console.log("All Trends:", trends);
@@ -5813,6 +6200,85 @@ if (!teamStats) {
         <strong>Turnovers / Game</strong><br>
         ${formatNBASnapshotValue(
           teamStats["Avg Turnovers"]
+        )}
+      </div>
+
+    </div>
+
+  `;
+
+} else if (league === "nhl") {
+
+  const formatNHLSnapshotValue = (value, decimals = 1) => {
+
+    const num = Number(value);
+
+    if (
+      value === undefined ||
+      value === null ||
+      value === "" ||
+      Number.isNaN(num)
+    ) {
+      return "--";
+    }
+
+    return decimals === 0
+      ? Math.round(num)
+      : num.toFixed(decimals);
+
+  };
+
+  statsContainer.innerHTML = `
+
+    <div class="team-stat-grid">
+
+      <div class="team-stat-card">
+        <strong>Games Played</strong><br>
+        ${formatNHLSnapshotValue(
+          teamStats["Games Played"],
+          0
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Goals / Game</strong><br>
+        ${formatNHLSnapshotValue(
+          teamStats["Avg Goals For"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Goals Allowed / Game</strong><br>
+        ${formatNHLSnapshotValue(
+          teamStats["Avg Goals Allowed"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Shots On Goal / Game</strong><br>
+        ${formatNHLSnapshotValue(
+          teamStats["Avg Shots On Goal"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Assists / Game</strong><br>
+        ${formatNHLSnapshotValue(
+          teamStats["Avg Assists"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Points / Game</strong><br>
+        ${formatNHLSnapshotValue(
+          teamStats["Avg Points"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Saves / Game</strong><br>
+        ${formatNHLSnapshotValue(
+          teamStats["Avg Saves"]
         )}
       </div>
 
