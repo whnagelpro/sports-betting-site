@@ -5358,6 +5358,62 @@ async function initTeamProfilePage() {
 
   }
 
+  // =====================================================
+  // NBA TEAM HERO RATINGS
+  // =====================================================
+
+  if (league === "nba" && teamTrends.length) {
+
+    const ratingRow = teamTrends[0];
+
+    const setHeroValue = (id, value) => {
+
+      const element =
+        document.getElementById(id);
+
+      if (!element) return;
+
+      element.textContent =
+        value !== undefined &&
+        value !== null &&
+        String(value).trim() !== ""
+          ? value
+          : "--";
+
+    };
+
+    setHeroValue(
+      "offensive-rating",
+      ratingRow["Offensive Rating"]
+    );
+
+    setHeroValue(
+      "defensive-rating",
+      ratingRow["Defensive Rating"]
+    );
+
+    setHeroValue(
+      "overall-rating",
+      ratingRow["Overall Rating"]
+    );
+
+    setHeroValue(
+      "rating-tier",
+      ratingRow["Rating Tier"]
+    );
+
+    setHeroValue(
+      "rating-notes",
+      ratingRow["Rating Notes"]
+    );
+
+    setHeroValue(
+      "last-updated",
+      ratingRow["Last Updated"]
+    );
+
+  }
+
   console.log("First Team Trend:", teamTrends[0]);
 
   console.log("All Trends:", trends);
@@ -5489,6 +5545,85 @@ if (league === "mlb") {
         <strong>Strikeouts / Game</strong><br>
         ${formatMLBSnapshotValue(
           teamStats["Avg Strikeouts"]
+        )}
+      </div>
+
+    </div>
+
+  `;
+
+  } else if (league === "nba") {
+
+  const formatNBASnapshotValue = (value, decimals = 1) => {
+
+    const num = Number(value);
+
+    if (
+      value === undefined ||
+      value === null ||
+      value === "" ||
+      Number.isNaN(num)
+    ) {
+      return "--";
+    }
+
+    return decimals === 0
+      ? Math.round(num)
+      : num.toFixed(decimals);
+
+  };
+
+  statsContainer.innerHTML = `
+
+    <div class="team-stat-grid">
+
+      <div class="team-stat-card">
+        <strong>Games Played</strong><br>
+        ${formatNBASnapshotValue(
+          teamStats["Games Played"],
+          0
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Points / Game</strong><br>
+        ${formatNBASnapshotValue(
+          teamStats["Avg Points For"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Points Allowed / Game</strong><br>
+        ${formatNBASnapshotValue(
+          teamStats["Avg Points Allowed"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Rebounds / Game</strong><br>
+        ${formatNBASnapshotValue(
+          teamStats["Avg Rebounds"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Assists / Game</strong><br>
+        ${formatNBASnapshotValue(
+          teamStats["Avg Assists"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Threes / Game</strong><br>
+        ${formatNBASnapshotValue(
+          teamStats["Avg Threes"]
+        )}
+      </div>
+
+      <div class="team-stat-card">
+        <strong>Turnovers / Game</strong><br>
+        ${formatNBASnapshotValue(
+          teamStats["Avg Turnovers"]
         )}
       </div>
 
