@@ -1777,7 +1777,14 @@ function refreshNBATeamTrendsOutputSheet() {
     "Above Season %",
     "Trend Strength",
     "Trend Note",
-    "Last Updated"
+    "Last Updated",
+    "League Rank",
+    "Rank Score",
+    "Offensive Rating",
+    "Defensive Rating",
+    "Overall Rating",
+    "Rating Tier",
+    "Rating Notes"
   ];
 
   const logs = getNBAObjectsFromSheet_(logSheet);
@@ -1848,7 +1855,14 @@ function refreshNBATeamTrendsOutputSheet() {
         aboveSeasonPct,
         strength,
         note,
-        now
+        now,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
       ]);
     });
   });
@@ -1858,12 +1872,322 @@ function refreshNBATeamTrendsOutputSheet() {
     String(a[1] || "").localeCompare(String(b[1] || ""))
   );
 
-  writeNBAOutputSheet_(sheet, headers, rows);
+    writeNBAOutputSheet_(sheet, headers, rows);
 
-  sheet.getRange("K:M").setNumberFormat("0%");
-  sheet.getRange("N:N").setNumberFormat("0.0");
+    populateNBATeamMetricRanks_(sheet);
+    populateNBATeamRatings_(sheet);
+
+    sheet.getRange("K:M").setNumberFormat("0%");
+    sheet.getRange("N:N").setNumberFormat("0.0");
 
   Logger.log(`Wrote ${rows.length} rows to NBA Team Trends v2.`);
+}
+
+function populateNBATeamMetricRanks_(sheet) {
+
+  const data = sheet.getDataRange().getValues();
+
+  if (data.length < 2) return;
+
+  const header = data[0];
+
+  const teamCol = header.indexOf("Team");
+  const metricCol = header.indexOf("Metric");
+  const seasonAvgCol = header.indexOf("Season Avg");
+  const leagueRankCol = header.indexOf("League Rank");
+  const rankScoreCol = header.indexOf("Rank Score");
+
+  if (
+    teamCol === -1 ||
+    metricCol === -1 ||
+    seasonAvgCol === -1 ||
+    leagueRankCol === -1 ||
+    rankScoreCol === -1
+  ) {
+    return;
+  }
+
+  const lowerIsBetter = new Set([
+    "Points Allowed",
+    "Turnovers"
+  ]);
+
+  const grouped = {};
+
+  for (let i = 1; i < data.length; i++) {
+
+    const metric = String(
+      data[i][metricCol] || ""
+    ).trim();
+
+    const value = Number(
+      data[i][seasonAvgCol]
+    );
+
+    if (!metric || Number.isNaN(value)) {
+      continue;
+    }
+
+    if (!grouped[metric]) {
+      grouped[metric] = [];
+    }
+
+    grouped[metric].push({
+      rowIndex: i,
+      value
+    });
+  }
+
+  Object.keys(grouped).forEach(metric => {
+
+    const metricRows = grouped[metric];
+
+    metricRows.sort((a, b) => {
+
+      if (lowerIsBetter.has(metric)) {
+        return a.value - b.value;
+      }
+
+      return b.value - a.value;
+    });
+
+    const teamCount = metricRows.length;
+
+    metricRows.forEach((item, index) => {
+
+      const rank = index + 1;
+
+      let rankScore = 100;
+
+      if (teamCount > 1) {
+        rankScore =
+          100 *
+          (
+            1 -
+            (rank - 1) /
+            (teamCount - 1)
+          );
+      }
+
+      data[item.rowIndex][leagueRankCol] =
+        rank;
+
+      data[item.rowIndex][rankScoreCol] =
+        Number(rankScore.toFixed(1));
+    });
+  });
+
+  sheet
+    .getRange(
+      2,
+      leagueRankCol + 1,
+      data.length - 1,
+      2
+    )
+    .setValues(
+      data
+        .slice(1)
+        .map(row => [
+          row[leagueRankCol],
+          row[rankScoreCol]
+        ])
+    );
+}
+
+function populateNBATeamRatings_(sheet) {
+
+  const data = sheet.getDataRange().getValues();
+
+  if (data.length < 2) return;
+
+  const header = data[0];
+
+  const teamCol =
+    header.indexOf("Team");
+
+  const metricCol =
+    header.indexOf("Metric");
+
+  const rankScoreCol =
+    header.indexOf("Rank Score");
+
+  const offensiveCol =
+    header.indexOf("Offensive Rating");
+
+  const defensiveCol =
+    header.indexOf("Defensive Rating");
+
+  const overallCol =
+    header.indexOf("Overall Rating");
+
+  const tierCol =
+    header.indexOf("Rating Tier");
+
+  const notesCol =
+    header.indexOf("Rating Notes");
+
+  if (
+    teamCol === -1 ||
+    metricCol === -1 ||
+    rankScoreCol === -1 ||
+    offensiveCol === -1 ||
+    defensiveCol === -1 ||
+    overallCol === -1 ||
+    tierCol === -1 ||
+    notesCol === -1
+  ) {
+    return;
+  }
+
+  const teams = {};
+
+  for (let i = 1; i < data.length; i++) {
+
+    const team =
+      String(data[i][teamCol] || "").trim();
+
+    const metric =
+      String(data[i][metricCol] || "").trim();
+
+    const rankScore =
+      Number(data[i][rankScoreCol]);
+
+    if (
+      !team ||
+      !metric ||
+      Number.isNaN(rankScore)
+    ) {
+      continue;
+    }
+
+    if (!teams[team]) {
+      teams[team] = {};
+    }
+
+    teams[team][metric] = rankScore;
+  }
+
+  const ratings = {};
+
+  Object.keys(teams).forEach(team => {
+
+    const metrics = teams[team];
+
+    const offenseValues = [
+      metrics["Points For"],
+      metrics["Assists"],
+      metrics["Threes"]
+    ].filter(value => Number.isFinite(value));
+
+    const defenseValues = [
+      metrics["Points Allowed"],
+      metrics["Rebounds"],
+      metrics["Turnovers"]
+    ].filter(value => Number.isFinite(value));
+
+    const offense =
+      offenseValues.length
+        ? offenseValues.reduce(
+            (sum, value) => sum + value,
+            0
+          ) / offenseValues.length
+        : 0;
+
+    const defense =
+      defenseValues.length
+        ? defenseValues.reduce(
+            (sum, value) => sum + value,
+            0
+          ) / defenseValues.length
+        : 0;
+
+    const overall =
+      offense * 0.60 +
+      defense * 0.40;
+
+    let tier = "";
+
+    if (overall >= 90) {
+      tier = "Elite";
+    } else if (overall >= 75) {
+      tier = "Strong";
+    } else if (overall >= 55) {
+      tier = "Average";
+    } else if (overall >= 40) {
+      tier = "Below Average";
+    } else {
+      tier = "Weak";
+    }
+
+    let notes =
+      "Balanced team profile.";
+
+    if (offense > defense + 20) {
+      notes =
+        "Offense carrying the team.";
+    } else if (defense > offense + 20) {
+      notes =
+        "Defense carrying the team.";
+    }
+
+    ratings[team] = {
+      offense:
+        Number(offense.toFixed(1)),
+
+      defense:
+        Number(defense.toFixed(1)),
+
+      overall:
+        Number(overall.toFixed(1)),
+
+      tier,
+      notes
+    };
+  });
+
+  for (let i = 1; i < data.length; i++) {
+
+    const team =
+      String(data[i][teamCol] || "").trim();
+
+    const rating = ratings[team];
+
+    if (!rating) continue;
+
+    data[i][offensiveCol] =
+      rating.offense;
+
+    data[i][defensiveCol] =
+      rating.defense;
+
+    data[i][overallCol] =
+      rating.overall;
+
+    data[i][tierCol] =
+      rating.tier;
+
+    data[i][notesCol] =
+      rating.notes;
+  }
+
+  sheet
+    .getRange(
+      2,
+      offensiveCol + 1,
+      data.length - 1,
+      5
+    )
+    .setValues(
+      data
+        .slice(1)
+        .map(row => [
+          row[offensiveCol],
+          row[defensiveCol],
+          row[overallCol],
+          row[tierCol],
+          row[notesCol]
+        ])
+    );
 }
 
 function hitRateNBA_(values, threshold) {

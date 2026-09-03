@@ -5366,6 +5366,74 @@ async function initTeamProfilePage() {
 
     const ratingRow = teamTrends[0];
 
+    // -----------------------------------------------------
+    // NBA OVERALL TEAM RANKING
+    // -----------------------------------------------------
+
+    const nbaTeamRatingsMap = new Map();
+
+    trends.forEach(row => {
+
+      const teamName =
+        String(row["Team"] || "").trim();
+
+      const overallRating =
+        Number(row["Overall Rating"]);
+
+      if (
+        teamName &&
+        !Number.isNaN(overallRating) &&
+        String(row["Overall Rating"] || "").trim() !== "" &&
+        !nbaTeamRatingsMap.has(teamName)
+      ) {
+
+        nbaTeamRatingsMap.set(
+          teamName,
+          overallRating
+        );
+
+      }
+
+    });
+
+    const nbaOverallRankings =
+      [...nbaTeamRatingsMap.entries()]
+        .map(([teamName, overallRating]) => ({
+          teamName,
+          overallRating
+        }))
+        .sort(
+          (a, b) =>
+            b.overallRating - a.overallRating
+        );
+
+    const currentTeamName =
+      decodeURIComponent(team);
+
+    const currentTeamRankIndex =
+      nbaOverallRankings.findIndex(
+        item =>
+          item.teamName === currentTeamName
+      );
+
+    const overallLeagueRank =
+      currentTeamRankIndex >= 0
+        ? currentTeamRankIndex + 1
+        : null;
+
+    const overallRankScore =
+      overallLeagueRank !== null &&
+      nbaOverallRankings.length > 1
+        ? (
+            100 *
+            (
+              1 -
+              (overallLeagueRank - 1) /
+              (nbaOverallRankings.length - 1)
+            )
+          ).toFixed(1)
+        : null;
+
     const setHeroValue = (id, value) => {
 
       const element =
@@ -5381,6 +5449,18 @@ async function initTeamProfilePage() {
           : "--";
 
     };
+
+    setHeroValue(
+      "league-rank",
+      overallLeagueRank !== null
+        ? `#${overallLeagueRank}`
+        : "--"
+    );
+
+    setHeroValue(
+      "rank-score",
+      overallRankScore
+    );
 
     setHeroValue(
       "offensive-rating",
@@ -5463,16 +5543,12 @@ async function initTeamProfilePage() {
   const statsContainer =
     document.getElementById("team-season-stats-content");
 
-  if (!teamStats) {
+if (!teamStats) {
 
-    statsContainer.innerHTML =
-      "<p>No season statistics found.</p>";
+  statsContainer.innerHTML =
+    "<p>No season statistics found.</p>";
 
-    return;
-
-  }
-
-if (league === "mlb") {
+} else if (league === "mlb") {
 
   const formatMLBSnapshotValue = (value, decimals = 1) => {
 
@@ -5684,7 +5760,7 @@ const trendsContainer =
 if (!teamTrends.length) {
 
   trendsContainer.innerHTML =
-    "<p>No team trends available.</p>";
+    "<p>No current team trends found.</p>";
 
 } else {
 
