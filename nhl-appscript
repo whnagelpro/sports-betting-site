@@ -1342,7 +1342,14 @@ function refreshNHLTeamTrendsOutputSheet() {
     "Above Season %",
     "Trend Strength",
     "Trend Note",
-    "Last Updated"
+    "Last Updated",
+    "League Rank",
+    "Rank Score",
+    "Offensive Rating",
+    "Defensive Rating",
+    "Overall Rating",
+    "Rating Tier",
+    "Rating Notes"
   ];
 
   const logs = getNHLObjectsFromSheet_(logSheet);
@@ -1418,6 +1425,12 @@ function refreshNHLTeamTrendsOutputSheet() {
     });
   });
 
+  // =====================================================
+  // NHL TEAM METRIC RANKS + RATINGS
+  // =====================================================
+
+  populateNHLTeamRatings_(rows);
+
   rows.sort((a, b) =>
     String(a[0] || "").localeCompare(String(b[0] || "")) ||
     String(a[1] || "").localeCompare(String(b[1] || ""))
@@ -1429,6 +1442,319 @@ function refreshNHLTeamTrendsOutputSheet() {
   sheet.getRange("N:N").setNumberFormat("0.0");
 
   Logger.log(`Wrote ${rows.length} rows to NHL Team Trends v2.`);
+}
+
+function populateNHLTeamRatings_(rows) {
+
+  if (!rows || !rows.length) return;
+
+  // -----------------------------------------------------
+  // BUILD METRIC MAP
+  // -----------------------------------------------------
+
+  const teamMetricMap = {};
+
+  rows.forEach(row => {
+
+    const team = String(row[0] || "").trim();
+    const metric = String(row[1] || "").trim();
+    const seasonAvg = Number(row[2]);
+
+    if (
+      !team ||
+      !metric ||
+      Number.isNaN(seasonAvg)
+    ) {
+      return;
+    }
+
+    if (!teamMetricMap[team]) {
+      teamMetricMap[team] = {};
+    }
+
+    teamMetricMap[team][metric] = seasonAvg;
+
+  });
+
+
+  // -----------------------------------------------------
+  // METRIC RANK SCORE HELPER
+  // -----------------------------------------------------
+
+  const getMetricRankScores = (
+    metricName,
+    lowerIsBetter = false
+  ) => {
+
+    const values = Object.keys(teamMetricMap)
+      .map(team => ({
+        team,
+        value: Number(
+          teamMetricMap[team][metricName]
+        )
+      }))
+      .filter(item =>
+        !Number.isNaN(item.value)
+      );
+
+    values.sort((a, b) =>
+      lowerIsBetter
+        ? a.value - b.value
+        : b.value - a.value
+    );
+
+    const scores = {};
+
+    values.forEach((item, index) => {
+
+      const rank = index + 1;
+
+      const score =
+        values.length > 1
+          ? 100 *
+            (
+              1 -
+              (rank - 1) /
+              (values.length - 1)
+            )
+          : 100;
+
+      scores[item.team] = {
+        rank,
+        score
+      };
+
+    });
+
+    return scores;
+
+  };
+
+
+  // -----------------------------------------------------
+  // CALCULATE METRIC RANK SCORES
+  // -----------------------------------------------------
+
+  const goalsForScores =
+    getMetricRankScores("Goals For");
+
+  const goalsAllowedScores =
+    getMetricRankScores(
+      "Goals Allowed",
+      true
+    );
+
+  const shotsScores =
+    getMetricRankScores("Shots On Goal");
+
+  const assistsScores =
+    getMetricRankScores("Assists");
+
+  const pointsScores =
+    getMetricRankScores("Points");
+
+  const savesScores =
+    getMetricRankScores("Saves");
+
+
+  // -----------------------------------------------------
+  // CALCULATE TEAM RATINGS
+  // -----------------------------------------------------
+
+  const teamRatings = {};
+
+  Object.keys(teamMetricMap).forEach(team => {
+
+    const offensiveScores = [
+      goalsForScores[team]?.score,
+      shotsScores[team]?.score,
+      assistsScores[team]?.score,
+      pointsScores[team]?.score
+    ].filter(value =>
+      value !== undefined &&
+      !Number.isNaN(Number(value))
+    );
+
+    const defensiveScores = [
+      goalsAllowedScores[team]?.score,
+      savesScores[team]?.score
+    ].filter(value =>
+      value !== undefined &&
+      !Number.isNaN(Number(value))
+    );
+
+    const offensiveRating =
+      offensiveScores.length
+        ? offensiveScores.reduce(
+            (sum, value) => sum + value,
+            0
+          ) / offensiveScores.length
+        : 0;
+
+    const defensiveRating =
+      defensiveScores.length
+        ? defensiveScores.reduce(
+            (sum, value) => sum + value,
+            0
+          ) / defensiveScores.length
+        : 0;
+
+    const overallRating =
+      offensiveRating * 0.60 +
+      defensiveRating * 0.40;
+
+    teamRatings[team] = {
+      offensiveRating,
+      defensiveRating,
+      overallRating
+    };
+
+  });
+
+
+  // -----------------------------------------------------
+  // OVERALL NHL LEAGUE RANKINGS
+  // -----------------------------------------------------
+
+  const overallRankings =
+    Object.entries(teamRatings)
+      .map(([team, ratings]) => ({
+        team,
+        overallRating:
+          ratings.overallRating
+      }))
+      .sort(
+        (a, b) =>
+          b.overallRating -
+          a.overallRating
+      );
+
+  overallRankings.forEach(
+    (item, index) => {
+
+      const rank = index + 1;
+
+      const rankScore =
+        overallRankings.length > 1
+          ? 100 *
+            (
+              1 -
+              (rank - 1) /
+              (overallRankings.length - 1)
+            )
+          : 100;
+
+      teamRatings[item.team].leagueRank =
+        rank;
+
+      teamRatings[item.team].rankScore =
+        rankScore;
+
+    }
+  );
+
+
+  // -----------------------------------------------------
+  // WRITE RATINGS INTO EVERY TEAM TREND ROW
+  // -----------------------------------------------------
+
+  rows.forEach(row => {
+
+    const team =
+      String(row[0] || "").trim();
+
+    const ratings =
+      teamRatings[team];
+
+    if (!ratings) {
+
+      row.push(
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      );
+
+      return;
+
+    }
+
+    const offensiveRating =
+      ratings.offensiveRating;
+
+    const defensiveRating =
+      ratings.defensiveRating;
+
+    const overallRating =
+      ratings.overallRating;
+
+
+    // ---------------------------------------------------
+    // RATING TIER
+    // ---------------------------------------------------
+
+    let ratingTier = "Weak";
+
+    if (overallRating >= 90) {
+      ratingTier = "Elite";
+    } else if (overallRating >= 75) {
+      ratingTier = "Strong";
+    } else if (overallRating >= 55) {
+      ratingTier = "Average";
+    } else if (overallRating >= 40) {
+      ratingTier = "Below Average";
+    }
+
+
+    // ---------------------------------------------------
+    // RATING NOTES
+    // ---------------------------------------------------
+
+    let ratingNotes =
+      "Balanced team profile.";
+
+    if (
+      offensiveRating >
+      defensiveRating + 20
+    ) {
+
+      ratingNotes =
+        "Offense carrying the team.";
+
+    } else if (
+      defensiveRating >
+      offensiveRating + 20
+    ) {
+
+      ratingNotes =
+        "Defense carrying the team.";
+
+    }
+
+
+    row.push(
+      ratings.leagueRank,
+      Number(
+        ratings.rankScore.toFixed(1)
+      ),
+      Number(
+        offensiveRating.toFixed(1)
+      ),
+      Number(
+        defensiveRating.toFixed(1)
+      ),
+      Number(
+        overallRating.toFixed(1)
+      ),
+      ratingTier,
+      ratingNotes
+    );
+
+  });
+
 }
 
 // ----------------------------------------------------------------------------

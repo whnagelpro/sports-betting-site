@@ -517,6 +517,156 @@ function buildNFLReceiverSeasonPanels({
 
 }
 
+function buildNBASeasonPanels({
+    season,
+    games,
+    trends
+}) {
+
+    const points =
+        Number(
+            season["Avg Points"] ??
+            season["Points"] ??
+            0
+        );
+
+    const rebounds =
+        Number(
+            season["Avg Rebounds"] ??
+            season["Rebounds"] ??
+            0
+        );
+
+    const assists =
+        Number(
+            season["Avg Assists"] ??
+            season["Assists"] ??
+            0
+        );
+
+    const threes =
+        Number(
+            season["Avg Threes"] ??
+            season["Threes"] ??
+            0
+        );
+
+    const pra =
+        Number(
+            season["Avg PRA"] ??
+            season["PRA"] ??
+            (points + rebounds + assists)
+        );
+
+    return [
+
+        {
+            title: "Season Production",
+
+            stats: [
+
+                {
+                    label: "Games",
+                    value: games
+                },
+
+                {
+                    label: "Points",
+                    value: Math.round(points * games)
+                },
+
+                {
+                    label: "Rebounds",
+                    value: Math.round(rebounds * games)
+                },
+
+                {
+                    label: "Assists",
+                    value: Math.round(assists * games)
+                },
+
+                {
+                    label: "Threes",
+                    value: Math.round(threes * games)
+                },
+
+                {
+                    label: "PRA",
+                    value: Math.round(pra * games)
+                }
+
+            ]
+        },
+
+        {
+            title: "Per Game",
+
+            stats: [
+
+                {
+                    label: "Points / Game",
+                    value: points
+                },
+
+                {
+                    label: "Rebounds / Game",
+                    value: rebounds
+                },
+
+                {
+                    label: "Assists / Game",
+                    value: assists
+                },
+
+                {
+                    label: "Threes / Game",
+                    value: threes
+                },
+
+                {
+                    label: "PRA / Game",
+                    value: pra
+                }
+
+            ]
+        },
+
+        {
+            title: "Trend Metrics",
+
+            stats: [
+
+                {
+                    label: "Consistency",
+                    value:
+                        trends?.[0]?.consistency ??
+                        trends?.[0]?.["Consistency"] ??
+                        "-"
+                },
+
+                {
+                    label: "Trend Strength",
+                    value:
+                        trends?.[0]?.strength ??
+                        trends?.[0]?.["Trend Strength"] ??
+                        "-"
+                },
+
+                {
+                    label: "Risk Tier",
+                    value:
+                        trends?.[0]?.risk ??
+                        trends?.[0]?.["Risk Tier"] ??
+                        "-"
+                }
+
+            ]
+        }
+
+    ];
+
+}
+
 export function buildSeasonPanels(context) {
 
     const season = context.seasonStats || {};
@@ -576,6 +726,16 @@ export function buildSeasonPanels(context) {
     const positionGroup =
         context.positionGroup ||
         String(position).trim().toUpperCase();
+
+    if (league === "nba") {
+
+        return buildNBASeasonPanels({
+            season,
+            games,
+            trends
+        });
+
+    }
 
     if (league === "nfl" && positionGroup === "QB") {
 
