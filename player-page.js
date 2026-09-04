@@ -1331,8 +1331,18 @@ function formatStatValue(value, label = "") {
     const lower = String(label).toLowerCase();
 
     // Games should always be whole numbers
-    if (lower.includes("game")) {
+    if (
+        lower === "games" ||
+        lower === "games played"
+    ) {
         return Math.round(number);
+    }
+
+    if (
+        lower.includes("/ game") ||
+        lower.includes("per game")
+    ) {
+        return number.toFixed(1);
     }
 
     // Integer stats
