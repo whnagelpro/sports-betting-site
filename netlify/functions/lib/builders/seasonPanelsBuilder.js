@@ -667,6 +667,156 @@ function buildNBASeasonPanels({
 
 }
 
+function buildNHLSeasonPanels({
+    season,
+    games,
+    trends
+}) {
+
+    const goals =
+        Number(
+            season["Avg Goals"] ??
+            season["Goals"] ??
+            0
+        );
+
+    const assists =
+        Number(
+            season["Avg Assists"] ??
+            season["Assists"] ??
+            0
+        );
+
+    const points =
+        Number(
+            season["Avg Points"] ??
+            season["Points"] ??
+            0
+        );
+
+    const shotsOnGoal =
+        Number(
+            season["Avg Shots on Goal"] ??
+            season["Shots on Goal"] ??
+            0
+        );
+
+    const saves =
+        Number(
+            season["Avg Saves"] ??
+            season["Saves"] ??
+            0
+        );
+
+    return [
+
+        {
+            title: "Season Production",
+
+            stats: [
+
+                {
+                    label: "Games",
+                    value: games
+                },
+
+                {
+                    label: "Goals",
+                    value: Math.round(goals * games)
+                },
+
+                {
+                    label: "Assists",
+                    value: Math.round(assists * games)
+                },
+
+                {
+                    label: "Points",
+                    value: Math.round(points * games)
+                },
+
+                {
+                    label: "Shots on Goal",
+                    value: Math.round(shotsOnGoal * games)
+                },
+
+                {
+                    label: "Saves",
+                    value: Math.round(saves * games)
+                }
+
+            ]
+        },
+
+        {
+            title: "Per Game",
+
+            stats: [
+
+                {
+                    label: "Goals / Game",
+                    value: goals
+                },
+
+                {
+                    label: "Assists / Game",
+                    value: assists
+                },
+
+                {
+                    label: "Points / Game",
+                    value: points
+                },
+
+                {
+                    label: "Shots on Goal / Game",
+                    value: shotsOnGoal
+                },
+
+                {
+                    label: "Saves / Game",
+                    value: saves
+                }
+
+            ]
+        },
+
+        {
+            title: "Trend Metrics",
+
+            stats: [
+
+                {
+                    label: "Consistency",
+                    value:
+                        trends?.[0]?.consistency ??
+                        trends?.[0]?.["Consistency"] ??
+                        "-"
+                },
+
+                {
+                    label: "Trend Strength",
+                    value:
+                        trends?.[0]?.strength ??
+                        trends?.[0]?.["Trend Strength"] ??
+                        "-"
+                },
+
+                {
+                    label: "Risk Tier",
+                    value:
+                        trends?.[0]?.risk ??
+                        trends?.[0]?.["Risk Tier"] ??
+                        "-"
+                }
+
+            ]
+        }
+
+    ];
+
+}
+
 export function buildSeasonPanels(context) {
 
     const season = context.seasonStats || {};
@@ -730,6 +880,16 @@ export function buildSeasonPanels(context) {
     if (league === "nba") {
 
         return buildNBASeasonPanels({
+            season,
+            games,
+            trends
+        });
+
+    }
+
+    if (league === "nhl") {
+
+        return buildNHLSeasonPanels({
             season,
             games,
             trends
