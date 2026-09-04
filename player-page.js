@@ -532,7 +532,11 @@ section.hidden = false;
 
     console.log("First NFL Game Log:", player.gameLogs[0]);
 
-    player.gameLogs.forEach(game => {
+    const recentGames =
+        (player.gameLogs || [])
+            .slice(0, 10);
+
+    recentGames.forEach(game => {
 
         body.appendChild(
 
