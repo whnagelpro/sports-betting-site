@@ -34,15 +34,23 @@ export function buildNHLContext({
 
             name: profile["Full Name"],
 
-            team: profile["Team Name"],
+            team:
+                seasonStats["Team"] ??
+                "",
 
-            teamAbbreviation: profile["Team Abbreviation"],
+            teamAbbreviation: "",
 
-            position: profile.Position,
+            position:
+                profile["Position Code"] ??
+                "",
 
-            height: profile.Height,
+            height:
+                profile["Height in Inches"] ??
+                "",
 
-            weight: profile.Weight,
+            weight:
+                profile["Weight in Pounds"] ??
+                "",
 
             bats: "",
 
@@ -94,7 +102,7 @@ export function buildNHLContext({
                     label: "Shots on Goal",
 
                     value: Number(
-                        seasonStats["Avg Shots on Goal"] ?? 0
+                        seasonStats["Avg Shots On Goal"] ?? 0
                     ).toFixed(1)
 
                 },
@@ -146,7 +154,7 @@ export function buildNHLContext({
 
         positionGroup:
             String(
-                profile.Position ?? ""
+                profile["Position Code"] ?? ""
             )
                 .trim()
                 .toUpperCase(),

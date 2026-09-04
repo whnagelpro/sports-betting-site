@@ -696,8 +696,8 @@ function buildNHLSeasonPanels({
 
     const shotsOnGoal =
         Number(
-            season["Avg Shots on Goal"] ??
-            season["Shots on Goal"] ??
+            season["Avg Shots On Goal"] ??
+            season["Shots On Goal"] ??
             0
         );
 
