@@ -954,8 +954,10 @@ function renderProps() {
                 : topProp.ev,
 
     "top-prop-probability":
-        analytics?.probability ??
-        topProp.probability,
+        formatProbability(
+            analytics?.probability ??
+            topProp.probability
+        ),
 
     "top-prop-confidence":
         analytics?.confidence ??
@@ -1087,9 +1089,10 @@ function renderProps() {
 
                 <strong>
 
-                    ${analytics.probability ??
-                        prop.probability ??
-                        "-"}
+                    ${formatProbability(
+                        analytics.probability ??
+                        prop.probability
+                    )}
 
                 </strong>
 
@@ -1298,6 +1301,30 @@ function renderTrendCards() {
 // ------------------------------------------------------
 // Utilities
 // ------------------------------------------------------
+
+function formatProbability(value) {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return "-";
+    }
+
+    // Probability stored as decimal:
+    // 0.0851 -> 8.5%
+    if (number >= 0 && number <= 1) {
+        return `${(number * 100).toFixed(1)}%`;
+    }
+
+    // Probability already stored as percentage:
+    // 8.51 -> 8.5%
+    if (number > 1 && number <= 100) {
+        return `${number.toFixed(1)}%`;
+    }
+
+    return "-";
+
+}
 
 function setText(id, value) {
 
