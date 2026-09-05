@@ -1587,19 +1587,74 @@ function buildNFLPropsFromRows(rows) {
   }
   });
 
+  const bestMarkets = new Map();
+
+  props.forEach((prop) => {
+    const marketKey = [
+      prop.gameDate,
+      prop.awayTeam,
+      prop.homeTeam,
+      prop.playerId || prop.playerName,
+      prop.propType
+    ].join("|");
+
+    const existing = bestMarkets.get(marketKey);
+
+    if (!existing) {
+      bestMarkets.set(marketKey, prop);
+      return;
+    }
+
+    const currentEV =
+      Number.isFinite(prop.bestEV)
+        ? prop.bestEV
+        : -Infinity;
+
+    const existingEV =
+      Number.isFinite(existing.bestEV)
+        ? existing.bestEV
+        : -Infinity;
+
+    if (currentEV > existingEV) {
+      bestMarkets.set(marketKey, prop);
+      return;
+    }
+
+    if (currentEV === existingEV) {
+      const currentProbability =
+        Number.isFinite(prop.bestModelProbability)
+          ? prop.bestModelProbability
+          : -Infinity;
+
+      const existingProbability =
+        Number.isFinite(existing.bestModelProbability)
+          ? existing.bestModelProbability
+          : -Infinity;
+
+      if (currentProbability > existingProbability) {
+        bestMarkets.set(marketKey, prop);
+      }
+    }
+  });
+
+  const consolidatedProps =
+    Array.from(bestMarkets.values());
+
   console.log(
-    "NFL RECOMMENDATION BOARD:",
+    "NFL MARKET CONSOLIDATION:",
     {
-      sourceRows: rows.length,
-      recommendationCards: props.length,
-      overRecommendations:
-        props.filter(prop => prop.bestSide === "Over").length,
-      underRecommendations:
-        props.filter(prop => prop.bestSide === "Under").length
+      recommendationsBefore:
+        props.length,
+
+      recommendationsAfter:
+        consolidatedProps.length,
+
+      duplicatesRemoved:
+        props.length - consolidatedProps.length
     }
   );
 
-  return props;
+  return consolidatedProps;
 }
 
 function createBetCard(game, tierName = "Rookie") {
