@@ -1514,6 +1514,7 @@ function buildNFLPropsFromRows(rows) {
       overOdds !== "" &&
       !Number.isNaN(overEV)
     ) {
+    if (bestSide === "Over") {
       props.push({
         gameDate,
         playerId,
@@ -1543,6 +1544,7 @@ function buildNFLPropsFromRows(rows) {
         gameLabel
       });
     }
+    }
 
     if (
       playerName &&
@@ -1552,6 +1554,7 @@ function buildNFLPropsFromRows(rows) {
       underOdds !== "" &&
       !Number.isNaN(underEV)
     ) {
+    if (bestSide === "Under") {
       props.push({
         gameDate,
         playerId,
@@ -1581,7 +1584,20 @@ function buildNFLPropsFromRows(rows) {
         gameLabel
       });
     }
+  }
   });
+
+  console.log(
+    "NFL RECOMMENDATION BOARD:",
+    {
+      sourceRows: rows.length,
+      recommendationCards: props.length,
+      overRecommendations:
+        props.filter(prop => prop.bestSide === "Over").length,
+      underRecommendations:
+        props.filter(prop => prop.bestSide === "Under").length
+    }
+  );
 
   return props;
 }
