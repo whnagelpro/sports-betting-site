@@ -1640,20 +1640,6 @@ function buildNFLPropsFromRows(rows) {
   const consolidatedProps =
     Array.from(bestMarkets.values());
 
-  console.log(
-    "NFL MARKET CONSOLIDATION:",
-    {
-      recommendationsBefore:
-        props.length,
-
-      recommendationsAfter:
-        consolidatedProps.length,
-
-      duplicatesRemoved:
-        props.length - consolidatedProps.length
-    }
-  );
-
   return consolidatedProps;
 }
 
@@ -1769,7 +1755,11 @@ function createBetCard(game, tierName = "Rookie") {
 }
 
 function createPropCard(prop) {
-  const probabilityText = formatProbability(prop.impliedProbability);
+  const probabilityText =
+    prop.league === "nfl" &&
+    Number.isFinite(prop.bestModelProbability)
+      ? formatProbability(prop.bestModelProbability)
+      : formatProbability(prop.impliedProbability);
   const betTypeLower = (prop.betType || "").toLowerCase();
 
   let oddsToShow = "N/A";
@@ -1799,11 +1789,6 @@ function createPropCard(prop) {
         ? formatEV(prop.bestEV)
         : "—";
 
-    const bestProbabilityText =
-      Number.isFinite(prop.bestModelProbability)
-        ? formatProbability(prop.bestModelProbability)
-        : "—";
-
     const edgeText =
       Number.isFinite(prop.bestPriceEdge)
         ? formatProbability(prop.bestPriceEdge)
@@ -1820,16 +1805,6 @@ function createPropCard(prop) {
           <strong>Sportacular Model:</strong>
           ${isNoPlay ? "No Play" : prop.bestSide}
         </div>
-
-        ${
-          !isNoPlay
-            ? `
-              <div>
-                Model Probability: ${bestProbabilityText}
-              </div>
-            `
-            : ""
-        }
 
         <div>
           Best EV: ${bestEVText}
