@@ -2148,7 +2148,18 @@ function getPropDisplayOdds(prop) {
 }
 
 function getPropProbabilityValue(prop) {
-  if (!Number.isNaN(prop.impliedProbability) && prop.impliedProbability > 0) {
+  if (
+    prop.league === "nfl" &&
+    Number.isFinite(prop.bestModelProbability) &&
+    prop.bestModelProbability > 0
+  ) {
+    return prop.bestModelProbability;
+  }
+
+  if (
+    Number.isFinite(prop.impliedProbability) &&
+    prop.impliedProbability > 0
+  ) {
     return prop.impliedProbability;
   }
 
