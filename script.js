@@ -1097,10 +1097,36 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
 
       return `
         <div class="leaderboard-item">
-          <strong>#${index + 1} ${fullName} — ${formatPropTypeLabel(prop.propType)}</strong>
-          <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
-          <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
-          <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
+          <strong>
+            #${index + 1}
+            ${
+              prop.playerId && prop.league
+                ? `
+                  <a
+                    class="player-link"
+                    href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}"
+                  >
+                    ${fullName}
+                  </a>
+                `
+                : fullName
+            }
+            — ${formatPropTypeLabel(prop.propType)}
+          </strong>
+
+          <div class="${getEVClass(prop.ev)}">
+            EV: ${formatEV(prop.ev)}
+          </div>
+
+          <div>
+            ${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}
+          </div>
+
+          <div>
+            Line: ${formatLineValue(prop.lineValue)}
+            | Bet: ${prop.betType}
+            | Probability: ${probabilityText}
+          </div>
         </div>
       `;
     })
