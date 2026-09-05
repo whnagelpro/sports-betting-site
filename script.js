@@ -1325,7 +1325,7 @@ function transformRowsToGames(rows) {
     .filter((game) => game.rankings.length > 0);
 }
 
-function buildPropsFromRows(rows) {
+function buildPropsFromRows(rows, league = "mlb") {
   return rows
     .map((row, index) => {
 
@@ -1370,7 +1370,7 @@ return {
 
     gameId: safeText(row["Game Id"], ""),
 
-    league: "mlb",
+    league,
 
     playerName,
     playerFirstName,
@@ -1409,6 +1409,13 @@ function buildNFLPropsFromRows(rows) {
 
   rows.forEach((row) => {
     const gameDate = normalizeDate(row["Game Date"]);
+
+    const playerId =
+      safeText(
+        row["Player Id"] ||
+        row["Player ID"],
+        ""
+      );
 
     const playerFirstName = safeText(
       row["Player First Name"],
@@ -1463,6 +1470,8 @@ function buildNFLPropsFromRows(rows) {
     ) {
       props.push({
         gameDate,
+        playerId,
+        league: "nfl",
         playerName,
         playerFirstName,
         playerLastName,
@@ -1491,6 +1500,8 @@ function buildNFLPropsFromRows(rows) {
     ) {
       props.push({
         gameDate,
+        playerId,
+        league: "nfl",
         playerName,
         playerFirstName,
         playerLastName,
@@ -1646,13 +1657,18 @@ function createPropCard(prop) {
         <div>
           <h3>
 
-<a
-    class="player-link"
-    href="player.html?league=${prop.league}&id=${prop.playerId}">
-
-    ${fullName}
-
-</a>
+${
+    prop.playerId && prop.league
+        ? `
+            <a
+                class="player-link"
+                href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}"
+            >
+                ${fullName}
+            </a>
+        `
+        : fullName
+}
 
 —
 
@@ -1748,7 +1764,7 @@ async function fetchLeagueGames(csvUrl) {
   return todaysGames;
 }
 
-async function fetchLeagueProps(csvUrl) {
+async function fetchLeagueProps(csvUrl, league) {
   if (DATA_CACHE.props[csvUrl]) return DATA_CACHE.props[csvUrl];
 
   const headers = {};
@@ -1865,9 +1881,9 @@ if (
   console.log("First CSV Row:", rows[0]);
 
   const props =
-    csvUrl === NFL_PROPS_PREMIUM_URL
+    league === "nfl"
       ? buildNFLPropsFromRows(rows)
-      : buildPropsFromRows(rows);
+      : buildPropsFromRows(rows, league);
 
   const today = getTodayDateString();
 
@@ -2132,7 +2148,11 @@ async function renderPropsPage(pageKey) {
 `;
 
   try {
-    const props = await fetchLeagueProps(config.csvUrl);
+    const props =
+      await fetchLeagueProps(
+        config.csvUrl,
+        pageKey
+      );
     updateLastUpdated(config.lastUpdatedId);
 
     const renderPage = () => {
