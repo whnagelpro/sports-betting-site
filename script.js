@@ -1457,10 +1457,12 @@ function buildNFLPropsFromRows(rows) {
     const underEV = toNumber(row["EV Under"]);
 
     const impliedProbOver = toNumber(
+      row["Model Prob Over"] ||
       row["Implied Prob Over"]
     );
 
     const impliedProbUnder = toNumber(
+      row["Model Prob Under"] ||
       row["Implied Prob Under"]
     );
 
