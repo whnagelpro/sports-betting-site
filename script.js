@@ -1465,22 +1465,46 @@ function buildNFLPropsFromRows(rows) {
       ""
     );
 
-    const bestEV = toNumber(
+    const bestEVRaw = toNumber(
       row["Best EV"]
     );
 
-    const bestModelProbability = toNumber(
+    const bestEV =
+      Number.isFinite(bestEVRaw)
+        ? bestEVRaw
+        : null;
+
+    const bestModelProbabilityRaw = toNumber(
       row["Best Model Probability"]
     );
+
+    const bestModelProbability =
+      Number.isFinite(bestModelProbabilityRaw)
+        ? bestModelProbabilityRaw
+        : null;
 
     const riskTier = safeText(
       row["Risk Tier"],
       ""
     );
 
-    const modelConfidence = toNumber(
+    const bestPriceEdgeRaw = toNumber(
+      row["Best Price Edge"]
+    );
+
+    const bestPriceEdge =
+      Number.isFinite(bestPriceEdgeRaw)
+        ? bestPriceEdgeRaw
+        : null;
+
+    const modelConfidenceRaw = toNumber(
       row["Model Confidence"]
     );
+
+    const modelConfidence =
+      Number.isFinite(modelConfidenceRaw)
+        ? modelConfidenceRaw
+        : null;
 
     if (
       playerName &&
@@ -1510,6 +1534,7 @@ function buildNFLPropsFromRows(rows) {
         bestSide,
         bestEV,
         bestModelProbability,
+        bestPriceEdge,
         riskTier,
         modelConfidence,
 
@@ -1547,6 +1572,7 @@ function buildNFLPropsFromRows(rows) {
         bestSide,
         bestEV,
         bestModelProbability,
+        bestPriceEdge,
         riskTier,
         modelConfidence,
 
@@ -1556,16 +1582,6 @@ function buildNFLPropsFromRows(rows) {
       });
     }
   });
-
-  console.log(
-    "NFL DECISION LAYER TEST:",
-    props.find(
-      (prop) =>
-        prop.bestSide ||
-        !Number.isNaN(prop.bestEV) ||
-        !Number.isNaN(prop.bestModelProbability)
-    )
-  );
 
   return props;
 }
@@ -1697,6 +1713,69 @@ function createPropCard(prop) {
 
   const fullName = getPropFullName(prop);
 
+  const isNFLDecisionProp =
+    prop.league === "nfl" &&
+    prop.bestSide;
+
+  let nflDecisionHTML = "";
+
+  if (isNFLDecisionProp) {
+    const isNoPlay =
+      prop.bestSide === "No Play";
+
+    const bestEVText =
+      Number.isFinite(prop.bestEV)
+        ? formatEV(prop.bestEV)
+        : "—";
+
+    const bestProbabilityText =
+      Number.isFinite(prop.bestModelProbability)
+        ? formatProbability(prop.bestModelProbability)
+        : "—";
+
+    const edgeText =
+      Number.isFinite(prop.bestPriceEdge)
+        ? formatProbability(prop.bestPriceEdge)
+        : "—";
+
+    const confidenceText =
+      Number.isFinite(prop.modelConfidence)
+        ? `${prop.modelConfidence.toFixed(1)}`
+        : "—";
+
+    nflDecisionHTML = `
+      <div class="nfl-model-decision">
+        <div>
+          <strong>Sportacular Model:</strong>
+          ${isNoPlay ? "No Play" : prop.bestSide}
+        </div>
+
+        ${
+          !isNoPlay
+            ? `
+              <div>
+                Model Probability: ${bestProbabilityText}
+              </div>
+            `
+            : ""
+        }
+
+        <div>
+          Best EV: ${bestEVText}
+        </div>
+
+        <div>
+          Edge: ${edgeText}
+        </div>
+
+        <div>
+          Risk: ${prop.riskTier || "—"}
+          | Confidence: ${confidenceText}
+        </div>
+      </div>
+    `;
+  }
+
   return `
     <article class="prop-card">
       <div class="prop-card-header">
@@ -1734,6 +1813,7 @@ ${formatPropTypeLabel(prop.propType)}
           <div><strong>Model Probability:</strong> ${probabilityText}</div>
         </div>
       </div>
+      ${nflDecisionHTML}
     </article>
   `;
 }
