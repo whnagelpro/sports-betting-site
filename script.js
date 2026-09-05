@@ -1093,7 +1093,11 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
   container.innerHTML = topProps
     .map((prop, index) => {
       const fullName = getPropFullName(prop);
-      const probabilityText = formatProbability(prop.impliedProbability);
+      const probabilityText =
+        prop.league === "nfl" &&
+        Number.isFinite(prop.bestModelProbability)
+          ? formatProbability(prop.bestModelProbability)
+          : formatProbability(prop.impliedProbability);
 
       return `
         <div class="leaderboard-item">
