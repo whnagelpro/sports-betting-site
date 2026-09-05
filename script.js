@@ -1460,6 +1460,28 @@ function buildNFLPropsFromRows(rows) {
       row["Implied Prob Under"]
     );
 
+    const bestSide = safeText(
+      row["Best Side"],
+      ""
+    );
+
+    const bestEV = toNumber(
+      row["Best EV"]
+    );
+
+    const bestModelProbability = toNumber(
+      row["Best Model Probability"]
+    );
+
+    const riskTier = safeText(
+      row["Risk Tier"],
+      ""
+    );
+
+    const modelConfidence = toNumber(
+      row["Model Confidence"]
+    );
+
     if (
       playerName &&
       vendor &&
@@ -1484,6 +1506,13 @@ function buildNFLPropsFromRows(rows) {
         genericOdds: overOdds,
         impliedProbability: impliedProbOver,
         ev: overEV,
+
+        bestSide,
+        bestEV,
+        bestModelProbability,
+        riskTier,
+        modelConfidence,
+
         awayTeam,
         homeTeam,
         gameLabel
@@ -1514,12 +1543,29 @@ function buildNFLPropsFromRows(rows) {
         genericOdds: underOdds,
         impliedProbability: impliedProbUnder,
         ev: underEV,
+
+        bestSide,
+        bestEV,
+        bestModelProbability,
+        riskTier,
+        modelConfidence,
+
         awayTeam,
         homeTeam,
         gameLabel
       });
     }
   });
+
+  console.log(
+    "NFL DECISION LAYER TEST:",
+    props.find(
+      (prop) =>
+        prop.bestSide ||
+        !Number.isNaN(prop.bestEV) ||
+        !Number.isNaN(prop.bestModelProbability)
+    )
+  );
 
   return props;
 }

@@ -331,8 +331,8 @@ function refreshNFLScheduleSheet() {
   // ------------------------------------------
 
   const season = 2026;
-  const week = 4;
-  const seasonType = 1; // 1 = Preseason
+  const week = 1;
+  const seasonType = 2; // 1 = Preseason
 
   Logger.log(
     `Refreshing NFL Season ${season}, Week ${week}...`
@@ -992,7 +992,8 @@ function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
 
   const formulaHeaders = [
     "EV Over", "EV Under", "Implied Prob Over", "Implied Prob Under",
-    "Best Price Edge", "Risk Tier", "Model Confidence", "Player Name", "Team"
+    "Best Price Edge", "Risk Tier", "Model Confidence", "Player Name", "Team",
+    "Player Baseline", "Trend Adjustment", "Projected Stat", "Stat Std Dev"
   ];
 
   sheet.getRange(1, 1, 1, rawHeaders.length).setValues([rawHeaders]);
@@ -1002,28 +1003,240 @@ function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
   sheet.getRange("P2").setFormula(`=IF(N2>0,1+N2/100,IF(N2<0,1+100/ABS(N2),""))`);
   sheet.getRange("Q2").setFormula(`=IF(M2<0,ABS(M2)/(ABS(M2)+100),IF(M2>0,100/(M2+100),""))`);
   sheet.getRange("R2").setFormula(`=IF(N2<0,ABS(N2)/(ABS(N2)+100),IF(N2>0,100/(N2+100),""))`);
-  sheet.getRange("S2").setFormula(`=IFERROR(MAX(O2,P2)-1,"")`);
-  sheet.getRange("T2").setFormula(`=IF(S2>=0.25,"Low",IF(S2>=0.1,"Medium","High"))`);
-  sheet.getRange("U2").setFormula(`=IFERROR(S2*100,"")`);
+  sheet.getRange("S2").setFormula(`=IF(COUNT(O2:P2)=0,"",MAX(O2,P2)-1)`);
+  sheet.getRange("T2").setFormula(`=IF(S2="","",IF(S2>=0.25,"Low",IF(S2>=0.1,"Medium","High")))`);
+  sheet.getRange("U2").setFormula(`=IF(S2="","",S2*100)`);
   sheet.getRange("V2").setFormula(`=IFERROR(INDEX(Rosters!D:D,MATCH(F2,Rosters!A:A,0)),"")`);
   sheet.getRange("W2").setFormula(`=IFERROR(INDEX(Rosters!F:F,MATCH(F2,Rosters!A:A,0)),"")`);
+  sheet.getRange("X2").setFormula(
+    `=IFERROR(
+      LET(
+        statName,
+          SWITCH(
+            H2,
+            "passing_yards","Passing Yards",
+            "passing_tds","Passing TDs",
+            "interceptions","Interceptions",
+            "passing_completions","Completions",
+            "passing_attempts","Pass Attempts",
+            "rushing_yards","Rushing Yards",
+            "rushing_attempts","Rushing Attempts",
+            "rushing_tds","Rushing TDs",
+            "receptions","Receptions",
+            "receiving_yards","Receiving Yards",
+            "receiving_tds","Receiving TDs",
+            ""
+          ),
+
+        currentGames,
+          IFERROR(
+            INDEX(
+              'NFL Player Season Stats'!D:D,
+              MATCH(F2,'NFL Player Season Stats'!A:A,0)
+            ),
+            0
+          ),
+
+        currentAvg,
+          IFERROR(
+            INDEX(
+              'NFL Player Trends'!E:E,
+              MATCH(
+                1,
+                (F2='NFL Player Trends'!A:A)*
+                (statName='NFL Player Trends'!D:D),
+                0
+              )
+            ),
+            ""
+          ),
+
+        priorGames,
+          IFERROR(
+            INDEX(
+              'NFL Player Baselines'!D:D,
+              MATCH(F2,'NFL Player Baselines'!A:A,0)
+            ),
+            0
+          ),
+
+        priorTotal,
+          IFERROR(
+            SWITCH(
+              H2,
+              "passing_yards",
+                INDEX('NFL Player Baselines'!E:E,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "passing_tds",
+                INDEX('NFL Player Baselines'!F:F,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "interceptions",
+                INDEX('NFL Player Baselines'!G:G,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "passing_completions",
+                INDEX('NFL Player Baselines'!H:H,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "passing_attempts",
+                INDEX('NFL Player Baselines'!I:I,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "rushing_yards",
+                INDEX('NFL Player Baselines'!J:J,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "rushing_attempts",
+                INDEX('NFL Player Baselines'!K:K,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "rushing_tds",
+                INDEX('NFL Player Baselines'!L:L,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "receptions",
+                INDEX('NFL Player Baselines'!M:M,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "receiving_yards",
+                INDEX('NFL Player Baselines'!N:N,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              "receiving_tds",
+                INDEX('NFL Player Baselines'!O:O,MATCH(F2,'NFL Player Baselines'!A:A,0)),
+              ""
+            ),
+            ""
+          ),
+
+        priorAvg,
+          IF(
+            AND(priorGames>0,priorTotal<>""),
+            priorTotal/priorGames,
+            ""
+          ),
+
+        IF(
+          statName="",
+          "",
+          IF(
+            AND(currentGames>0,currentAvg<>"",priorAvg<>""),
+            ((4*priorAvg)+(currentGames*currentAvg))/(4+currentGames),
+            IF(
+              AND(currentGames>0,currentAvg<>""),
+              currentAvg,
+              priorAvg
+            )
+          )
+        )
+      ),
+      ""
+    )`
+  );
+
+  sheet.getRange("Y2").setFormula(
+    `=IFERROR(
+      LET(
+        statName,
+          SWITCH(
+            H2,
+            "passing_yards","Passing Yards",
+            "passing_tds","Passing TDs",
+            "interceptions","Interceptions",
+            "passing_completions","Completions",
+            "passing_attempts","Pass Attempts",
+            "rushing_yards","Rushing Yards",
+            "rushing_attempts","Rushing Attempts",
+            "rushing_tds","Rushing TDs",
+            "receptions","Receptions",
+            "receiving_yards","Receiving Yards",
+            "receiving_tds","Receiving TDs",
+            ""
+          ),
+
+        last5,
+          IFERROR(
+            INDEX(
+              'NFL Player Trends'!G:G,
+              MATCH(
+                1,
+                (F2='NFL Player Trends'!A:A)*
+                (statName='NFL Player Trends'!D:D),
+                0
+              )
+            ),
+            ""
+          ),
+
+        currentGames,
+          IFERROR(
+            INDEX(
+              'NFL Player Season Stats'!D:D,
+              MATCH(F2,'NFL Player Season Stats'!A:A,0)
+            ),
+            0
+          ),
+
+        IF(
+          OR(
+            X2="",
+            last5="",
+            currentGames=0
+          ),
+          0,
+          0.30*(last5-X2)
+        )
+      ),
+      0
+    )`
+  );
+
+  sheet.getRange("Z2").setFormula(
+    `=IF(OR(X2="",Y2=""),"",X2+Y2)`
+  );
+
+  sheet.getRange("AA2").setFormula(
+    `=IFERROR(
+      LET(
+        statCol,
+          SWITCH(
+            H2,
+            "passing_yards",7,
+            "passing_tds",8,
+            "interceptions",9,
+            "passing_completions",10,
+            "passing_attempts",11,
+            "rushing_yards",12,
+            "rushing_attempts",13,
+            "rushing_tds",14,
+            "receptions",15,
+            "receiving_yards",16,
+            "receiving_tds",17,
+            0
+          ),
+
+        values,
+          IF(
+            statCol=0,
+            "",
+            FILTER(
+              INDEX('NFL Player Game Logs'!A:Q,0,statCol),
+              'NFL Player Game Logs'!C:C=F2
+            )
+          ),
+
+        IF(
+          statCol=0,
+          "",
+          IF(
+            COUNT(values)<2,
+            "",
+            STDEV.S(values)
+          )
+        )
+      ),
+      ""
+    )`
+  );
 
   sheet.setFrozenRows(1);
   sheet.getRange("1:1").setFontWeight("bold");
-  sheet.getRange("A1:W1").setHorizontalAlignment("center");
+  sheet.getRange("A1:AA1").setHorizontalAlignment("center");
 
   if (!sheet.getFilter()) {
     sheet.getRange("A1:W1").createFilter();
   }
 
-  sheet.autoResizeColumns(1, 23);
+  sheet.autoResizeColumns(1, 27);
 }
 
 function clearNFLPlayerPropsSheet_(sheet) {
   const maxRows = sheet.getMaxRows();
 
   if (maxRows > 2) {
-    sheet.getRange(3, 1, maxRows - 2, 23).clearContent();
+    sheet.getRange(3, 1, maxRows - 2, 27).clearContent();
   }
 }
 
@@ -1045,8 +1258,8 @@ function fetchAllNFLPlayerPropsForGame_(gameId) {
 function copyNFLPlayerPropsFormulasDown_(sheet, rowCount) {
   if (!rowCount || rowCount <= 0) return;
 
-  sheet.getRange("O2:W2").copyTo(
-    sheet.getRange(3, 15, rowCount, 9),
+  sheet.getRange("O2:AA2").copyTo(
+    sheet.getRange(3, 15, rowCount, 13),
     SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
     false
   );
@@ -1131,16 +1344,17 @@ function refreshNFLPlayerPropsSheet() {
 function ensureNFLTrendTabs_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  [
-    "NFL Player Game Logs",
-    "NFL Team Game Logs",
-    "NFL Player Season Stats",
-    "NFL Team Season Stats",
-    "NFL Player Trends",
-    "NFL Team Trends",
-    "NFL Top Player Trends",
-    "NFL Top Team Trends"
-  ].forEach(name => {
+[
+  "NFL Player Game Logs",
+  "NFL Team Game Logs",
+  "NFL Player Season Stats",
+  "NFL Player Baselines",
+  "NFL Team Season Stats",
+  "NFL Player Trends",
+  "NFL Team Trends",
+  "NFL Top Player Trends",
+  "NFL Top Team Trends"
+].forEach(name => {
     if (!ss.getSheetByName(name)) {
       ss.insertSheet(name);
     }
@@ -1956,6 +2170,158 @@ function refreshNFLPlayerSeasonStatsSheet() {
   Logger.log(`Wrote ${rows.length} NFL player season stat rows.`);
 }
 
+function refreshNFLPlayerBaselinesSheet() {
+  ensureNFLTrendTabs_();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("NFL Player Baselines");
+
+  const headers = [
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Games Played",
+    "Passing Yards",
+    "Passing TDs",
+    "Interceptions",
+    "Completions",
+    "Pass Attempts",
+    "Rushing Yards",
+    "Rushing Attempts",
+    "Rushing TDs",
+    "Receptions",
+    "Receiving Yards",
+    "Receiving TDs",
+    "Season",
+    "Last Updated"
+  ];
+
+  const allRows = [];
+  let cursor = null;
+
+  do {
+    const params = {
+      season: 2025,
+      season_type: 2,
+      per_page: 100
+    };
+
+    if (cursor) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_("/nfl/v1/season_stats", params);
+
+    const data = Array.isArray(response.data)
+      ? response.data
+      : [];
+
+    allRows.push(...data);
+
+    cursor =
+      response.meta && response.meta.next_cursor
+        ? response.meta.next_cursor
+        : null;
+
+  } while (cursor);
+
+  const now = new Date();
+
+  const rows = allRows.map(row => {
+    const player = row.player || {};
+    const team = row.team || {};
+
+    const playerId =
+      row.player_id ||
+      player.id ||
+      "";
+
+    const playerName =
+      player.full_name ||
+      `${player.first_name || ""} ${player.last_name || ""}`.trim() ||
+      row.player_name ||
+      "";
+
+    const teamName =
+      getNFLTeamName_(team) ||
+      row.team_name ||
+      "";
+
+    return [
+      playerId,
+      playerName,
+      teamName,
+
+      getNFLStatNumber_(row, [
+        "games",
+        "games_played"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "passing_yards"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "passing_touchdowns",
+        "passing_tds"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "interceptions"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "completions",
+        "passing_completions"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "attempts",
+        "passing_attempts"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "rushing_yards"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "rushing_attempts"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "rushing_touchdowns",
+        "rushing_tds"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "receptions"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "receiving_yards"
+      ]),
+
+      getNFLStatNumber_(row, [
+        "receiving_touchdowns",
+        "receiving_tds"
+      ]),
+
+      2025,
+      now
+    ];
+  });
+
+  rows.sort((a, b) =>
+    String(a[1] || "").localeCompare(String(b[1] || ""))
+  );
+
+  writeNFLOutputSheet_(sheet, headers, rows);
+
+  Logger.log(
+    `Wrote ${rows.length} NFL player baseline rows for 2025.`
+  );
+}
+
 function refreshNFLTeamSeasonStatsSheet() {
   ensureNFLTrendTabs_();
 
@@ -2165,6 +2531,365 @@ function fetchAllNFLTeamStatsForGameIds_(gameIds) {
 
 }
 
+function populateNFLTeamRatings_(rows) {
+
+  if (!rows || !rows.length) return;
+
+  const teamMetricMap = {};
+
+  // -----------------------------------------------------
+  // BUILD TEAM -> METRIC -> SEASON AVG MAP
+  // -----------------------------------------------------
+
+  rows.forEach(row => {
+
+    const team =
+      String(row[0] || "").trim();
+
+    const metric =
+      String(row[1] || "").trim();
+
+    const seasonAvg =
+      Number(row[2]);
+
+    if (
+      !team ||
+      !metric ||
+      Number.isNaN(seasonAvg)
+    ) {
+      return;
+    }
+
+    if (!teamMetricMap[team]) {
+      teamMetricMap[team] = {};
+    }
+
+    teamMetricMap[team][metric] =
+      seasonAvg;
+
+  });
+
+  const teams =
+    Object.keys(teamMetricMap);
+
+  if (!teams.length) return;
+
+
+  // -----------------------------------------------------
+  // CALCULATE METRIC RANK SCORES
+  // -----------------------------------------------------
+
+  function getMetricRankScores_(
+    metric,
+    lowerIsBetter = false
+  ) {
+
+    const values = teams
+      .map(team => ({
+        team,
+        value:
+          Number(
+            teamMetricMap[team][metric]
+          )
+      }))
+      .filter(
+        item =>
+          !Number.isNaN(item.value)
+      );
+
+    values.sort((a, b) => {
+
+      if (lowerIsBetter) {
+        return a.value - b.value;
+      }
+
+      return b.value - a.value;
+
+    });
+
+    const scores = {};
+
+    values.forEach((item, index) => {
+
+      const rank =
+        index + 1;
+
+      let rankScore = 100;
+
+      if (values.length > 1) {
+
+        rankScore =
+          100 *
+          (
+            1 -
+            (rank - 1) /
+            (values.length - 1)
+          );
+
+      }
+
+      scores[item.team] = {
+        rank,
+        rankScore
+      };
+
+    });
+
+    return scores;
+
+  }
+
+
+  // -----------------------------------------------------
+  // NFL METRIC RANKINGS
+  // -----------------------------------------------------
+
+  const pointsFor =
+    getMetricRankScores_(
+      "Points For"
+    );
+
+  const pointsAllowed =
+    getMetricRankScores_(
+      "Points Allowed",
+      true
+    );
+
+  const passingYards =
+    getMetricRankScores_(
+      "Passing Yards"
+    );
+
+  const rushingYards =
+    getMetricRankScores_(
+      "Rushing Yards"
+    );
+
+  const turnovers =
+    getMetricRankScores_(
+      "Turnovers",
+      true
+    );
+
+  const sacks =
+    getMetricRankScores_(
+      "Sacks"
+    );
+
+
+  // -----------------------------------------------------
+  // HELPER: AVERAGE AVAILABLE SCORES
+  // -----------------------------------------------------
+
+  function averageScores_(scores) {
+
+    const valid =
+      scores.filter(
+        value =>
+          value !== null &&
+          value !== undefined &&
+          !Number.isNaN(value)
+      );
+
+    if (!valid.length) return 0;
+
+    return (
+      valid.reduce(
+        (sum, value) => sum + value,
+        0
+      ) / valid.length
+    );
+
+  }
+
+
+  // -----------------------------------------------------
+  // BUILD TEAM RATINGS
+  // -----------------------------------------------------
+
+  const teamRatings = {};
+
+  teams.forEach(team => {
+
+    const offensiveRating =
+      averageScores_([
+        pointsFor[team]?.rankScore,
+        passingYards[team]?.rankScore,
+        rushingYards[team]?.rankScore,
+        turnovers[team]?.rankScore
+      ]);
+
+    const defensiveRating =
+      averageScores_([
+        pointsAllowed[team]?.rankScore,
+        sacks[team]?.rankScore
+      ]);
+
+    const overallRating =
+      (
+        offensiveRating * 0.60
+      ) +
+      (
+        defensiveRating * 0.40
+      );
+
+    teamRatings[team] = {
+      offensiveRating,
+      defensiveRating,
+      overallRating
+    };
+
+  });
+
+
+  // -----------------------------------------------------
+  // OVERALL NFL RANKINGS
+  // -----------------------------------------------------
+
+  const overallRankings =
+    Object.entries(teamRatings)
+      .map(
+        ([team, ratings]) => ({
+          team,
+          overallRating:
+            ratings.overallRating
+        })
+      )
+      .sort(
+        (a, b) =>
+          b.overallRating -
+          a.overallRating
+      );
+
+  overallRankings.forEach(
+    (item, index) => {
+
+      const rank =
+        index + 1;
+
+      let rankScore = 100;
+
+      if (overallRankings.length > 1) {
+
+        rankScore =
+          100 *
+          (
+            1 -
+            (rank - 1) /
+            (overallRankings.length - 1)
+          );
+
+      }
+
+      teamRatings[item.team].leagueRank =
+        rank;
+
+      teamRatings[item.team].rankScore =
+        rankScore;
+
+    }
+  );
+
+
+  // -----------------------------------------------------
+  // ADD RATINGS TO EACH TREND ROW
+  // -----------------------------------------------------
+
+  rows.forEach(row => {
+
+    const team =
+      String(row[0] || "").trim();
+
+    const ratings =
+      teamRatings[team];
+
+    if (!ratings) {
+
+      row.push(
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      );
+
+      return;
+
+    }
+
+    const offense =
+      ratings.offensiveRating;
+
+    const defense =
+      ratings.defensiveRating;
+
+    const overall =
+      ratings.overallRating;
+
+
+    // ---------------------------------------------------
+    // RATING TIER
+    // ---------------------------------------------------
+
+    let ratingTier = "Weak";
+
+    if (overall >= 90) {
+      ratingTier = "Elite";
+    } else if (overall >= 75) {
+      ratingTier = "Strong";
+    } else if (overall >= 55) {
+      ratingTier = "Average";
+    } else if (overall >= 40) {
+      ratingTier = "Below Average";
+    }
+
+
+    // ---------------------------------------------------
+    // RATING NOTES
+    // ---------------------------------------------------
+
+    let ratingNotes =
+      "Balanced team profile.";
+
+    if (offense > defense + 20) {
+
+      ratingNotes =
+        "Offense carrying the team.";
+
+    } else if (
+      defense > offense + 20
+    ) {
+
+      ratingNotes =
+        "Defense carrying the team.";
+
+    }
+
+
+    row.push(
+      ratings.leagueRank,
+      Number(
+        ratings.rankScore.toFixed(1)
+      ),
+      Number(
+        offense.toFixed(1)
+      ),
+      Number(
+        defense.toFixed(1)
+      ),
+      Number(
+        overall.toFixed(1)
+      ),
+      ratingTier,
+      ratingNotes
+    );
+
+  });
+
+}
+
 function refreshNFLTeamTrendsOutputSheet() {
   ensureNFLTrendTabs_();
 
@@ -2176,7 +2901,9 @@ function refreshNFLTeamTrendsOutputSheet() {
     "Team", "Metric", "Season Avg", "Last 3 Avg", "Last 5 Avg", "Last 10 Avg",
     "Trend Direction", "Trend Score", "Consistency", "Risk Tier",
     "Hit Rate Last 3", "Hit Rate Last 5", "Hit Rate Last 10",
-    "Above Season %", "Trend Strength", "Trend Note", "Last Updated"
+    "Above Season %", "Trend Strength", "Trend Note", "Last Updated",
+    "League Rank", "Rank Score", "Offensive Rating", "Defensive Rating",
+    "Overall Rating", "Rating Tier", "Rating Notes"
   ];
 
   const logs = getNFLObjectsFromSheet_(logSheet);
@@ -2243,7 +2970,10 @@ function refreshNFLTeamTrendsOutputSheet() {
     });
   });
 
+  populateNFLTeamRatings_(rows);
+
   writeNFLOutputSheet_(sheet, headers, rows);
+
   sheet.getRange("K:M").setNumberFormat("0%");
   sheet.getRange("N:N").setNumberFormat("0.0");
 
