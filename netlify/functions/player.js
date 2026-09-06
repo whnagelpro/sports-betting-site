@@ -83,35 +83,82 @@ export async function handler(event) {
 
         stage = "loading CSV datasets";
 
-        console.log("Loading roster...");
-        const rosterStart = Date.now();
-        const roster = await loadCSV(source.roster);
-        console.log(`✓ roster loaded in ${Date.now() - rosterStart} ms`);
+        const timedLoad = async (label, loader) => {
 
-        console.log("Loading season stats...");
-        const seasonStart = Date.now();
-        const seasonRows = await loadSeasonStats(source.seasonStats);
-        console.log(`✓ season stats loaded in ${Date.now() - seasonStart} ms`);
+            const start = Date.now();
 
-        console.log("Loading game logs...");
-        const gameLogsStart = Date.now();
-        const gameLogRows = await loadGameLogs(source.gameLogs);
-        console.log(`✓ game logs loaded in ${Date.now() - gameLogsStart} ms`);
+            console.log(`Loading ${label}...`);
 
-        console.log("Loading trends...");
-        const trendsStart = Date.now();
-        const trendRows = await loadTrends(source.trends);
-        console.log(`✓ trends loaded in ${Date.now() - trendsStart} ms`);
+            try {
 
-        console.log("Loading game odds...");
-        const oddsStart = Date.now();
-        const gameOddsRows = await loadGameOdds(source.gameOdds);
-        console.log(`✓ game odds loaded in ${Date.now() - oddsStart} ms`);
+                const result = await loader();
 
-        console.log("Loading player props...");
-        const propsStart = Date.now();
-        const playerPropRows = await loadPlayerProps(source.playerProps);
-        console.log(`✓ player props loaded in ${Date.now() - propsStart} ms`);
+                console.log(
+                    `✓ ${label} loaded in ${Date.now() - start} ms`
+                );
+
+                return result;
+
+            } catch (error) {
+
+                console.error(
+                    `✗ ${label} failed after ${Date.now() - start} ms`
+                );
+
+                throw error;
+
+            }
+
+        };
+
+
+        const [
+
+            roster,
+
+            seasonRows,
+
+            gameLogRows,
+
+            trendRows,
+
+            gameOddsRows,
+
+            playerPropRows
+
+        ] = await Promise.all([
+
+            timedLoad(
+                "roster",
+                () => loadCSV(source.roster)
+            ),
+
+            timedLoad(
+                "season stats",
+                () => loadSeasonStats(source.seasonStats)
+            ),
+
+            timedLoad(
+                "game logs",
+                () => loadGameLogs(source.gameLogs)
+            ),
+
+            timedLoad(
+                "trends",
+                () => loadTrends(source.trends)
+            ),
+
+            timedLoad(
+                "game odds",
+                () => loadGameOdds(source.gameOdds)
+            ),
+
+            timedLoad(
+                "player props",
+                () => loadPlayerProps(source.playerProps)
+            )
+
+        ]);
 
 
         // ----------------------------
