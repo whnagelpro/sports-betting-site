@@ -6918,9 +6918,9 @@ renderTeamGameLog(
   league
 );
 
-}
-
 document.addEventListener(
   "DOMContentLoaded",
   initNFLPlayerProfileDirectory
 );
+
+}
