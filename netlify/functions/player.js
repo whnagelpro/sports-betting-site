@@ -37,6 +37,39 @@ import { buildSeasonPanels } from "./lib/builders/seasonPanelsBuilder.js";
 
 import { calculatePlayerAnalytics } from "./lib/analytics/playerAnalytics.js";
 
+async function safeTimedLoad(
+    label,
+    loader,
+    fallback = []
+) {
+
+    const start = Date.now();
+
+    console.log(`Loading ${label}...`);
+
+    try {
+
+        const result =
+            await loader();
+
+        console.log(
+            `✓ ${label} loaded in ${Date.now() - start} ms`
+        );
+
+        return result;
+
+    } catch (error) {
+
+        console.warn(
+            `⚠ ${label} unavailable after ${Date.now() - start} ms:`,
+            error?.message || String(error)
+        );
+
+        return fallback;
+
+    }
+
+}
 
 export async function handler(event) {
 
@@ -81,40 +114,24 @@ export async function handler(event) {
         // Load CSV data
         // ----------------------------
 
-        stage = "loading CSV datasets";
+        stage = "loading required roster";
 
-        const timedLoad = async (label, loader) => {
+        console.log("Loading roster...");
 
-            const start = Date.now();
+        const rosterStart =
+            Date.now();
 
-            console.log(`Loading ${label}...`);
+        const roster =
+            await loadCSV(source.roster);
 
-            try {
+        console.log(
+            `✓ roster loaded in ${Date.now() - rosterStart} ms`
+        );
 
-                const result = await loader();
 
-                console.log(
-                    `✓ ${label} loaded in ${Date.now() - start} ms`
-                );
-
-                return result;
-
-            } catch (error) {
-
-                console.error(
-                    `✗ ${label} failed after ${Date.now() - start} ms`
-                );
-
-                throw error;
-
-            }
-
-        };
-
+        stage = "loading supplemental CSV datasets";
 
         const [
-
-            roster,
 
             seasonRows,
 
@@ -128,32 +145,27 @@ export async function handler(event) {
 
         ] = await Promise.all([
 
-            timedLoad(
-                "roster",
-                () => loadCSV(source.roster)
-            ),
-
-            timedLoad(
+            safeTimedLoad(
                 "season stats",
                 () => loadSeasonStats(source.seasonStats)
             ),
 
-            timedLoad(
+            safeTimedLoad(
                 "game logs",
                 () => loadGameLogs(source.gameLogs)
             ),
 
-            timedLoad(
+            safeTimedLoad(
                 "trends",
                 () => loadTrends(source.trends)
             ),
 
-            timedLoad(
+            safeTimedLoad(
                 "game odds",
                 () => loadGameOdds(source.gameOdds)
             ),
 
-            timedLoad(
+            safeTimedLoad(
                 "player props",
                 () => loadPlayerProps(source.playerProps)
             )
