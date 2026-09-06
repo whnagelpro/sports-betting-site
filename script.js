@@ -6569,6 +6569,63 @@ if (!teamStats) {
 
 }
 
+const trendsContainer =
+  document.getElementById("team-trends-content");
+
+if (!teamTrends.length) {
+
+  trendsContainer.innerHTML =
+    "<p>No current team trends found.</p>";
+
+} else {
+
+  trendsContainer.innerHTML =
+    teamTrends.map(createTeamTrendCard).join("");
+
+    document
+      .querySelectorAll(".team-trend-card")
+      .forEach(card => {
+
+        card.addEventListener("click", () => {
+
+          document
+            .querySelectorAll(".team-trend-card")
+            .forEach(c => c.classList.remove("selected"));
+
+          card.classList.add("selected");
+
+          const metric = card.dataset.metric;
+
+          const trend =
+            teamTrends.find(
+              t => t["Metric"] === metric
+            );
+
+          if (!trend) return;
+
+          // renderModelEdge(trend);
+
+        });
+
+      });
+
+      if (teamTrends.length > 0) {
+
+          // renderModelEdge(teamTrends[0]);
+
+      }
+}
+
+console.log(teamGames);
+console.log(teamGames[0]);
+
+renderTeamGameLog(
+  teamGames,
+  league
+);
+
+}
+
 /* ==========================================================
    NFL PLAYER PROFILE DIRECTORY
 ========================================================== */
@@ -6860,63 +6917,6 @@ async function initNFLPlayerProfileDirectory() {
     }
 
   }
-
-}
-
-const trendsContainer =
-  document.getElementById("team-trends-content");
-
-if (!teamTrends.length) {
-
-  trendsContainer.innerHTML =
-    "<p>No current team trends found.</p>";
-
-} else {
-
-  trendsContainer.innerHTML =
-    teamTrends.map(createTeamTrendCard).join("");
-
-    document
-      .querySelectorAll(".team-trend-card")
-      .forEach(card => {
-
-        card.addEventListener("click", () => {
-
-          document
-            .querySelectorAll(".team-trend-card")
-            .forEach(c => c.classList.remove("selected"));
-
-          card.classList.add("selected");
-
-          const metric = card.dataset.metric;
-
-          const trend =
-            teamTrends.find(
-              t => t["Metric"] === metric
-            );
-
-          if (!trend) return;
-
-          // renderModelEdge(trend);
-
-        });
-
-      });
-
-      if (teamTrends.length > 0) {
-
-          // renderModelEdge(teamTrends[0]);
-
-      }
-}
-
-console.log(teamGames);
-console.log(teamGames[0]);
-
-renderTeamGameLog(
-  teamGames,
-  league
-);
 
 }
 
