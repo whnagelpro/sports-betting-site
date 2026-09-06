@@ -5,7 +5,6 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { DATA_SOURCES } from "./lib/config.js";
 
@@ -77,15 +76,11 @@ async function safeTimedLoad(
 
 async function loadLocalNFLRoster() {
 
-    const currentFile =
-        fileURLToPath(import.meta.url);
-
-    const currentDirectory =
-        path.dirname(currentFile);
-
     const rosterPath =
         path.join(
-            currentDirectory,
+            process.cwd(),
+            "netlify",
+            "functions",
             "data",
             "nfl-roster.csv"
         );
