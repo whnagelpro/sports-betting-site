@@ -9,14 +9,57 @@ import Papa from "papaparse";
 // Download a CSV file
 // ------------------------------------------------------
 
-async function fetchCSV(url) {
-    const response = await fetch(url);
+const CSV_FETCH_TIMEOUT_MS = 12000;
 
-    if (!response.ok) {
-        throw new Error(`Unable to download CSV: ${response.status}`);
+async function fetchCSV(url) {
+
+    const controller =
+        new AbortController();
+
+    const timeoutId =
+        setTimeout(
+            () => controller.abort(),
+            CSV_FETCH_TIMEOUT_MS
+        );
+
+    try {
+
+        const response =
+            await fetch(
+                url,
+                {
+                    signal: controller.signal
+                }
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Unable to download CSV: ${response.status}`
+            );
+
+        }
+
+        return await response.text();
+
+    } catch (error) {
+
+        if (error?.name === "AbortError") {
+
+            throw new Error(
+                `CSV request timed out after ${CSV_FETCH_TIMEOUT_MS} ms`
+            );
+
+        }
+
+        throw error;
+
+    } finally {
+
+        clearTimeout(timeoutId);
+
     }
 
-    return await response.text();
 }
 
 // ------------------------------------------------------
