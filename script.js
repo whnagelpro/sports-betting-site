@@ -36,6 +36,7 @@ const MLB_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-
 const MLB_TOP_PLAYER_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=111828453&single=true&output=csv";
 const MLB_TOP_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1644397014&single=true&output=csv";
 const NFL_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1933017030&single=true&output=csv";
+const NFL_ROSTERS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1700733763&single=true&output=csv";
 const NFL_SCHEDULE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1131205016&single=true&output=csv";
 const NFL_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1953623841&single=true&output=csv";
 const NFL_TEAM_GAME_LOGS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1231176215&single=true&output=csv";
@@ -6568,6 +6569,300 @@ if (!teamStats) {
 
 }
 
+/* ==========================================================
+   NFL PLAYER PROFILE DIRECTORY
+========================================================== */
+
+async function initNFLPlayerProfileDirectory() {
+
+  const teamSelect =
+    document.getElementById("nfl-player-profile-team");
+
+  const playerSelect =
+    document.getElementById("nfl-player-profile-player");
+
+  const profileButton =
+    document.getElementById("nfl-player-profile-button");
+
+  const message =
+    document.getElementById(
+      "nfl-player-profile-directory-message"
+    );
+
+  // This code should only run on the NFL Player Profiles page.
+  if (!teamSelect || !playerSelect || !profileButton) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(NFL_ROSTERS_CSV_URL);
+
+    if (!response.ok) {
+      throw new Error(
+        `NFL roster request failed: ${response.status}`
+      );
+    }
+
+    const csv =
+      await response.text();
+
+    const rows =
+      parseCSV(csv);
+
+    /*
+      Keep valid active players only.
+
+      Exact NFL Rosters headers:
+      Id
+      Full Name
+      Team Name
+      Position
+      Status
+    */
+    const players =
+      rows
+        .map((row) => ({
+          id: String(row["Id"] || "").trim(),
+          name: String(row["Full Name"] || "").trim(),
+          team: String(row["Team Name"] || "").trim(),
+          position: String(row["Position"] || "").trim(),
+          status: String(row["Status"] || "").trim()
+        }))
+        .filter((player) =>
+          player.id &&
+          player.name &&
+          player.team &&
+          player.status.toLowerCase() === "active"
+        );
+
+
+    if (!players.length) {
+      throw new Error(
+        "No active NFL players were found in the roster."
+      );
+    }
+
+
+    /*
+      Build unique alphabetical team list from
+      the actual roster rather than hard-coding teams.
+    */
+    const teams =
+      [...new Set(
+        players.map((player) => player.team)
+      )]
+        .filter(Boolean)
+        .sort((a, b) =>
+          a.localeCompare(b)
+        );
+
+
+    teamSelect.innerHTML = `
+      <option value="">
+        Select an NFL team
+      </option>
+    `;
+
+
+    teams.forEach((team) => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = team;
+      option.textContent = team;
+
+      teamSelect.appendChild(option);
+
+    });
+
+
+    /*
+      Team selection
+      ----------------
+      Filter the roster to the selected team
+      and populate the player dropdown.
+    */
+    teamSelect.addEventListener(
+      "change",
+      () => {
+
+        const selectedTeam =
+          teamSelect.value;
+
+        playerSelect.innerHTML = `
+          <option value="">
+            Select a player
+          </option>
+        `;
+
+        playerSelect.disabled = true;
+        profileButton.disabled = true;
+
+        if (message) {
+          message.textContent = "";
+        }
+
+
+        if (!selectedTeam) {
+
+          playerSelect.innerHTML = `
+            <option value="">
+              Select a team first
+            </option>
+          `;
+
+          return;
+
+        }
+
+
+        const teamPlayers =
+          players
+            .filter(
+              (player) =>
+                player.team === selectedTeam
+            )
+            .sort((a, b) =>
+              a.name.localeCompare(b.name)
+            );
+
+
+        teamPlayers.forEach((player) => {
+
+          const option =
+            document.createElement("option");
+
+          option.value = player.id;
+
+          option.textContent =
+            player.position
+              ? `${player.name} — ${player.position}`
+              : player.name;
+
+          playerSelect.appendChild(option);
+
+        });
+
+
+        if (!teamPlayers.length) {
+
+          playerSelect.innerHTML = `
+            <option value="">
+              No active players found
+            </option>
+          `;
+
+          if (message) {
+            message.textContent =
+              "No active players were found for this team.";
+          }
+
+          return;
+
+        }
+
+
+        playerSelect.disabled = false;
+
+      }
+    );
+
+
+    /*
+      Player selection
+      ----------------
+      Enable the profile button only when
+      an actual player ID is selected.
+    */
+    playerSelect.addEventListener(
+      "change",
+      () => {
+
+        profileButton.disabled =
+          !playerSelect.value;
+
+        if (message) {
+          message.textContent = "";
+        }
+
+      }
+    );
+
+
+    /*
+      Profile navigation
+      ------------------
+      Use the existing universal player profile route.
+    */
+    profileButton.addEventListener(
+      "click",
+      () => {
+
+        const playerId =
+          playerSelect.value;
+
+        if (!playerId) {
+          return;
+        }
+
+        window.location.href =
+          `player.html?league=nfl&id=${encodeURIComponent(playerId)}`;
+
+      }
+    );
+
+
+    if (message) {
+      message.textContent = "";
+    }
+
+
+    console.log(
+      "NFL Player Profile Directory:",
+      {
+        players: players.length,
+        teams: teams.length
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "NFL Player Profile Directory Error:",
+      error
+    );
+
+
+    teamSelect.innerHTML = `
+      <option value="">
+        Unable to load NFL teams
+      </option>
+    `;
+
+    teamSelect.disabled = true;
+
+    playerSelect.innerHTML = `
+      <option value="">
+        Players unavailable
+      </option>
+    `;
+
+    playerSelect.disabled = true;
+    profileButton.disabled = true;
+
+
+    if (message) {
+      message.textContent =
+        "NFL player directory data is temporarily unavailable.";
+    }
+
+  }
+
+}
+
 const trendsContainer =
   document.getElementById("team-trends-content");
 
@@ -6624,3 +6919,8 @@ renderTeamGameLog(
 );
 
 }
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initNFLPlayerProfileDirectory
+);
