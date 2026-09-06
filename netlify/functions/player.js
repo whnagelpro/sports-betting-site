@@ -172,6 +172,35 @@ export async function handler(event) {
 
         ]);
 
+        const dataAvailability = {
+
+            seasonStats:
+                Array.isArray(seasonRows) &&
+                seasonRows.length > 0,
+
+            gameLogs:
+                Array.isArray(gameLogRows) &&
+                gameLogRows.length > 0,
+
+            trends:
+                Array.isArray(trendRows) &&
+                trendRows.length > 0,
+
+            gameOdds:
+                Array.isArray(gameOddsRows) &&
+                gameOddsRows.length > 0,
+
+            playerProps:
+                Array.isArray(playerPropRows) &&
+                playerPropRows.length > 0
+
+        };
+
+        console.log(
+            "Player data availability:",
+            dataAvailability
+        );
+
 
         // ----------------------------
         // Build player context
@@ -301,6 +330,8 @@ export async function handler(event) {
         const player = {
 
             hero,
+
+            dataAvailability,
 
             isPitcher: context.isPitcher,
 
