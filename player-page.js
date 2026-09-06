@@ -240,6 +240,9 @@ function renderHero() {
 
 function renderQuickStats() {
 
+    const seasonDataAvailable =
+        player?.dataAvailability?.seasonStats !== false;
+
     const grid = document.getElementById(
 
         "quick-stats-grid"
@@ -263,7 +266,11 @@ function renderQuickStats() {
 
                 stat.label,
 
-                stat.value
+                seasonDataAvailable
+
+                                ? stat.value
+
+                                : null
 
             )
 
