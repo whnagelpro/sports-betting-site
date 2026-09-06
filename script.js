@@ -6638,18 +6638,26 @@ const PLAYER_PROFILE_DIRECTORY_CONFIG = {
 
   nfl: {
     label: "NFL",
-    rosterUrl: NFL_ROSTERS_CSV_URL
+    rosterUrl: NFL_ROSTERS_CSV_URL,
+    type: "standard"
   },
 
   nba: {
     label: "NBA",
-    rosterUrl: NBA_ROSTERS_CSV_URL
+    rosterUrl: NBA_ROSTERS_CSV_URL,
+    type: "standard"
   },
 
   nhl: {
     label: "NHL",
     rosterUrl: NHL_PLAYERS_CSV_URL,
     type: "nhl"
+  },
+
+  mlb: {
+    label: "MLB",
+    rosterUrl: MLB_ROSTERS_CSV_URL,
+    type: "standard"
   }
 
 };
@@ -7136,6 +7144,7 @@ document.addEventListener(
     initPlayerProfileDirectory("nfl");
     initPlayerProfileDirectory("nba");
     initPlayerProfileDirectory("nhl");
+    initPlayerProfileDirectory("mlb");
 
   }
 );
