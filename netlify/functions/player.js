@@ -37,7 +37,10 @@ import { buildSeasonPanels } from "./lib/builders/seasonPanelsBuilder.js";
 
 import { calculatePlayerAnalytics } from "./lib/analytics/playerAnalytics.js";
 
+
 export async function handler(event) {
+
+    let stage = "starting player endpoint";
 
     try {
 
@@ -73,52 +76,65 @@ export async function handler(event) {
 
         }
 
+
         // ----------------------------
         // Load CSV data
         // ----------------------------
 
-const [
+        stage = "loading CSV datasets";
 
-    roster,
+        const [
 
-    seasonRows,
+            roster,
 
-    gameLogRows,
+            seasonRows,
 
-    trendRows,
+            gameLogRows,
 
-    gameOddsRows,
+            trendRows,
 
-    playerPropRows
+            gameOddsRows,
 
-] = await Promise.all([
+            playerPropRows
 
-    loadCSV(source.roster),
+        ] = await Promise.all([
 
-    loadSeasonStats(source.seasonStats),
+            loadCSV(source.roster),
 
-    loadGameLogs(source.gameLogs),
+            loadSeasonStats(source.seasonStats),
 
-    loadTrends(source.trends),
+            loadGameLogs(source.gameLogs),
 
-    loadGameOdds(source.gameOdds),
+            loadTrends(source.trends),
 
-    loadPlayerProps(source.playerProps)
+            loadGameOdds(source.gameOdds),
 
-]);
+            loadPlayerProps(source.playerProps)
 
-console.log("Building context...");
-const context = loadPlayerContext({
-    league,
-    playerId: id,
-    roster,
-    seasonRows,
-    gameLogRows,
-    trendRows,
-    gameOddsRows,
-    playerPropRows
-});
-console.log("✓ context built");
+        ]);
+
+
+        // ----------------------------
+        // Build player context
+        // ----------------------------
+
+        stage = "building player context";
+
+        console.log("Building context...");
+
+        const context = loadPlayerContext({
+            league,
+            playerId: id,
+            roster,
+            seasonRows,
+            gameLogRows,
+            trendRows,
+            gameOddsRows,
+            playerPropRows
+        });
+
+        console.log("✓ context built");
+
 
         if (!context) {
 
@@ -128,113 +144,171 @@ console.log("✓ context built");
 
         }
 
+
         // ----------------------------
         // Build player object
         // ----------------------------
 
-console.log("Building hero...");
-const hero = buildHero(context);
-console.log("✓ hero");
+        stage = "building hero";
 
-console.log("Building matchup...");
-const matchup = buildMatchup(context);
-console.log("✓ matchup");
+        console.log("Building hero...");
 
-console.log("Building trends...");
-const trends = buildTrends(context);
-console.log("✓ trends");
+        const hero = buildHero(context);
 
-console.log("Building game logs...");
-const gameLogs = buildGameLogs(context);
-console.log("Built Game Logs:");
-console.log(gameLogs[0]);
+        console.log("✓ hero");
 
-const season = context.seasonStats;
 
-const quickStats = buildQuickStats(context);
+        stage = "building matchup";
 
-const seasonPanels = buildSeasonPanels(context);
+        console.log("Building matchup...");
 
-console.log("Building analytics...");
+        const matchup = buildMatchup(context);
 
-const analytics = calculatePlayerAnalytics({
-    seasonStats: season,
-    gameLogs: context.gameLogs,
-    matchup: context.matchup,
-    props: context.props
-});
+        console.log("✓ matchup");
 
-console.log("Analytics object:");
-console.log(analytics);
 
-console.log("Context props:");
-console.log(context.props);
+        stage = "building trends";
 
-console.log("✓ analytics");
+        console.log("Building trends...");
 
-// Build props from the evaluated analytics WITHOUT modifying context
-console.log("Building props...");
+        const trends = buildTrends(context);
 
-const props = buildProps({
-    ...context,
-    props: analytics?.propAnalytics ?? []
-});
+        console.log("✓ trends");
 
-console.log("✓ props");
 
-const player = {
+        stage = "building game logs";
 
-    hero,
+        console.log("Building game logs...");
 
-    isPitcher: context.isPitcher,
+        const gameLogs = buildGameLogs(context);
 
-    positionGroup:
-        context.positionGroup ??
-        (context.isPitcher ? "PITCHER" : "HITTER"),
+        console.log("Built Game Logs:");
 
-    season,
+        console.log(gameLogs[0]);
 
-    matchup,
 
-    props,
+        const season = context.seasonStats;
 
-    trends,
 
-    gameLogs,
+        stage = "building quick stats";
 
-    quickStats,
+        const quickStats = buildQuickStats(context);
 
-    seasonPanels,
 
-    insights: [],
+        stage = "building season panels";
 
-    analytics: analytics ?? {
-        score: 0,
-        sportacularScore: 0,
-        stars: 0,
-        confidence: "N/A",
-        recommendation: "No Props Available",
-        edge: null,
-        bestProp: null,
-        propAnalytics: [],
-        consistency: 0,
-        modelEdge: null,
-        analyticsVersion: 2
-    }
+        const seasonPanels = buildSeasonPanels(context);
 
-};
 
-console.log("Returning player response...");
+        stage = "calculating player analytics";
 
-return success(player);
+        console.log("Building analytics...");
+
+        const analytics = calculatePlayerAnalytics({
+            seasonStats: season,
+            gameLogs: context.gameLogs,
+            matchup: context.matchup,
+            props: context.props
+        });
+
+
+        console.log("Analytics object:");
+
+        console.log(analytics);
+
+
+        console.log("Context props:");
+
+        console.log(context.props);
+
+
+        console.log("✓ analytics");
+
+
+        // Build props from the evaluated analytics WITHOUT modifying context
+
+        stage = "building props";
+
+        console.log("Building props...");
+
+        const props = buildProps({
+            ...context,
+            props: analytics?.propAnalytics ?? []
+        });
+
+        console.log("✓ props");
+
+
+        const player = {
+
+            hero,
+
+            isPitcher: context.isPitcher,
+
+            positionGroup:
+                context.positionGroup ??
+                (context.isPitcher ? "PITCHER" : "HITTER"),
+
+            season,
+
+            matchup,
+
+            props,
+
+            trends,
+
+            gameLogs,
+
+            quickStats,
+
+            seasonPanels,
+
+            insights: [],
+
+            analytics: analytics ?? {
+                score: 0,
+                sportacularScore: 0,
+                stars: 0,
+                confidence: "N/A",
+                recommendation: "No Props Available",
+                edge: null,
+                bestProp: null,
+                propAnalytics: [],
+                consistency: 0,
+                modelEdge: null,
+                analyticsVersion: 2
+            }
+
+        };
+
+
+        stage = "returning player response";
+
+        console.log("Returning player response...");
+
+        return success(player);
 
     }
 
     catch (error) {
 
+        console.error(
+            `PLAYER ENDPOINT FAILED DURING: ${stage}`
+        );
+
         console.error(error);
 
-        return serverError(error);
+        return {
+            statusCode: 500,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                error: "Unable to load player.",
+                stage,
+                message: error?.message || String(error)
+            })
+        };
 
     }
 

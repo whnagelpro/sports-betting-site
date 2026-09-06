@@ -991,21 +991,255 @@ function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
   ];
 
   const formulaHeaders = [
-    "EV Over", "EV Under", "Implied Prob Over", "Implied Prob Under",
+    "EV Over", "EV Under", "Model Prob Over", "Model Prob Under",
     "Best Price Edge", "Risk Tier", "Model Confidence", "Player Name", "Team",
-    "Player Baseline", "Trend Adjustment", "Projected Stat", "Stat Std Dev"
+    "Player Baseline", "Trend Adjustment", "Projected Stat", "Stat Std Dev",
+    "Best Side", "Best EV", "Best Model Probability"
   ];
 
   sheet.getRange(1, 1, 1, rawHeaders.length).setValues([rawHeaders]);
   sheet.getRange(1, 15, 1, formulaHeaders.length).setValues([formulaHeaders]);
 
-  sheet.getRange("O2").setFormula(`=IF(M2>0,1+M2/100,IF(M2<0,1+100/ABS(M2),""))`);
-  sheet.getRange("P2").setFormula(`=IF(N2>0,1+N2/100,IF(N2<0,1+100/ABS(N2),""))`);
-  sheet.getRange("Q2").setFormula(`=IF(M2<0,ABS(M2)/(ABS(M2)+100),IF(M2>0,100/(M2+100),""))`);
-  sheet.getRange("R2").setFormula(`=IF(N2<0,ABS(N2)/(ABS(N2)+100),IF(N2>0,100/(N2+100),""))`);
-  sheet.getRange("S2").setFormula(`=IF(COUNT(O2:P2)=0,"",MAX(O2,P2)-1)`);
-  sheet.getRange("T2").setFormula(`=IF(S2="","",IF(S2>=0.25,"Low",IF(S2>=0.1,"Medium","High")))`);
-  sheet.getRange("U2").setFormula(`=IF(S2="","",S2*100)`);
+  sheet.getRange("O2").setFormula(
+    `=IF(
+      OR(
+        Q2="",
+        M2=""
+      ),
+      "",
+      Q2*IF(M2>0,M2/100,100/ABS(M2))-(1-Q2)
+    )`
+  );
+  sheet.getRange("P2").setFormula(
+    `=IF(
+      OR(
+        R2="",
+        N2=""
+      ),
+      "",
+      R2*IF(N2>0,N2/100,100/ABS(N2))-(1-R2)
+    )`
+  );
+  sheet.getRange("Q2").setFormula(
+    `=IF(
+      OR(
+        J2<>"over_under",
+        Z2="",
+        AA2="",
+        AA2<=0,
+        NOT(
+          OR(
+            H2="passing_yards",
+            H2="passing_completions",
+            H2="passing_attempts",
+            H2="rushing_yards",
+            H2="rushing_attempts",
+            H2="receptions",
+            H2="receiving_yards"
+          )
+        )
+      ),
+      "",
+      LET(
+        currentGames,
+          IFERROR(
+            INDEX(
+              'NFL Player Season Stats'!D:D,
+              MATCH(
+                F2,
+                'NFL Player Season Stats'!A:A,
+                0
+              )
+            ),
+            0
+          ),
+
+        reliability,
+          MIN(
+            1,
+            0.60 + 0.05*currentGames
+          ),
+
+        rawOver,
+          1-NORM.S.DIST(
+            (I2-Z2)/AA2,
+            TRUE
+          ),
+
+        calibratedOver,
+          0.5 +
+          (rawOver-0.5)*reliability,
+
+        MIN(
+          0.975,
+          MAX(
+            0.025,
+            calibratedOver
+          )
+        )
+      )
+    )`
+  );
+  sheet.getRange("R2").setFormula(
+    `=IF(
+      OR(
+        J2<>"over_under",
+        Z2="",
+        AA2="",
+        AA2<=0,
+        NOT(
+          OR(
+            H2="passing_yards",
+            H2="passing_completions",
+            H2="passing_attempts",
+            H2="rushing_yards",
+            H2="rushing_attempts",
+            H2="receptions",
+            H2="receiving_yards"
+          )
+        )
+      ),
+      "",
+      1-Q2
+    )`
+  );
+  sheet.getRange("S2").setFormula(
+    `=IF(
+      OR(
+        Q2="",
+        R2="",
+        M2="",
+        N2=""
+      ),
+      "",
+      LET(
+        impliedOver,
+          IF(
+            M2>0,
+            100/(M2+100),
+            ABS(M2)/(ABS(M2)+100)
+          ),
+
+        impliedUnder,
+          IF(
+            N2>0,
+            100/(N2+100),
+            ABS(N2)/(ABS(N2)+100)
+          ),
+
+        totalImplied,
+          impliedOver+impliedUnder,
+
+        vigFreeOver,
+          impliedOver/totalImplied,
+
+        vigFreeUnder,
+          impliedUnder/totalImplied,
+
+        overEdge,
+          Q2-vigFreeOver,
+
+        underEdge,
+          R2-vigFreeUnder,
+
+        MAX(overEdge,underEdge)
+      )
+    )`
+  );
+  sheet.getRange("T2").setFormula(
+    `=IF(
+      OR(
+        Z2="",
+        AA2="",
+        AA2<=0,
+        S2=""
+      ),
+      "",
+      LET(
+        currentGames,
+          IFERROR(
+            INDEX(
+              'NFL Player Season Stats'!D:D,
+              MATCH(
+                F2,
+                'NFL Player Season Stats'!A:A,
+                0
+              )
+            ),
+            0
+          ),
+
+        relativeUncertainty,
+          IF(
+            ABS(Z2)>0,
+            AA2/ABS(Z2),
+            999
+          ),
+
+        sampleRisk,
+          IF(
+            currentGames=0,
+            2,
+            IF(
+              currentGames<4,
+              1,
+              0
+            )
+          ),
+
+        uncertaintyRisk,
+          IF(
+            relativeUncertainty>=0.50,
+            2,
+            IF(
+              relativeUncertainty>=0.25,
+              1,
+              0
+            )
+          ),
+
+        disagreementRisk,
+          IF(
+            S2>=0.20,
+            2,
+            IF(
+              S2>=0.12,
+              1,
+              0
+            )
+          ),
+
+        riskPoints,
+          sampleRisk +
+          uncertaintyRisk +
+          disagreementRisk,
+
+        IF(
+          riskPoints>=4,
+          "High",
+          IF(
+            riskPoints>=2,
+            "Medium",
+            "Low"
+          )
+        )
+      )
+    )`
+  );
+  sheet.getRange("U2").setFormula(
+    `=IF(
+      OR(
+        Q2="",
+        R2="",
+        S2=""
+      ),
+      "",
+      MIN(
+        100,
+        MAX(Q2,R2)*100 + S2*25
+      )
+    )`
+  );
   sheet.getRange("V2").setFormula(`=IFERROR(INDEX(Rosters!D:D,MATCH(F2,Rosters!A:A,0)),"")`);
   sheet.getRange("W2").setFormula(`=IFERROR(INDEX(Rosters!F:F,MATCH(F2,Rosters!A:A,0)),"")`);
   sheet.getRange("X2").setFormula(
@@ -1197,7 +1431,7 @@ function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
             0
           ),
 
-        values,
+        currentValues,
           IF(
             statCol=0,
             "",
@@ -1207,13 +1441,60 @@ function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
             )
           ),
 
+        historicalValues,
+          IF(
+            statCol=0,
+            "",
+            FILTER(
+              INDEX('NFL Player Historical Logs'!A:Q,0,statCol),
+              'NFL Player Historical Logs'!C:C=F2
+            )
+          ),
+
+        currentN,
+          IFERROR(COUNT(currentValues),0),
+
+        historicalN,
+          IFERROR(COUNT(historicalValues),0),
+
+        currentSD,
+          IF(
+            currentN>=2,
+            STDEV.S(currentValues),
+            ""
+          ),
+
+        historicalSD,
+          IF(
+            historicalN>=2,
+            STDEV.S(historicalValues),
+            ""
+          ),
+
         IF(
           statCol=0,
           "",
           IF(
-            COUNT(values)<2,
-            "",
-            STDEV.S(values)
+            AND(currentN>=2,historicalN>=2),
+            SQRT(
+              (
+                4*POWER(historicalSD,2) +
+                (currentN-1)*POWER(currentSD,2)
+              ) /
+              (
+                4 +
+                (currentN-1)
+              )
+            ),
+            IF(
+              currentN>=2,
+              currentSD,
+              IF(
+                historicalN>=2,
+                historicalSD,
+                ""
+              )
+            )
           )
         )
       ),
@@ -1221,22 +1502,83 @@ function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
     )`
   );
 
+  sheet.getRange("AB2").setFormula(
+    `=IF(
+      OR(
+        O2="",
+        P2="",
+        Q2="",
+        R2=""
+      ),
+      "",
+      IF(
+        MAX(O2,P2)<=0,
+        "No Play",
+        IF(
+          O2>P2,
+          "Over",
+          IF(
+            P2>O2,
+            "Under",
+            "No Play"
+          )
+        )
+      )
+    )`
+  );
+
+  sheet.getRange("AC2").setFormula(
+    `=IF(
+      AB2="",
+      "",
+      IF(
+        AB2="No Play",
+        MAX(O2,P2),
+        IF(
+          AB2="Over",
+          O2,
+          P2
+        )
+      )
+    )`
+  );
+
+  sheet.getRange("AD2").setFormula(
+    `=IF(
+      AB2="",
+      "",
+      IF(
+        AB2="Over",
+        Q2,
+        IF(
+          AB2="Under",
+          R2,
+          ""
+        )
+      )
+    )`
+  );
+
   sheet.setFrozenRows(1);
   sheet.getRange("1:1").setFontWeight("bold");
-  sheet.getRange("A1:AA1").setHorizontalAlignment("center");
+  sheet.getRange("A1:AD1").setHorizontalAlignment("center");
 
-  if (!sheet.getFilter()) {
-    sheet.getRange("A1:W1").createFilter();
+  const existingFilter = sheet.getFilter();
+
+  if (existingFilter) {
+    existingFilter.remove();
   }
 
-  sheet.autoResizeColumns(1, 27);
+  sheet.getRange("A1:AD1").createFilter();
+
+  sheet.autoResizeColumns(1, 30);
 }
 
 function clearNFLPlayerPropsSheet_(sheet) {
   const maxRows = sheet.getMaxRows();
 
   if (maxRows > 2) {
-    sheet.getRange(3, 1, maxRows - 2, 27).clearContent();
+    sheet.getRange(3, 1, maxRows - 2, 30).clearContent();
   }
 }
 
@@ -1258,8 +1600,8 @@ function fetchAllNFLPlayerPropsForGame_(gameId) {
 function copyNFLPlayerPropsFormulasDown_(sheet, rowCount) {
   if (!rowCount || rowCount <= 0) return;
 
-  sheet.getRange("O2:AA2").copyTo(
-    sheet.getRange(3, 15, rowCount, 13),
+  sheet.getRange("O2:AD2").copyTo(
+    sheet.getRange(3, 15, rowCount, 16),
     SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
     false
   );
@@ -1346,6 +1688,7 @@ function ensureNFLTrendTabs_() {
 
 [
   "NFL Player Game Logs",
+  "NFL Player Historical Logs",
   "NFL Team Game Logs",
   "NFL Player Season Stats",
   "NFL Player Baselines",
@@ -1374,33 +1717,47 @@ function writeNFLOutputSheet_(sheet, headers, rows) {
   sheet.autoResizeColumns(1, headers.length);
 }
 
-function fetchAllNFLStatsForGameIds_(gameIds) {
+function fetchAllNFLStatsForGameIds_(gameIds, season = 2026, seasonType = 1) {
   const allStats = [];
 
   gameIds.forEach((gameId, index) => {
-    Logger.log(`Fetching NFL stats for game ${index + 1}/${gameIds.length}: ${gameId}`);
+    Logger.log(
+      `Fetching NFL stats for game ${index + 1}/${gameIds.length}: ${gameId}`
+    );
 
     let cursor = null;
 
     do {
       const params = {
         "game_ids[]": gameId,
-        "seasons[]": 2026,
-        season_type: 1,
+        "seasons[]": season,
+        season_type: seasonType,
         per_page: 100
       };
-      if (cursor) params.cursor = cursor;
 
-      const response = fetchApi_("/nfl/v1/stats", params);
-      Logger.log("Stats response for game " + gameId);
-      Logger.log(JSON.stringify(response, null, 2));
-      const stats = Array.isArray(response.data) ? response.data : [];
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      const response =
+        fetchApi_("/nfl/v1/stats", params);
+
+      Logger.log(
+        `Stats response for game ${gameId}`
+      );
+
+      const stats =
+        Array.isArray(response.data)
+          ? response.data
+          : [];
 
       allStats.push(...stats);
 
-      cursor = response.meta && response.meta.next_cursor
-        ? response.meta.next_cursor
-        : null;
+      cursor =
+        response.meta &&
+        response.meta.next_cursor
+          ? response.meta.next_cursor
+          : null;
 
     } while (cursor);
 
@@ -1596,6 +1953,30 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
     const playerId = stat.player_id || (stat.player && stat.player.id) || "";
     const playerName = getNFLPlayerNameFromStat_(stat);
 
+    const playerPosition =
+      String(
+        (stat.player && stat.player.position) ||
+        stat.position ||
+        ""
+      )
+        .trim()
+        .toUpperCase();
+
+    const eligiblePositions = [
+      "QB",
+      "QUARTERBACK",
+      "RB",
+      "RUNNING BACK",
+      "WR",
+      "WIDE RECEIVER",
+      "TE",
+      "TIGHT END"
+    ];
+
+    if (!eligiblePositions.includes(playerPosition)) {
+      return;
+    }
+
     const team = stat.team || {};
     const teamName = getNFLTeamName_(team) || stat.team_name || "";
 
@@ -1622,13 +2003,6 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
 
     if (!playerId && !playerName) return;
 
-    const played =
-      passingYards > 0 || passingTDs > 0 || interceptions > 0 || completions > 0 || passAttempts > 0 ||
-      rushingYards > 0 || rushingAttempts > 0 || rushingTDs > 0 ||
-      receptions > 0 || receivingYards > 0 || receivingTDs > 0;
-
-    if (!played) return;
-
     rows.push([
       gameInfo.date,
       gameId,
@@ -1653,6 +2027,325 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
   upsertNFLRowsByKeyForDateRange_(sheet, headers, rows, [1, 2], startDate, endDate);
 
   Logger.log(`Upserted ${rows.length} NFL player game-log rows.`);
+}
+
+function refreshNFLPlayerHistoricalLogsSheet() {
+  ensureNFLTrendTabs_();
+
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet =
+    ss.getSheetByName(
+      "NFL Player Historical Logs"
+    );
+
+  const headers = [
+    "Game Date",
+    "Game ID",
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Opponent",
+    "Passing Yards",
+    "Passing TDs",
+    "Interceptions",
+    "Completions",
+    "Pass Attempts",
+    "Rushing Yards",
+    "Rushing Attempts",
+    "Rushing TDs",
+    "Receptions",
+    "Receiving Yards",
+    "Receiving TDs"
+  ];
+
+  Logger.log(
+    "Refreshing 2025 NFL Player Historical Logs..."
+  );
+
+  const games =
+    getNFLCompletedGamesForDateRange_(
+      "2025-09-01",
+      "2026-01-05"
+    );
+
+  Logger.log(
+    `2025 historical completed games found: ${games.length}`
+  );
+
+  if (!games.length) {
+    Logger.log(
+      "No 2025 NFL historical games found."
+    );
+
+    writeNFLOutputSheet_(
+      sheet,
+      headers,
+      []
+    );
+
+    return;
+  }
+
+  const gameMap = {};
+
+  const gameIds =
+    games
+      .map(game => {
+        const gameId =
+          String(game.id || "");
+
+        gameMap[gameId] = {
+          date:
+            getNFLGameAZDate_(game),
+
+          homeTeam:
+            getNFLHomeTeamNameFromGame_(
+              game
+            ),
+
+          awayTeam:
+            getNFLAwayTeamNameFromGame_(
+              game
+            )
+        };
+
+        return gameId;
+      })
+      .filter(Boolean);
+
+  Logger.log(
+    `Fetching historical stats for ${gameIds.length} games...`
+  );
+
+  const statRows =
+    fetchAllNFLStatsForGameIds_(
+      gameIds,
+      2025,
+      2
+    );
+
+  Logger.log(
+    `Historical player stat rows returned: ${statRows.length}`
+  );
+
+  const rows = [];
+
+  statRows.forEach(stat => {
+    const gameId =
+      String(
+        stat.game_id ||
+        (stat.game && stat.game.id) ||
+        ""
+      );
+
+    const gameInfo =
+      gameMap[gameId] || {};
+
+    const playerId =
+      stat.player_id ||
+      (stat.player && stat.player.id) ||
+      "";
+
+    const playerName =
+      getNFLPlayerNameFromStat_(stat);
+
+    const playerPosition =
+      String(
+        (stat.player && stat.player.position) ||
+        stat.position ||
+        ""
+      )
+        .trim()
+        .toUpperCase();
+
+    const eligiblePositions = [
+      "QB",
+      "QUARTERBACK",
+      "RB",
+      "RUNNING BACK",
+      "WR",
+      "WIDE RECEIVER",
+      "TE",
+      "TIGHT END"
+    ];
+
+    if (!eligiblePositions.includes(playerPosition)) {
+      return;
+    }
+
+    const team =
+      stat.team || {};
+
+    const teamName =
+      getNFLTeamName_(team) ||
+      stat.team_name ||
+      "";
+
+    const opponent =
+      teamName === gameInfo.homeTeam
+        ? gameInfo.awayTeam
+        : teamName === gameInfo.awayTeam
+          ? gameInfo.homeTeam
+          : "";
+
+    const passingYards =
+      getNFLStatNumber_(
+        stat,
+        [
+          "passing_yards",
+          "pass_yards",
+          "passing.yds",
+          "passing.yards"
+        ]
+      );
+
+    const passingTDs =
+      getNFLStatNumber_(
+        stat,
+        [
+          "passing_touchdowns",
+          "passing_tds",
+          "pass_tds",
+          "passing.td"
+        ]
+      );
+
+    const interceptions =
+      getNFLStatNumber_(
+        stat,
+        [
+          "interceptions",
+          "passing_interceptions",
+          "passing.int"
+        ]
+      );
+
+    const completions =
+      getNFLStatNumber_(
+        stat,
+        [
+          "completions",
+          "passing_completions",
+          "passing.cmp"
+        ]
+      );
+
+    const passAttempts =
+      getNFLStatNumber_(
+        stat,
+        [
+          "pass_attempts",
+          "passing_attempts",
+          "passing.att"
+        ]
+      );
+
+    const rushingYards =
+      getNFLStatNumber_(
+        stat,
+        [
+          "rushing_yards",
+          "rush_yards",
+          "rushing.yds",
+          "rushing.yards"
+        ]
+      );
+
+    const rushingAttempts =
+      getNFLStatNumber_(
+        stat,
+        [
+          "rushing_attempts",
+          "rush_attempts",
+          "rushing.att"
+        ]
+      );
+
+    const rushingTDs =
+      getNFLStatNumber_(
+        stat,
+        [
+          "rushing_touchdowns",
+          "rushing_tds",
+          "rush_tds",
+          "rushing.td"
+        ]
+      );
+
+    const receptions =
+      getNFLStatNumber_(
+        stat,
+        [
+          "receptions",
+          "receiving_receptions",
+          "receiving.rec"
+        ]
+      );
+
+    const receivingYards =
+      getNFLStatNumber_(
+        stat,
+        [
+          "receiving_yards",
+          "rec_yards",
+          "receiving.yds",
+          "receiving.yards"
+        ]
+      );
+
+    const receivingTDs =
+      getNFLStatNumber_(
+        stat,
+        [
+          "receiving_touchdowns",
+          "receiving_tds",
+          "rec_tds",
+          "receiving.td"
+        ]
+      );
+
+    if (!playerId && !playerName) {
+      return;
+    }
+
+    rows.push([
+      gameInfo.date,
+      gameId,
+      playerId,
+      playerName,
+      teamName,
+      opponent,
+      passingYards,
+      passingTDs,
+      interceptions,
+      completions,
+      passAttempts,
+      rushingYards,
+      rushingAttempts,
+      rushingTDs,
+      receptions,
+      receivingYards,
+      receivingTDs
+    ]);
+  });
+
+  rows.sort(
+    (a, b) =>
+      new Date(b[0]).getTime() -
+      new Date(a[0]).getTime()
+  );
+
+  writeNFLOutputSheet_(
+    sheet,
+    headers,
+    rows
+  );
+
+  Logger.log(
+    `Wrote ${rows.length} historical NFL player game-log rows.`
+  );
 }
 
 function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
@@ -3271,6 +3964,131 @@ function onOpen() {
     .addItem("Refresh NFL Team Logs February", "refreshNFLTeamGameLogsFebruary")
 
     .addToUi();
+}
+
+function diagnoseNFLGameParticipation423946() {
+  const gameId = 423946;
+
+  // Use the same BALLDONTLIE API key already stored
+  // in this Apps Script project's Script Properties.
+
+  const payload = fetchApi_(
+    "/nfl/v1/stats",
+    {
+      "game_ids[]": gameId,
+      per_page: 100
+    }
+  );
+
+  const stats =
+    Array.isArray(payload.data)
+      ? payload.data
+      : [];
+
+  let positiveTrackedRows = 0;
+  let allZeroTrackedRows = 0;
+
+  console.log(
+    "===== NFL PARTICIPATION DIAGNOSTIC ====="
+  );
+  console.log("Game ID: " + gameId);
+  console.log("Total API stat rows: " + stats.length);
+
+  stats.forEach((stat, index) => {
+    const player = stat.player || {};
+
+    const playerId =
+      player.id ??
+      stat.player_id ??
+      "";
+
+    const playerName =
+      (
+        (player.first_name || "") +
+        " " +
+        (player.last_name || "")
+      ).trim() ||
+      stat.player_name ||
+      "";
+
+    // Match the offensive statistics currently tracked
+    // by Sportacular's NFL player-log pipeline.
+    const tracked = {
+      passingYards: Number(stat.passing_yards) || 0,
+      passingTDs: Number(stat.passing_touchdowns) || 0,
+      interceptions: Number(stat.interceptions) || 0,
+      completions: Number(stat.completions) || 0,
+      passAttempts: Number(stat.passing_attempts) || 0,
+
+      rushingYards: Number(stat.rushing_yards) || 0,
+      rushingAttempts: Number(stat.rushing_attempts) || 0,
+      rushingTDs: Number(stat.rushing_touchdowns) || 0,
+
+      receptions: Number(stat.receptions) || 0,
+      receivingYards: Number(stat.receiving_yards) || 0,
+      receivingTDs: Number(stat.receiving_touchdowns) || 0
+    };
+
+    const hasTrackedProduction =
+      Object.values(tracked).some(value => value !== 0);
+
+    if (hasTrackedProduction) {
+      positiveTrackedRows++;
+    } else {
+      allZeroTrackedRows++;
+    }
+
+    console.log(
+      [
+        "ROW " + (index + 1),
+        "Player ID: " + playerId,
+        "Player: " + playerName,
+        "Classification: " +
+          (hasTrackedProduction
+            ? "TRACKED PRODUCTION"
+            : "ALL ZERO")
+      ].join(" | ")
+    );
+
+    // Most important part of this diagnostic:
+    // expose every field BALLDONTLIE actually returned.
+    console.log(
+      "RAW STAT OBJECT: " +
+      JSON.stringify(stat)
+    );
+  });
+
+  console.log(
+    "===== DIAGNOSTIC SUMMARY ====="
+  );
+
+  console.log(
+    "Total API stat rows: " + stats.length
+  );
+
+  console.log(
+    "Rows with tracked production: " +
+    positiveTrackedRows
+  );
+
+  console.log(
+    "All-zero tracked rows: " +
+    allZeroTrackedRows
+  );
+
+  console.log(
+    "Zero-row percentage: " +
+    (
+      stats.length
+        ? (allZeroTrackedRows / stats.length) * 100
+        : 0
+    ).toFixed(1) +
+    "%"
+  );
+
+  console.log(
+    "===== END DIAGNOSTIC ====="
+  );
 }
 
 // ============================================================================
