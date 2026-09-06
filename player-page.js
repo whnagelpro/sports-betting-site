@@ -1446,7 +1446,17 @@ function createSeasonPanel(panel) {
 
     section.className = "stats-panel";
 
-    const rows = panel.stats.map(stat => `
+    const seasonDataAvailable =
+        player?.dataAvailability?.seasonStats !== false;
+
+    const rows = panel.stats.map(stat => {
+
+        const value =
+            seasonDataAvailable
+                ? stat.value
+                : null;
+
+        return `
 
         <div class="stat-row">
 
@@ -1455,7 +1465,7 @@ function createSeasonPanel(panel) {
             <strong>
 
                 ${formatStatValue(
-                    stat.value,
+                    value,
                     stat.label
                 )}
 
@@ -1463,7 +1473,9 @@ function createSeasonPanel(panel) {
 
         </div>
 
-    `).join("");
+    `;
+
+    }).join("");
 
     section.innerHTML = `
 
