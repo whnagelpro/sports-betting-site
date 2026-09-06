@@ -2889,38 +2889,113 @@ function refreshNFLPlayerBaselinesSheet() {
     "Last Updated"
   ];
 
-  const allRows = [];
-  let cursor = null;
+  function fetchSeasonStats_(season) {
+    const allRows = [];
+    let cursor = null;
 
-  do {
-    const params = {
-      season: 2025,
-      season_type: 2,
-      per_page: 100
-    };
+    do {
+      const params = {
+        season: season,
+        season_type: 2,
+        per_page: 100
+      };
 
-    if (cursor) {
-      params.cursor = cursor;
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      const response = fetchApi_("/nfl/v1/season_stats", params);
+
+      const data = Array.isArray(response.data)
+        ? response.data
+        : [];
+
+      allRows.push(...data);
+
+      cursor =
+        response.meta && response.meta.next_cursor
+          ? response.meta.next_cursor
+          : null;
+
+    } while (cursor);
+
+    return allRows;
+  }
+
+  // Primary prior = 2025.
+  // Fallback prior = 2024 only when the player has no valid 2025 sample.
+  const rows2025 = fetchSeasonStats_(2025);
+  const rows2024 = fetchSeasonStats_(2024);
+
+  const valid2025PlayerIds = new Set();
+
+  rows2025.forEach(row => {
+    const player = row.player || {};
+
+    const playerId =
+      row.player_id ||
+      player.id ||
+      "";
+
+    const gamesPlayed = getNFLStatNumber_(row, [
+      "games",
+      "games_played"
+    ]);
+
+    if (playerId && gamesPlayed > 0) {
+      valid2025PlayerIds.add(String(playerId));
     }
+  });
 
-    const response = fetchApi_("/nfl/v1/season_stats", params);
+  const selectedRows = [];
 
-    const data = Array.isArray(response.data)
-      ? response.data
-      : [];
+  // Always prefer a valid 2025 sample.
+  rows2025.forEach(row => {
+    const gamesPlayed = getNFLStatNumber_(row, [
+      "games",
+      "games_played"
+    ]);
 
-    allRows.push(...data);
+    if (gamesPlayed > 0) {
+      selectedRows.push({
+        row: row,
+        season: 2025
+      });
+    }
+  });
 
-    cursor =
-      response.meta && response.meta.next_cursor
-        ? response.meta.next_cursor
-        : null;
+  // Add 2024 only for players without a valid 2025 sample.
+  rows2024.forEach(row => {
+    const player = row.player || {};
 
-  } while (cursor);
+    const playerId =
+      row.player_id ||
+      player.id ||
+      "";
+
+    const gamesPlayed = getNFLStatNumber_(row, [
+      "games",
+      "games_played"
+    ]);
+
+    if (
+      playerId &&
+      gamesPlayed > 0 &&
+      !valid2025PlayerIds.has(String(playerId))
+    ) {
+      selectedRows.push({
+        row: row,
+        season: 2024
+      });
+    }
+  });
 
   const now = new Date();
 
-  const rows = allRows.map(row => {
+  const rows = selectedRows.map(item => {
+    const row = item.row;
+    const season = item.season;
+
     const player = row.player || {};
     const team = row.team || {};
 
@@ -2999,7 +3074,7 @@ function refreshNFLPlayerBaselinesSheet() {
         "receiving_tds"
       ]),
 
-      2025,
+      season,
       now
     ];
   });
@@ -3010,8 +3085,11 @@ function refreshNFLPlayerBaselinesSheet() {
 
   writeNFLOutputSheet_(sheet, headers, rows);
 
+  const fallbackCount = rows.filter(row => row[15] === 2024).length;
+
   Logger.log(
-    `Wrote ${rows.length} NFL player baseline rows for 2025.`
+    `Wrote ${rows.length} NFL player baseline rows. ` +
+    `${fallbackCount} players used the 2024 fallback.`
   );
 }
 

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>NFL Player Profiles | Sportacular Analytics</title>
+
+  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+
+    <div class="logo">
+      <a href="/">
+        <img src="/logo.png" alt="Sportacular Analytics Logo" />
+      </a>
+    </div>
+
+    <button
+      class="mobile-menu-toggle"
+      id="mobile-menu-toggle"
+      aria-label="Open menu"
+      aria-expanded="false"
+    >
+      ☰
+    </button>
+
+    <nav id="site-nav">
+      <ul class="nav-links">
+
+        <li><a href="index.html">Home</a></li>
+
+        <li class="dropdown">
+          <a href="#">NBA</a>
+          <ul class="dropdown-menu">
+            <li><a href="nba-odds.html">Game Odds</a></li>
+            <li><a href="nba-props.html">Player Props</a></li>
+            <li><a href="nba-trends.html">Player Trends</a></li>
+            <li><a href="nba-team-trends.html">Team Trends</a></li>
+            <li><a href="nba-team-profiles.html">Team Profiles</a></li>
+            <li><a href="nba-player-profiles.html">Player Profiles</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">NHL</a>
+          <ul class="dropdown-menu">
+            <li><a href="nhl-odds.html">Game Odds</a></li>
+            <li><a href="nhl-props.html">Player Props</a></li>
+            <li><a href="nhl-trends.html">Player Trends</a></li>
+            <li><a href="nhl-team-trends.html">Team Trends</a></li>
+            <li><a href="nhl-team-profiles.html">Team Profiles</a></li>
+            <li><a href="nhl-player-profiles.html">Player Profiles</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">MLB</a>
+          <ul class="dropdown-menu">
+            <li><a href="mlb-odds.html">Game Odds</a></li>
+            <li><a href="mlb-props.html">Player Props</a></li>
+            <li><a href="mlb-trends.html">Player Trends</a></li>
+            <li><a href="mlb-team-trends.html">Team Trends</a></li>
+            <li><a href="mlb-team-profiles.html">Team Profiles</a></li>
+            <li><a href="mlb-player-profiles.html">Player Profiles</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">NFL</a>
+          <ul class="dropdown-menu">
+            <li><a href="nfl-odds.html">Game Odds</a></li>
+            <li><a href="nfl-props.html">Player Props</a></li>
+            <li><a href="nfl-trends.html">Player Trends</a></li>
+            <li><a href="nfl-team-trends.html">Team Trends</a></li>
+            <li><a href="nfl-team-profiles.html">Team Profiles</a></li>
+            <li><a href="nfl-player-profiles.html">Player Profiles</a></li>
+          </ul>
+        </li>
+
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="index.html#about">About</a></li>
+
+        <li class="dropdown">
+          <a href="#">Legal</a>
+          <ul class="dropdown-menu">
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="disclaimer.html">Disclaimer</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </li>
+
+        <li id="nav-login-item">
+          <a href="auth.html">Login</a>
+        </li>
+
+        <li id="nav-account-item" style="display: none;">
+          <a href="auth.html">Account</a>
+        </li>
+
+        <li id="nav-logout-item" style="display: none;">
+          <a href="#" id="nav-logout-link">Logout</a>
+        </li>
+
+      </ul>
+    </nav>
+
+  </div>
+</header>
+
+
+<main class="league-page">
+
+  <section class="league-hero">
+    <div class="container">
+
+      <h1>NFL Player Profiles</h1>
+
+      <p class="league-description">
+        Explore NFL players with Sportacular Analytics including
+        season production, recent performance, trends, consistency,
+        and player-specific analytical insights.
+        Select a team and player below to open the player's complete profile.
+      </p>
+
+    </div>
+  </section>
+
+
+  <section class="bets-section">
+
+    <div class="container">
+
+      <div class="section-header">
+
+        <h2>Find a Player</h2>
+
+        <p>
+          Select an NFL team, then choose a player to view
+          their complete Sportacular profile.
+        </p>
+
+      </div>
+
+
+      <div class="player-profile-directory">
+
+        <div class="player-directory-control">
+
+          <label for="nfl-player-profile-team">
+            Team
+          </label>
+
+          <select
+            id="nfl-player-profile-team"
+            class="sportsbook-select"
+          >
+            <option value="">
+              Loading NFL teams...
+            </option>
+          </select>
+
+        </div>
+
+
+        <div class="player-directory-control">
+
+          <label for="nfl-player-profile-player">
+            Player
+          </label>
+
+          <select
+            id="nfl-player-profile-player"
+            class="sportsbook-select"
+            disabled
+          >
+            <option value="">
+              Select a team first
+            </option>
+          </select>
+
+        </div>
+
+
+        <div class="player-directory-action">
+
+          <button
+            id="nfl-player-profile-button"
+            class="btn btn-primary"
+            type="button"
+            disabled
+          >
+            View Player Profile
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="nfl-player-profile-directory-message"
+        class="player-directory-message"
+        aria-live="polite"
+      ></div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer class="site-footer">
+
+  <div class="container">
+
+    <p>
+      <strong>Disclaimer:</strong>
+      Data provided by BallDontLie API.
+      This website is for informational and educational purposes only.
+      Nothing on this site guarantees results or should be considered
+      financial advice. If you sports bet, always bet responsibly.
+    </p>
+
+    <p class="support-email">
+      We would love to hear from you!
+      Contact us at support@sportacularanalytics.com.
+    </p>
+
+    <p>
+      &copy; 2026 Sportacular Analytics. All rights reserved.
+    </p>
+
+  </div>
+
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const toggle =
+    document.getElementById("mobile-menu-toggle");
+
+  const nav =
+    document.getElementById("site-nav");
+
+  if (toggle && nav) {
+
+    toggle.addEventListener("click", () => {
+
+      nav.classList.toggle("mobile-open");
+
+      const isOpen =
+        nav.classList.contains("mobile-open");
+
+      toggle.setAttribute(
+        "aria-expanded",
+        isOpen ? "true" : "false"
+      );
+
+      toggle.textContent =
+        isOpen ? "✕" : "☰";
+
+    });
+
+  }
+
+
+  if (window.innerWidth <= 768) {
+
+    document
+      .querySelectorAll(".dropdown > a")
+      .forEach((link) => {
+
+        link.addEventListener("click", (e) => {
+
+          e.preventDefault();
+
+          const parent =
+            link.parentElement;
+
+          parent.classList.toggle("open");
+
+        });
+
+      });
+
+  }
+
+});
+</script>
+
+
+</body>
+</html>
