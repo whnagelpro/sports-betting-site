@@ -1360,10 +1360,28 @@ function renderFields(fields) {
 
 function formatStatValue(value, label = "") {
 
+    /*
+      Preserve genuinely unavailable values.
+
+      Important:
+      Number(null) === 0
+      Number("") === 0
+
+      Those conversions would make missing data
+      look like a legitimate statistical zero.
+    */
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "—";
+    }
+
     const number = Number(value);
 
     if (!Number.isFinite(number)) {
-        return value ?? "-";
+        return value ?? "—";
     }
 
     const lower = String(label).toLowerCase();
