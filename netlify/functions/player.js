@@ -83,35 +83,35 @@ export async function handler(event) {
 
         stage = "loading CSV datasets";
 
-        const [
+        console.log("Loading roster...");
+        const rosterStart = Date.now();
+        const roster = await loadCSV(source.roster);
+        console.log(`✓ roster loaded in ${Date.now() - rosterStart} ms`);
 
-            roster,
+        console.log("Loading season stats...");
+        const seasonStart = Date.now();
+        const seasonRows = await loadSeasonStats(source.seasonStats);
+        console.log(`✓ season stats loaded in ${Date.now() - seasonStart} ms`);
 
-            seasonRows,
+        console.log("Loading game logs...");
+        const gameLogsStart = Date.now();
+        const gameLogRows = await loadGameLogs(source.gameLogs);
+        console.log(`✓ game logs loaded in ${Date.now() - gameLogsStart} ms`);
 
-            gameLogRows,
+        console.log("Loading trends...");
+        const trendsStart = Date.now();
+        const trendRows = await loadTrends(source.trends);
+        console.log(`✓ trends loaded in ${Date.now() - trendsStart} ms`);
 
-            trendRows,
+        console.log("Loading game odds...");
+        const oddsStart = Date.now();
+        const gameOddsRows = await loadGameOdds(source.gameOdds);
+        console.log(`✓ game odds loaded in ${Date.now() - oddsStart} ms`);
 
-            gameOddsRows,
-
-            playerPropRows
-
-        ] = await Promise.all([
-
-            loadCSV(source.roster),
-
-            loadSeasonStats(source.seasonStats),
-
-            loadGameLogs(source.gameLogs),
-
-            loadTrends(source.trends),
-
-            loadGameOdds(source.gameOdds),
-
-            loadPlayerProps(source.playerProps)
-
-        ]);
+        console.log("Loading player props...");
+        const propsStart = Date.now();
+        const playerPropRows = await loadPlayerProps(source.playerProps);
+        console.log(`✓ player props loaded in ${Date.now() - propsStart} ms`);
 
 
         // ----------------------------
