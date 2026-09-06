@@ -10,8 +10,10 @@ import Papa from "papaparse";
 // ------------------------------------------------------
 
 const CSV_FETCH_TIMEOUT_MS = 12000;
+const CSV_FETCH_MAX_ATTEMPTS = 2;
 
-async function fetchCSV(url) {
+
+async function fetchCSVOnce(url) {
 
     const controller =
         new AbortController();
@@ -59,6 +61,54 @@ async function fetchCSV(url) {
         clearTimeout(timeoutId);
 
     }
+
+}
+
+
+async function fetchCSV(url) {
+
+    let lastError = null;
+
+
+    for (
+        let attempt = 1;
+        attempt <= CSV_FETCH_MAX_ATTEMPTS;
+        attempt++
+    ) {
+
+        try {
+
+            if (attempt > 1) {
+
+                console.warn(
+                    `Retrying CSV request — attempt ${attempt} of ${CSV_FETCH_MAX_ATTEMPTS}`
+                );
+
+            }
+
+
+            return await fetchCSVOnce(url);
+
+
+        } catch (error) {
+
+            lastError =
+                error;
+
+
+            console.warn(
+                `CSV request attempt ${attempt} failed:`,
+                error?.message || String(error)
+            );
+
+        }
+
+    }
+
+
+    throw new Error(
+        `CSV request failed after ${CSV_FETCH_MAX_ATTEMPTS} attempts: ${lastError?.message || "Unknown error"}`
+    );
 
 }
 
