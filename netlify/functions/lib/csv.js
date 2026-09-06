@@ -12,6 +12,9 @@ import Papa from "papaparse";
 const CSV_FETCH_TIMEOUT_MS = 12000;
 const CSV_FETCH_MAX_ATTEMPTS = 2;
 
+const CSV_CACHE_TTL_MS = 5 * 60 * 1000;
+
+const csvCache = new Map();
 
 async function fetchCSVOnce(url) {
 
@@ -64,10 +67,52 @@ async function fetchCSVOnce(url) {
 
 }
 
+function getCachedCSV(url) {
+
+    const cached =
+        csvCache.get(url);
+
+    if (!cached) {
+        return null;
+    }
+
+    const age =
+        Date.now() - cached.timestamp;
+
+    if (age > CSV_CACHE_TTL_MS) {
+        return null;
+    }
+
+    return cached.csv;
+
+}
+
+
+function setCachedCSV(url, csv) {
+
+    csvCache.set(url, {
+        csv,
+        timestamp: Date.now()
+    });
+
+}
 
 async function fetchCSV(url) {
 
     let lastError = null;
+
+    const cached =
+        getCachedCSV(url);
+
+    if (cached !== null) {
+
+        console.log(
+            "✓ Using cached CSV"
+        );
+
+        return cached;
+
+    }
 
 
     for (
@@ -86,15 +131,20 @@ async function fetchCSV(url) {
 
             }
 
+            const csv =
+                await fetchCSVOnce(url);
 
-            return await fetchCSVOnce(url);
+            setCachedCSV(
+                url,
+                csv
+            );
 
+            return csv;
 
         } catch (error) {
 
             lastError =
                 error;
-
 
             console.warn(
                 `CSV request attempt ${attempt} failed:`,
@@ -102,6 +152,26 @@ async function fetchCSV(url) {
             );
 
         }
+
+    }
+
+
+    /*
+      A stale cached copy is still preferable
+      to completely failing a player profile
+      when Google Sheets is temporarily unavailable.
+    */
+
+    const stale =
+        csvCache.get(url);
+
+    if (stale?.csv) {
+
+        console.warn(
+            "⚠ Using stale cached CSV after live request failure"
+        );
+
+        return stale.csv;
 
     }
 
