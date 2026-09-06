@@ -6643,10 +6643,56 @@ const PLAYER_PROFILE_DIRECTORY_CONFIG = {
   nba: {
     label: "NBA",
     rosterUrl: NBA_ROSTERS_CSV_URL
+  },
+
+  nhl: {
+    label: "NHL",
+    rosterUrl: NHL_PLAYERS_CSV_URL,
+    type: "nhl"
   }
 
 };
 
+function getNHLCurrentTeam(teamsValue) {
+
+  if (!teamsValue) {
+    return "";
+  }
+
+  let teams;
+
+  try {
+    teams = JSON.parse(teamsValue);
+  } catch (error) {
+    return "";
+  }
+
+  if (!Array.isArray(teams) || !teams.length) {
+    return "";
+  }
+
+  /*
+    The NHL Players sheet contains team history.
+    Use the highest season as the player's
+    current/latest team.
+  */
+  const latestTeam =
+    [...teams]
+      .filter((team) =>
+        team &&
+        team.full_name &&
+        team.season !== undefined &&
+        team.season !== null
+      )
+      .sort(
+        (a, b) =>
+          Number(b.season) - Number(a.season)
+      )[0];
+
+  return latestTeam
+    ? String(latestTeam.full_name || "").trim()
+    : "";
+}
 
 async function initPlayerProfileDirectory(league) {
 
@@ -6732,34 +6778,80 @@ async function initPlayerProfileDirectory(league) {
     */
     const players =
       rows
-        .map((row) => ({
+        .map((row) => {
 
-          id:
+          const id =
             String(
               row["Id"] || ""
-            ).trim(),
+            ).trim();
 
-          name:
+          const name =
             String(
               row["Full Name"] || ""
-            ).trim(),
+            ).trim();
 
-          team:
-            String(
-              row["Team Name"] || ""
-            ).trim(),
+          /*
+            NHL uses:
+              Teams
+              Position Code
 
-          position:
-            String(
-              row["Position"] || ""
-            ).trim(),
+            NFL/NBA use:
+              Team Name
+              Position
+              Status
+          */
+          if (config.type === "nhl") {
 
-          status:
-            String(
-              row["Status"] || ""
-            ).trim()
+            return {
 
-        }))
+              id,
+
+              name,
+
+              team:
+                getNHLCurrentTeam(
+                  row["Teams"]
+                ),
+
+              position:
+                String(
+                  row["Position Code"] || ""
+                ).trim(),
+
+              /*
+                NHL Players does not use the same
+                Status field as NFL/NBA.
+              */
+              status: "active"
+
+            };
+
+          }
+
+          return {
+
+            id,
+
+            name,
+
+            team:
+              String(
+                row["Team Name"] || ""
+              ).trim(),
+
+            position:
+              String(
+                row["Position"] || ""
+              ).trim(),
+
+            status:
+              String(
+                row["Status"] || ""
+              ).trim()
+
+          };
+
+        })
         .filter((player) =>
 
           player.id &&
@@ -7042,6 +7134,7 @@ document.addEventListener(
 
     initPlayerProfileDirectory("nfl");
     initPlayerProfileDirectory("nba");
+    initPlayerProfileDirectory("nhl");
 
   }
 );
