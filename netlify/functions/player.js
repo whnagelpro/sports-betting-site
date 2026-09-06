@@ -3,9 +3,13 @@
 // Universal Player Endpoint
 // ======================================================
 
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { DATA_SOURCES } from "./lib/config.js";
 
-import { loadCSV } from "./lib/csv.js";
+import { loadCSV, parseCSV } from "./lib/csv.js";
 
 import { loadSeasonStats } from "./lib/seasonStats.js";
 
@@ -71,6 +75,43 @@ async function safeTimedLoad(
 
 }
 
+async function loadLocalNFLRoster() {
+
+    const currentFile =
+        fileURLToPath(import.meta.url);
+
+    const currentDirectory =
+        path.dirname(currentFile);
+
+    const rosterPath =
+        path.join(
+            currentDirectory,
+            "data",
+            "nfl-roster.csv"
+        );
+
+    console.log(
+        "Loading local NFL roster:",
+        rosterPath
+    );
+
+    const csv =
+        await fs.readFile(
+            rosterPath,
+            "utf8"
+        );
+
+    const roster =
+        parseCSV(csv);
+
+    console.log(
+        `✓ Local NFL roster parsed — ${roster.length} players`
+    );
+
+    return roster;
+
+}
+
 export async function handler(event) {
 
     let stage = "starting player endpoint";
@@ -121,8 +162,19 @@ export async function handler(event) {
         const rosterStart =
             Date.now();
 
-        const roster =
-            await loadCSV(source.roster);
+        let roster;
+
+        if (league === "nfl") {
+
+            roster =
+                await loadLocalNFLRoster();
+
+        } else {
+
+            roster =
+                await loadCSV(source.roster);
+
+        }
 
         console.log(
             `✓ roster loaded in ${Date.now() - rosterStart} ms`
