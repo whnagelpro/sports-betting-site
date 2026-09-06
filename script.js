@@ -6628,51 +6628,101 @@ renderTeamGameLog(
 }
 
 /* ==========================================================
-   NFL PLAYER PROFILE DIRECTORY
+   PLAYER PROFILE DIRECTORY
+   Shared directory engine for all leagues
 ========================================================== */
 
-async function initNFLPlayerProfileDirectory() {
+const PLAYER_PROFILE_DIRECTORY_CONFIG = {
+
+  nfl: {
+    label: "NFL",
+    rosterUrl: NFL_ROSTERS_CSV_URL
+  },
+
+  nba: {
+    label: "NBA",
+    rosterUrl: NBA_ROSTERS_CSV_URL
+  }
+
+};
+
+
+async function initPlayerProfileDirectory(league) {
+
+  const config =
+    PLAYER_PROFILE_DIRECTORY_CONFIG[league];
+
+  if (!config) {
+    return;
+  }
+
+
+  const leagueLabel =
+    config.label;
+
 
   const teamSelect =
-    document.getElementById("nfl-player-profile-team");
+    document.getElementById(
+      `${league}-player-profile-team`
+    );
 
   const playerSelect =
-    document.getElementById("nfl-player-profile-player");
+    document.getElementById(
+      `${league}-player-profile-player`
+    );
 
   const profileButton =
-    document.getElementById("nfl-player-profile-button");
+    document.getElementById(
+      `${league}-player-profile-button`
+    );
 
   const message =
     document.getElementById(
-      "nfl-player-profile-directory-message"
+      `${league}-player-profile-directory-message`
     );
 
-  // This code should only run on the NFL Player Profiles page.
-  if (!teamSelect || !playerSelect || !profileButton) {
+
+  /*
+    This allows the same script.js to load on every
+    Sportacular page without running directory logic
+    unless the required controls actually exist.
+  */
+  if (
+    !teamSelect ||
+    !playerSelect ||
+    !profileButton
+  ) {
     return;
   }
+
 
   try {
 
     const response =
-      await fetch(NFL_ROSTERS_CSV_URL);
+      await fetch(config.rosterUrl);
+
 
     if (!response.ok) {
+
       throw new Error(
-        `NFL roster request failed: ${response.status}`
+        `${leagueLabel} roster request failed: ${response.status}`
       );
+
     }
+
 
     const csv =
       await response.text();
 
+
     const rows =
       parseCSV(csv);
 
-    /*
-      Keep valid active players only.
 
-      Exact NFL Rosters headers:
+    /*
+      NFL and NBA currently share these exact
+      directory-relevant Rosters headers:
+
       Id
       Full Name
       Team Name
@@ -6682,44 +6732,74 @@ async function initNFLPlayerProfileDirectory() {
     const players =
       rows
         .map((row) => ({
-          id: String(row["Id"] || "").trim(),
-          name: String(row["Full Name"] || "").trim(),
-          team: String(row["Team Name"] || "").trim(),
-          position: String(row["Position"] || "").trim(),
-          status: String(row["Status"] || "").trim()
+
+          id:
+            String(
+              row["Id"] || ""
+            ).trim(),
+
+          name:
+            String(
+              row["Full Name"] || ""
+            ).trim(),
+
+          team:
+            String(
+              row["Team Name"] || ""
+            ).trim(),
+
+          position:
+            String(
+              row["Position"] || ""
+            ).trim(),
+
+          status:
+            String(
+              row["Status"] || ""
+            ).trim()
+
         }))
         .filter((player) =>
+
           player.id &&
           player.name &&
           player.team &&
           player.status.toLowerCase() === "active"
+
         );
 
 
     if (!players.length) {
+
       throw new Error(
-        "No active NFL players were found in the roster."
+        `No active ${leagueLabel} players were found in the roster.`
       );
+
     }
 
 
     /*
-      Build unique alphabetical team list from
-      the actual roster rather than hard-coding teams.
+      Build the team list dynamically from
+      the actual active roster.
     */
     const teams =
-      [...new Set(
-        players.map((player) => player.team)
-      )]
+      [
+        ...new Set(
+          players.map(
+            (player) => player.team
+          )
+        )
+      ]
         .filter(Boolean)
-        .sort((a, b) =>
-          a.localeCompare(b)
+        .sort(
+          (a, b) =>
+            a.localeCompare(b)
         );
 
 
     teamSelect.innerHTML = `
       <option value="">
-        Select an NFL team
+        Select an ${leagueLabel} team
       </option>
     `;
 
@@ -6729,8 +6809,11 @@ async function initNFLPlayerProfileDirectory() {
       const option =
         document.createElement("option");
 
-      option.value = team;
-      option.textContent = team;
+      option.value =
+        team;
+
+      option.textContent =
+        team;
 
       teamSelect.appendChild(option);
 
@@ -6740,8 +6823,7 @@ async function initNFLPlayerProfileDirectory() {
     /*
       Team selection
       ----------------
-      Filter the roster to the selected team
-      and populate the player dropdown.
+      Filter active players to the selected team.
     */
     teamSelect.addEventListener(
       "change",
@@ -6750,14 +6832,20 @@ async function initNFLPlayerProfileDirectory() {
         const selectedTeam =
           teamSelect.value;
 
+
         playerSelect.innerHTML = `
           <option value="">
             Select a player
           </option>
         `;
 
-        playerSelect.disabled = true;
-        profileButton.disabled = true;
+
+        playerSelect.disabled =
+          true;
+
+        profileButton.disabled =
+          true;
+
 
         if (message) {
           message.textContent = "";
@@ -6783,8 +6871,9 @@ async function initNFLPlayerProfileDirectory() {
               (player) =>
                 player.team === selectedTeam
             )
-            .sort((a, b) =>
-              a.name.localeCompare(b.name)
+            .sort(
+              (a, b) =>
+                a.name.localeCompare(b.name)
             );
 
 
@@ -6793,12 +6882,16 @@ async function initNFLPlayerProfileDirectory() {
           const option =
             document.createElement("option");
 
-          option.value = player.id;
+
+          option.value =
+            player.id;
+
 
           option.textContent =
             player.position
               ? `${player.name} — ${player.position}`
               : player.name;
+
 
           playerSelect.appendChild(option);
 
@@ -6813,17 +6906,22 @@ async function initNFLPlayerProfileDirectory() {
             </option>
           `;
 
+
           if (message) {
+
             message.textContent =
               "No active players were found for this team.";
+
           }
+
 
           return;
 
         }
 
 
-        playerSelect.disabled = false;
+        playerSelect.disabled =
+          false;
 
       }
     );
@@ -6832,7 +6930,7 @@ async function initNFLPlayerProfileDirectory() {
     /*
       Player selection
       ----------------
-      Enable the profile button only when
+      Enable profile navigation only after
       an actual player ID is selected.
     */
     playerSelect.addEventListener(
@@ -6841,6 +6939,7 @@ async function initNFLPlayerProfileDirectory() {
 
         profileButton.disabled =
           !playerSelect.value;
+
 
         if (message) {
           message.textContent = "";
@@ -6851,9 +6950,7 @@ async function initNFLPlayerProfileDirectory() {
 
 
     /*
-      Profile navigation
-      ------------------
-      Use the existing universal player profile route.
+      Universal Player Profile navigation.
     */
     profileButton.addEventListener(
       "click",
@@ -6862,12 +6959,14 @@ async function initNFLPlayerProfileDirectory() {
         const playerId =
           playerSelect.value;
 
+
         if (!playerId) {
           return;
         }
 
+
         window.location.href =
-          `player.html?league=nfl&id=${encodeURIComponent(playerId)}`;
+          `player.html?league=${encodeURIComponent(league)}&id=${encodeURIComponent(playerId)}`;
 
       }
     );
@@ -6879,28 +6978,32 @@ async function initNFLPlayerProfileDirectory() {
 
 
     console.log(
-      "NFL Player Profile Directory:",
+      `${leagueLabel} Player Profile Directory:`,
       {
         players: players.length,
         teams: teams.length
       }
     );
 
+
   } catch (error) {
 
     console.error(
-      "NFL Player Profile Directory Error:",
+      `${leagueLabel} Player Profile Directory Error:`,
       error
     );
 
 
     teamSelect.innerHTML = `
       <option value="">
-        Unable to load NFL teams
+        Unable to load ${leagueLabel} teams
       </option>
     `;
 
-    teamSelect.disabled = true;
+
+    teamSelect.disabled =
+      true;
+
 
     playerSelect.innerHTML = `
       <option value="">
@@ -6908,20 +7011,36 @@ async function initNFLPlayerProfileDirectory() {
       </option>
     `;
 
-    playerSelect.disabled = true;
-    profileButton.disabled = true;
+
+    playerSelect.disabled =
+      true;
+
+    profileButton.disabled =
+      true;
 
 
     if (message) {
+
       message.textContent =
-        "NFL player directory data is temporarily unavailable.";
+        `${leagueLabel} player directory data is temporarily unavailable.`;
+
     }
 
   }
 
 }
 
+
+/* ==========================================================
+   PLAYER PROFILE DIRECTORY INITIALIZATION
+========================================================== */
+
 document.addEventListener(
   "DOMContentLoaded",
-  initNFLPlayerProfileDirectory
+  () => {
+
+    initPlayerProfileDirectory("nfl");
+    initPlayerProfileDirectory("nba");
+
+  }
 );
