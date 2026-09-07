@@ -104,7 +104,10 @@ export function scoreProp({
 
         score: overallScore,
 
-        modelEdge: edge.edgePercent,
+        modelEdge:
+            hasModelProbability
+                ? edge.edgePercent
+                : null,
 
         probability: projectedProbability,
 
