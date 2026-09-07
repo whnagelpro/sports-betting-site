@@ -1,0 +1,588 @@
+Id,First Name,Last Name,Full Name,Team Id,Team Name,Team Abbreviation,Conference,Division,Position,Height,Weight,Jersey Number,College,Country,Draft Year,Draft Round,Draft Number,Status
+3,Steven,Adams,Steven Adams,11,Houston Rockets,HOU,West,Southwest,C,6-11,265,12,Pittsburgh,New Zealand,2013,1,12,Active
+4,Bam,Adebayo,Bam Adebayo,16,Miami Heat,MIA,East,Southeast,C-F,6-9,255,13,Kentucky,USA,2017,1,14,Active
+8,Grayson,Allen,Grayson Allen,4,Charlotte Hornets,CHA,East,Southeast,G,6-3,198,8,Duke,USA,2018,1,21,Active
+9,Jarrett,Allen,Jarrett Allen,6,Cleveland Cavaliers,CLE,East,Central,C,6-9,243,31,Texas,USA,2017,1,22,Active
+12,Kyle,Anderson,Kyle Anderson,28,Toronto Raptors,TOR,East,Atlantic,F,6-8,230,12,UCLA,USA,2014,1,30,Active
+15,Giannis,Antetokounmpo,Giannis Antetokounmpo,16,Miami Heat,MIA,East,Southeast,F,6-11,243,7,Filathlitikos,Greece,2013,1,15,Active
+18,OG,Anunoby,OG Anunoby,20,New York Knicks,NYK,East,Atlantic,F,6-7,240,8,Indiana,United Kingdom,2017,1,23,Active
+22,Deandre,Ayton,Deandre Ayton,30,Washington Wizards,WAS,East,Southeast,C,7-0,252,5,Arizona,Bahamas,2018,1,1,Active
+24,Marvin,Bagley III,Marvin Bagley III,8,Denver Nuggets,DEN,West,Northwest,F,6-10,235,35,Duke,USA,2018,1,2,Active
+28,Mo,Bamba,Mo Bamba,29,Utah Jazz,UTA,West,Northwest,C,7-0,231,11,Texas,USA,2018,1,6,Active
+30,Harrison,Barnes,Harrison Barnes,27,San Antonio Spurs,SAS,West,Southwest,F,6-7,225,40,North Carolina,USA,2012,1,7,Active
+33,Nicolas,Batum,Nicolas Batum,13,LA Clippers,LAC,West,Pacific,F-G,6-7,230,33,Le Mans,France,2008,1,25,Active
+37,Bradley,Beal,Bradley Beal,13,LA Clippers,LAC,West,Pacific,G,6-4,207,0,Florida,USA,2012,1,3,Active
+53,Bogdan,Bogdanovic,Bogdan Bogdanovic,11,Houston Rockets,HOU,West,Southwest,G,6-5,225,31,Fenerbahce,Serbia,2014,1,27,Active
+57,Devin,Booker,Devin Booker,24,Phoenix Suns,PHX,West,Pacific,G,6-5,206,15,Kentucky,USA,2015,1,13,Active
+60,Tony,Bradley,Tony Bradley,1,Atlanta Hawks,ATL,East,Southeast,C,6-10,248,13,North Carolina,USA,2017,1,28,Active
+61,Mikal,Bridges,Mikal Bridges,20,New York Knicks,NYK,East,Atlantic,F,6-6,209,25,Villanova,USA,2018,1,10,Active
+62,Miles,Bridges,Miles Bridges,24,Phoenix Suns,PHX,West,Pacific,F,6-7,225,0,Michigan State,USA,2018,1,12,Active
+66,Dillon,Brooks,Dillon Brooks,24,Phoenix Suns,PHX,West,Pacific,G-F,6-7,225,3,Oregon,Canada,2017,2,45,Active
+69,Bruce,Brown,Bruce Brown,8,Denver Nuggets,DEN,West,Northwest,G,6-4,202,11,Miami,USA,2018,2,42,Active
+70,Jaylen,Brown,Jaylen Brown,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-6,223,7,California,USA,2016,1,3,Active
+73,Jalen,Brunson,Jalen Brunson,20,New York Knicks,NYK,East,Atlantic,G,6-2,190,11,Villanova,USA,2018,2,33,Active
+74,Thomas,Bryant,Thomas Bryant,6,Cleveland Cavaliers,CLE,East,Central,C,6-9,248,3,Indiana,USA,2017,2,42,Active
+79,Jimmy,Butler,Jimmy Butler,10,Golden State Warriors,GSW,West,Pacific,G-F,6-6,230,10,Marquette,USA,2011,1,30,Active
+81,Kentavious,Caldwell-Pope,Kentavious Caldwell-Pope,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-5,204,3,Georgia,USA,2013,1,8,Active
+83,Clint,Capela,Clint Capela,11,Houston Rockets,HOU,West,Southwest,C,6-10,256,30,Elan Chalon,Switzerland,2014,1,25,Active
+85,Wendell,Carter Jr.,Wendell Carter Jr.,22,Orlando Magic,ORL,East,Southeast,F,6-10,270,34,Duke,USA,2018,1,7,Active
+87,Jevon,Carter,Jevon Carter,22,Orlando Magic,ORL,East,Southeast,G,6-0,190,2,West Virginia,USA,2018,2,32,Active
+89,Alex,Caruso,Alex Caruso,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-5,186,9,Texas A&M,USA,,,,Active
+100,Jordan,Clarkson,Jordan Clarkson,20,New York Knicks,NYK,East,Atlantic,G,6-5,194,0,Missouri,USA,2014,2,46,Active
+101,John,Collins,John Collins,9,Detroit Pistons,DET,East,Central,F-C,6-9,226,20,Wake Forest,USA,2017,1,19,Active
+102,Zach,Collins,Zach Collins,5,Chicago Bulls,CHI,East,Central,F-C,6-9,240,12,Gonzaga,USA,2017,1,10,Active
+104,Mike,Conley,Mike Conley,2,Boston Celtics,BOS,East,Atlantic,G,6-1,175,44,Ohio State,USA,2007,1,4,Active
+105,Pat,Connaughton,Pat Connaughton,4,Charlotte Hornets,CHA,East,Southeast,G,6-5,209,21,Notre Dame,USA,2015,2,41,Active
+114,Seth,Curry,Seth Curry,10,Golden State Warriors,GSW,West,Pacific,G,6-1,185,31,Duke,USA,,,,Active
+115,Stephen,Curry,Stephen Curry,10,Golden State Warriors,GSW,West,Pacific,G,6-2,185,30,Davidson,USA,2009,1,7,Active
+117,Anthony,Davis,Anthony Davis,30,Washington Wizards,WAS,East,Southeast,F-C,6-10,253,23,Kentucky,USA,2012,1,1,Active
+131,Donte,DiVincenzo,Donte DiVincenzo,18,Minnesota Timberwolves,MIN,West,Northwest,G,6-4,203,0,Villanova,USA,2018,1,17,Active
+132,Luka,Doncic,Luka Doncic,14,Los Angeles Lakers,LAL,West,Pacific,F-G,6-8,230,77,Real Madrid,Slovenia,2018,1,3,Active
+137,Andre,Drummond,Andre Drummond,20,New York Knicks,NYK,East,Atlantic,C,6-11,279,0,Connecticut,USA,2012,1,9,Active
+139,Kris,Dunn,Kris Dunn,13,LA Clippers,LAC,West,Pacific,G,6-3,205,8,Providence,USA,2016,1,5,Active
+140,Kevin,Durant,Kevin Durant,11,Houston Rockets,HOU,West,Southwest,F,6-11,240,7,Texas,USA,2007,1,2,Active
+145,Joel,Embiid,Joel Embiid,23,Philadelphia 76ers,PHI,East,Atlantic,F-C,7-0,270,21,Kansas,Cameroon,2014,1,3,Active
+158,Dorian,Finney-Smith,Dorian Finney-Smith,4,Charlotte Hornets,CHA,East,Southeast,F,6-7,220,2,Florida,USA,,,,Active
+161,De'Aaron,Fox,De'Aaron Fox,27,San Antonio Spurs,SAS,West,Southwest,G,6-3,185,4,Kentucky,USA,2017,1,5,Active
+172,Paul,George,Paul George,2,Boston Celtics,BOS,East,Atlantic,F,6-8,230,8,Fresno State,USA,2010,1,10,Active
+173,Taj,Gibson,Taj Gibson,15,Memphis Grizzlies,MEM,West,Southwest,F,6-9,232,67,Southern California,USA,2009,1,26,Active
+175,Shai,Gilgeous-Alexander,Shai Gilgeous-Alexander,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-6,195,2,Kentucky,Canada,2018,1,11,Active
+176,Rudy,Gobert,Rudy Gobert,18,Minnesota Timberwolves,MIN,West,Northwest,C,7-1,258,27,Cholet,France,2013,1,27,Active
+177,Aaron,Gordon,Aaron Gordon,8,Denver Nuggets,DEN,West,Northwest,F,6-8,235,32,Arizona,USA,2014,1,4,Active
+182,Jerami,Grant,Jerami Grant,15,Memphis Grizzlies,MEM,West,Southwest,F,6-7,213,9,Syracuse,USA,2014,2,39,Active
+185,Draymond,Green,Draymond Green,10,Golden State Warriors,GSW,West,Pacific,F,6-6,230,23,Michigan State,USA,2012,2,35,Active
+188,Jeff,Green,Jeff Green,11,Houston Rockets,HOU,West,Southwest,F,6-8,235,32,Georgetown,USA,2007,1,5,Active
+191,Tim,Hardaway Jr.,Tim Hardaway Jr.,16,Miami Heat,MIA,East,Southeast,G,6-5,205,10,Michigan,USA,2013,1,24,Active
+192,James,Harden,James Harden,6,Cleveland Cavaliers,CLE,East,Central,G,6-5,220,1,Arizona State,USA,2009,1,3,Active
+196,Gary,Harris,Gary Harris,9,Detroit Pistons,DET,East,Central,G,6-4,210,11,Michigan State,USA,2014,1,19,Active
+200,Tobias,Harris,Tobias Harris,27,San Antonio Spurs,SAS,West,Southwest,F,6-8,226,12,Tennessee,USA,2011,1,19,Active
+201,Isaiah,Hartenstein,Isaiah Hartenstein,21,Oklahoma City Thunder,OKC,West,Northwest,F-C,7-0,250,55,Zalgiris,Germany,2017,2,43,Active
+202,Josh,Hart,Josh Hart,20,New York Knicks,NYK,East,Atlantic,G,6-5,215,3,Villanova,USA,2017,1,30,Active
+208,Mario,Hezonja,Mario Hezonja,6,Cleveland Cavaliers,CLE,East,Central,F,6-8,220,33,FC Barcelona,Croatia,2015,1,5,Active
+210,Buddy,Hield,Buddy Hield,1,Atlanta Hawks,ATL,East,Southeast,G,6-4,220,8,Oklahoma,Bahamas,2016,1,6,Active
+213,Aaron,Holiday,Aaron Holiday,11,Houston Rockets,HOU,West,Southwest,G,6-0,185,0,UCLA,USA,2018,1,23,Active
+214,Jrue,Holiday,Jrue Holiday,25,Portland Trail Blazers,POR,West,Northwest,G,6-4,220,5,UCLA,USA,2009,1,17,Active
+219,Al,Horford,Al Horford,10,Golden State Warriors,GSW,West,Pacific,C-F,6-8,240,20,Florida,Dominican Republic,2007,1,3,Active
+221,Kevin,Huerter,Kevin Huerter,9,Detroit Pistons,DET,East,Central,G,6-6,190,27,Maryland,USA,2018,1,19,Active
+227,Brandon,Ingram,Brandon Ingram,28,Toronto Raptors,TOR,East,Atlantic,F,6-8,190,3,Duke,USA,2016,1,2,Active
+228,Kyrie,Irving,Kyrie Irving,7,Dallas Mavericks,DAL,West,Southwest,G,6-2,195,11,Duke,Australia,2011,1,1,Active
+229,Jonathan,Isaac,Jonathan Isaac,22,Orlando Magic,ORL,East,Southeast,F,6-10,230,1,Florida State,USA,2017,1,6,Active
+231,Jaren,Jackson Jr.,Jaren Jackson Jr.,29,Utah Jazz,UTA,West,Northwest,F-C,6-10,242,20,Michigan State,USA,2018,1,4,Active
+237,LeBron,James,LeBron James,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-9,250,23,St. Vincent-St. Mary HS (OH),USA,2003,1,1,Active
+246,Nikola,Jokic,Nikola Jokic,8,Denver Nuggets,DEN,West,Northwest,C,6-11,284,15,Mega Basket,Serbia,2014,2,41,Active
+247,Derrick,Jones Jr.,Derrick Jones Jr.,13,LA Clippers,LAC,West,Pacific,F-G,6-6,210,5,UNLV,USA,,,,Active
+249,Tyus,Jones,Tyus Jones,8,Denver Nuggets,DEN,West,Northwest,G,6-0,196,5,Duke,USA,2015,1,24,Active
+250,DeAndre,Jordan,DeAndre Jordan,19,New Orleans Pelicans,NOP,West,Southwest,C,6-11,265,6,Texas A&M,USA,2008,2,35,Active
+254,Luke,Kennard,Luke Kennard,24,Phoenix Suns,PHX,West,Pacific,G,6-5,206,10,Duke,USA,2017,1,12,Active
+261,Luke,Kornet,Luke Kornet,27,San Antonio Spurs,SAS,West,Southwest,F-C,7-1,250,7,Vanderbilt,USA,,,,Active
+265,Kyle,Kuzma,Kyle Kuzma,17,Milwaukee Bucks,MIL,East,Central,F,6-8,221,18,Utah,USA,2017,1,27,Active
+268,Zach,LaVine,Zach LaVine,26,Sacramento Kings,SAC,West,Pacific,G,6-5,200,8,UCLA,USA,2014,1,13,Active
+274,Kawhi,Leonard,Kawhi Leonard,13,LA Clippers,LAC,West,Pacific,F,6-6,225,2,San Diego State,USA,2011,1,15,Active
+277,Caris,LeVert,Caris LeVert,17,Milwaukee Bucks,MIL,East,Central,G,6-7,205,8,Michigan,USA,2016,1,20,Active
+278,Damian,Lillard,Damian Lillard,25,Portland Trail Blazers,POR,West,Northwest,G,6-2,200,0,Weber State,USA,2012,1,6,Active
+282,Kevon,Looney,Kevon Looney,14,Los Angeles Lakers,LAL,West,Pacific,F,6-9,222,55,UCLA,USA,2015,1,30,Active
+283,Brook,Lopez,Brook Lopez,13,LA Clippers,LAC,West,Pacific,C,7-1,282,11,Stanford,USA,2008,1,10,Active
+285,Kevin,Love,Kevin Love,29,Utah Jazz,UTA,West,Northwest,F-C,6-10,251,42,UCLA,USA,2008,1,5,Active
+286,Kyle,Lowry,Kyle Lowry,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-0,196,7,Villanova,USA,2006,1,24,Active
+290,Trey,Lyles,Trey Lyles,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-9,234,41,Kentucky,Canada,2015,1,12,Active
+297,Lauri,Markkanen,Lauri Markkanen,29,Utah Jazz,UTA,West,Northwest,F,7-1,240,23,Arizona,Finland,2017,1,7,Active
+303,CJ,McCollum,CJ McCollum,1,Atlanta Hawks,ATL,East,Southeast,G,6-3,190,3,Lehigh,USA,2013,1,10,Active
+304,T.J.,McConnell,T.J. McConnell,12,Indiana Pacers,IND,East,Central,G,6-1,190,9,Arizona,USA,2015,,,Active
+313,De'Anthony,Melton,De'Anthony Melton,10,Golden State Warriors,GSW,West,Pacific,G,6-2,200,8,Southern California,USA,2018,2,46,Active
+315,Khris,Middleton,Khris Middleton,30,Washington Wizards,WAS,East,Southeast,F,6-7,222,20,Texas A&M,USA,2012,2,39,Active
+322,Donovan,Mitchell,Donovan Mitchell,6,Cleveland Cavaliers,CLE,East,Central,G,6-2,215,45,Louisville,USA,2017,1,13,Active
+324,Malik,Monk,Malik Monk,26,Sacramento Kings,SAC,West,Pacific,G,6-3,200,0,Kentucky,USA,2017,1,11,Active
+334,Dejounte,Murray,Dejounte Murray,19,New Orleans Pelicans,NOP,West,Southwest,G,6-4,180,5,Washington,USA,2016,1,29,Active
+335,Jamal,Murray,Jamal Murray,8,Denver Nuggets,DEN,West,Northwest,G,6-4,215,27,Kentucky,Canada,2016,1,7,Active
+338,Svi,Mykhailiuk,Svi Mykhailiuk,29,Utah Jazz,UTA,West,Northwest,G,6-7,205,10,Kansas,Ukraine,2018,2,47,Active
+340,Larry,Nance Jr.,Larry Nance Jr.,12,Indiana Pacers,IND,East,Central,F,6-6,245,22,Wyoming,USA,2015,1,27,Active
+344,Georges,Niang,Georges Niang,10,Golden State Warriors,GSW,West,Pacific,F,6-6,230,20,Iowa State,USA,2016,2,50,Active
+349,Jusuf,Nurkic,Jusuf Nurkic,29,Utah Jazz,UTA,West,Northwest,C,6-11,290,30,Cedevita,Bosnia and Herzegovina,2014,1,16,Active
+351,Royce,O'Neale,Royce O'Neale,4,Charlotte Hornets,CHA,East,Southeast,F,6-6,226,0,Baylor,USA,,,,Active
+356,Josh,Okogie,Josh Okogie,29,Utah Jazz,UTA,West,Northwest,G,6-4,213,20,Georgia Tech,Nigeria,2018,1,20,Active
+360,Kelly,Oubre Jr.,Kelly Oubre Jr.,12,Indiana Pacers,IND,East,Central,F,6-8,210,10,Kansas,USA,2015,1,15,Active
+373,Jakob,Poeltl,Jakob Poeltl,28,Toronto Raptors,TOR,East,Atlantic,C,7-0,253,19,Utah,Austria,2016,1,9,Active
+375,Michael,Porter Jr.,Michael Porter Jr.,3,Brooklyn Nets,BKN,East,Atlantic,F,6-10,218,17,Missouri,USA,2018,1,14,Active
+377,Bobby,Portis,Bobby Portis,16,Miami Heat,MIA,East,Southeast,F,6-9,250,95,Arkansas,USA,2015,1,22,Active
+378,Kristaps,Porzingis,Kristaps Porzingis,10,Golden State Warriors,GSW,West,Pacific,F-C,7-2,240,7,Cajasol Sevilla,Latvia,2015,1,4,Active
+379,Dwight,Powell,Dwight Powell,7,Dallas Mavericks,DAL,West,Southwest,F-C,6-10,240,7,Stanford,Canada,2014,2,45,Active
+380,Norman,Powell,Norman Powell,5,Chicago Bulls,CHI,East,Central,F-G,6-3,215,24,UCLA,USA,2015,2,46,Active
+383,Taurean,Prince,Taurean Prince,9,Detroit Pistons,DET,East,Central,F,6-6,218,12,Baylor,USA,2016,1,12,Active
+387,Julius,Randle,Julius Randle,3,Brooklyn Nets,BKN,East,Atlantic,F,6-9,250,30,Kentucky,USA,2014,1,7,Active
+397,Duncan,Robinson,Duncan Robinson,9,Detroit Pistons,DET,East,Central,F,6-7,215,55,Michigan,USA,,,,Active
+399,Mitchell,Robinson,Mitchell Robinson,2,Boston Celtics,BOS,East,Atlantic,C,7-0,240,4,Western Kentucky,USA,2018,2,36,Active
+405,D'Angelo,Russell,D'Angelo Russell,15,Memphis Grizzlies,MEM,West,Southwest,G,6-3,193,5,Ohio State,USA,2015,1,2,Active
+406,Domantas,Sabonis,Domantas Sabonis,26,Sacramento Kings,SAC,West,Pacific,F,6-10,240,11,Gonzaga,Lithuania,2016,1,11,Active
+409,Dennis,Schroder,Dennis Schroder,4,Charlotte Hornets,CHA,East,Southeast,G,6-1,175,8,Braunschweig,Germany,2013,1,17,Active
+413,Collin,Sexton,Collin Sexton,14,Los Angeles Lakers,LAL,West,Pacific,G,6-3,190,10,Alabama,USA,2018,1,8,Active
+414,Landry,Shamet,Landry Shamet,20,New York Knicks,NYK,East,Atlantic,G,6-5,190,44,Wichita State,USA,2018,1,26,Active
+416,Pascal,Siakam,Pascal Siakam,12,Indiana Pacers,IND,East,Central,F,6-8,245,43,New Mexico State,Cameroon,2016,1,27,Active
+419,Anfernee,Simons,Anfernee Simons,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-3,200,22,Edgewater HS (FL),USA,2018,1,24,Active
+420,Marcus,Smart,Marcus Smart,11,Houston Rockets,HOU,West,Southwest,G,6-3,220,36,Oklahoma State,USA,2014,1,6,Active
+434,Jayson,Tatum,Jayson Tatum,2,Boston Celtics,BOS,East,Atlantic,F,6-8,210,0,Duke,USA,2017,1,3,Active
+443,Klay,Thompson,Klay Thompson,16,Miami Heat,MIA,East,Southeast,G,6-5,220,31,Washington State,USA,2011,1,11,Active
+447,Karl-Anthony,Towns,Karl-Anthony Towns,20,New York Knicks,NYK,East,Atlantic,C,7-0,248,32,Kentucky,USA,2015,1,1,Active
+452,Myles,Turner,Myles Turner,17,Milwaukee Bucks,MIL,East,Central,C-F,6-11,250,3,Texas,USA,2015,1,11,Active
+457,Jarred,Vanderbilt,Jarred Vanderbilt,14,Los Angeles Lakers,LAL,West,Pacific,F,6-8,214,2,Kentucky,USA,2018,2,41,Active
+458,Fred,VanVleet,Fred VanVleet,11,Houston Rockets,HOU,West,Southwest,G,6-0,197,5,Wichita State,USA,,,,Active
+460,Nikola,Vucevic,Nikola Vucevic,22,Orlando Magic,ORL,East,Southeast,C,6-9,265,9,Southern California,Montenegro,2011,1,16,Active
+462,Moritz,Wagner,Moritz Wagner,3,Brooklyn Nets,BKN,East,Atlantic,C,6-11,245,21,Michigan,Germany,2018,1,25,Active
+473,Derrick,White,Derrick White,2,Boston Celtics,BOS,East,Atlantic,G,6-4,190,9,Colorado,USA,2017,1,29,Active
+475,Andrew,Wiggins,Andrew Wiggins,16,Miami Heat,MIA,East,Southeast,F-G,6-6,197,22,Kansas,Canada,2014,1,1,Active
+476,Robert,Williams III,Robert Williams III,25,Portland Trail Blazers,POR,West,Northwest,C-F,6-9,249,35,Texas A&M,USA,2018,1,27,Active
+480,Kenrich,Williams,Kenrich Williams,21,Oklahoma City Thunder,OKC,West,Northwest,G-F,6-7,210,34,TCU,USA,,,,Active
+490,Trae,Young,Trae Young,30,Washington Wizards,WAS,East,Southeast,G,6-2,164,3,Oklahoma,USA,2018,1,5,Active
+493,Ivica,Zubac,Ivica Zubac,12,Indiana Pacers,IND,East,Central,C,7-0,240,40,Mega Basket,Croatia,2016,2,32,Active
+2189,Gary,Payton II,Gary Payton II,10,Golden State Warriors,GSW,West,Pacific,G,6-2,195,0,Oregon State,USA,,,,Active
+3089,Gary,Trent Jr.,Gary Trent Jr.,17,Milwaukee Bucks,MIL,East,Central,G,6-5,204,5,Duke,USA,2018,2,37,Active
+3092,Haywood,Highsmith,Haywood Highsmith,24,Phoenix Suns,PHX,West,Pacific,F,6-5,220,7,Wheeling Jesuit,USA,2018,,,Active
+666400,Nickeil,Alexander-Walker,Nickeil Alexander-Walker,1,Atlanta Hawks,ATL,East,Southeast,G,6-5,205,7,Virginia Tech,Canada,2019,1,17,Active
+666423,RJ,Barrett,RJ Barrett,28,Toronto Raptors,TOR,East,Atlantic,F-G,6-6,214,9,Duke,Canada,2019,1,3,Active
+666442,Goga,Bitadze,Goga Bitadze,22,Orlando Magic,ORL,East,Southeast,C,6-11,250,35,Mega Basket,Georgia,2019,1,18,Active
+666508,Nicolas,Claxton,Nicolas Claxton,5,Chicago Bulls,CHI,East,Central,F-C,6-11,215,9,Georgia,USA,2019,2,31,Active
+666511,Amir,Coffey,Amir Coffey,24,Phoenix Suns,PHX,West,Pacific,G,6-7,210,2,Minnesota,USA,,,,Active
+666541,Luguentz,Dort,Luguentz Dort,1,Atlanta Hawks,ATL,East,Southeast,G,6-4,220,5,Arizona State,Canada,,,,Active
+666560,Tacko,Fall,Tacko Fall,23,Philadelphia 76ers,PHI,East,Atlantic,C,7-6,311,99,Central Florida,Senegal,,,,Active
+666577,Daniel,Gafford,Daniel Gafford,7,Dallas Mavericks,DAL,West,Southwest,F,6-10,265,21,Arkansas,USA,2019,2,38,Active
+666581,Darius,Garland,Darius Garland,13,LA Clippers,LAC,West,Pacific,G,6-1,192,10,Vanderbilt,USA,2019,1,5,Active
+666604,Javonte,Green,Javonte Green,9,Detroit Pistons,DET,East,Central,G-F,6-5,205,31,Radford,USA,,,,Active
+666609,Rui,Hachimura,Rui Hachimura,13,LA Clippers,LAC,West,Pacific,F,6-8,230,28,Gonzaga,Japan,2019,1,9,Active
+666626,Jaxson,Hayes,Jaxson Hayes,29,Utah Jazz,UTA,West,Northwest,C,7-0,220,11,Texas,USA,2019,1,8,Active
+666633,Tyler,Herro,Tyler Herro,17,Milwaukee Bucks,MIL,East,Central,G,6-5,195,11,Kentucky,USA,2019,1,13,Active
+666656,De'Andre,Hunter,De'Andre Hunter,26,Sacramento Kings,SAC,West,Pacific,F,6-7,221,15,Virginia,USA,2019,1,4,Active
+666676,Ty,Jerome,Ty Jerome,15,Memphis Grizzlies,MEM,West,Southwest,G,6-5,195,2,Virginia,USA,2019,1,24,Active
+666679,Cameron,Johnson,Cameron Johnson,8,Denver Nuggets,DEN,West,Northwest,F,6-8,210,23,North Carolina,USA,2019,1,11,Active
+666682,Keldon,Johnson,Keldon Johnson,27,San Antonio Spurs,SAS,West,Southwest,F,6-6,220,3,Kentucky,USA,2019,1,29,Active
+666743,Terance,Mann,Terance Mann,3,Brooklyn Nets,BKN,East,Atlantic,G,6-6,215,14,Florida State,USA,2019,2,48,Active
+666747,Caleb,Martin,Caleb Martin,7,Dallas Mavericks,DAL,West,Southwest,F,6-5,205,16,Nevada,USA,,,,Active
+666767,Jordan,McLaughlin,Jordan McLaughlin,27,San Antonio Spurs,SAS,West,Southwest,G,5-11,185,0,Southern California,USA,,,,Active
+666786,Ja,Morant,Ja Morant,25,Portland Trail Blazers,POR,West,Northwest,G,6-2,174,12,Murray State,USA,2019,1,2,Active
+666848,Jordan,Poole,Jordan Poole,19,New Orleans Pelicans,NOP,West,Southwest,G,6-4,194,3,Michigan,USA,2019,1,28,Active
+666849,Kevin,Porter Jr.,Kevin Porter Jr.,17,Milwaukee Bucks,MIL,East,Central,G,6-5,203,7,Southern California,USA,2019,1,30,Active
+666908,Max,Strus,Max Strus,13,LA Clippers,LAC,West,Pacific,G,6-5,215,2,DePaul,USA,,,,Active
+666923,Matisse,Thybulle,Matisse Thybulle,14,Los Angeles Lakers,LAL,West,Pacific,G-F,6-5,202,4,Washington,USA,2019,1,20,Active
+666940,Dean,Wade,Dean Wade,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-9,228,32,Kansas State,USA,,,,Active
+666950,P.J.,Washington,P.J. Washington,7,Dallas Mavericks,DAL,West,Southwest,F,6-7,230,25,Kentucky,USA,2019,1,12,Active
+666956,Coby,White,Coby White,4,Charlotte Hornets,CHA,East,Southeast,G,6-4,210,3,North Carolina,USA,2019,1,7,Active
+666965,Grant,Williams,Grant Williams,4,Charlotte Hornets,CHA,East,Southeast,F,6-7,236,2,Tennessee,USA,2019,1,22,Active
+666969,Zion,Williamson,Zion Williamson,19,New Orleans Pelicans,NOP,West,Southwest,F,6-6,284,1,Duke,USA,2019,1,1,Active
+667378,Naz,Reid,Naz Reid,4,Charlotte Hornets,CHA,East,Southeast,F-C,6-9,264,11,Louisiana State,USA,,,,Active
+1603383,Gabe,Vincent,Gabe Vincent,1,Atlanta Hawks,ATL,East,Southeast,G,6-2,200,4,California-Santa Barbara,USA,,,,Active
+3547238,Anthony,Edwards,Anthony Edwards,18,Minnesota Timberwolves,MIN,West,Northwest,G,6-4,225,5,Georgia,USA,2020,1,1,Active
+3547239,LaMelo,Ball,LaMelo Ball,18,Minnesota Timberwolves,MIN,West,Northwest,G,6-7,180,1,Illawarra,USA,2020,1,3,Active
+3547242,Deni,Avdija,Deni Avdija,25,Portland Trail Blazers,POR,West,Northwest,F,6-8,228,8,Maccabi Tel Aviv,Israel,2020,1,9,Active
+3547243,Obi,Toppin,Obi Toppin,12,Indiana Pacers,IND,East,Central,F,6-9,220,1,Dayton,USA,2020,1,8,Active
+3547244,Onyeka,Okongwu,Onyeka Okongwu,1,Atlanta Hawks,ATL,East,Southeast,F-C,6-10,240,17,Southern California,USA,2020,1,6,Active
+3547245,Tyrese,Haliburton,Tyrese Haliburton,12,Indiana Pacers,IND,East,Central,G,6-5,185,0,Iowa State,USA,2020,1,12,Active
+3547246,Devin,Vassell,Devin Vassell,27,San Antonio Spurs,SAS,West,Southwest,G-F,6-5,200,24,Florida State,USA,2020,1,11,Active
+3547247,Isaac,Okoro,Isaac Okoro,5,Chicago Bulls,CHI,East,Central,F-G,6-4,225,35,Auburn,USA,2020,1,5,Active
+3547248,Patrick,Williams,Patrick Williams,5,Chicago Bulls,CHI,East,Central,F,6-6,235,44,Florida State,USA,2020,1,4,Active
+3547249,Precious,Achiuwa,Precious Achiuwa,26,Sacramento Kings,SAC,West,Pacific,F,6-8,243,9,Memphis,Nigeria,2020,1,20,Active
+3547250,Aaron,Nesmith,Aaron Nesmith,12,Indiana Pacers,IND,East,Central,G-F,6-5,215,23,Vanderbilt,USA,2020,1,14,Active
+3547254,Tyrese,Maxey,Tyrese Maxey,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-2,200,0,Kentucky,USA,2020,1,21,Active
+3547256,Saddiq,Bey,Saddiq Bey,19,New Orleans Pelicans,NOP,West,Southwest,F,6-8,215,41,Villanova,USA,2020,1,19,Active
+3547258,Josh,Green,Josh Green,29,Utah Jazz,UTA,West,Northwest,G,6-6,200,10,Arizona,Australia,2020,1,18,Active
+3547259,Jaden,McDaniels,Jaden McDaniels,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-9,185,3,Washington,USA,2020,1,28,Active
+3547264,Jalen,Smith,Jalen Smith,5,Chicago Bulls,CHI,East,Central,F-C,6-8,244,25,Maryland,USA,2020,1,10,Active
+3547267,Isaiah,Stewart,Isaiah Stewart,15,Memphis Grizzlies,MEM,West,Southwest,F-C,6-8,250,28,Washington,USA,2020,1,16,Active
+3547268,Zeke,Nnaji,Zeke Nnaji,8,Denver Nuggets,DEN,West,Northwest,F-C,6-10,240,22,Arizona,USA,2020,1,22,Active
+3547269,Immanuel,Quickley,Immanuel Quickley,28,Toronto Raptors,TOR,East,Atlantic,G,6-2,190,5,Kentucky,USA,2020,1,25,Active
+3547270,Paul,Reed,Paul Reed,9,Detroit Pistons,DET,East,Central,F,6-9,210,7,DePaul,USA,2020,2,58,Active
+3547272,Isaiah,Joe,Isaiah Joe,9,Detroit Pistons,DET,East,Central,G,6-4,165,11,Arkansas,USA,2020,2,49,Active
+3547274,Tre,Jones,Tre Jones,5,Chicago Bulls,CHI,East,Central,G,6-1,190,30,Duke,USA,2020,2,41,Active
+3547276,Payton,Pritchard,Payton Pritchard,2,Boston Celtics,BOS,East,Atlantic,G,6-1,195,11,Oregon,USA,2020,1,26,Active
+3547282,Nick,Richards,Nick Richards,16,Miami Heat,MIA,East,Southeast,C,6-11,245,13,Kentucky,Jamaica,2020,2,42,Active
+3547285,Xavier,Tillman,Xavier Tillman,4,Charlotte Hornets,CHA,East,Southeast,F,6-8,245,26,Michigan State,USA,2020,2,35,Active
+3547287,Desmond,Bane,Desmond Bane,22,Orlando Magic,ORL,East,Southeast,G,6-6,215,3,TCU,USA,2020,1,30,Active
+3547293,Naji,Marshall,Naji Marshall,7,Dallas Mavericks,DAL,West,Southwest,F,6-6,220,3,Xavier,USA,,,,Active
+3547299,Sam,Merrill,Sam Merrill,6,Cleveland Cavaliers,CLE,East,Central,G,6-4,205,5,Utah State,USA,2020,2,60,Active
+3547301,Jae'Sean,Tate,Jae'Sean Tate,11,Houston Rockets,HOU,West,Southwest,F,6-4,230,8,Ohio State,USA,,,,Active
+3547302,Anthony,Gill,Anthony Gill,30,Washington Wizards,WAS,East,Southeast,F,6-7,230,16,Virginia,USA,,,,Active
+4197387,Vit,Krejci,Vit Krejci,25,Portland Trail Blazers,POR,West,Northwest,G,6-8,195,27,Zaragoza,Czech Republic,2020,2,37,Active
+17553967,Neemias,Queta,Neemias Queta,2,Boston Celtics,BOS,East,Atlantic,C,7-0,248,88,Utah State,Portugal,2021,2,39,Active
+17553979,Jonathan,Kuminga,Jonathan Kuminga,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-7,225,0,NBA G League Ignite,DRC,2021,1,7,Active
+17553992,Moses,Moody,Moses Moody,10,Golden State Warriors,GSW,West,Pacific,G,6-5,211,4,Arkansas,USA,2021,1,14,Active
+17553994,Davion,Mitchell,Davion Mitchell,16,Miami Heat,MIA,East,Southeast,G,6-0,202,2,Baylor,USA,2021,1,9,Active
+17553995,Austin,Reaves,Austin Reaves,14,Los Angeles Lakers,LAL,West,Pacific,G,6-5,197,15,Oklahoma,USA,,,,Active
+17554004,AJ,Lawson,AJ Lawson,28,Toronto Raptors,TOR,East,Atlantic,G,6-6,179,0,South Carolina,Canada,,,,Active
+17895854,Charles,Bassey,Charles Bassey,10,Golden State Warriors,GSW,West,Pacific,G,6-10,230,28,Western Kentucky,Nigeria,2021,2,53,Active
+17895858,Quentin,Grimes,Quentin Grimes,14,Los Angeles Lakers,LAL,West,Pacific,G,6-5,207,5,Houston,USA,2021,1,25,Active
+17895966,Jalen,Green,Jalen Green,24,Phoenix Suns,PHX,West,Pacific,G,6-4,186,4,NBA G League Ignite,USA,2021,1,2,Active
+17895983,Ayo,Dosunmu,Ayo Dosunmu,18,Minnesota Timberwolves,MIN,West,Northwest,G,6-4,201,13,Illinois,USA,2021,2,38,Active
+17896024,Herbert,Jones,Herbert Jones,19,New Orleans Pelicans,NOP,West,Southwest,F,6-7,206,2,Alabama,USA,2021,2,35,Active
+17896026,Franz,Wagner,Franz Wagner,22,Orlando Magic,ORL,East,Southeast,F,6-10,220,22,Michigan,Germany,2021,1,8,Active
+17896027,Ziaire,Williams,Ziaire Williams,14,Los Angeles Lakers,LAL,West,Pacific,G-F,6-9,185,11,Stanford,USA,2021,1,10,Active
+17896029,Sharife,Cooper,Sharife Cooper,30,Washington Wizards,WAS,East,Southeast,G,6-0,176,13,Auburn,USA,2021,2,48,Active
+17896031,Nah'Shon,Hyland,Nah'Shon Hyland,18,Minnesota Timberwolves,MIN,West,Northwest,G,6-2,169,8,Virginia Commonwealth,USA,2021,1,26,Active
+17896033,Miles,McBride,Miles McBride,20,New York Knicks,NYK,East,Atlantic,G,6-2,195,2,West Virginia,USA,2021,2,36,Active
+17896035,Isaiah,Jackson,Isaiah Jackson,13,LA Clippers,LAC,West,Pacific,F,6-8,205,23,Kentucky,USA,2021,1,22,Active
+17896036,Tre,Mann,Tre Mann,30,Washington Wizards,WAS,East,Southeast,G,6-4,178,23,Florida,USA,2021,1,18,Active
+17896038,Day'Ron,Sharpe,Day'Ron Sharpe,3,Brooklyn Nets,BKN,East,Atlantic,C,6-10,265,20,North Carolina,USA,2021,1,29,Active
+17896039,Justin,Champagnie,Justin Champagnie,30,Washington Wizards,WAS,East,Southeast,F,6-6,206,9,Pittsburgh,USA,,,,Active
+17896040,Jalen,Johnson,Jalen Johnson,1,Atlanta Hawks,ATL,East,Southeast,F,6-8,219,1,Duke,USA,2021,1,20,Active
+17896045,Corey,Kispert,Corey Kispert,1,Atlanta Hawks,ATL,East,Southeast,F,6-6,224,24,Gonzaga,USA,2021,1,15,Active
+17896055,Scottie,Barnes,Scottie Barnes,28,Toronto Raptors,TOR,East,Atlantic,G-F,6-8,237,4,Florida State,USA,2021,1,4,Active
+17896056,Luka,Garza,Luka Garza,2,Boston Celtics,BOS,East,Atlantic,C,6-10,243,52,Iowa,USA,2021,2,52,Active
+17896058,Trendon,Watford,Trendon Watford,19,New Orleans Pelicans,NOP,West,Southwest,F,6-8,245,12,Louisiana State,USA,,,,Active
+17896059,Sandro,Mamukelashvili,Sandro Mamukelashvili,14,Los Angeles Lakers,LAL,West,Pacific,F,6-9,240,54,Seton Hall,Georgia,2021,2,54,Active
+17896060,Sam,Hauser,Sam Hauser,2,Boston Celtics,BOS,East,Atlantic,F,6-7,217,30,Virginia,USA,,,,Active
+17896062,Alperen,Sengun,Alperen Sengun,11,Houston Rockets,HOU,West,Southwest,F-C,6-11,243,28,Besiktas,Turkey,2021,1,16,Active
+17896063,Jericho,Sims,Jericho Sims,17,Milwaukee Bucks,MIL,East,Central,F,6-10,250,0,Texas,USA,2021,2,58,Active
+17896065,Josh,Giddey,Josh Giddey,5,Chicago Bulls,CHI,East,Central,G,6-7,214,3,NBA Global Academy,Australia,2021,1,6,Active
+17896067,Santi,Aldama,Santi Aldama,7,Dallas Mavericks,DAL,West,Southwest,F,7-0,215,34,Loyola-Maryland,Spain,2021,1,30,Active
+17896071,Isaiah,Livers,Isaiah Livers,24,Phoenix Suns,PHX,West,Pacific,F,6-6,232,18,Michigan,USA,2021,2,42,Active
+17896073,Jalen,Suggs,Jalen Suggs,22,Orlando Magic,ORL,East,Southeast,G,6-5,205,4,Gonzaga,USA,2021,1,5,Active
+17896075,Cade,Cunningham,Cade Cunningham,9,Detroit Pistons,DET,East,Central,G-F,6-6,220,2,Oklahoma State,USA,2021,1,1,Active
+17896076,Evan,Mobley,Evan Mobley,6,Cleveland Cavaliers,CLE,East,Central,F-C,6-11,215,4,Southern California,USA,2021,1,3,Active
+17896078,Aaron,Wiggins,Aaron Wiggins,1,Atlanta Hawks,ATL,East,Southeast,G,6-5,190,21,Maryland,USA,2021,2,55,Active
+17896097,Jose,Alvarado,Jose Alvarado,20,New York Knicks,NYK,East,Atlantic,G,6-0,179,5,Georgia Tech,USA,,,,Active
+17896103,Jay,Huff,Jay Huff,12,Indiana Pacers,IND,East,Central,F-C,7-1,240,32,Virginia,USA,,,,Active
+18677986,Trey,Murphy III,Trey Murphy III,19,New Orleans Pelicans,NOP,West,Southwest,F,6-8,206,25,Virginia,USA,2021,1,17,Active
+18678058,Jordan,Goodwin,Jordan Goodwin,24,Phoenix Suns,PHX,West,Pacific,G,6-3,215,23,St. Louis,USA,,,,Active
+19465326,Jock,Landale,Jock Landale,1,Atlanta Hawks,ATL,East,Southeast,C,6-11,255,31,St. Mary's,Australia,,,,Active
+19465584,Micah,Potter,Micah Potter,25,Portland Trail Blazers,POR,West,Northwest,F,6-9,248,11,Wisconsin,USA,,,,Active
+19465585,Dru,Smith,Dru Smith,16,Miami Heat,MIA,East,Southeast,G,6-2,203,12,Missouri,USA,,,,Active
+24489167,Brandon,Williams,Brandon Williams,10,Golden State Warriors,GSW,West,Pacific,G,6-1,190,10,Arizona,USA,,,,Active
+38017507,Andrew,Nembhard,Andrew Nembhard,12,Indiana Pacers,IND,East,Central,G-F,6-4,191,2,Gonzaga,Canada,2022,2,31,Active
+38017649,Julian,Champagnie,Julian Champagnie,27,San Antonio Spurs,SAS,West,Southwest,F,6-7,217,30,St. John's,USA,,,,Active
+38017656,Scotty,Pippen Jr.,Scotty Pippen Jr.,15,Memphis Grizzlies,MEM,West,Southwest,G,6-2,170,1,Vanderbilt,USA,,,,Active
+38017676,MarJon,Beauchamp,MarJon Beauchamp,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-7,199,16,NBA G League Ignite,USA,2022,1,24,Active
+38017677,Dyson,Daniels,Dyson Daniels,1,Atlanta Hawks,ATL,East,Southeast,G,6-7,199,5,NBA G League Ignite,Australia,2022,1,8,Active
+38017679,Jaden,Hardy,Jaden Hardy,14,Los Angeles Lakers,LAL,West,Pacific,G,6-3,198,7,NBA G League Ignite,USA,2022,2,37,Active
+38017683,Paolo,Banchero,Paolo Banchero,22,Orlando Magic,ORL,East,Southeast,F,6-10,250,5,Duke,USA,2022,1,1,Active
+38017684,Jabari,Smith Jr.,Jabari Smith Jr.,11,Houston Rockets,HOU,West,Southwest,F,6-11,220,10,Auburn,USA,2022,1,3,Active
+38017685,Chet,Holmgren,Chet Holmgren,21,Oklahoma City Thunder,OKC,West,Northwest,C-F,7-1,208,7,Gonzaga,USA,2022,1,2,Active
+38017686,Bennedict,Mathurin,Bennedict Mathurin,13,LA Clippers,LAC,West,Pacific,G-F,6-5,210,9,Arizona,Canada,2022,1,6,Active
+38017688,Keegan,Murray,Keegan Murray,26,Sacramento Kings,SAC,West,Pacific,F,6-8,225,13,Iowa,USA,2022,1,4,Active
+38017690,Shaedon,Sharpe,Shaedon Sharpe,25,Portland Trail Blazers,POR,West,Northwest,G,6-5,210,17,Kentucky,Canada,2022,1,7,Active
+38017691,TyTy,Washington Jr.,TyTy Washington Jr.,13,LA Clippers,LAC,West,Pacific,G,6-3,195,14,Kentucky,USA,2022,1,29,Active
+38017692,Malaki,Branham,Malaki Branham,22,Orlando Magic,ORL,East,Southeast,F,6-4,180,22,Ohio State,USA,2022,1,20,Active
+38017693,Blake,Wesley,Blake Wesley,25,Portland Trail Blazers,POR,West,Northwest,G,6-4,190,1,Notre Dame,USA,2022,1,25,Active
+38017694,Jalen,Duren,Jalen Duren,9,Detroit Pistons,DET,East,Central,C,6-10,250,0,Memphis,USA,2022,1,13,Active
+38017695,Tari,Eason,Tari Eason,11,Houston Rockets,HOU,West,Southwest,F,6-8,215,17,Louisiana State,USA,2022,1,17,Active
+38017696,Nikola,Jovic,Nikola Jovic,16,Miami Heat,MIA,East,Southeast,F,6-10,205,5,Mega Basket,Serbia,2022,1,27,Active
+38017697,Max,Christie,Max Christie,7,Dallas Mavericks,DAL,West,Southwest,G,6-5,190,0,Michigan State,USA,2022,2,35,Active
+38017698,Mark,Williams,Mark Williams,24,Phoenix Suns,PHX,West,Pacific,C,7-1,240,15,Duke,USA,2022,1,15,Active
+38017699,Jeremy,Sochan,Jeremy Sochan,25,Portland Trail Blazers,POR,West,Northwest,F,6-8,230,20,Baylor,Poland,2022,1,9,Active
+38017700,Wendell,Moore Jr.,Wendell Moore Jr.,9,Detroit Pistons,DET,East,Central,G,6-5,215,14,Duke,USA,2022,1,26,Active
+38017703,Jalen,Williams,Jalen Williams,21,Oklahoma City Thunder,OKC,West,Northwest,G-F,6-5,211,8,Santa Clara,USA,2022,1,12,Active
+38017705,Walker,Kessler,Walker Kessler,14,Los Angeles Lakers,LAL,West,Pacific,C,7-2,245,14,Auburn,USA,2022,1,22,Active
+38017706,Jaylin,Williams,Jaylin Williams,21,Oklahoma City Thunder,OKC,West,Northwest,F,6-9,240,6,Arkansas,USA,2022,2,34,Active
+38017707,JD,Davison,JD Davison,22,Orlando Magic,ORL,East,Southeast,G,6-1,195,4,Alabama,USA,2022,2,53,Active
+38017708,Bryce,McGowens,Bryce McGowens,19,New Orleans Pelicans,NOP,West,Southwest,G,6-6,190,11,Nebraska,USA,2022,2,40,Active
+38017709,Christian,Braun,Christian Braun,8,Denver Nuggets,DEN,West,Northwest,G,6-6,220,0,Kansas,USA,2022,1,21,Active
+38017710,Christian,Koloko,Christian Koloko,19,New Orleans Pelicans,NOP,West,Southwest,C,6-11,225,10,Arizona,Cameroon,2022,2,33,Active
+38017711,Jabari,Walker,Jabari Walker,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-7,237,33,Colorado,USA,2022,2,57,Active
+38017712,Ryan,Rollins,Ryan Rollins,17,Milwaukee Bucks,MIL,East,Central,G,6-3,180,13,Toledo,USA,2022,2,44,Active
+38017714,Keon,Ellis,Keon Ellis,3,Brooklyn Nets,BKN,East,Atlantic,G,6-4,175,14,Alabama,USA,,,,Active
+38017715,Josh,Minott,Josh Minott,3,Brooklyn Nets,BKN,East,Atlantic,F,6-8,205,0,Memphis,USA,2022,2,45,Active
+38017716,Ousmane,Dieng,Ousmane Dieng,17,Milwaukee Bucks,MIL,East,Central,F,6-9,185,21,New Zealand Breakers,France,2022,1,11,Active
+38017717,Ron,Harper Jr.,Ron Harper Jr.,2,Boston Celtics,BOS,East,Atlantic,F,6-5,233,13,Rutgers,USA,,,,Active
+38017719,Dalen,Terry,Dalen Terry,10,Golden State Warriors,GSW,West,Pacific,F,6-6,210,14,Arizona,USA,2022,1,18,Active
+38017720,Trevor,Keels,Trevor Keels,16,Miami Heat,MIA,East,Southeast,G,6-3,215,3,Duke,USA,2022,2,42,Active
+38017721,Peyton,Watson,Peyton Watson,6,Cleveland Cavaliers,CLE,East,Central,G,6-8,200,8,UCLA,USA,2022,1,30,Active
+38017722,Tyrese,Martin,Tyrese Martin,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-6,215,23,Connecticut,USA,2022,2,51,Active
+38017724,Caleb,Houstan,Caleb Houstan,19,New Orleans Pelicans,NOP,West,Southwest,G,6-8,205,33,Michigan,Canada,2022,2,32,Active
+38017725,Moussa,Diabate,Moussa Diabate,4,Charlotte Hornets,CHA,East,Southeast,F,6-10,210,14,Michigan,France,2022,2,43,Active
+38017727,Collin,Gillespie,Collin Gillespie,24,Phoenix Suns,PHX,West,Pacific,G,6-1,195,12,Villanova,USA,,,,Active
+38017728,Jake,LaRavia,Jake LaRavia,14,Los Angeles Lakers,LAL,West,Pacific,F,6-7,235,12,Wake Forest,USA,2022,1,19,Active
+38017729,David,Roddy,David Roddy,8,Denver Nuggets,DEN,West,Northwest,F,6-5,255,45,Colorado State,USA,2022,1,23,Active
+38017730,Dominick,Barlow,Dominick Barlow,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-9,224,25,Overtime Elite,USA,,,,Active
+38017733,A.J.,Green,A.J. Green,17,Milwaukee Bucks,MIL,East,Central,G,6-4,190,20,Northern Iowa,USA,,,,Active
+38017734,Jamal,Cain,Jamal Cain,22,Orlando Magic,ORL,East,Southeast,F,6-7,191,8,Oakland,USA,,,,Active
+38017739,Simone,Fontecchio,Simone Fontecchio,16,Miami Heat,MIA,East,Southeast,F,6-7,209,0,Baskonia,Italy,,,,Active
+38124126,John,Butler Jr.,John Butler Jr.,17,Milwaukee Bucks,MIL,East,Central,F,7-0,220,21,Florida State,USA,,,,Active
+44477062,Jamaree,Bouyea,Jamaree Bouyea,24,Phoenix Suns,PHX,West,Pacific,G,6-2,180,17,San Francisco,USA,,,,Active
+44477085,Quenton,Jackson,Quenton Jackson,12,Indiana Pacers,IND,East,Central,G,6-4,173,29,Texas A&M,USA,,,,Active
+45088184,Keaton,Wallace,Keaton Wallace,1,Atlanta Hawks,ATL,East,Southeast,G,6-3,185,2,Texas-San Antonio,USA,,,,Active
+47738533,Jeenathan,Williams,Jeenathan Williams,10,Golden State Warriors,GSW,West,Pacific,G,6-5,205,19,Buffalo,USA,,,,Active
+56677582,Jalen,Pickett,Jalen Pickett,13,LA Clippers,LAC,West,Pacific,G,6-2,202,24,Penn State,USA,2023,2,32,Active
+56677722,Jalen,Wilson,Jalen Wilson,1,Atlanta Hawks,ATL,East,Southeast,F,6-6,220,22,Kansas,USA,2023,2,51,Active
+56677738,Colin,Castleton,Colin Castleton,22,Orlando Magic,ORL,East,Southeast,C,6-10,250,14,Florida,USA,,,,Active
+56677747,Scoot,Henderson,Scoot Henderson,25,Portland Trail Blazers,POR,West,Northwest,G,6-3,207,0,NBA G League Ignite,USA,2023,1,3,Active
+56677776,Julian,Strawther,Julian Strawther,8,Denver Nuggets,DEN,West,Northwest,G,6-6,205,3,Gonzaga,USA,2023,1,29,Active
+56677778,Oscar,Tshiebwe,Oscar Tshiebwe,11,Houston Rockets,HOU,West,Southwest,F-C,6-8,255,34,Kentucky,DRC,,,,Active
+56677782,Leonard,Miller,Leonard Miller,5,Chicago Bulls,CHI,East,Central,F,6-10,220,11,NBA G League Ignite,Canada,2023,2,33,Active
+56677785,Jaime,Jaquez Jr.,Jaime Jaquez Jr.,17,Milwaukee Bucks,MIL,East,Central,G,6-6,225,24,UCLA,USA,2023,1,18,Active
+56677791,Kris,Murray,Kris Murray,15,Memphis Grizzlies,MEM,West,Southwest,F,6-8,218,24,Iowa,USA,2023,1,23,Active
+56677792,Marcus,Sasser,Marcus Sasser,7,Dallas Mavericks,DAL,West,Southwest,G,6-1,195,8,Houston,USA,2023,1,25,Active
+56677799,Trayce,Jackson-Davis,Trayce Jackson-Davis,28,Toronto Raptors,TOR,East,Atlantic,F,6-9,245,32,Indiana,USA,2023,2,57,Active
+56677806,Mouhamed,Gueye,Mouhamed Gueye,1,Atlanta Hawks,ATL,East,Southeast,F,6-11,210,18,Washington State,Senegal,2023,2,39,Active
+56677817,Sidy,Cissoko,Sidy Cissoko,25,Portland Trail Blazers,POR,West,Northwest,G,6-6,220,91,NBA G League Ignite,France,2023,2,44,Active
+56677822,Victor,Wembanyama,Victor Wembanyama,27,San Antonio Spurs,SAS,West,Southwest,F-C,7-4,235,1,Metropolitans 92,France,2023,1,1,Active
+56677823,Brandon,Miller,Brandon Miller,4,Charlotte Hornets,CHA,East,Southeast,F,6-7,200,24,Alabama,USA,2023,1,2,Active
+56677824,Taylor,Hendricks,Taylor Hendricks,15,Memphis Grizzlies,MEM,West,Southwest,F,6-9,215,22,Central Florida,USA,2023,1,9,Active
+56677825,Amen,Thompson,Amen Thompson,11,Houston Rockets,HOU,West,Southwest,G-F,6-7,200,1,Overtime Elite,USA,2023,1,4,Active
+56677826,Ausar,Thompson,Ausar Thompson,9,Detroit Pistons,DET,East,Central,G-F,6-7,205,9,Overtime Elite,USA,2023,1,5,Active
+56677827,Anthony,Black,Anthony Black,22,Orlando Magic,ORL,East,Southeast,G,6-7,200,0,Arkansas,USA,2023,1,6,Active
+56677828,Gradey,Dick,Gradey Dick,28,Toronto Raptors,TOR,East,Atlantic,G,6-7,200,1,Kansas,USA,2023,1,13,Active
+56677829,Rayan,Rupert,Rayan Rupert,23,Philadelphia 76ers,PHI,East,Atlantic,G-F,6-7,205,21,New Zealand Breakers,France,2023,2,43,Active
+56677830,GG,Jackson,GG Jackson,15,Memphis Grizzlies,MEM,West,Southwest,F,6-9,210,45,South Carolina,USA,2023,2,45,Active
+56677832,Jarace,Walker,Jarace Walker,12,Indiana Pacers,IND,East,Central,F,6-7,235,5,Houston,USA,2023,1,8,Active
+56677833,Cason,Wallace,Cason Wallace,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-3,195,22,Kentucky,USA,2023,1,10,Active
+56677834,Keyonte,George,Keyonte George,29,Utah Jazz,UTA,West,Northwest,G,6-4,185,3,Baylor,USA,2023,1,16,Active
+56677837,Jordan,Hawkins,Jordan Hawkins,19,New Orleans Pelicans,NOP,West,Southwest,G,6-5,190,24,Connecticut,USA,2023,1,14,Active
+56677838,Kobe,Bufkin,Kobe Bufkin,19,New Orleans Pelicans,NOP,West,Southwest,G,6-4,195,44,Michigan,USA,2023,1,15,Active
+56677839,Jett,Howard,Jett Howard,7,Dallas Mavericks,DAL,West,Southwest,G,6-8,215,13,Michigan,USA,2023,1,11,Active
+56677840,Dereck,Lively II,Dereck Lively II,7,Dallas Mavericks,DAL,West,Southwest,C,7-1,230,2,Duke,USA,2023,1,12,Active
+56677842,Brice,Sensabaugh,Brice Sensabaugh,29,Utah Jazz,UTA,West,Northwest,F,6-6,235,28,Ohio State,USA,2023,1,28,Active
+56677843,Noah,Clowney,Noah Clowney,3,Brooklyn Nets,BKN,East,Atlantic,F,6-10,210,21,Alabama,USA,2023,1,21,Active
+56677844,Bilal,Coulibaly,Bilal Coulibaly,30,Washington Wizards,WAS,East,Southeast,G,6-7,195,0,Metropolitans 92,France,2023,1,7,Active
+56677849,Kobe,Brown,Kobe Brown,12,Indiana Pacers,IND,East,Central,F,6-7,250,24,Missouri,USA,2023,1,30,Active
+56677850,Toumani,Camara,Toumani Camara,25,Portland Trail Blazers,POR,West,Northwest,F,6-7,230,33,Dayton,Belgium,2023,2,52,Active
+56677851,Jaylen,Clark,Jaylen Clark,18,Minnesota Timberwolves,MIN,West,Northwest,G,6-5,205,7,UCLA,USA,2023,2,53,Active
+56677852,Andre,Jackson Jr.,Andre Jackson Jr.,28,Toronto Raptors,TOR,East,Atlantic,G,6-6,209,44,Connecticut,USA,2023,2,36,Active
+56677856,Jordan,Miller,Jordan Miller,13,LA Clippers,LAC,West,Pacific,G,6-5,194,22,Miami,USA,2023,2,48,Active
+56677857,Julian,Phillips,Julian Phillips,11,Houston Rockets,HOU,West,Southwest,F,6-6,201,4,Tennessee,USA,2023,2,35,Active
+56677858,Brandin,Podziemski,Brandin Podziemski,10,Golden State Warriors,GSW,West,Pacific,G,6-4,205,2,Santa Clara,USA,2023,1,19,Active
+56677859,Olivier-Maxence,Prosper,Olivier-Maxence Prosper,15,Memphis Grizzlies,MEM,West,Southwest,F,6-7,230,18,Marquette,Canada,2023,1,24,Active
+56677861,Ben,Sheppard,Ben Sheppard,12,Indiana Pacers,IND,East,Central,G,6-6,190,26,Belmont,USA,2023,1,26,Active
+56677862,Jalen,Slawson,Jalen Slawson,12,Indiana Pacers,IND,East,Central,F,6-7,215,18,Furman,USA,2023,2,54,Active
+56677864,Jordan,Walsh,Jordan Walsh,2,Boston Celtics,BOS,East,Atlantic,G,6-6,205,27,Arkansas,USA,2023,2,38,Active
+56677872,Craig,Porter,Craig Porter,6,Cleveland Cavaliers,CLE,East,Central,G,6-1,180,9,Wichita State,USA,,,,Active
+57875092,Gui,Santos,Gui Santos,10,Golden State Warriors,GSW,West,Pacific,F,6-7,185,15,Minas,Brazil,2022,2,55,Active
+64269023,Trey,Jemison,Trey Jemison,28,Toronto Raptors,TOR,East,Atlantic,C,6-10,270,50,Alabama-Birmingham,USA,,,,Active
+64270026,Pete,Nance,Pete Nance,17,Milwaukee Bucks,MIL,East,Central,F,6-9,225,35,Northwestern,USA,,,,Active
+436846673,Adam,Flagler,Adam Flagler,26,Sacramento Kings,SAC,West,Pacific,G,6-1,180,14,Baylor,USA,,,,Active
+795959473,Pat,Spencer,Pat Spencer,24,Phoenix Suns,PHX,West,Pacific,G,6-2,205,61,Northwestern,USA,,,,Active
+1016384149,Tristan,Vukcevic,Tristan Vukcevic,30,Washington Wizards,WAS,East,Southeast,F,7-0,220,0,Real Madrid,Italy,2023,2,42,Active
+1028025177,Matas,Buzelis,Matas Buzelis,5,Chicago Bulls,CHI,East,Central,F,6-8,196,14,NBA G League Ignite,USA,2024,1,11,Active
+1028025235,Carlton,Carrington,Carlton Carrington,30,Washington Wizards,WAS,East,Southeast,G,6-4,190,7,Pittsburgh,USA,2024,1,14,Active
+1028025242,Devin,Carter,Devin Carter,1,Atlanta Hawks,ATL,East,Southeast,G,6-2,195,22,Providence,USA,2024,1,13,Active
+1028025261,Stephon,Castle,Stephon Castle,27,San Antonio Spurs,SAS,West,Southwest,G,6-6,215,5,Connecticut,USA,2024,1,4,Active
+1028025344,Donovan,Clingan,Donovan Clingan,25,Portland Trail Blazers,POR,West,Northwest,C,7-2,280,23,Connecticut,USA,2024,1,7,Active
+1028025362,Isaiah,Collier,Isaiah Collier,29,Utah Jazz,UTA,West,Northwest,G,6-4,210,8,Southern California,USA,2024,1,29,Active
+1028025497,Tristan,Da Silva,Tristan Da Silva,22,Orlando Magic,ORL,East,Southeast,F,6-8,217,23,Colorado,Germany,2024,1,18,Active
+1028025498,Pacome,Dadiet,Pacome Dadiet,20,New York Knicks,NYK,East,Atlantic,F,6-9,210,4,Ratiopharm Ulm,France,2024,1,25,Active
+1028025639,Rob,Dillingham,Rob Dillingham,5,Chicago Bulls,CHI,East,Central,G,6-2,175,7,Kentucky,USA,2024,1,8,Active
+1028025723,Ryan,Dunn,Ryan Dunn,24,Phoenix Suns,PHX,West,Pacific,F,6-7,216,0,Virginia,USA,2024,1,28,Active
+1028025754,Zach,Edey,Zach Edey,15,Memphis Grizzlies,MEM,West,Southwest,C,7-3,305,14,Purdue,Canada,2024,1,9,Active
+1028026060,KyShawn,George,KyShawn George,30,Washington Wizards,WAS,East,Southeast,F,6-8,200,18,Miami,Switzerland,2024,1,24,Active
+1028026508,Ronald,Holland II,Ronald Holland II,9,Detroit Pistons,DET,East,Central,F,6-8,206,5,NBA G League Ignite,USA,2024,1,5,Active
+1028026514,DaRon,Holmes II,DaRon Holmes II,8,Denver Nuggets,DEN,West,Northwest,F,6-9,225,14,Dayton,USA,2024,1,22,Active
+1028026717,AJ,Johnson,AJ Johnson,15,Memphis Grizzlies,MEM,West,Southwest,G,6-5,160,8,Illawarra,USA,2024,1,23,Active
+1028026812,Dillon,Jones,Dillon Jones,20,New York Knicks,NYK,East,Atlantic,F,6-5,235,,Weber State,USA,2024,1,26,Active
+1028026974,Dalton,Knecht,Dalton Knecht,14,Los Angeles Lakers,LAL,West,Pacific,F,6-6,215,4,Tennessee,USA,2024,1,17,Active
+1028027372,Jared,McCain,Jared McCain,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-3,195,3,Duke,USA,2024,1,16,Active
+1028027567,Yves,Missi,Yves Missi,19,New Orleans Pelicans,NOP,West,Southwest,C,6-11,235,21,Baylor,Cameroon,2024,1,21,Active
+1028028244,Zaccharie,Risacher,Zaccharie Risacher,7,Dallas Mavericks,DAL,West,Southwest,F,6-8,200,10,JL Bourg-en-Bresse,France,2024,1,1,Active
+1028028379,Tidjane,Salaun,Tidjane Salaun,4,Charlotte Hornets,CHA,East,Southeast,F,6-10,207,31,Cholet,France,2024,1,6,Active
+1028028405,Alexandre,Sarr,Alexandre Sarr,30,Washington Wizards,WAS,East,Southeast,C,7-0,205,20,Washington Wizards,France,2024,1,2,Active
+1028028434,Baylor,Scheierman,Baylor Scheierman,2,Boston Celtics,BOS,East,Atlantic,G,6-6,205,55,Creighton,USA,2024,1,30,Active
+1028028501,Terrence,Shannon Jr.,Terrence Shannon Jr.,18,Minnesota Timberwolves,MIN,West,Northwest,G-F,6-6,215,4,Illinois,USA,2024,1,27,Active
+1028028519,Reed,Sheppard,Reed Sheppard,11,Houston Rockets,HOU,West,Southwest,G,6-2,185,15,Kentucky,USA,2024,1,3,Active
+1028028932,Nikola,Topic,Nikola Topic,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-6,200,44,Crvena zvezda,Serbia,2024,1,12,Active
+1028028993,Jaylon,Tyson,Jaylon Tyson,6,Cleveland Cavaliers,CLE,East,Central,G-F,6-6,215,20,California,USA,2024,1,20,Active
+1028029111,Ja'Kobe,Walter,Ja'Kobe Walter,28,Toronto Raptors,TOR,East,Atlantic,G,6-4,180,14,Baylor,USA,2024,1,19,Active
+1028029127,Kel'el,Ware,Kel'el Ware,17,Milwaukee Bucks,MIL,East,Central,C,7-0,230,9,Indiana,USA,2024,1,15,Active
+1028029291,Cody,Williams,Cody Williams,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-8,190,5,Colorado,USA,2024,1,10,Active
+1028034846,Adem,Bona,Adem Bona,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-10,235,30,UCLA,Nigeria,2024,2,41,Active
+1028035215,Cam,Christie,Cam Christie,13,LA Clippers,LAC,West,Pacific,G,6-5,190,24,Minnesota,USA,2024,2,46,Active
+1028035794,Kyle,Filipowski,Kyle Filipowski,29,Utah Jazz,UTA,West,Northwest,C,6-11,250,2,Duke,USA,2024,2,32,Active
+1028035897,Johnny,Furphy,Johnny Furphy,12,Indiana Pacers,IND,East,Central,G,6-8,200,12,Kansas,Australia,2024,2,35,Active
+1028036515,Oso,Ighodaro,Oso Ighodaro,24,Phoenix Suns,PHX,West,Pacific,F,6-11,235,11,Marquette,USA,2024,2,40,Active
+1028036898,Tyler,Kolek,Tyler Kolek,20,New York Knicks,NYK,East,Atlantic,G,6-2,195,13,Marquette,USA,2024,2,34,Active
+1028036986,Pelle,Larsson,Pelle Larsson,16,Miami Heat,MIA,East,Southeast,G,6-5,215,9,Arizona,Sweden,2024,2,44,Active
+1028037477,Ajay,Mitchell,Ajay Mitchell,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-4,190,25,California-Santa Barbara,Belgium,2024,2,38,Active
+1028037494,Jonathan,Mogbo,Jonathan Mogbo,26,Sacramento Kings,SAC,West,Pacific,F,6-9,225,2,San Francisco,USA,2024,2,31,Active
+1028038100,Antonio,Reeves,Antonio Reeves,4,Charlotte Hornets,CHA,East,Southeast,G,6-5,205,12,Kentucky,USA,2024,2,47,Active
+1028038426,Jamal,Shead,Jamal Shead,28,Toronto Raptors,TOR,East,Atlantic,G,6-1,200,23,Houston,USA,2024,2,45,Active
+1028038474,K.J.,Simpson,K.J. Simpson,8,Denver Nuggets,DEN,West,Northwest,G,6-2,189,25,Colorado,USA,2024,2,42,Active
+1028039105,Jaylen,Wells,Jaylen Wells,15,Memphis Grizzlies,MEM,West,Southwest,F,6-7,,0,Washington State,USA,2024,2,39,Active
+1028045812,Enrique,Freeman,Enrique Freeman,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-9,220,25,Akron,USA,2024,2,50,Active
+1028046422,Ariel,Hukporti,Ariel Hukporti,23,Philadelphia 76ers,PHI,East,Atlantic,C,7-0,246,55,Riesen Ludwigsburg,Germany,2024,2,58,Active
+1028046464,Harrison,Ingram,Harrison Ingram,29,Utah Jazz,UTA,West,Northwest,F,6-5,230,55,North Carolina,USA,2024,2,48,Active
+1028046517,Bronny,James,Bronny James,14,Los Angeles Lakers,LAL,West,Pacific,G,6-2,210,9,Southern California,USA,2024,2,55,Active
+1028047255,Kevin,McCullar Jr.,Kevin McCullar Jr.,20,New York Knicks,NYK,East,Atlantic,G,6-6,210,9,Kansas,USA,2024,2,56,Active
+1028047928,Quinten,Post,Quinten Post,15,Memphis Grizzlies,MEM,West,Southwest,C,7-0,238,21,Boston College,Netherlands,2024,2,52,Active
+1028048549,Cam,Spencer,Cam Spencer,15,Memphis Grizzlies,MEM,West,Southwest,G,6-3,205,24,Connecticut,USA,2024,2,53,Active
+1028112004,Zyon,Pullin,Zyon Pullin,18,Minnesota Timberwolves,MIN,West,Northwest,G,6-4,206,15,Florida,USA,,,,Active
+1028125584,Keshad,Johnson,Keshad Johnson,16,Miami Heat,MIA,East,Southeast,F,6-6,225,16,Arizona,USA,,,,Active
+1028203085,Trey,Alexander,Trey Alexander,29,Utah Jazz,UTA,West,Northwest,G,6-5,185,23,Creighton,USA,,,,Active
+1028203948,Isaiah,Crawford,Isaiah Crawford,11,Houston Rockets,HOU,West,Southwest,F,6-6,220,27,Louisiana Tech,USA,,,,Active
+1028205331,Isaac,Jones,Isaac Jones,9,Detroit Pistons,DET,East,Central,F,6-8,245,3,Washington State,USA,,,,Active
+1028214238,Justin,Edwards,Justin Edwards,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-7,217,11,Kentucky,USA,,,,Active
+1028214958,Blake,Hinson,Blake Hinson,29,Utah Jazz,UTA,West,Northwest,F,6-8,230,2,Pittsburgh,USA,,,,Active
+1028218679,Branden,Carlson,Branden Carlson,25,Portland Trail Blazers,POR,West,Northwest,C,7-0,220,15,Utah,USA,,,,Active
+1028240128,Daniss,Jenkins,Daniss Jenkins,9,Detroit Pistons,DET,East,Central,G,6-4,165,24,St. John's,USA,,,,Active
+1028243201,Jamison,Battle,Jamison Battle,28,Toronto Raptors,TOR,East,Atlantic,F,6-7,220,77,Ohio State,USA,,,,Active
+1028244219,Tristan,Enaruna,Tristan Enaruna,6,Cleveland Cavaliers,CLE,East,Central,F,6-7,220,21,Cleveland State,Netherlands,,,,Active
+1028244692,PJ,Hall,PJ Hall,4,Charlotte Hornets,CHA,East,Southeast,C,6-8,245,16,Clemson,USA,,,,Active
+1028245237,David,Jones,David Jones,27,San Antonio Spurs,SAS,West,Southwest,F,6-4,210,25,Memphis,Dominican Republic,,,,Active
+1028245777,Karlo,Matkovic,Karlo Matkovic,19,New Orleans Pelicans,NOP,West,Southwest,F-C,6-10,231,17,Mega Basket,Bosnia and Herzegovina,2022,2,52,Active
+1028245994,Riley,Minix,Riley Minix,6,Cleveland Cavaliers,CLE,East,Central,F,6-7,230,12,Morehead State,USA,,,,Active
+1028246478,Daeqwon,Plowden,Daeqwon Plowden,26,Sacramento Kings,SAC,West,Pacific,G-F,6-4,216,29,Bowling Green,USA,,,,Active
+1028255289,Spencer,Jones,Spencer Jones,8,Denver Nuggets,DEN,West,Northwest,F,6-7,225,21,Stanford,USA,,,,Active
+1028256970,Jamarion,Sharp,Jamarion Sharp,13,LA Clippers,LAC,West,Pacific,C,7-5,235,33,Mississippi,USA,,,,Active
+1028257937,Jahmir,Young,Jahmir Young,16,Miami Heat,MIA,East,Southeast,G,6-0,185,17,Maryland,USA,,,,Active
+1028264794,Elijah,Harkless,Elijah Harkless,9,Detroit Pistons,DET,East,Central,G,6-3,195,16,UNLV,USA,,,,Active
+1028265377,Yuki,Kawamura,Yuki Kawamura,13,LA Clippers,LAC,West,Pacific,G,5-7,159,8,Japan,Japan,,,,Active
+1028265620,Malevy,Leons,Malevy Leons,10,Golden State Warriors,GSW,West,Pacific,F,6-9,210,33,Bradley,Netherlands,,,,Active
+1028266882,Cormac,Ryan,Cormac Ryan,17,Milwaukee Bucks,MIL,East,Central,G,6-5,205,30,North Carolina,USA,,,,Active
+1028267166,Tolu,Smith,Tolu Smith,9,Detroit Pistons,DET,East,Central,F,6-11,,35,Mississippi State,USA,,,,Active
+1028271147,Alex,Morales,Alex Morales,22,Orlando Magic,ORL,East,Southeast,G,6-6,210,30,Wagner,USA,,,,Active
+1028274126,RayJ,Dennis,RayJ Dennis,1,Atlanta Hawks,ATL,East,Southeast,G,6-1,180,0,Baylor,USA,,,,Active
+1042560902,Nae'Qwan,Tomlin,Nae'Qwan Tomlin,6,Cleveland Cavaliers,CLE,East,Central,F,6-8,210,35,Memphis,USA,,,,Active
+1057260888,Airious,Bailey,Airious Bailey,29,Utah Jazz,UTA,West,Northwest,F,6-9,200,19,Rutgers,USA,2025,1,5,Active
+1057261935,VJ,Edgecombe,VJ Edgecombe,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-4,190,77,Baylor,USA,2025,1,3,Active
+1057262088,Cooper,Flagg,Cooper Flagg,7,Dallas Mavericks,DAL,West,Southwest,F,6-9,205,32,Duke,USA,2025,1,1,Active
+1057262518,Dylan,Harper,Dylan Harper,27,San Antonio Spurs,SAS,West,Southwest,G,6-5,215,2,Rutgers,USA,2025,1,2,Active
+1057262985,Tre,Johnson,Tre Johnson,30,Washington Wizards,WAS,East,Southeast,G,6-5,190,12,Texas,USA,2025,1,6,Active
+1057263194,Kon,Knueppel,Kon Knueppel,4,Charlotte Hornets,CHA,East,Southeast,G-F,6-6,215,7,Duke,USA,2025,1,4,Active
+1057266649,Cedric,Coward,Cedric Coward,15,Memphis Grizzlies,MEM,West,Southwest,G,6-5,206,23,Washington State,USA,2025,1,11,Active
+1057266813,Egor,Demin,Egor Demin,3,Brooklyn Nets,BKN,East,Atlantic,G,6-8,200,8,Brigham Young,Russia,2025,1,8,Active
+1057267077,Jeremiah,Fears,Jeremiah Fears,19,New Orleans Pelicans,NOP,West,Southwest,G,6-3,190,0,Oklahoma,USA,2025,1,7,Active
+1057268513,Khaman,Maluach,Khaman Maluach,24,Phoenix Suns,PHX,West,Pacific,C,7-1,250,10,Duke,South Sudan,2025,1,10,Active
+1057268940,Collin,Murray-Boyles,Collin Murray-Boyles,28,Toronto Raptors,TOR,East,Atlantic,F,6-7,245,30,South Carolina,USA,2025,1,9,Active
+1057271099,Joan,Beringer,Joan Beringer,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-11,230,19,Cedevita Olimpija (Slovenia),France,2025,1,17,Active
+1057271360,Carter,Bryant,Carter Bryant,27,San Antonio Spurs,SAS,West,Southwest,F,6-6,220,11,Arizona,USA,2025,1,14,Active
+1057271583,Walter,Clayton Jr.,Walter Clayton Jr.,15,Memphis Grizzlies,MEM,West,Southwest,G,6-4,195,4,Florida,USA,2025,1,18,Active
+1057272081,Noa,Essengue,Noa Essengue,5,Chicago Bulls,CHI,East,Central,F,6-8,194,24,Ratiopharm Ulm (Germany),France,2025,1,12,Active
+1057272939,Kasparas,Jakučionis,Kasparas Jakučionis,17,Milwaukee Bucks,MIL,East,Central,G,6-5,200,25,Illinois-Urbana-Champaign,Lithuania,2025,1,20,Active
+1057274415,Derik,Queen,Derik Queen,19,New Orleans Pelicans,NOP,West,Southwest,C,6-9,250,22,Maryland,USA,2025,1,13,Active
+1057274983,Thomas,Sorber,Thomas Sorber,21,Oklahoma City Thunder,OKC,West,Northwest,C,6-9,250,12,Georgetown,USA,2025,1,15,Active
+1057275262,Nolan,Traoré,Nolan Traoré,3,Brooklyn Nets,BKN,East,Atlantic,G,6-3,185,13,Saint-Quentin,France,2025,1,19,Active
+1057275769,Hansen,Yang,Hansen Yang,25,Portland Trail Blazers,POR,West,Northwest,C,7-1,270,16,Zibo,China,2025,1,16,Active
+1057276634,Nique,Clifford,Nique Clifford,26,Sacramento Kings,SAC,West,Pacific,G,6-5,175,0,Colorado State,USA,2025,1,24,Active
+1057277425,Hugo,González,Hugo González,2,Boston Celtics,BOS,East,Atlantic,G,6-6,200,28,Spain,Spain,2025,1,28,Active
+1057278805,Liam,McNeeley,Liam McNeeley,4,Charlotte Hornets,CHA,East,Southeast,F,6-7,210,33,Connecticut,USA,2025,1,29,Active
+1057279093,Asa,Newell,Asa Newell,1,Atlanta Hawks,ATL,East,Southeast,F,6-10,220,14,Georgia,USA,2025,1,23,Active
+1057279105,Yanic Konan,Niederhauser,Yanic Konan Niederhauser,13,LA Clippers,LAC,West,Pacific,C,6-11,242,14,Penn State,Switzerland,2025,1,30,Active
+1057279425,Drake,Powell,Drake Powell,3,Brooklyn Nets,BKN,East,Atlantic,F,6-5,195,4,North Carolina,USA,2025,1,22,Active
+1057279571,Jase,Richardson,Jase Richardson,22,Orlando Magic,ORL,East,Southeast,G,6-1,180,11,Michigan State,USA,2025,1,25,Active
+1057279594,Will,Riley,Will Riley,30,Washington Wizards,WAS,East,Southeast,F,6-9,180,27,Illinois-Urbana-Champaign,USA,2025,1,21,Active
+1057279760,Ben,Saraf,Ben Saraf,3,Brooklyn Nets,BKN,East,Atlantic,G,6-6,200,77,Ratiopharm Ulm,Israel,2025,1,26,Active
+1057280779,Danny,Wolf,Danny Wolf,3,Brooklyn Nets,BKN,East,Atlantic,F-C,6-11,250,2,Michigan,USA,2025,1,27,Active
+1057382509,Johni,Broome,Johni Broome,13,LA Clippers,LAC,West,Pacific,F,6-9,244,22,Auburn,USA,2025,2,35,Active
+1057383369,Rasheer,Fleming,Rasheer Fleming,24,Phoenix Suns,PHX,West,Pacific,F,6-9,240,20,St. Joseph's (PA),USA,2025,2,31,Active
+1057384156,Sion,James,Sion James,4,Charlotte Hornets,CHA,East,Southeast,G,6-5,220,4,Duke,USA,2025,2,33,Active
+1057384362,Ryan,Kalkbrenner,Ryan Kalkbrenner,4,Charlotte Hornets,CHA,East,Southeast,C,7-1,256,11,Creighton,USA,2025,2,34,Active
+1057385481,Noah,Penda,Noah Penda,22,Orlando Magic,ORL,East,Southeast,G-F,6-7,215,93,Le Mans Sarthe,France,2025,2,32,Active
+1057386376,Adou,Thiero,Adou Thiero,14,Los Angeles Lakers,LAL,West,Pacific,G,6-7,220,1,Arkansas,USA,2025,2,36,Active
+1057387526,Koby,Brea,Koby Brea,24,Phoenix Suns,PHX,West,Pacific,G,6-5,215,14,Kentucky,USA,2025,2,41,Active
+1057389374,Kam,Jones,Kam Jones,17,Milwaukee Bucks,MIL,East,Central,G,6-4,200,7,Marquette,USA,2025,2,38,Active
+1057389625,Chaz,Lanier,Chaz Lanier,9,Detroit Pistons,DET,East,Central,G,6-3,206,20,Tennessee,USA,2025,2,37,Active
+1057389862,Alijah,Martin,Alijah Martin,28,Toronto Raptors,TOR,East,Atlantic,G,6-2,210,55,Florida,USA,2025,2,39,Active
+1057390538,Micah,Peavy,Micah Peavy,19,New Orleans Pelicans,NOP,West,Southwest,G-F,6-7,215,14,Georgetown,USA,2025,2,40,Active
+1057390745,Maxime,Raynaud,Maxime Raynaud,26,Sacramento Kings,SAC,West,Pacific,C,7-1,250,42,Stanford,France,2025,2,42,Active
+1057391756,Jamir,Watkins,Jamir Watkins,30,Washington Wizards,WAS,East,Southeast,F,6-6,210,5,Florida State,USA,2025,2,43,Active
+1057392335,Brooks,Barnhizer,Brooks Barnhizer,21,Oklahoma City Thunder,OKC,West,Northwest,F,6-5,230,23,Northwestern,USA,2025,2,44,Active
+1057393207,Mohamed,Diawara,Mohamed Diawara,20,New York Knicks,NYK,East,Atlantic,F,6-9,225,51,Paris Basketball,France,2025,2,51,Active
+1057394921,Bogoljub,Marković,Bogoljub Marković,17,Milwaukee Bucks,MIL,East,Central,F,6-11,210,23,Serbia,Serbia,2025,2,47,Active
+1057394959,Jahmai,Mashack,Jahmai Mashack,15,Memphis Grizzlies,MEM,West,Southwest,G,6-4,203,,Tennessee,USA,2025,2,59,Active
+1057395638,Taelon,Peter,Taelon Peter,27,San Antonio Spurs,SAS,West,Southwest,G,6-3,185,4,Liberty,USA,2025,2,54,Active
+1057395754,Tyrese,Proctor,Tyrese Proctor,6,Cleveland Cavaliers,CLE,East,Central,G,6-4,185,24,Duke,Australia,2025,2,49,Active
+1057395872,Will,Richard,Will Richard,10,Golden State Warriors,GSW,West,Pacific,G,6-3,206,3,Florida,USA,2025,2,56,Active
+1057396055,Kobe,Sanders,Kobe Sanders,13,LA Clippers,LAC,West,Pacific,G,6-8,207,4,Nevada,USA,2025,2,50,Active
+1057396191,Max,Shulga,Max Shulga,2,Boston Celtics,BOS,East,Atlantic,G,6-4,210,44,Virginia Commonwealth,Ukraine,2025,2,57,Active
+1057396260,Javon,Small,Javon Small,15,Memphis Grizzlies,MEM,West,Southwest,G,6-1,190,10,West Virginia,USA,2025,2,48,Active
+1057396603,John,Tonje,John Tonje,25,Portland Trail Blazers,POR,West,Northwest,G,6-4,218,8,Wisconsin,USA,2025,2,53,Active
+1057396966,Amari,Williams,Amari Williams,2,Boston Celtics,BOS,East,Atlantic,F-C,6-11,250,77,Kentucky,United Kingdom,2025,2,46,Active
+1057397172,Rocco,Zikarsky,Rocco Zikarsky,18,Minnesota Timberwolves,MIN,West,Northwest,C,7-3,227,44,Brisbane Bullets (Australia),Australia,2025,2,45,Active
+1057844839,Tamar,Bates,Tamar Bates,29,Utah Jazz,UTA,West,Northwest,G,6-4,195,7,Missouri,USA,,,,Active
+1057845274,Dylan,Cardwell,Dylan Cardwell,26,Sacramento Kings,SAC,West,Pacific,C,6-10,255,32,Auburn,USA,,,,Active
+1057845382,Moussa,Cisse,Moussa Cisse,7,Dallas Mavericks,DAL,West,Southwest,C,6-11,220,30,Memphis,Guinea,,,,Active
+1057846109,Myron,Gardner,Myron Gardner,16,Miami Heat,MIA,East,Southeast,F,6-5,220,15,Arkansas-Little Rock,USA,,,,Active
+1057846172,Keshon,Gilbert,Keshon Gilbert,1,Atlanta Hawks,ATL,East,Southeast,G,6-4,200,,Iowa State,USA,,,,Active
+1057846206,Vladislav,Goldin,Vladislav Goldin,16,Miami Heat,MIA,East,Southeast,C,7-0,250,50,Michigan,Russia,,,,Active
+1057846535,Chucky,Hepburn,Chucky Hepburn,28,Toronto Raptors,TOR,East,Atlantic,G,6-0,190,24,Louisville,USA,,,,Active
+1057846700,CJ,Huntley,CJ Huntley,24,Phoenix Suns,PHX,West,Pacific,F,6-11,230,22,Appalachian State,USA,,,,Active
+1057846840,Chaney,Johnson,Chaney Johnson,3,Brooklyn Nets,BKN,East,Atlantic,G-F,6-7,220,31,Auburn,USA,,,,Active
+1057846921,Curtis,Jones,Curtis Jones,8,Denver Nuggets,DEN,West,Northwest,G,6-3,195,1,Iowa State,USA,,,,Active
+1057847330,Caleb,Love,Caleb Love,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-3,212,2,Arizona,USA,,,,Active
+1057847504,Chris,Mañon,Chris Mañon,14,Los Angeles Lakers,LAL,West,Pacific,G,6-4,209,30,Vanderbilt,USA,,,,Active
+1057847891,Jameer,Nelson Jr.,Jameer Nelson Jr.,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-1,190,,TCU,USA,,,,Active
+1057847894,Ryan,Nembhard,Ryan Nembhard,1,Atlanta Hawks,ATL,East,Southeast,G,5-11,180,9,Gonzaga,Canada,,,,Active
+1057848025,Norchad,Omier,Norchad Omier,13,LA Clippers,LAC,West,Pacific,F,6-7,248,,Miami,Nicaragua,,,,Active
+1057848244,John,Poulakidas,John Poulakidas,7,Dallas Mavericks,DAL,West,Southwest,G,6-6,205,1,Yale,USA,,,,Active
+1057849072,Saint,Thomas,Saint Thomas,23,Philadelphia 76ers,PHI,East,Atlantic,F,6-7,235,,Southern California,USA,,,,Active
+1057849685,Chris,Youngblood,Chris Youngblood,25,Portland Trail Blazers,POR,West,Northwest,G,6-4,,3,Alabama,USA,,,,Active
+1057968644,LJ,Cryer,LJ Cryer,10,Golden State Warriors,GSW,West,Pacific,G,6-0,,18,Houston,USA,,,,Active
+1058921044,Sean,Pedulla,Sean Pedulla,11,Houston Rockets,HOU,West,Southwest,G,6-1,195,,Mississippi,USA,,,,Active
+1059753274,Malachi,Smith,Malachi Smith,28,Toronto Raptors,TOR,East,Atlantic,G,6-4,205,18,Gonzaga,USA,,,,Active
+1059875475,Grant,Nelson,Grant Nelson,3,Brooklyn Nets,BKN,East,Atlantic,F,7-0,215,16,Alabama,USA,,,,Active
+1059992972,Bez,Mbeng,Bez Mbeng,29,Utah Jazz,UTA,West,Northwest,G,6-4,185,21,Yale,USA,,,,Active
+1076658911,Jayson,Kent,Jayson Kent,25,Portland Trail Blazers,POR,West,Northwest,F,6-8,215,,Texas,USA,,,,Active
+1081266162,Hayden,Gray,Hayden Gray,29,Utah Jazz,UTA,West,Northwest,G,6-4,190,,California-San Diego,USA,,,,Active
+1091338860,Darius,Acuff Jr.,Darius Acuff Jr.,26,Sacramento Kings,SAC,West,Pacific,G,6-2,190,5,Arkansas,USA,2026,1,7,Active
+1091339280,Cameron,Boozer,Cameron Boozer,15,Memphis Grizzlies,MEM,West,Southwest,F,6-10,250,27,Duke,USA,2026,1,3,Active
+1091339436,Mikel,Brown Jr.,Mikel Brown Jr.,3,Brooklyn Nets,BKN,East,Atlantic,G,6-5,190,0,Louisville,USA,2026,1,6,Active
+1091340077,AJ,Dybantsa,AJ Dybantsa,30,Washington Wizards,WAS,East,Southeast,F,6-9,210,4,Brigham Young,USA,2026,1,1,Active
+1091340263,Kingston,Flemings,Kingston Flemings,1,Atlanta Hawks,ATL,East,Southeast,G,6-4,190,4,Houston,USA,2026,1,8,Active
+1091341156,Morez,Johnson,Morez Johnson,7,Dallas Mavericks,DAL,West,Southwest,F,6-9,250,14,Michigan,USA,2026,1,9,Active
+1091342427,Darryn,Peterson,Darryn Peterson,29,Utah Jazz,UTA,West,Northwest,G,6-6,205,22,Kansas,USA,2026,1,2,Active
+1091343544,Keaton,Wagler,Keaton Wagler,13,LA Clippers,LAC,West,Pacific,G,6-6,175,1,Illinois,USA,2026,1,5,Active
+1091343852,Caleb,Wilson,Caleb Wilson,5,Chicago Bulls,CHI,East,Central,F,6-10,215,8,North Carolina,USA,2026,1,4,Active
+1091349196,Nate,Ament,Nate Ament,17,Milwaukee Bucks,MIL,East,Central,F,6-10,207,,Tennessee,USA,2026,1,13,Active
+1091349204,Christian,Anderson,Christian Anderson,4,Charlotte Hornets,CHA,East,Southeast,G,6-0,165,5,Texas Tech,USA,2026,1,18,Active
+1091349754,Brayden,Burries,Brayden Burries,17,Milwaukee Bucks,MIL,East,Central,G,6-4,205,0,Arizona,USA,2026,1,10,Active
+1091349831,Cameron,Carr,Cameron Carr,14,Los Angeles Lakers,LAL,West,Pacific,G,6-5,175,43,Baylor,USA,2026,1,24,Active
+1091350193,Sergio,De Larrea,Sergio De Larrea,7,Dallas Mavericks,DAL,West,Southwest,G,6-5,175,55,"Valencia, Spain",Spain,2026,1,25,Active
+1091350401,Zuby,Ejiofor,Zuby Ejiofor,1,Atlanta Hawks,ATL,East,Southeast,F,6-9,240,20,St. John's,USA,2026,1,23,Active
+1091350801,Allen,Graves,Allen Graves,28,Toronto Raptors,TOR,East,Atlantic,F,6-9,225,22,Santa Clara,USA,2026,1,19,Active
+1091351802,Yaxel,Lendeborg,Yaxel Lendeborg,10,Golden State Warriors,GSW,West,Pacific,F,6-9,250,1,Alabama-Birmingham,USA,2026,1,11,Active
+1091351869,Karim,Lopez,Karim Lopez,15,Memphis Grizzlies,MEM,West,Southwest,F,6-8,210,35,-,Mexico,2026,1,21,Active
+1091351965,Aday,Mara,Aday Mara,21,Oklahoma City Thunder,OKC,West,Northwest,C,7-2,255,15,Michigan,Spain,2026,1,12,Active
+1091352549,Ebuka,Okorie,Ebuka Okorie,9,Detroit Pistons,DET,East,Central,G,6-2,185,,Stanford,Nigeria,2026,1,17,Active
+1091352730,Labaron,Philon,Labaron Philon,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-4,177,0,Alabama,USA,2026,1,22,Active
+1091352835,Jayden,Quaintance,Jayden Quaintance,27,San Antonio Spurs,SAS,West,Southwest,F,6-10,255,22,Kentucky,USA,2026,1,20,Active
+1091353463,Hannes,Steinbach,Hannes Steinbach,4,Charlotte Hornets,CHA,East,Southeast,F,6-11,,22,Washington,Germany,2026,1,14,Active
+1091353486,Bennett,Stirtz,Bennett Stirtz,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-4,180,14,Iowa,USA,2026,1,16,Active
+1091353537,Dailyn,Swain,Dailyn Swain,5,Chicago Bulls,CHI,East,Central,F,6-7,220,5,Texas,USA,2026,1,15,Active
+1091360181,Chris,Cenac Jr.,Chris Cenac Jr.,2,Boston Celtics,BOS,East,Atlantic,F,6-11,240,12,Houston,USA,2026,1,27,Active
+1091361657,Joshua,Jefferson,Joshua Jefferson,3,Brooklyn Nets,BKN,East,Atlantic,F,6-9,240,9,Iowa State,USA,2026,1,28,Active
+1091361855,Alex,Karaban,Alex Karaban,26,Sacramento Kings,SAC,West,Pacific,F,6-8,220,33,Connecticut,USA,2026,1,29,Active
+1091362981,Koa,Peat,Koa Peat,24,Phoenix Suns,PHX,West,Pacific,F,6-8,235,18,Arizona,USA,2026,1,30,Active
+1091363216,Tarris,Reed Jr.,Tarris Reed Jr.,27,San Antonio Spurs,SAS,West,Southwest,C,6-11,265,10,Connecticut,USA,2026,1,26,Active
+1091462892,Tyler,Bilodeau,Tyler Bilodeau,3,Brooklyn Nets,BKN,East,Atlantic,F,6-9,230,34,UCLA,USA,2026,2,43,Active
+1091463018,Jaden,Bradley,Jaden Bradley,28,Toronto Raptors,TOR,East,Atlantic,G,6-3,200,,Arizona,USA,2026,2,50,Active
+1091463040,Trevon,Brazile,Trevon Brazile,8,Denver Nuggets,DEN,West,Northwest,F,6-10,220,,Arkansas,USA,2026,2,35,Active
+1091463115,Maliq,Brown,Maliq Brown,27,San Antonio Spurs,SAS,West,Southwest,F,6-9,225,,Duke,USA,2026,2,44,Active
+1091463429,Ryan,Conwell,Ryan Conwell,16,Miami Heat,MIA,East,Southeast,G,6-4,215,4,Louisville,USA,2026,2,37,Active
+1091463885,Isaiah,Evans,Isaiah Evans,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-6,175,33,Duke,USA,2026,2,33,Active
+1091464155,Ja'Kobi,Gillespie,Ja'Kobi Gillespie,27,San Antonio Spurs,SAS,West,Southwest,G,6-1,186,,Tennessee,USA,2026,2,42,Active
+1091464608,Bryce,Hopkins,Bryce Hopkins,8,Denver Nuggets,DEN,West,Northwest,,,,,St. John's,,2026,2,49,Active
+1091464994,Jack,Kayil,Jack Kayil,20,New York Knicks,NYK,East,Atlantic,G,6-3,174,,-,Germany,2026,2,39,Active
+1091465199,Tobi,Lawal,Tobi Lawal,7,Dallas Mavericks,DAL,West,Southwest,F,6-8,215,33,Virginia Tech,United Kingdom,2026,2,48,Active
+1091465658,Baba,Miller,Baba Miller,13,LA Clippers,LAC,West,Pacific,F,6-11,204,,Cincinnati,Spain,2026,2,36,Active
+1091465698,Dillon,Mitchell,Dillon Mitchell,2,Boston Celtics,BOS,East,Atlantic,F,6-8,205,,St. John's,USA,2026,2,40,Active
+1091465870,Izaiyah,Nelson,Izaiyah Nelson,22,Orlando Magic,ORL,East,Southeast,F,6-10,218,25,South Florida,USA,2026,2,51,Active
+1091465898,Tyler,Nickel,Tyler Nickel,20,New York Knicks,NYK,East,Atlantic,F,6-7,220,,Vanderbilt,USA,2026,2,47,Active
+1091465991,Felix,Okpara,Felix Okpara,30,Washington Wizards,WAS,East,Southeast,C,6-11,235,,Tennessee,Nigeria,2026,2,46,Active
+1091466034,Otega,Oweh,Otega Oweh,21,Oklahoma City Thunder,OKC,West,Northwest,G,6-4,215,13,Kentucky,USA,2026,2,41,Active
+1091466594,Richie,Saunders,Richie Saunders,15,Memphis Grizzlies,MEM,West,Southwest,G,6-5,200,,Brigham Young,USA,2026,2,32,Active
+1091466685,Emanuel,Sharp,Emanuel Sharp,26,Sacramento Kings,SAC,West,Pacific,G,6-3,210,34,Houston,Israel,2026,2,45,Active
+1091466792,Braden,Smith,Braden Smith,12,Indiana Pacers,IND,East,Central,G,6-0,170,3,Purdue,USA,2026,2,38,Active
+1091467074,Meleek,Thomas,Meleek Thomas,6,Cleveland Cavaliers,CLE,East,Central,G,6-5,185,15,Arkansas,USA,2026,2,34,Active
+1091467104,Bruce,Thornton,Bruce Thornton,11,Houston Rockets,HOU,West,Southwest,G,6-2,215,,Ohio State,USA,2026,2,31,Active
+1091475281,Lajae,Jones,Lajae Jones,10,Golden State Warriors,GSW,West,Pacific,G-F,6-7,220,25,Florida State,,2026,2,54,Active
+1091475805,Nick,Martinelli,Nick Martinelli,13,LA Clippers,LAC,West,Pacific,F,6-7,220,,Northwestern,USA,2026,2,55,Active
+1091476372,Ugonna,Onyenso,Ugonna Onyenso,9,Detroit Pistons,DET,East,Central,C,6-11,225,,Virginia,Nigeria,2026,2,53,Active
+1091477603,Henri,Veesaar,Henri Veesaar,1,Atlanta Hawks,ATL,East,Southeast,C,7-0,225,13,North Carolina,Estonia,2026,2,52,Active
+1091480242,Vsevolod,Ishchenko,Vsevolod Ishchenko,7,Dallas Mavericks,DAL,West,Southwest,G,6-3,,,-,Russia,2026,2,56,Active
+1091480528,Trey,Kaufman-Renn,Trey Kaufman-Renn,18,Minnesota Timberwolves,MIN,West,Northwest,F,6-9,230,14,Purdue,USA,2026,2,59,Active
+1091480795,Malique,Lewis,Malique Lewis,17,Milwaukee Bucks,MIL,East,Central,F,6-8,195,,-,Trinidad and Tobago,2026,2,60,Active
+1091481434,Narcisse,Ngoy,Narcisse Ngoy,13,LA Clippers,LAC,West,Pacific,C,7-0,,,-,France,2026,2,57,Active
+1091481720,Jaron,Pierre Jr.,Jaron Pierre Jr.,19,New Orleans Pelicans,NOP,West,Southwest,G,6-5,210,10,Southern Methodist,USA,2026,2,58,Active
+1091903404,Tobe,Awaka,Tobe Awaka,5,Chicago Bulls,CHI,East,Central,F,6-8,250,,Arizona,USA,,,,Active
+1091904395,Josh,Dix,Josh Dix,21,Oklahoma City Thunder,OKC,West,Northwest,,,,,Creighton,,,,,Active
+1091904403,Tre,Donaldson,Tre Donaldson,16,Miami Heat,MIA,East,Southeast,G,6-3,195,24,Miami,USA,,,,Active
+1091906694,AK,Okereke,AK Okereke,14,Los Angeles Lakers,LAL,West,Pacific,F,6-7,244,31,Vanderbilt,USA,,,,Active
+1091907371,Jaylin,Sellers,Jaylin Sellers,5,Chicago Bulls,CHI,East,Central,,,,,Providence,,,,,Active
+1091907917,Ernest,"Udeh, Jr.","Ernest Udeh, Jr.",6,Cleveland Cavaliers,CLE,East,Central,C,6-11,266,39,Miami,USA,,,,Active
+1092116264,Michael,Ajayi,Michael Ajayi,4,Charlotte Hornets,CHA,East,Southeast,G,6-7,235,,Butler,USA,,,,Active
+1092116681,Kylan,Boswell,Kylan Boswell,4,Charlotte Hornets,CHA,East,Southeast,G,6-2,200,,Illinois,USA,,,,Active
+1092195008,Quadir,Copeland,Quadir Copeland,11,Houston Rockets,HOU,West,Southwest,G,6-6,203,,North Carolina State,USA,,,,Active
+1092197212,Duke,Miles,Duke Miles,23,Philadelphia 76ers,PHI,East,Atlantic,G,6-2,175,,Vanderbilt,USA,,,,Active
+1092199635,Tarik,Biberovic,Tarik Biberovic,7,Dallas Mavericks,DAL,West,Southwest,F,6-7,218,,                                   ,Bosnia and Herzegovina,2023,2,56,Active
+1092199652,Nate,Bittle,Nate Bittle,28,Toronto Raptors,TOR,East,Atlantic,C,7-0,215,,Oregon,USA,,,,Active
+1092288797,Tucker,DeVries,Tucker DeVries,2,Boston Celtics,BOS,East,Atlantic,,,,,Indiana,,,,,Active
+1092288834,Alpha,Diallo,Alpha Diallo,8,Denver Nuggets,DEN,West,Northwest,,,,,-,,,,,Active
+1092292401,Milos,Uzan,Milos Uzan,2,Boston Celtics,BOS,East,Atlantic,G,6-3,175,,Houston,USA,,,,Active
+1092732494,Arthur,Kaluma,Arthur Kaluma,14,Los Angeles Lakers,LAL,West,Pacific,F,6-7,225,,Texas,Uganda,,,,Active
+1094002723,Malik,Dia,Malik Dia,19,New Orleans Pelicans,NOP,West,Southwest,F,6-9,250,8,Mississippi,USA,,,,Active
+1094642691,Rafael,Castro,Rafael Castro,11,Houston Rockets,HOU,West,Southwest,C,6-11,220,,George Washington,USA,,,,Active
+1094831183,J'Vonne,Hadley,J'Vonne Hadley,16,Miami Heat,MIA,East,Southeast,,,,,Louisville,,,,,Active
+1095497363,Khalifa,Diop,Khalifa Diop,6,Cleveland Cavaliers,CLE,East,Central,C,6-11,231,18,CB Gran Canaria,Senegal,2022,2,39,Active
+1095634078,Jarkel,Joiner,Jarkel Joiner,4,Charlotte Hornets,CHA,East,Southeast,G,6-1,181,,North Carolina State,USA,,,,Active
+1095855040,Kobe,Stewart,Kobe Stewart,4,Charlotte Hornets,CHA,East,Southeast,G-F,6-6,180,,Presbyterian,USA,,,,Active

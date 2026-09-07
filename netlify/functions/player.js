@@ -74,7 +74,10 @@ async function safeTimedLoad(
 
 }
 
-async function loadLocalNFLRoster() {
+async function loadLocalRoster(league) {
+
+    const rosterFileName =
+        `${league}-roster.csv`;
 
     const rosterPath =
         path.join(
@@ -82,11 +85,11 @@ async function loadLocalNFLRoster() {
             "netlify",
             "functions",
             "data",
-            "nfl-roster.csv"
+            rosterFileName
         );
 
     console.log(
-        "Loading local NFL roster:",
+        `Loading local ${league.toUpperCase()} roster:`,
         rosterPath
     );
 
@@ -100,7 +103,7 @@ async function loadLocalNFLRoster() {
         parseCSV(csv);
 
     console.log(
-        `✓ Local NFL roster parsed — ${roster.length} players`
+        `✓ Local ${league.toUpperCase()} roster parsed — ${roster.length} players`
     );
 
     return roster;
@@ -159,10 +162,13 @@ export async function handler(event) {
 
         let roster;
 
-        if (league === "nfl") {
+        if (
+            league === "nfl" ||
+            league === "nba"
+        ) {
 
             roster =
-                await loadLocalNFLRoster();
+                await loadLocalRoster(league);
 
         } else {
 
