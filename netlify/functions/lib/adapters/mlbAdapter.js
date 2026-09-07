@@ -257,18 +257,38 @@ const games = Number(
                     prop.Vendor ?? "",
 
                 probability:
-                    prop["Poisson Over"] !== undefined &&
-                    prop["Poisson Over"] !== null &&
-                    prop["Poisson Over"] !== ""
-                        ? Number(prop["Poisson Over"])
-                        : null,
+                    String(prop.Type ?? "").toLowerCase() === "milestone"
+                        ? (
+                            prop["Poisson Milestone"] !== undefined &&
+                            prop["Poisson Milestone"] !== null &&
+                            prop["Poisson Milestone"] !== ""
+                                ? Number(prop["Poisson Milestone"])
+                                : null
+                        )
+                        : (
+                            prop["Poisson Over"] !== undefined &&
+                            prop["Poisson Over"] !== null &&
+                            prop["Poisson Over"] !== ""
+                                ? Number(prop["Poisson Over"])
+                                : null
+                        ),
 
                 probabilitySource:
-                    prop["Poisson Over"] !== undefined &&
-                    prop["Poisson Over"] !== null &&
-                    prop["Poisson Over"] !== ""
-                        ? "poisson_over"
-                        : null,
+                    String(prop.Type ?? "").toLowerCase() === "milestone"
+                        ? (
+                            prop["Poisson Milestone"] !== undefined &&
+                            prop["Poisson Milestone"] !== null &&
+                            prop["Poisson Milestone"] !== ""
+                                ? "poisson_milestone"
+                                : null
+                        )
+                        : (
+                            prop["Poisson Over"] !== undefined &&
+                            prop["Poisson Over"] !== null &&
+                            prop["Poisson Over"] !== ""
+                                ? "poisson_over"
+                                : null
+                        ),
 
                 expectedValue:
                     Number(
