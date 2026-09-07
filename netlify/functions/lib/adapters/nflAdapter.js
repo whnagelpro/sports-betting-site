@@ -396,7 +396,171 @@ export function buildNFLContext({
 
         matchup,
 
-        props,
+        props: (props ?? []).map(prop => {
+
+            const type =
+                String(prop.Type ?? "")
+                    .toLowerCase();
+
+            const bestSide =
+                String(
+                    prop["Best Side"] ?? ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            const isOverUnder =
+                type === "over_under";
+
+            let odds = 0;
+            let probability = null;
+            let probabilitySource = null;
+            let expectedValue = null;
+
+            if (isOverUnder) {
+
+                if (bestSide === "under") {
+
+                    odds =
+                        Number(
+                            prop["Under Odds"] ?? 0
+                        );
+
+                    if (
+                        prop["Model Prob Under"] !== undefined &&
+                        prop["Model Prob Under"] !== null &&
+                        prop["Model Prob Under"] !== ""
+                    ) {
+                        probability =
+                            Number(
+                                prop["Model Prob Under"]
+                            );
+
+                        probabilitySource =
+                            "model_prob_under";
+                    }
+
+                    if (
+                        prop["EV Under"] !== undefined &&
+                        prop["EV Under"] !== null &&
+                        prop["EV Under"] !== ""
+                    ) {
+                        expectedValue =
+                            Number(
+                                prop["EV Under"]
+                            );
+                    }
+
+                } else {
+
+                    odds =
+                        Number(
+                            prop["Over Odds"] ?? 0
+                        );
+
+                    if (
+                        prop["Model Prob Over"] !== undefined &&
+                        prop["Model Prob Over"] !== null &&
+                        prop["Model Prob Over"] !== ""
+                    ) {
+                        probability =
+                            Number(
+                                prop["Model Prob Over"]
+                            );
+
+                        probabilitySource =
+                            "model_prob_over";
+                    }
+
+                    if (
+                        prop["EV Over"] !== undefined &&
+                        prop["EV Over"] !== null &&
+                        prop["EV Over"] !== ""
+                    ) {
+                        expectedValue =
+                            Number(
+                                prop["EV Over"]
+                            );
+                    }
+
+                }
+
+            } else {
+
+                odds =
+                    Number(
+                        prop.Odds ?? 0
+                    );
+
+                if (
+                    prop["Best Model Probability"] !== undefined &&
+                    prop["Best Model Probability"] !== null &&
+                    prop["Best Model Probability"] !== ""
+                ) {
+                    probability =
+                        Number(
+                            prop["Best Model Probability"]
+                        );
+
+                    probabilitySource =
+                        "best_model_probability";
+                }
+
+                if (
+                    prop["Best EV"] !== undefined &&
+                    prop["Best EV"] !== null &&
+                    prop["Best EV"] !== ""
+                ) {
+                    expectedValue =
+                        Number(
+                            prop["Best EV"]
+                        );
+                }
+
+            }
+
+            return {
+
+                id: prop.Id,
+
+                type,
+
+                market:
+                    String(
+                        prop["Prop Type"] ?? ""
+                    ).toLowerCase(),
+
+                displayName:
+                    String(
+                        prop["Prop Type"] ?? ""
+                    ).replaceAll("_", " "),
+
+                line:
+                    Number(
+                        prop["Line Value"] ?? 0
+                    ),
+
+                odds,
+
+                oddsFormat: "american",
+
+                sportsbook:
+                    prop.Vendor ?? "",
+
+                probability,
+
+                probabilitySource,
+
+                expectedValue,
+
+                bestSide:
+                    bestSide || null,
+
+                raw: prop
+
+            };
+
+        }),
 
         positionGroup,
 

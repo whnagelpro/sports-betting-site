@@ -257,9 +257,18 @@ const games = Number(
                     prop.Vendor ?? "",
 
                 probability:
-                    Number(
-                        prop["Poisson Over"] ?? 0
-                    ),
+                    prop["Poisson Over"] !== undefined &&
+                    prop["Poisson Over"] !== null &&
+                    prop["Poisson Over"] !== ""
+                        ? Number(prop["Poisson Over"])
+                        : null,
+
+                probabilitySource:
+                    prop["Poisson Over"] !== undefined &&
+                    prop["Poisson Over"] !== null &&
+                    prop["Poisson Over"] !== ""
+                        ? "poisson_over"
+                        : null,
 
                 expectedValue:
                     Number(
