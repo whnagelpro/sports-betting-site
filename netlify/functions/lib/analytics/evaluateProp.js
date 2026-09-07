@@ -25,6 +25,17 @@ export function evaluateProp({
 
     console.log("✓ projection");
 
+    const isBettingModelEligible =
+        projection.source === "prop_model" &&
+        projection.probability !== null &&
+        projection.probability !== undefined &&
+        projection.probability !== "";
+
+    const bettingProbability =
+        isBettingModelEligible
+            ? projection.probability
+            : null;
+
     const scoredProp =
 
         scoreProp({
@@ -35,7 +46,7 @@ export function evaluateProp({
 
                 projectedProbability:
 
-                    projection.probability,
+                    bettingProbability,
 
                 consistencyScore:
 
@@ -50,7 +61,7 @@ export function evaluateProp({
     const edge = buildEdgeResult({
 
         probability:
-            projection.probability,
+            bettingProbability,
 
         impliedProbability:
             scoredProp.impliedProbability,
