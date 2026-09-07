@@ -30,8 +30,21 @@ const MARKET_FIELDS = {
 
 function getPropModelProbability(prop) {
 
+    const rawProbability =
+        prop?.probability;
+
+    if (
+        rawProbability === null ||
+        rawProbability === undefined ||
+        rawProbability === ""
+    ) {
+
+        return null;
+
+    }
+
     const probability =
-        Number(prop?.probability);
+        Number(rawProbability);
 
     if (
         Number.isFinite(probability) &&
@@ -54,6 +67,25 @@ export function calculateProjectedProbability({
     prop
 
 }) {
+
+    const propModelProbability =
+        getPropModelProbability(prop);
+
+    if (propModelProbability !== null) {
+
+        return {
+            probability:
+                propModelProbability,
+
+            hits: 0,
+
+            sampleSize:
+                gameLogs.length,
+
+            source: "prop_model"
+        };
+
+    }
 
     if (
         String(prop?.type ?? "")
@@ -84,23 +116,11 @@ export function calculateProjectedProbability({
 
     if (!prop || !gameLogs.length) {
 
-        const fallbackProbability =
-            getPropModelProbability(prop);
-
         return {
-
-            probability:
-                fallbackProbability,
-
+            probability: null,
             hits: 0,
-
             sampleSize: 0,
-
-            source:
-                fallbackProbability === null
-                    ? "unavailable"
-                    : "prop_model"
-
+            source: "unavailable"
         };
 
     }
@@ -111,24 +131,14 @@ export function calculateProjectedProbability({
 
     if (!field) {
 
-        const fallbackProbability =
-            getPropModelProbability(prop);
-
         return {
-
-            probability:
-                fallbackProbability,
-
+            probability: null,
             hits: 0,
 
             sampleSize:
                 gameLogs.length,
 
-            source:
-                fallbackProbability === null
-                    ? "unavailable"
-                    : "prop_model"
-
+            source: "unavailable"
         };
 
     }

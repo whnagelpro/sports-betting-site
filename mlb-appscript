@@ -3159,7 +3159,7 @@ function populateOverallTeamRatings_(sheet) {
     header.indexOf("Overall Rating");
 
   const tierCol =
-    header.indexOf("Team Tier");
+    header.indexOf("Rating Tier");
 
   const notesCol =
     header.indexOf("Rating Notes");
