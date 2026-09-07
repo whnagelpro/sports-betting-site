@@ -28,6 +28,25 @@ const MARKET_FIELDS = {
 
 };
 
+function getPropModelProbability(prop) {
+
+    const probability =
+        Number(prop?.probability);
+
+    if (
+        Number.isFinite(probability) &&
+        probability >= 0 &&
+        probability <= 1
+    ) {
+
+        return probability;
+
+    }
+
+    return null;
+
+}
+
 export function calculateProjectedProbability({
 
     gameLogs = [],
@@ -38,13 +57,22 @@ export function calculateProjectedProbability({
 
     if (!prop || !gameLogs.length) {
 
+        const fallbackProbability =
+            getPropModelProbability(prop);
+
         return {
 
-            probability: 0,
+            probability:
+                fallbackProbability,
 
             hits: 0,
 
-            sampleSize: 0
+            sampleSize: 0,
+
+            source:
+                fallbackProbability === null
+                    ? "unavailable"
+                    : "prop_model"
 
         };
 
@@ -56,13 +84,23 @@ export function calculateProjectedProbability({
 
     if (!field) {
 
+        const fallbackProbability =
+            getPropModelProbability(prop);
+
         return {
 
-            probability: 0,
+            probability:
+                fallbackProbability,
 
             hits: 0,
 
-            sampleSize: gameLogs.length
+            sampleSize:
+                gameLogs.length,
+
+            source:
+                fallbackProbability === null
+                    ? "unavailable"
+                    : "prop_model"
 
         };
 
@@ -87,14 +125,14 @@ export function calculateProjectedProbability({
     return {
 
         probability:
-
             clears / gameLogs.length,
 
         hits: clears,
 
         sampleSize:
+            gameLogs.length,
 
-            gameLogs.length
+        source: "game_logs"
 
     };
 
