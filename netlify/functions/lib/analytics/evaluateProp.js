@@ -87,16 +87,24 @@ export function evaluateProp({
         evaluation: {
 
             sportacularScore:
-                edge?.score ?? scoredProp.score ?? 0,
+                isBettingModelEligible
+                    ? (edge?.score ?? scoredProp.score ?? null)
+                    : null,
 
             modelEdge:
-                edge?.edgePercent ?? 0,
+                isBettingModelEligible
+                    ? (edge?.edgePercent ?? null)
+                    : null,
 
             confidence:
-                edge?.confidence ?? "Unknown",
+                isBettingModelEligible
+                    ? (edge?.confidence ?? "Unknown")
+                    : "Low",
 
             recommendation:
-                edge?.recommendation ?? "None"
+                isBettingModelEligible
+                    ? (edge?.recommendation ?? "None")
+                    : "Unavailable"
 
         }
 
