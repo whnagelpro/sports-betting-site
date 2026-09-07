@@ -206,24 +206,26 @@ const games = Number(
                     prop.Type ?? ""
                 ).toLowerCase();
 
-            const oddsFormat =
-
-                type === "milestone"
-
-                    ? "decimal"
-
-                    : "american";
+            const oddsFormat = "american";
 
             const odds =
 
-                oddsFormat === "decimal"
+                type === "milestone"
 
-                    ? Number(
-                        prop["Decimal Odds"] ?? 0
+                    ? (
+                        prop["Odds"] !== undefined &&
+                        prop["Odds"] !== null &&
+                        prop["Odds"] !== ""
+                            ? Number(prop["Odds"])
+                            : null
                     )
 
-                    : Number(
-                        prop["Over Odds"] ?? 0
+                    : (
+                        prop["Over Odds"] !== undefined &&
+                        prop["Over Odds"] !== null &&
+                        prop["Over Odds"] !== ""
+                            ? Number(prop["Over Odds"])
+                            : null
                     );
 
             return {

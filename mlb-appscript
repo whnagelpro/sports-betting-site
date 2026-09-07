@@ -4023,6 +4023,969 @@ function backtestMLBLambdaWeights() {
 
 }
 
+function backtestMLBHitsRunsRBIsModels() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const logsSheet =
+    ss.getSheetByName("MLB Player Game Logs");
+
+  if (!logsSheet) {
+    throw new Error(
+      'Sheet "MLB Player Game Logs" not found.'
+    );
+  }
+
+  const values =
+    logsSheet.getDataRange().getValues();
+
+  if (values.length < 12) {
+    throw new Error(
+      "Not enough MLB Player Game Logs to run H+R+RBI backtest."
+    );
+  }
+
+  const header = values[0];
+
+  const playerIdCol =
+    header.indexOf("Player ID");
+
+  const gameDateCol =
+    header.indexOf("Game Date");
+
+  const hitsCol =
+    header.indexOf("Hits");
+
+  const runsCol =
+    header.indexOf("Runs");
+
+  const rbisCol =
+    header.indexOf("RBIs");
+
+  if (
+    playerIdCol === -1 ||
+    gameDateCol === -1 ||
+    hitsCol === -1 ||
+    runsCol === -1 ||
+    rbisCol === -1
+  ) {
+    throw new Error(
+      "Required Player ID, Game Date, Hits, Runs, or RBIs column not found."
+    );
+  }
+
+  const playerGames = {};
+
+  for (let i = 1; i < values.length; i++) {
+
+    const row = values[i];
+
+    const playerId =
+      String(row[playerIdCol] || "");
+
+    if (!playerId) continue;
+
+    if (!playerGames[playerId]) {
+      playerGames[playerId] = [];
+    }
+
+    playerGames[playerId].push(row);
+  }
+
+  Object.values(playerGames)
+    .forEach(games => {
+
+      games.sort((a, b) => {
+        return (
+          new Date(a[gameDateCol]) -
+          new Date(b[gameDateCol])
+        );
+      });
+
+    });
+
+  const models = [
+    {
+      name: "Direct Season H+R+RBI Avg",
+      type: "direct_season"
+    },
+    {
+      name: "Sum Season Hits + Runs + RBIs",
+      type: "component_season"
+    }
+  ];
+
+  /*
+   * Candidate recent-form weights for the
+   * direct H+R+RBI model.
+   *
+   * 100/0 is already represented by the
+   * Direct Season model above, so these
+   * test increasing amounts of Last-10 form.
+   */
+  for (
+    let recentPercent = 5;
+    recentPercent <= 50;
+    recentPercent += 5
+  ) {
+
+    models.push({
+      name:
+        "Direct H+R+RBI " +
+        (100 - recentPercent) +
+        "/" +
+        recentPercent,
+      type: "direct_blend",
+      season:
+        (100 - recentPercent) / 100,
+      recent:
+        recentPercent / 100
+    });
+
+  }
+
+  const results = models.map(model => {
+
+    let absoluteError = 0;
+    let squaredError = 0;
+    let predictions = 0;
+
+    Object.values(playerGames)
+      .forEach(games => {
+
+        /*
+         * Require at least 11 previous games.
+         * This matches our existing Lambda
+         * backtest structure and ensures a
+         * full previous Last-10 sample.
+         */
+        for (
+          let targetIndex = 11;
+          targetIndex < games.length;
+          targetIndex++
+        ) {
+
+          const previousGames =
+            games.slice(0, targetIndex);
+
+          const recentGames =
+            previousGames.slice(-10);
+
+          const actualRow =
+            games[targetIndex];
+
+          const actualHits =
+            Number(actualRow[hitsCol]);
+
+          const actualRuns =
+            Number(actualRow[runsCol]);
+
+          const actualRBIs =
+            Number(actualRow[rbisCol]);
+
+          if (
+            !Number.isFinite(actualHits) ||
+            !Number.isFinite(actualRuns) ||
+            !Number.isFinite(actualRBIs)
+          ) {
+            continue;
+          }
+
+          const actual =
+            actualHits +
+            actualRuns +
+            actualRBIs;
+
+          const seasonCompositeValues =
+            previousGames
+              .map(row => {
+
+                const hits =
+                  Number(row[hitsCol]);
+
+                const runs =
+                  Number(row[runsCol]);
+
+                const rbis =
+                  Number(row[rbisCol]);
+
+                if (
+                  !Number.isFinite(hits) ||
+                  !Number.isFinite(runs) ||
+                  !Number.isFinite(rbis)
+                ) {
+                  return null;
+                }
+
+                return hits + runs + rbis;
+              })
+              .filter(Number.isFinite);
+
+          const recentCompositeValues =
+            recentGames
+              .map(row => {
+
+                const hits =
+                  Number(row[hitsCol]);
+
+                const runs =
+                  Number(row[runsCol]);
+
+                const rbis =
+                  Number(row[rbisCol]);
+
+                if (
+                  !Number.isFinite(hits) ||
+                  !Number.isFinite(runs) ||
+                  !Number.isFinite(rbis)
+                ) {
+                  return null;
+                }
+
+                return hits + runs + rbis;
+              })
+              .filter(Number.isFinite);
+
+          if (
+            !seasonCompositeValues.length ||
+            !recentCompositeValues.length
+          ) {
+            continue;
+          }
+
+          const seasonCompositeAvg =
+            seasonCompositeValues.reduce(
+              (sum, value) => sum + value,
+              0
+            ) /
+            seasonCompositeValues.length;
+
+          const recentCompositeAvg =
+            recentCompositeValues.reduce(
+              (sum, value) => sum + value,
+              0
+            ) /
+            recentCompositeValues.length;
+
+          let prediction = null;
+
+          if (
+            model.type === "direct_season"
+          ) {
+
+            prediction =
+              seasonCompositeAvg;
+
+          }
+
+          else if (
+            model.type === "component_season"
+          ) {
+
+            const validPrevious =
+              previousGames.filter(row => {
+
+                return (
+                  Number.isFinite(
+                    Number(row[hitsCol])
+                  ) &&
+                  Number.isFinite(
+                    Number(row[runsCol])
+                  ) &&
+                  Number.isFinite(
+                    Number(row[rbisCol])
+                  )
+                );
+
+              });
+
+            if (!validPrevious.length) {
+              continue;
+            }
+
+            const avgHits =
+              validPrevious.reduce(
+                (sum, row) =>
+                  sum + Number(row[hitsCol]),
+                0
+              ) /
+              validPrevious.length;
+
+            const avgRuns =
+              validPrevious.reduce(
+                (sum, row) =>
+                  sum + Number(row[runsCol]),
+                0
+              ) /
+              validPrevious.length;
+
+            const avgRBIs =
+              validPrevious.reduce(
+                (sum, row) =>
+                  sum + Number(row[rbisCol]),
+                0
+              ) /
+              validPrevious.length;
+
+            prediction =
+              avgHits +
+              avgRuns +
+              avgRBIs;
+
+          }
+
+          else if (
+            model.type === "direct_blend"
+          ) {
+
+            prediction =
+              (
+                seasonCompositeAvg *
+                model.season
+              ) +
+              (
+                recentCompositeAvg *
+                model.recent
+              );
+
+          }
+
+          if (
+            !Number.isFinite(prediction)
+          ) {
+            continue;
+          }
+
+          const error =
+            prediction - actual;
+
+          absoluteError +=
+            Math.abs(error);
+
+          squaredError +=
+            error * error;
+
+          predictions++;
+
+        }
+
+      });
+
+    if (!predictions) {
+      return null;
+    }
+
+    return {
+      name: model.name,
+      type: model.type,
+      seasonWeight:
+        model.type === "direct_blend"
+          ? model.season
+          : (
+              model.type === "direct_season" ||
+              model.type === "component_season"
+                ? 1
+                : ""
+            ),
+      recentWeight:
+        model.type === "direct_blend"
+          ? model.recent
+          : 0,
+      predictions,
+      mae:
+        absoluteError / predictions,
+      rmse:
+        Math.sqrt(
+          squaredError / predictions
+        )
+    };
+
+  }).filter(Boolean);
+
+  if (!results.length) {
+    throw new Error(
+      "H+R+RBI backtest produced no valid predictions."
+    );
+  }
+
+  const baseline =
+    results.find(
+      result =>
+        result.type === "direct_season"
+    );
+
+  const bestMAE =
+    results.reduce(
+      (best, result) =>
+        !best || result.mae < best.mae
+          ? result
+          : best,
+      null
+    );
+
+  const bestRMSE =
+    results.reduce(
+      (best, result) =>
+        !best || result.rmse < best.rmse
+          ? result
+          : best,
+      null
+    );
+
+  const outputSheetName =
+    "MLB H+R+RBI Backtest";
+
+  let outputSheet =
+    ss.getSheetByName(outputSheetName);
+
+  if (!outputSheet) {
+    outputSheet =
+      ss.insertSheet(outputSheetName);
+  }
+
+  outputSheet.clearContents();
+
+  const output = [[
+    "Model",
+    "Season Weight",
+    "Last 10 Weight",
+    "Predictions",
+    "MAE",
+    "RMSE",
+    "MAE Improvement vs Direct Season",
+    "RMSE Improvement vs Direct Season",
+    "Best MAE?",
+    "Best RMSE?"
+  ]];
+
+  results.forEach(result => {
+
+    let maeImprovement = "";
+    let rmseImprovement = "";
+
+    if (
+      baseline &&
+      baseline.mae > 0
+    ) {
+
+      maeImprovement =
+        (
+          baseline.mae -
+          result.mae
+        ) /
+        baseline.mae;
+
+    }
+
+    if (
+      baseline &&
+      baseline.rmse > 0
+    ) {
+
+      rmseImprovement =
+        (
+          baseline.rmse -
+          result.rmse
+        ) /
+        baseline.rmse;
+
+    }
+
+    output.push([
+      result.name,
+      result.seasonWeight,
+      result.recentWeight,
+      result.predictions,
+      result.mae,
+      result.rmse,
+      maeImprovement,
+      rmseImprovement,
+      result === bestMAE
+        ? "YES"
+        : "",
+      result === bestRMSE
+        ? "YES"
+        : ""
+    ]);
+
+  });
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      output.length,
+      output[0].length
+    )
+    .setValues(output);
+
+  outputSheet
+    .getRange(
+      2,
+      2,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0%");
+
+  outputSheet
+    .getRange(
+      2,
+      5,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0.0000");
+
+  outputSheet
+    .getRange(
+      2,
+      7,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0.000%");
+
+  outputSheet.autoResizeColumns(
+    1,
+    output[0].length
+  );
+
+  Logger.log(
+    "MLB H+R+RBI backtest complete."
+  );
+
+}
+
+function validateMLBHitsRunsRBIsHoldout() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const logsSheet =
+    ss.getSheetByName("MLB Player Game Logs");
+
+  if (!logsSheet) {
+    throw new Error(
+      'Sheet "MLB Player Game Logs" not found.'
+    );
+  }
+
+  const values =
+    logsSheet.getDataRange().getValues();
+
+  if (values.length < 12) {
+    throw new Error(
+      "Not enough MLB Player Game Logs to run H+R+RBI holdout."
+    );
+  }
+
+  const header = values[0];
+
+  const playerIdCol =
+    header.indexOf("Player ID");
+
+  const gameDateCol =
+    header.indexOf("Game Date");
+
+  const hitsCol =
+    header.indexOf("Hits");
+
+  const runsCol =
+    header.indexOf("Runs");
+
+  const rbisCol =
+    header.indexOf("RBIs");
+
+  if (
+    playerIdCol === -1 ||
+    gameDateCol === -1 ||
+    hitsCol === -1 ||
+    runsCol === -1 ||
+    rbisCol === -1
+  ) {
+    throw new Error(
+      "Required Player ID, Game Date, Hits, Runs, or RBIs column not found."
+    );
+  }
+
+  const playerGames = {};
+
+  for (let i = 1; i < values.length; i++) {
+
+    const row = values[i];
+
+    const playerId =
+      String(row[playerIdCol] || "");
+
+    if (!playerId) continue;
+
+    if (!playerGames[playerId]) {
+      playerGames[playerId] = [];
+    }
+
+    playerGames[playerId].push(row);
+  }
+
+  Object.values(playerGames)
+    .forEach(games => {
+
+      games.sort((a, b) => {
+        return (
+          new Date(a[gameDateCol]) -
+          new Date(b[gameDateCol])
+        );
+      });
+
+    });
+
+  const models = [
+    {
+      name: "Season Only 100/0",
+      season: 1.00,
+      recent: 0.00
+    },
+    {
+      name: "Season + Last 10 95/5",
+      season: 0.95,
+      recent: 0.05
+    },
+    {
+      name: "Season + Last 10 90/10",
+      season: 0.90,
+      recent: 0.10
+    }
+  ];
+
+  const results = models.map(model => {
+
+    let absoluteError = 0;
+    let squaredError = 0;
+    let predictions = 0;
+
+    Object.values(playerGames)
+      .forEach(games => {
+
+        /*
+         * Use the earlier 75% of each player's
+         * chronological games as the initial
+         * training period.
+         *
+         * Predictions are scored only on the
+         * later 25% holdout period.
+         */
+        const holdoutStart =
+          Math.floor(games.length * 0.75);
+
+        if (holdoutStart < 11) {
+          return;
+        }
+
+        for (
+          let targetIndex = holdoutStart;
+          targetIndex < games.length;
+          targetIndex++
+        ) {
+
+          const previousGames =
+            games.slice(0, targetIndex);
+
+          const recentGames =
+            previousGames.slice(-10);
+
+          if (
+            previousGames.length < 11 ||
+            recentGames.length < 10
+          ) {
+            continue;
+          }
+
+          const actualRow =
+            games[targetIndex];
+
+          const actualHits =
+            Number(actualRow[hitsCol]);
+
+          const actualRuns =
+            Number(actualRow[runsCol]);
+
+          const actualRBIs =
+            Number(actualRow[rbisCol]);
+
+          if (
+            !Number.isFinite(actualHits) ||
+            !Number.isFinite(actualRuns) ||
+            !Number.isFinite(actualRBIs)
+          ) {
+            continue;
+          }
+
+          const actual =
+            actualHits +
+            actualRuns +
+            actualRBIs;
+
+          const seasonValues =
+            previousGames
+              .map(row => {
+
+                const hits =
+                  Number(row[hitsCol]);
+
+                const runs =
+                  Number(row[runsCol]);
+
+                const rbis =
+                  Number(row[rbisCol]);
+
+                if (
+                  !Number.isFinite(hits) ||
+                  !Number.isFinite(runs) ||
+                  !Number.isFinite(rbis)
+                ) {
+                  return null;
+                }
+
+                return hits + runs + rbis;
+              })
+              .filter(Number.isFinite);
+
+          const recentValues =
+            recentGames
+              .map(row => {
+
+                const hits =
+                  Number(row[hitsCol]);
+
+                const runs =
+                  Number(row[runsCol]);
+
+                const rbis =
+                  Number(row[rbisCol]);
+
+                if (
+                  !Number.isFinite(hits) ||
+                  !Number.isFinite(runs) ||
+                  !Number.isFinite(rbis)
+                ) {
+                  return null;
+                }
+
+                return hits + runs + rbis;
+              })
+              .filter(Number.isFinite);
+
+          if (
+            !seasonValues.length ||
+            !recentValues.length
+          ) {
+            continue;
+          }
+
+          const seasonAverage =
+            seasonValues.reduce(
+              (sum, value) => sum + value,
+              0
+            ) /
+            seasonValues.length;
+
+          const recentAverage =
+            recentValues.reduce(
+              (sum, value) => sum + value,
+              0
+            ) /
+            recentValues.length;
+
+          const prediction =
+            (
+              seasonAverage *
+              model.season
+            ) +
+            (
+              recentAverage *
+              model.recent
+            );
+
+          if (!Number.isFinite(prediction)) {
+            continue;
+          }
+
+          const error =
+            prediction - actual;
+
+          absoluteError +=
+            Math.abs(error);
+
+          squaredError +=
+            error * error;
+
+          predictions++;
+
+        }
+
+      });
+
+    if (!predictions) {
+      return null;
+    }
+
+    return {
+      name: model.name,
+      seasonWeight: model.season,
+      recentWeight: model.recent,
+      predictions,
+      mae:
+        absoluteError / predictions,
+      rmse:
+        Math.sqrt(
+          squaredError / predictions
+        )
+    };
+
+  }).filter(Boolean);
+
+  if (!results.length) {
+    throw new Error(
+      "H+R+RBI holdout produced no valid predictions."
+    );
+  }
+
+  const baseline =
+    results.find(
+      result =>
+        result.seasonWeight === 1 &&
+        result.recentWeight === 0
+    );
+
+  const bestMAE =
+    results.reduce(
+      (best, result) =>
+        !best || result.mae < best.mae
+          ? result
+          : best,
+      null
+    );
+
+  const bestRMSE =
+    results.reduce(
+      (best, result) =>
+        !best || result.rmse < best.rmse
+          ? result
+          : best,
+      null
+    );
+
+  const outputSheetName =
+    "MLB H+R+RBI Holdout";
+
+  let outputSheet =
+    ss.getSheetByName(outputSheetName);
+
+  if (!outputSheet) {
+    outputSheet =
+      ss.insertSheet(outputSheetName);
+  }
+
+  outputSheet.clearContents();
+
+  const output = [[
+    "Model",
+    "Season Weight",
+    "Last 10 Weight",
+    "Predictions",
+    "MAE",
+    "RMSE",
+    "MAE Improvement vs Season Only",
+    "RMSE Improvement vs Season Only",
+    "Best MAE?",
+    "Best RMSE?"
+  ]];
+
+  results.forEach(result => {
+
+    const maeImprovement =
+      baseline && baseline.mae > 0
+        ? (
+            baseline.mae -
+            result.mae
+          ) /
+          baseline.mae
+        : "";
+
+    const rmseImprovement =
+      baseline && baseline.rmse > 0
+        ? (
+            baseline.rmse -
+            result.rmse
+          ) /
+          baseline.rmse
+        : "";
+
+    output.push([
+      result.name,
+      result.seasonWeight,
+      result.recentWeight,
+      result.predictions,
+      result.mae,
+      result.rmse,
+      maeImprovement,
+      rmseImprovement,
+      result === bestMAE
+        ? "YES"
+        : "",
+      result === bestRMSE
+        ? "YES"
+        : ""
+    ]);
+
+  });
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      output.length,
+      output[0].length
+    )
+    .setValues(output);
+
+  outputSheet
+    .getRange(
+      2,
+      2,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0%");
+
+  outputSheet
+    .getRange(
+      2,
+      5,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0.0000");
+
+  outputSheet
+    .getRange(
+      2,
+      7,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0.000%");
+
+  outputSheet.autoResizeColumns(
+    1,
+    output[0].length
+  );
+
+  Logger.log(
+    "MLB H+R+RBI chronological holdout complete."
+  );
+
+}
+
 function validateMLBLambdaWeightsHoldout() {
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -4779,6 +5742,19 @@ function refreshMLBPlayerPropsSheet() {
       const trend =
         trendMap[trendKey] || null;
 
+      if (!trend) {
+
+        Logger.log(
+          "LAMBDA TREND MISS | " +
+          "playerId=" + playerId +
+          " | propType=" + propType +
+          " | normalized=" +
+            normalizeMLBStatType_(propType) +
+          " | trendKey=" + trendKey
+        );
+
+      }
+
       const trendScore =
         trend ? trend.trendScore : "";
 
@@ -4845,7 +5821,12 @@ function refreshMLBPlayerPropsSheet() {
         stolen_bases: {
           season: 1.00,
           recent: 0.00
-        }
+        },
+
+        hits_runs_rbis: {
+          season: 0.95,
+          recent: 0.05
+        },
 
       };
 
@@ -4853,6 +5834,21 @@ function refreshMLBPlayerPropsSheet() {
         lambdaWeightsByMarket[
           normalizedPropType
         ] || null;
+
+      if (
+        trend &&
+        !lambdaWeights
+      ) {
+
+        Logger.log(
+          "LAMBDA MARKET MISS | " +
+          "playerId=" + playerId +
+          " | propType=" + propType +
+          " | normalized=" +
+            normalizedPropType
+        );
+
+      }
 
       let modelLambda = "";
 
@@ -4929,6 +5925,29 @@ function refreshMLBPlayerPropsSheet() {
       const underOdds =
         (prop.market && prop.market.under_odds) ||
         "";
+
+      if (
+        normalizedPropType === "home_runs" ||
+        normalizedPropType === "hits" ||
+        normalizedPropType === "runs"
+      ) {
+
+        Logger.log(
+          "LAMBDA CHECK | " +
+          "playerId=" + playerId +
+          " | market=" +
+            normalizedPropType +
+          " | trend=" +
+            (trend ? "FOUND" : "MISSING") +
+          " | seasonAvg=" +
+            (trend ? trend.seasonAvg : "NA") +
+          " | last10Avg=" +
+            (trend ? trend.last10Avg : "NA") +
+          " | modelLambda=" +
+            modelLambda
+        );
+
+      }
 
       allRows.push([
       game.id,
