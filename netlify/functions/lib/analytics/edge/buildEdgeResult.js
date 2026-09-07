@@ -130,20 +130,29 @@ export function buildEdgeResult({
 
 }) {
 
-    const modelProbability =
+    const hasModelProbability =
+        probability !== null &&
+        probability !== undefined &&
+        probability !== "";
 
-        Number(probability);
+    const hasSportsbookProbability =
+        impliedProbability !== null &&
+        impliedProbability !== undefined &&
+        impliedProbability !== "";
+
+    const modelProbability =
+        hasModelProbability
+            ? Number(probability)
+            : NaN;
 
     const sportsbookProbability =
-
-        Number(impliedProbability);
+        hasSportsbookProbability
+            ? Number(impliedProbability)
+            : NaN;
 
     if (
-
         !Number.isFinite(modelProbability) ||
-
         !Number.isFinite(sportsbookProbability)
-
     ) {
 
         return {

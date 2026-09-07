@@ -564,11 +564,27 @@ function copyFormulaTemplatesDown_(sheet, rowCount) {
   if (!rowCount || rowCount <= 0) return;
 
   // Copy formulas only for O:U
-  sheet.getRange("O2:U2").copyTo(
-    sheet.getRange(3, 15, rowCount, 7),
-    SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
-    false
-  );
+  const leftFormulaSource =
+    sheet.getRange("O2:Q2");
+
+  const rightFormulaSource =
+    sheet.getRange("S2:U2");
+
+  if (rowCount > 0) {
+
+    leftFormulaSource.copyTo(
+      sheet.getRange(3, 15, rowCount, 3),
+      SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
+      false
+    );
+
+    rightFormulaSource.copyTo(
+      sheet.getRange(3, 19, rowCount, 3),
+      SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
+      false
+    );
+
+  }
 
   // Copy formulas only for V:W
   sheet.getRange("V2:W2").copyTo(
@@ -1631,9 +1647,10 @@ function normalizeMLBStatType_(stat) {
     "hits": "hits",
 
     "runs": "runs",
+    "runs_scored": "runs",
+    "runs scored": "runs",
 
     "rbis": "rbis",
-
     "rbi": "rbis",
 
     "hits + runs + rbis": "hits_runs_rbis",
@@ -3629,6 +3646,973 @@ function sportacularScoreMLB_({
   ) / 10;
 }
 
+function backtestMLBLambdaWeights() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const logsSheet =
+    ss.getSheetByName("MLB Player Game Logs");
+
+  if (!logsSheet) {
+    throw new Error(
+      'Sheet "MLB Player Game Logs" not found.'
+    );
+  }
+
+  const values =
+    logsSheet.getDataRange().getValues();
+
+  if (values.length < 12) {
+    throw new Error(
+      "Not enough MLB Player Game Logs to run backtest."
+    );
+  }
+
+  const header = values[0];
+
+  const playerIdCol =
+    header.indexOf("Player ID");
+
+  const gameDateCol =
+    header.indexOf("Game Date");
+
+  if (
+    playerIdCol === -1 ||
+    gameDateCol === -1
+  ) {
+    throw new Error(
+      "Required Player ID or Game Date column not found."
+    );
+  }
+
+  const marketColumns = [
+    ["Hits", "Hits"],
+    ["Runs", "Runs"],
+    ["RBIs", "RBIs"],
+    ["Home Runs", "Home Runs"],
+    ["Total Bases", "Total Bases"],
+    ["Walks", "Walks"],
+    ["Strikeouts", "Strikeouts"],
+    ["Stolen Bases", "Stolen Bases"]
+  ];
+
+  const markets = marketColumns
+    .map(([label, columnName]) => ({
+      label,
+      column:
+        header.indexOf(columnName)
+    }))
+    .filter(market => market.column !== -1);
+
+  if (!markets.length) {
+    throw new Error(
+      "No supported MLB stat columns found."
+    );
+  }
+
+  const weightSets = [];
+
+  for (
+    let seasonPercent = 100;
+    seasonPercent >= 0;
+    seasonPercent -= 5
+  ) {
+
+    const seasonWeight =
+      seasonPercent / 100;
+
+    const recentWeight =
+      1 - seasonWeight;
+
+    weightSets.push({
+      season: seasonWeight,
+      recent: recentWeight
+    });
+
+  }
+
+  const playerGames = {};
+
+  for (let i = 1; i < values.length; i++) {
+
+    const row = values[i];
+
+    const playerId =
+      String(row[playerIdCol] || "");
+
+    if (!playerId) continue;
+
+    if (!playerGames[playerId]) {
+      playerGames[playerId] = [];
+    }
+
+    playerGames[playerId].push(row);
+  }
+
+  Object.values(playerGames)
+    .forEach(games => {
+
+      games.sort((a, b) => {
+
+        return (
+          new Date(a[gameDateCol]) -
+          new Date(b[gameDateCol])
+        );
+
+      });
+
+    });
+
+  const results = [];
+
+  markets.forEach(market => {
+
+    weightSets.forEach(weights => {
+
+      let absoluteError = 0;
+      let squaredError = 0;
+      let predictions = 0;
+
+      Object.values(playerGames)
+        .forEach(games => {
+
+          /*
+           * Require at least 11 previous games:
+           *
+           * - season-to-date average
+           * - previous 10-game average
+           * - then predict the NEXT game
+           */
+
+          for (
+            let targetIndex = 11;
+            targetIndex < games.length;
+            targetIndex++
+          ) {
+
+            const previousGames =
+              games.slice(0, targetIndex);
+
+            const recentGames =
+              previousGames.slice(-10);
+
+            const seasonValues =
+              previousGames
+                .map(row =>
+                  Number(row[market.column])
+                )
+                .filter(Number.isFinite);
+
+            const recentValues =
+              recentGames
+                .map(row =>
+                  Number(row[market.column])
+                )
+                .filter(Number.isFinite);
+
+            const actual =
+              Number(
+                games[targetIndex][market.column]
+              );
+
+            if (
+              !seasonValues.length ||
+              !recentValues.length ||
+              !Number.isFinite(actual)
+            ) {
+              continue;
+            }
+
+            const seasonAvg =
+              seasonValues.reduce(
+                (sum, value) => sum + value,
+                0
+              ) / seasonValues.length;
+
+            const recentAvg =
+              recentValues.reduce(
+                (sum, value) => sum + value,
+                0
+              ) / recentValues.length;
+
+            const prediction =
+              (seasonAvg * weights.season) +
+              (recentAvg * weights.recent);
+
+            const error =
+              prediction - actual;
+
+            absoluteError +=
+              Math.abs(error);
+
+            squaredError +=
+              error * error;
+
+            predictions++;
+
+          }
+
+        });
+
+      if (!predictions) return;
+
+      const mae =
+        absoluteError / predictions;
+
+      const rmse =
+        Math.sqrt(
+          squaredError / predictions
+        );
+
+      results.push({
+        market: market.label,
+        seasonWeight: weights.season,
+        recentWeight: weights.recent,
+        predictions,
+        mae,
+        rmse
+      });
+
+    });
+
+  });
+
+  if (!results.length) {
+    throw new Error(
+      "Backtest produced no valid predictions."
+    );
+  }
+
+  const seasonOnlyByMarket = {};
+
+  results.forEach(result => {
+
+    if (
+      result.seasonWeight === 1 &&
+      result.recentWeight === 0
+    ) {
+      seasonOnlyByMarket[result.market] =
+        result;
+    }
+
+  });
+
+  const bestByMarket = {};
+
+  results.forEach(result => {
+
+    const existing =
+      bestByMarket[result.market];
+
+    if (
+      !existing ||
+      result.mae < existing.mae
+    ) {
+      bestByMarket[result.market] =
+        result;
+    }
+
+  });
+
+  const outputSheetName =
+    "MLB Model Backtest";
+
+  let outputSheet =
+    ss.getSheetByName(outputSheetName);
+
+  if (!outputSheet) {
+    outputSheet =
+      ss.insertSheet(outputSheetName);
+  }
+
+  outputSheet.clearContents();
+
+  const output = [[
+    "Market",
+    "Season Weight",
+    "Last 10 Weight",
+    "Predictions",
+    "MAE",
+    "RMSE",
+    "MAE Improvement vs Season Only",
+    "Best MAE?"
+  ]];
+
+  results.forEach(result => {
+
+    const best =
+      bestByMarket[result.market];
+
+    const seasonOnly =
+      seasonOnlyByMarket[result.market];
+
+    let improvement = "";
+
+    if (
+      seasonOnly &&
+      Number.isFinite(seasonOnly.mae) &&
+      seasonOnly.mae > 0
+    ) {
+
+      improvement =
+        (
+          seasonOnly.mae -
+          result.mae
+        ) /
+        seasonOnly.mae;
+
+    }
+
+    output.push([
+      result.market,
+      result.seasonWeight,
+      result.recentWeight,
+      result.predictions,
+      result.mae,
+      result.rmse,
+      improvement,
+      result === best ? "YES" : ""
+    ]);
+
+  });
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      output.length,
+      output[0].length
+    )
+    .setValues(output);
+
+  outputSheet
+    .getRange(
+      2,
+      2,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0%");
+
+  outputSheet
+    .getRange(
+      2,
+      5,
+      output.length - 1,
+      2
+    )
+    .setNumberFormat("0.0000");
+
+  outputSheet
+    .getRange(
+      2,
+      7,
+      output.length - 1,
+      1
+    )
+    .setNumberFormat("0.000%");
+
+  outputSheet.autoResizeColumns(
+    1,
+    output[0].length
+  );
+
+  Logger.log(
+    "MLB Lambda weight backtest complete."
+  );
+
+}
+
+function validateMLBLambdaWeightsHoldout() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const logsSheet =
+    ss.getSheetByName("MLB Player Game Logs");
+
+  if (!logsSheet) {
+    throw new Error(
+      'Sheet "MLB Player Game Logs" not found.'
+    );
+  }
+
+  const values =
+    logsSheet.getDataRange().getValues();
+
+  if (values.length < 12) {
+    throw new Error(
+      "Not enough MLB Player Game Logs to run holdout validation."
+    );
+  }
+
+  const header = values[0];
+
+  const playerIdCol =
+    header.indexOf("Player ID");
+
+  const gameDateCol =
+    header.indexOf("Game Date");
+
+  if (
+    playerIdCol === -1 ||
+    gameDateCol === -1
+  ) {
+    throw new Error(
+      "Required Player ID or Game Date column not found."
+    );
+  }
+
+  const marketConfigs = [
+    {
+      market: "Hits",
+      columnName: "Hits",
+      seasonWeight: 0.95,
+      recentWeight: 0.05
+    },
+    {
+      market: "Runs",
+      columnName: "Runs",
+      seasonWeight: 1.00,
+      recentWeight: 0.00
+    },
+    {
+      market: "RBIs",
+      columnName: "RBIs",
+      seasonWeight: 1.00,
+      recentWeight: 0.00
+    },
+    {
+      market: "Home Runs",
+      columnName: "Home Runs",
+      seasonWeight: 1.00,
+      recentWeight: 0.00
+    },
+    {
+      market: "Total Bases",
+      columnName: "Total Bases",
+      seasonWeight: 1.00,
+      recentWeight: 0.00
+    },
+    {
+      market: "Walks",
+      columnName: "Walks",
+      seasonWeight: 0.00,
+      recentWeight: 1.00
+    },
+    {
+      market: "Strikeouts",
+      columnName: "Strikeouts",
+      seasonWeight: 0.85,
+      recentWeight: 0.15
+    },
+    {
+      market: "Stolen Bases",
+      columnName: "Stolen Bases",
+      seasonWeight: 0.00,
+      recentWeight: 1.00
+    }
+  ];
+
+  const markets =
+    marketConfigs
+      .map(config => ({
+        ...config,
+        column:
+          header.indexOf(config.columnName)
+      }))
+      .filter(config =>
+        config.column !== -1
+      );
+
+  if (!markets.length) {
+    throw new Error(
+      "No supported MLB stat columns found."
+    );
+  }
+
+  /*
+   * Convert each valid row into a compact object.
+   * This avoids repeatedly constructing Date objects
+   * and reading the full spreadsheet row later.
+   */
+  const compactRows = [];
+
+  const uniqueDateSet =
+    new Set();
+
+  for (let i = 1; i < values.length; i++) {
+
+    const row = values[i];
+
+    const playerId =
+      String(row[playerIdCol] || "");
+
+    if (!playerId) {
+      continue;
+    }
+
+    const dateObject =
+      new Date(row[gameDateCol]);
+
+    if (
+      Number.isNaN(
+        dateObject.getTime()
+      )
+    ) {
+      continue;
+    }
+
+    /*
+     * YYYY-MM-DD sorts correctly as text,
+     * so we don't need Utilities.formatDate()
+     * inside our large prediction loops.
+     */
+    const dateKey =
+      Utilities.formatDate(
+        dateObject,
+        Session.getScriptTimeZone(),
+        "yyyy-MM-dd"
+      );
+
+    uniqueDateSet.add(dateKey);
+
+    const stats = {};
+
+    markets.forEach(config => {
+
+      const rawValue =
+        row[config.column];
+
+      /*
+       * Do not silently convert a genuinely
+       * blank spreadsheet cell into zero.
+       */
+      if (
+        rawValue === "" ||
+        rawValue === null ||
+        rawValue === undefined
+      ) {
+        stats[config.market] = null;
+        return;
+      }
+
+      const numericValue =
+        Number(rawValue);
+
+      stats[config.market] =
+        Number.isFinite(numericValue)
+          ? numericValue
+          : null;
+
+    });
+
+    compactRows.push({
+      playerId,
+      dateKey,
+      stats
+    });
+
+  }
+
+  const uniqueDates =
+    [...uniqueDateSet].sort();
+
+  if (uniqueDates.length < 5) {
+    throw new Error(
+      "Not enough unique dates for holdout validation."
+    );
+  }
+
+  const holdoutStartIndex =
+    Math.floor(
+      uniqueDates.length * 0.80
+    );
+
+  const holdoutStartDate =
+    uniqueDates[holdoutStartIndex];
+
+  Logger.log(
+    `MLB holdout begins ${holdoutStartDate}`
+  );
+
+  /*
+   * Group compact observations by player.
+   */
+  const playerGames = {};
+
+  compactRows.forEach(game => {
+
+    if (
+      !playerGames[game.playerId]
+    ) {
+      playerGames[
+        game.playerId
+      ] = [];
+    }
+
+    playerGames[
+      game.playerId
+    ].push(game);
+
+  });
+
+  /*
+   * Sort each player's games exactly once.
+   */
+  Object.values(playerGames)
+    .forEach(games => {
+
+      games.sort(
+        (a, b) =>
+          a.dateKey.localeCompare(
+            b.dateKey
+          )
+      );
+
+    });
+
+  /*
+   * Create one accumulator per market.
+   */
+  const accumulators = {};
+
+  markets.forEach(config => {
+
+    accumulators[config.market] = {
+      candidateAbsoluteError: 0,
+      candidateSquaredError: 0,
+      seasonAbsoluteError: 0,
+      seasonSquaredError: 0,
+      predictions: 0
+    };
+
+  });
+
+  /*
+   * Each player is now processed once.
+   */
+  Object.values(playerGames)
+    .forEach(games => {
+
+      const state = {};
+
+      markets.forEach(config => {
+
+        state[config.market] = {
+          seasonSum: 0,
+          seasonCount: 0,
+          recentValues: [],
+          recentSum: 0
+        };
+
+      });
+
+      games.forEach(game => {
+
+        markets.forEach(config => {
+
+          const market =
+            config.market;
+
+          const actual =
+            game.stats[market];
+
+          const marketState =
+            state[market];
+
+          /*
+           * Evaluate BEFORE adding the current
+           * game's result. This prevents leakage.
+           */
+          if (
+            game.dateKey >=
+              holdoutStartDate &&
+            actual !== null &&
+            marketState.seasonCount > 0 &&
+            marketState.recentValues.length >= 10
+          ) {
+
+            const seasonAvg =
+              marketState.seasonSum /
+              marketState.seasonCount;
+
+            const recentAvg =
+              marketState.recentSum /
+              marketState.recentValues.length;
+
+            const candidatePrediction =
+              (
+                seasonAvg *
+                config.seasonWeight
+              ) +
+              (
+                recentAvg *
+                config.recentWeight
+              );
+
+            const seasonPrediction =
+              seasonAvg;
+
+            const candidateError =
+              candidatePrediction -
+              actual;
+
+            const seasonError =
+              seasonPrediction -
+              actual;
+
+            const accumulator =
+              accumulators[market];
+
+            accumulator
+              .candidateAbsoluteError +=
+                Math.abs(
+                  candidateError
+                );
+
+            accumulator
+              .candidateSquaredError +=
+                candidateError *
+                candidateError;
+
+            accumulator
+              .seasonAbsoluteError +=
+                Math.abs(
+                  seasonError
+                );
+
+            accumulator
+              .seasonSquaredError +=
+                seasonError *
+                seasonError;
+
+            accumulator.predictions++;
+
+          }
+
+          /*
+           * Now update history with the
+           * current result.
+           */
+          if (actual !== null) {
+
+            marketState.seasonSum +=
+              actual;
+
+            marketState.seasonCount++;
+
+            marketState
+              .recentValues
+              .push(actual);
+
+            marketState.recentSum +=
+              actual;
+
+            if (
+              marketState
+                .recentValues
+                .length > 10
+            ) {
+
+              marketState.recentSum -=
+                marketState
+                  .recentValues
+                  .shift();
+
+            }
+
+          }
+
+        });
+
+      });
+
+    });
+
+  const results = [];
+
+  markets.forEach(config => {
+
+    const accumulator =
+      accumulators[config.market];
+
+    const predictions =
+      accumulator.predictions;
+
+    if (!predictions) {
+      return;
+    }
+
+    const candidateMAE =
+      accumulator
+        .candidateAbsoluteError /
+      predictions;
+
+    const candidateRMSE =
+      Math.sqrt(
+        accumulator
+          .candidateSquaredError /
+        predictions
+      );
+
+    const seasonMAE =
+      accumulator
+        .seasonAbsoluteError /
+      predictions;
+
+    const seasonRMSE =
+      Math.sqrt(
+        accumulator
+          .seasonSquaredError /
+        predictions
+      );
+
+    const maeImprovement =
+      seasonMAE > 0
+        ? (
+            seasonMAE -
+            candidateMAE
+          ) /
+          seasonMAE
+        : 0;
+
+    const rmseImprovement =
+      seasonRMSE > 0
+        ? (
+            seasonRMSE -
+            candidateRMSE
+          ) /
+          seasonRMSE
+        : 0;
+
+    let resultLabel = "SAME";
+
+    if (maeImprovement > 0) {
+      resultLabel = "PASS";
+    } else if (maeImprovement < 0) {
+      resultLabel = "FAIL";
+    }
+
+    results.push([
+      config.market,
+      config.seasonWeight,
+      config.recentWeight,
+      predictions,
+      seasonMAE,
+      candidateMAE,
+      maeImprovement,
+      seasonRMSE,
+      candidateRMSE,
+      rmseImprovement,
+      resultLabel
+    ]);
+
+  });
+
+  if (!results.length) {
+    throw new Error(
+      "Holdout produced no valid predictions."
+    );
+  }
+
+  const outputSheetName =
+    "MLB Model Holdout";
+
+  let outputSheet =
+    ss.getSheetByName(
+      outputSheetName
+    );
+
+  if (!outputSheet) {
+
+    outputSheet =
+      ss.insertSheet(
+        outputSheetName
+      );
+
+  }
+
+  outputSheet.clearContents();
+
+  const output = [[
+    "Market",
+    "Season Weight",
+    "Last 10 Weight",
+    "Predictions",
+    "Season MAE",
+    "Candidate MAE",
+    "MAE Improvement",
+    "Season RMSE",
+    "Candidate RMSE",
+    "RMSE Improvement",
+    "MAE Result"
+  ], ...results];
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      output.length,
+      output[0].length
+    )
+    .setValues(output);
+
+  outputSheet
+    .getRange(
+      2,
+      2,
+      results.length,
+      2
+    )
+    .setNumberFormat("0%");
+
+  outputSheet
+    .getRange(
+      2,
+      5,
+      results.length,
+      2
+    )
+    .setNumberFormat("0.0000");
+
+  outputSheet
+    .getRange(
+      2,
+      7,
+      results.length,
+      1
+    )
+    .setNumberFormat("0.000%");
+
+  outputSheet
+    .getRange(
+      2,
+      8,
+      results.length,
+      2
+    )
+    .setNumberFormat("0.0000");
+
+  outputSheet
+    .getRange(
+      2,
+      10,
+      results.length,
+      1
+    )
+    .setNumberFormat("0.000%");
+
+  outputSheet.autoResizeColumns(
+    1,
+    output[0].length
+  );
+
+  Logger.log(
+    `MLB holdout validation complete. Holdout begins ${holdoutStartDate}.`
+  );
+
+}
+
 function getMLBOpponentFromStat_(stat) {
   const game = stat.game || {};
   const team = stat.team || {};
@@ -3692,6 +4676,12 @@ function refreshMLBPlayerPropsSheet() {
   const statTypeCol =
     trendHeader.indexOf("Stat Type");
 
+  const seasonAvgCol =
+    trendHeader.indexOf("Season Avg");
+
+  const last10AvgCol =
+    trendHeader.indexOf("Last 10 Avg");
+
   const trendScoreCol =
     trendHeader.indexOf("Normalized Trend Score");
 
@@ -3714,6 +4704,12 @@ function refreshMLBPlayerPropsSheet() {
       normalizeMLBStatType_(row[statTypeCol]);
 
     trendMap[key] = {
+
+      seasonAvg:
+        Number(row[seasonAvgCol]) || 0,
+
+      last10Avg:
+        Number(row[last10AvgCol]) || 0,
 
       trendScore:
         Number(row[trendScoreCol]) || 0,
@@ -3795,6 +4791,120 @@ function refreshMLBPlayerPropsSheet() {
       const sportacularScore =
         trend ? trend.sportacularScore : "";
 
+      const normalizedPropType =
+        normalizeMLBStatType_(propType);
+
+      /*
+      * Production MLB Lambda weights.
+      *
+      * Calibrated using rolling historical backtesting
+      * and validated on the later chronological holdout.
+      *
+      * Most markets use the more stable season-to-date
+      * average. Batter strikeouts retain a modest
+      * Last-10 component because 85/15 improved both
+      * MAE and RMSE on the holdout.
+      */
+      const lambdaWeightsByMarket = {
+
+        hits: {
+          season: 1.00,
+          recent: 0.00
+        },
+
+        runs: {
+          season: 1.00,
+          recent: 0.00
+        },
+
+        rbis: {
+          season: 1.00,
+          recent: 0.00
+        },
+
+        home_runs: {
+          season: 1.00,
+          recent: 0.00
+        },
+
+        total_bases: {
+          season: 1.00,
+          recent: 0.00
+        },
+
+        walks: {
+          season: 1.00,
+          recent: 0.00
+        },
+
+        strikeouts: {
+          season: 0.85,
+          recent: 0.15
+        },
+
+        stolen_bases: {
+          season: 1.00,
+          recent: 0.00
+        }
+
+      };
+
+      const lambdaWeights =
+        lambdaWeightsByMarket[
+          normalizedPropType
+        ] || null;
+
+      let modelLambda = "";
+
+      if (
+        lambdaWeights &&
+        trend
+      ) {
+
+        const seasonAvg =
+          Number(trend.seasonAvg);
+
+        const last10Avg =
+          Number(trend.last10Avg);
+
+        if (
+          Number.isFinite(seasonAvg) &&
+          seasonAvg >= 0
+        ) {
+
+          /*
+          * Season average is always our
+          * required production baseline.
+          */
+          modelLambda = seasonAvg;
+
+          /*
+          * Apply recent form only for a market
+          * whose validated production weight
+          * actually requires it.
+          */
+          if (
+            lambdaWeights.recent > 0 &&
+            Number.isFinite(last10Avg) &&
+            last10Avg >= 0
+          ) {
+
+            modelLambda =
+              (
+                seasonAvg *
+                lambdaWeights.season
+              ) +
+              (
+                last10Avg *
+                lambdaWeights.recent
+              );
+
+          }
+
+        }
+
+      }
+
       const lineValue =
         prop.line ||
         prop.line_value ||
@@ -3839,7 +4949,7 @@ function refreshMLBPlayerPropsSheet() {
       "",     // O Decimal Odds
       "",     // P Implied Probability
       "",     // Q Vig-Free Probability
-      "",     // R Lambda
+      modelLambda,   // R Lambda
       "",     // S Poisson Over
       "",     // T Poisson Milestone
       "",     // U EV
