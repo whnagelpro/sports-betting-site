@@ -165,7 +165,8 @@ export async function handler(event) {
         if (
             league === "nfl" ||
             league === "nba" ||
-            league === "nhl"
+            league === "nhl" ||
+            league === "mlb"
         ) {
 
             roster =
