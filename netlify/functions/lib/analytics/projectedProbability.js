@@ -55,6 +55,33 @@ export function calculateProjectedProbability({
 
 }) {
 
+    if (
+        String(prop?.type ?? "")
+            .toLowerCase() === "milestone"
+    ) {
+
+        const milestoneProbability =
+            getPropModelProbability(prop);
+
+        return {
+
+            probability:
+                milestoneProbability,
+
+            hits: 0,
+
+            sampleSize:
+                gameLogs.length,
+
+            source:
+                milestoneProbability === null
+                    ? "unavailable"
+                    : "prop_model"
+
+        };
+
+    }
+
     if (!prop || !gameLogs.length) {
 
         const fallbackProbability =
