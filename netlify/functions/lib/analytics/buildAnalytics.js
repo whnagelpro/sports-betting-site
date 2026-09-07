@@ -88,6 +88,30 @@ export function buildAnalytics({
 
     const edgeValue = Number(modelEdge);
 
+    const hasProbability =
+        probability !== null &&
+        probability !== undefined &&
+        probability !== "";
+
+    const probabilityValue =
+        hasProbability
+            ? Number(probability)
+            : NaN;
+
+    const hasImpliedProbability =
+        impliedProbability !== null &&
+        impliedProbability !== undefined &&
+        impliedProbability !== "";
+
+    const impliedProbabilityValue =
+        hasImpliedProbability
+            ? Number(impliedProbability)
+            : NaN;
+
+    const hasModelAnalytics =
+        Number.isFinite(probabilityValue) &&
+        Number.isFinite(impliedProbabilityValue);
+
     return {
 
         sportacularScore,
@@ -98,20 +122,24 @@ export function buildAnalytics({
                 : null,
 
         probability:
-            Number.isFinite(Number(probability))
-                ? Number(probability)
+            Number.isFinite(probabilityValue)
+                ? probabilityValue
                 : null,
 
         impliedProbability:
-            Number.isFinite(Number(impliedProbability))
-                ? Number(impliedProbability)
+            Number.isFinite(impliedProbabilityValue)
+                ? impliedProbabilityValue
                 : null,
 
         confidence:
-            buildConfidence(sportacularScore),
+            hasModelAnalytics
+                ? buildConfidence(sportacularScore)
+                : "Low",
 
         recommendation:
-            buildRecommendation(sportacularScore)
+            hasModelAnalytics
+                ? buildRecommendation(sportacularScore)
+                : "Unavailable"
 
     };
 
