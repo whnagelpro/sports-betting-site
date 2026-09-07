@@ -291,9 +291,13 @@ const games = Number(
                         ),
 
                 expectedValue:
-                    Number(
-                        prop["EV Over/Milestone ($1 Bet)"] ?? 0
-                    ),
+                    prop["EV Over/Milestone ($1 Bet)"] !== undefined &&
+                    prop["EV Over/Milestone ($1 Bet)"] !== null &&
+                    prop["EV Over/Milestone ($1 Bet)"] !== ""
+                        ? Number(
+                            prop["EV Over/Milestone ($1 Bet)"]
+                        )
+                        : null,
 
                 raw: prop
 
