@@ -85,15 +85,20 @@ export function scoreProp({
 
     );
 
-    const overallScore = Math.round(
+    const hasModelProbability =
+        projectedProbability !== null &&
+        projectedProbability !== undefined &&
+        projectedProbability !== "" &&
+        Number.isFinite(Number(projectedProbability));
 
-        evScore * 0.50 +
-
-        edgeScore * 0.30 +
-
-        consistencyScore * 0.20
-
-    );
+    const overallScore =
+        hasModelProbability
+            ? Math.round(
+                evScore * 0.50 +
+                edgeScore * 0.30 +
+                consistencyScore * 0.20
+            )
+            : null;
 
     const analytics = buildAnalytics({
 

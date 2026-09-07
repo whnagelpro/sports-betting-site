@@ -86,7 +86,15 @@ export function buildAnalytics({
 
     );
 
-    const edgeValue = Number(modelEdge);
+    const hasModelEdge =
+        modelEdge !== null &&
+        modelEdge !== undefined &&
+        modelEdge !== "";
+
+    const edgeValue =
+        hasModelEdge
+            ? Number(modelEdge)
+            : NaN;
 
     const hasProbability =
         probability !== null &&
