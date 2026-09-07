@@ -5,4 +5,4 @@
   node_bundler = "esbuild"
 
 [functions."*"]
-  included_files = ["netlify/functions/lib/**"]
+  included_files = ["netlify/functions/lib/**", "netlify/functions/data/*.csv"]
