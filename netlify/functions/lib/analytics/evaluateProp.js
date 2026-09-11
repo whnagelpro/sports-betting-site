@@ -1,110 +1,300 @@
-import { calculateProjectedProbability } from "./projectedProbability.js";
-import { scoreProp } from "./scoreProp.js";
-import { buildEdgeResult } from "./edge/buildEdgeResult.js";
+// ======================================================
+// Sportacular Analytics
+// Universal Player Prop Evaluation
+//
+// P16:
+// P15 spreadsheet outputs are authoritative for betting
+// probability, EV, edge, score, risk, and confidence.
+// The backend must transport those values rather than
+// independently rescoring the prop.
+// ======================================================
+
+
+function toNullableNumber(value) {
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === ""
+    ) {
+        return null;
+    }
+
+    const number =
+        Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : null;
+}
+
+
+function normalizeBestSide(value) {
+
+    const side =
+        String(value ?? "")
+            .trim()
+            .toLowerCase();
+
+    if (side === "over") {
+        return "Over";
+    }
+
+    if (side === "under") {
+        return "Under";
+    }
+
+    if (
+        side === "no play" ||
+        side === "no_play" ||
+        side === "nopay"
+    ) {
+        return "No Play";
+    }
+
+    return null;
+}
+
 
 export function evaluateProp({
 
     prop,
 
-    gameLogs,
+    gameLogs = [],
 
-    consistency
+    consistency = {}
 
 }) {
 
-    console.log("evaluateProp START");
+    console.log("evaluateProp START — P15 authoritative mode");
 
-    const projection =
-        calculateProjectedProbability({
 
-            gameLogs,
+    if (!prop) {
+        return null;
+    }
 
-            prop
 
-        });
+    const bestSide =
+        normalizeBestSide(
+            prop.bestSide
+        );
 
-    console.log("✓ projection");
 
-    const isBettingModelEligible =
-        projection.source === "prop_model" &&
-        projection.probability !== null &&
-        projection.probability !== undefined &&
-        projection.probability !== "";
+    // --------------------------------------------------
+    // P15 authoritative values
+    // --------------------------------------------------
 
-    const bettingProbability =
-        isBettingModelEligible
-            ? projection.probability
-            : null;
+    const probability =
+        toNullableNumber(
+            prop.bestModelProbability ??
+            prop.probability
+        );
 
-    const scoredProp =
+    const expectedValue =
+        toNullableNumber(
+            prop.bestEV ??
+            prop.expectedValue
+        );
 
-        scoreProp({
+    const priceEdge =
+        toNullableNumber(
+            prop.bestPriceEdge
+        );
 
-            prop,
+    const sportacularScore =
+        toNullableNumber(
+            prop.sportacularScore
+        );
 
-            model: {
+    const sportacularEdge =
+        toNullableNumber(
+            prop.sportacularEdge
+        );
 
-                projectedProbability:
+    const riskScore =
+        toNullableNumber(
+            prop.riskScore
+        );
 
-                    bettingProbability,
+    const modelConfidence =
+        toNullableNumber(
+            prop.modelConfidence
+        );
 
-                consistencyScore:
 
-                    consistency.score
+    const isActionable =
+        bestSide === "Over" ||
+        bestSide === "Under";
 
-            }
 
-        });
+    // --------------------------------------------------
+    // Compatibility object
+    //
+    // Keep the existing downstream object shape while
+    // sourcing its betting values from P15.
+    // --------------------------------------------------
 
-    console.log("✓ scoreProp");
-
-    const edge = buildEdgeResult({
+    const edge = {
 
         probability:
-            bettingProbability,
+            isActionable
+                ? probability
+                : null,
 
         impliedProbability:
-            scoredProp.impliedProbability,
+            null,
 
-        consistency:
-            consistency.score,
+        edge:
+            isActionable
+                ? priceEdge
+                : null,
 
-        sampleSize:
-            gameLogs.length
+        edgePercent:
+            isActionable &&
+            sportacularEdge !== null
+                ? sportacularEdge
+                : null,
 
-    });
+        score:
+            isActionable
+                ? sportacularScore
+                : null,
 
-    console.log("✓ buildEdgeResult");
+        confidence:
+            prop.confidenceTier ??
+            null,
+
+        recommendation:
+            bestSide ??
+            "No Play"
+
+    };
+
+
+    const expectedValueCompatibility =
+        expectedValue === null
+            ? null
+            : {
+
+                // Existing builders expect this property.
+                expectedValuePercent:
+                    expectedValue * 100,
+
+                // Preserve the original $1-bet EV too.
+                expectedValue
+
+            };
+
+
+    const evaluation = {
+
+        sportacularScore,
+
+        sportacularEdge,
+
+        bestSide,
+
+        bestEV:
+            expectedValue,
+
+        bestModelProbability:
+            probability,
+
+        bestPriceEdge:
+            priceEdge,
+
+        riskScore,
+
+        riskTier:
+            prop.riskTier ??
+            null,
+
+        modelConfidence,
+
+        confidenceTier:
+            prop.confidenceTier ??
+            null,
+
+        recommendation:
+            bestSide ??
+            "No Play",
+
+        actionable:
+            isActionable
+
+    };
+
+
+    console.log(
+        "✓ P15 authoritative prop evaluation",
+        {
+            market: prop.market,
+            bestSide,
+            sportacularScore,
+            sportacularEdge,
+            confidenceTier:
+                prop.confidenceTier ?? null
+        }
+    );
+
 
     return {
 
-        ...scoredProp,
+        ...prop,
 
-        projection,
+        bestSide,
+
+        probability:
+            isActionable
+                ? probability
+                : null,
+
+        expectedValue:
+            expectedValueCompatibility,
+
+        sportacularScore,
+
+        sportacularEdge,
+
+        score:
+            sportacularScore,
 
         edge,
 
-        evaluation: {
+        evaluation,
 
-            sportacularScore:
-                isBettingModelEligible
-                    ? (edge?.score ?? scoredProp.score ?? null)
-                    : null,
+        analytics: {
+
+            sportacularScore,
+
+            sportacularEdge,
 
             modelEdge:
-                isBettingModelEligible
-                    ? (edge?.edgePercent ?? null)
+                sportacularEdge,
+
+            probability:
+                isActionable
+                    ? probability
                     : null,
 
+            impliedProbability:
+                null,
+
             confidence:
-                isBettingModelEligible
-                    ? (edge?.confidence ?? "Unknown")
-                    : "Low",
+                prop.confidenceTier ??
+                null,
 
             recommendation:
-                isBettingModelEligible
-                    ? (edge?.recommendation ?? "None")
-                    : "Unavailable"
+                bestSide ??
+                "No Play",
+
+            riskScore,
+
+            riskTier:
+                prop.riskTier ??
+                null,
+
+            modelConfidence
 
         }
 
