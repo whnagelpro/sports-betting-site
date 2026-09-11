@@ -1334,82 +1334,348 @@ function transformRowsToGames(rows) {
 }
 
 function buildPropsFromRows(rows, league = "mlb") {
-  return rows
-    .map((row, index) => {
 
-        if (index === 0) {
-          console.log(Object.keys(row));
-        }
-    
-      const gameDate = normalizeDate(row["Game Date"]);
+  const props = [];
 
-      const playerFirstName = safeText(row["Player First Name"], "");
-      const playerLastName = safeText(row["Player Last Name"], "");
-      const playerName = `${playerFirstName} ${playerLastName}`.trim();
+  rows.forEach((row) => {
 
-      const vendor = safeText(row["Vendor"], "");
-      const propType = safeText(row["Prop Type"], "");
-      const lineValue = safeText(row["Line Value"], "");
-      const betType = safeText(row["Type"], "");
-      const overOdds = safeText(row["Over Odds"], "");
-      const underOdds = safeText(row["Under Odds"], "");
-      const genericOdds = safeText(row["Odds"], "");
-
-      const impliedProbability = toNumber(
-        row["Implied Probability"] ||
-        row["Implied Prob"] ||
-        row["Implied Probability (%)"]
+    const gameDate =
+      normalizeDate(
+        row["Game Date"]
       );
 
-      const ev = toNumber(row["EV Over/Milestone ($1 Bet)"]);
+    const playerId =
+      safeText(
+        row["Player Id"],
+        ""
+      );
 
-      const awayTeam = safeText(row["Away Team"], "");
-      const homeTeam = safeText(row["Home Team"], "");
+    const playerName =
+      safeText(
+        row["Player Name"],
+        ""
+      );
 
-      let gameLabel = "";
-      if (awayTeam && homeTeam) {
-        gameLabel = `${awayTeam} at ${homeTeam}`;
-      }
+    const playerFirstName =
+      safeText(
+        row["Player First Name"],
+        ""
+      );
 
-return {
-    gameDate,
+    const playerLastName =
+      safeText(
+        row["Player Last Name"],
+        ""
+      );
 
-    playerId: safeText(row["Player Id"], ""),
+    const resolvedPlayerName =
+      playerName ||
+      `${playerFirstName} ${playerLastName}`.trim();
 
-    gameId: safeText(row["Game Id"], ""),
+    const vendor =
+      safeText(
+        row["Vendor"],
+        ""
+      );
 
-    league,
+    const propType =
+      safeText(
+        row["Prop Type"],
+        ""
+      );
 
-    playerName,
-    playerFirstName,
-    playerLastName,
+    const lineValue =
+      safeText(
+        row["Line Value"],
+        ""
+      );
 
-    vendor,
-    propType,
-    lineValue,
-    betType,
+    const overOdds =
+      safeText(
+        row["Over Odds"],
+        ""
+      );
 
-    overOdds,
-    underOdds,
-    genericOdds,
+    const underOdds =
+      safeText(
+        row["Under Odds"],
+        ""
+      );
 
-    impliedProbability,
-    ev,
+    const genericOdds =
+      safeText(
+        row["Odds"],
+        ""
+      );
 
-    awayTeam,
-    homeTeam,
+    const bestSide =
+      safeText(
+        row["Best Side"],
+        ""
+      );
 
-    gameLabel
-};
-    })
-    .filter((prop) =>
-      prop.gameDate &&
-      (prop.playerName || prop.playerFirstName || prop.playerLastName) &&
-      prop.vendor &&
-      prop.propType &&
-      prop.lineValue &&
-      !Number.isNaN(prop.ev)
-    );
+    const normalizedBestSide =
+      bestSide
+        .trim()
+        .toLowerCase();
+
+
+    // --------------------------------------------
+    // Universal A:AJ model outputs
+    // --------------------------------------------
+
+    const modelProbOver =
+      toNumber(
+        row["Model Prob Over"]
+      );
+
+    const modelProbUnder =
+      toNumber(
+        row["Model Prob Under"]
+      );
+
+    const evOver =
+      toNumber(
+        row["EV Over"]
+      );
+
+    const evUnder =
+      toNumber(
+        row["EV Under"]
+      );
+
+    const bestEVRaw =
+      toNumber(
+        row["Best EV"]
+      );
+
+    const bestEV =
+      Number.isFinite(bestEVRaw)
+        ? bestEVRaw
+        : null;
+
+    const bestModelProbabilityRaw =
+      toNumber(
+        row["Best Model Probability"]
+      );
+
+    const bestModelProbability =
+      Number.isFinite(bestModelProbabilityRaw)
+        ? bestModelProbabilityRaw
+        : null;
+
+    const bestPriceEdgeRaw =
+      toNumber(
+        row["Best Price Edge"]
+      );
+
+    const bestPriceEdge =
+      Number.isFinite(bestPriceEdgeRaw)
+        ? bestPriceEdgeRaw
+        : null;
+
+    const riskScoreRaw =
+      toNumber(
+        row["Risk Score"]
+      );
+
+    const riskScore =
+      Number.isFinite(riskScoreRaw)
+        ? riskScoreRaw
+        : null;
+
+    const modelConfidenceRaw =
+      toNumber(
+        row["Model Confidence"]
+      );
+
+    const modelConfidence =
+      Number.isFinite(modelConfidenceRaw)
+        ? modelConfidenceRaw
+        : null;
+
+    const sportacularScoreRaw =
+      toNumber(
+        row["Sportacular Score"]
+      );
+
+    const sportacularScore =
+      Number.isFinite(sportacularScoreRaw)
+        ? sportacularScoreRaw
+        : null;
+
+    const sportacularEdgeRaw =
+      toNumber(
+        row["Sportacular Edge"]
+      );
+
+    const sportacularEdge =
+      Number.isFinite(sportacularEdgeRaw)
+        ? sportacularEdgeRaw
+        : null;
+
+
+    // --------------------------------------------
+    // Only actionable P15 sides become website
+    // betting opportunities.
+    // --------------------------------------------
+
+    let betType = "";
+    let ev = NaN;
+    let probability = NaN;
+    let selectedOdds = "";
+
+    if (normalizedBestSide === "over") {
+
+      betType = "Over";
+      ev = evOver;
+      probability = modelProbOver;
+      selectedOdds = overOdds;
+
+    } else if (normalizedBestSide === "under") {
+
+      betType = "Under";
+      ev = evUnder;
+      probability = modelProbUnder;
+      selectedOdds = underOdds;
+
+    } else {
+
+      // P15 explicitly decided No Play.
+      return;
+
+    }
+
+
+    const awayTeam =
+      safeText(
+        row["Away Team"],
+        ""
+      );
+
+    const homeTeam =
+      safeText(
+        row["Home Team"],
+        ""
+      );
+
+    const gameLabel =
+      awayTeam && homeTeam
+        ? `${awayTeam} at ${homeTeam}`
+        : "";
+
+
+    if (
+      !gameDate ||
+      !resolvedPlayerName ||
+      !vendor ||
+      !propType ||
+      lineValue === "" ||
+      !Number.isFinite(ev)
+    ) {
+      return;
+    }
+
+
+    props.push({
+
+      gameDate,
+
+      playerId,
+
+      gameId:
+        safeText(
+          row["Game Id"],
+          ""
+        ),
+
+      league,
+
+      playerName:
+        resolvedPlayerName,
+
+      playerFirstName,
+
+      playerLastName,
+
+      vendor,
+
+      propType,
+
+      lineValue,
+
+      betType,
+
+      overOdds,
+
+      underOdds,
+
+      genericOdds:
+        selectedOdds ||
+        genericOdds,
+
+      // Existing frontend still uses this field name.
+      // It now contains the selected P15 model probability.
+      impliedProbability:
+        Number.isFinite(probability)
+          ? probability
+          : bestModelProbability,
+
+      ev,
+
+      bestSide:
+        bestSide || null,
+
+      bestEV,
+
+      bestModelProbability,
+
+      bestPriceEdge,
+
+      trendScore:
+        toNumber(
+          row["Trend Score"]
+        ),
+
+      trendStrength:
+        safeText(
+          row["Trend Strength"],
+          ""
+        ),
+
+      riskScore,
+
+      riskTier:
+        safeText(
+          row["Risk Tier"],
+          ""
+        ),
+
+      modelConfidence,
+
+      sportacularScore,
+
+      sportacularEdge,
+
+      confidenceTier:
+        safeText(
+          row["Confidence Tier"],
+          ""
+        ),
+
+      awayTeam,
+
+      homeTeam,
+
+      gameLabel
+
+    });
+
+  });
+
+
+  return props;
+
 }
 
 function buildNFLPropsFromRows(rows) {
