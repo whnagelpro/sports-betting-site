@@ -1121,7 +1121,14 @@ const NBA_PLAYER_TREND_STATS = [
   { label: "Rebounds", key: "rebounds" },
   { label: "Assists", key: "assists" },
   { label: "Threes", key: "threes" },
-  { label: "PRA", key: "pra" }
+  { label: "Steals", key: "steals" },
+  { label: "Blocks", key: "blocks" },
+  { label: "Turnovers", key: "turnovers" },
+  { label: "Points + Rebounds", key: "pointsRebounds" },
+  { label: "Points + Assists", key: "pointsAssists" },
+  { label: "Rebounds + Assists", key: "reboundsAssists" },
+  { label: "PRA", key: "pra" },
+  { label: "Blocks + Steals", key: "blocksSteals" }
 ];
 
 const NBA_TEAM_TREND_STATS = [
@@ -1288,6 +1295,9 @@ function refreshNBAPlayerSeasonStatsSheet() {
     "Avg Rebounds",
     "Avg Assists",
     "Avg Threes",
+    "Avg Steals",
+    "Avg Blocks",
+    "Avg Turnovers",
     "Avg PRA",
     "Consistency Score",
     "Last Updated"
@@ -1315,6 +1325,10 @@ function refreshNBAPlayerSeasonStatsSheet() {
       rebounds: Number(row["Rebounds"] || 0),
       assists: Number(row["Assists"] || 0),
       threes: Number(row["Threes"] || 0),
+      steals: Number(row["Steals"] || 0),
+      blocks: Number(row["Blocks"] || 0),
+      turnovers: Number(row["Turnovers"] || 0),
+
       pra:
         Number(row["Points"] || 0) +
         Number(row["Rebounds"] || 0) +
@@ -1338,6 +1352,9 @@ function refreshNBAPlayerSeasonStatsSheet() {
       avgNBA_(games.map(g => g.rebounds)),
       avgNBA_(games.map(g => g.assists)),
       avgNBA_(games.map(g => g.threes)),
+      avgNBA_(games.map(g => g.steals)),
+      avgNBA_(games.map(g => g.blocks)),
+      avgNBA_(games.map(g => g.turnovers)),
       avgNBA_(praValues),
       consistencyScoreNBA_(praValues),
       now
@@ -1400,17 +1417,52 @@ function refreshNBAPlayerTrendsSheet() {
       };
     }
 
+    const points =
+      Number(row["Points"] || 0);
+
+    const rebounds =
+      Number(row["Rebounds"] || 0);
+
+    const assists =
+      Number(row["Assists"] || 0);
+
+    const steals =
+      Number(row["Steals"] || 0);
+
+    const blocks =
+      Number(row["Blocks"] || 0);
+
     grouped[playerId].games.push({
       date: row["Game Date"],
       minutes: Number(row["Minutes"] || 0),
-      points: Number(row["Points"] || 0),
-      rebounds: Number(row["Rebounds"] || 0),
-      assists: Number(row["Assists"] || 0),
-      threes: Number(row["Threes"] || 0),
+
+      points,
+      rebounds,
+      assists,
+
+      threes:
+        Number(row["Threes"] || 0),
+
+      steals,
+      blocks,
+
+      turnovers:
+        Number(row["Turnovers"] || 0),
+
+      pointsRebounds:
+        points + rebounds,
+
+      pointsAssists:
+        points + assists,
+
+      reboundsAssists:
+        rebounds + assists,
+
       pra:
-        Number(row["Points"] || 0) +
-        Number(row["Rebounds"] || 0) +
-        Number(row["Assists"] || 0)
+        points + rebounds + assists,
+
+      blocksSteals:
+        blocks + steals
     });
   });
 
@@ -2593,130 +2645,569 @@ function getNBAPlayerIdsForTrendPipeline_() {
 }
 
 /**
- * Refreshes the "Player Props" tab with all NBA player props for today's games.
- * This avoids using many volatile custom functions in sheet cells.
+ * ============================================================================
+ * P15 D7D — NBA PLAYER PROPS TREND INDEX
+ * ============================================================================
+ *
+ * Reuses the existing validated NBA Player Trends output.
+ *
+ * Provides:
+ *   AC Trend Score
+ *   AD Trend Strength
+ *   AG Model Confidence
+ *
+ * Key:
+ *   Player ID :: normalized Player Props market
+ * ============================================================================
  */
-function refreshNBAPlayerPropsSheet() {
-  const sheetName = "Player Props";
-  const scheduleSheetName = "Schedule";
 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(sheetName);
-  const scheduleSheet = ss.getSheetByName(scheduleSheetName);
+const NBA_PROP_TREND_LABELS = Object.freeze({
+  points:
+    "Points",
+
+  rebounds:
+    "Rebounds",
+
+  assists:
+    "Assists",
+
+  threes:
+    "Threes",
+
+  steals:
+    "Steals",
+
+  blocks:
+    "Blocks",
+
+  turnovers:
+    "Turnovers",
+
+  points_rebounds:
+    "Points + Rebounds",
+
+  points_assists:
+    "Points + Assists",
+
+  rebounds_assists:
+    "Rebounds + Assists",
+
+  points_rebounds_assists:
+    "PRA",
+
+  blocks_steals:
+    "Blocks + Steals"
+});
+
+
+function buildNBAPlayerPropsTrendIndex_() {
+
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+
+  const sheet =
+    ss.getSheetByName(
+      "NBA Player Trends"
+    );
+
 
   if (!sheet) {
-    throw new Error(`Sheet "${sheetName}" not found.`);
+    return {};
   }
+
+
+  const rows =
+    getNBAObjectsFromSheet_(
+      sheet
+    );
+
+
+  const index = {};
+
+
+  rows.forEach(row => {
+
+    const playerId =
+      String(
+        row["Player ID"] ?? ""
+      ).trim();
+
+
+    const statType =
+      String(
+        row["Stat Type"] ?? ""
+      ).trim();
+
+
+    if (
+      !playerId ||
+      !statType
+    ) {
+      return;
+    }
+
+
+    Object.keys(
+      NBA_PROP_TREND_LABELS
+    ).forEach(marketKey => {
+
+      if (
+        NBA_PROP_TREND_LABELS[
+          marketKey
+        ] !==
+        statType
+      ) {
+        return;
+      }
+
+
+      index[
+        `${playerId}::${marketKey}`
+      ] = {
+
+        trendScore:
+          parseNBANumberOrNull_(
+            row["Trend Score"]
+          ),
+
+        trendStrength:
+          row["Trend Strength"] ??
+          null,
+
+        modelConfidence:
+          calculateTrendConfidence_(
+            row
+          )
+      };
+    });
+  });
+
+
+  return index;
+}
+
+
+/**
+ * Attach validated NBA trend/confidence fields to one frozen Q:T context.
+ */
+function enrichNBAPlayerPropContextWithTrend_(
+  context,
+  playerId,
+  marketKey,
+  trendIndex
+) {
+
+  if (!context) {
+    return null;
+  }
+
+
+  const trend =
+    (
+      trendIndex &&
+      trendIndex[
+        `${playerId}::${marketKey}`
+      ]
+    ) ||
+    null;
+
+
+  return Object.assign(
+    {},
+    context,
+    {
+
+      trendScore:
+        trend
+          ? trend.trendScore
+          : null,
+
+      trendStrength:
+        trend
+          ? trend.trendStrength
+          : null,
+
+      modelConfidence:
+        trend
+          ? trend.modelConfidence
+          : null
+    }
+  );
+}
+
+/**
+ * ============================================================================
+ * P15 D7D — NBA UNIVERSAL PLAYER PROPS PRODUCTION REFRESH
+ * ============================================================================
+ *
+ * Direct A:AJ output.
+ *
+ * Removes the old:
+ *   - row-2 formula-template dependency
+ *   - row-3 production start
+ *   - A:N-only production write
+ *
+ * Production rows now begin at row 2.
+ * ============================================================================
+ */
+function refreshNBAPlayerPropsSheet() {
+
+  const sheetName =
+    "Player Props";
+
+
+  const scheduleSheetName =
+    "Schedule";
+
+
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+
+  const sheet =
+    ss.getSheetByName(
+      sheetName
+    );
+
+
+  const scheduleSheet =
+    ss.getSheetByName(
+      scheduleSheetName
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      `Sheet "${sheetName}" not found.`
+    );
+  }
+
 
   if (!scheduleSheet) {
-    throw new Error(`Sheet "${scheduleSheetName}" not found.`);
+    throw new Error(
+      `Sheet "${scheduleSheetName}" not found.`
+    );
   }
 
-  ensurePropFormulaTemplates_(sheet);
-  ensureNameFormulaTemplates_(sheet);
 
-  Logger.log("Refreshing NBA player props using Schedule tab game IDs...");
+  Logger.log(
+    "Refreshing NBA player props using universal A:AJ production output..."
+  );
 
-  const games = getGamesFromScheduleSheet_(scheduleSheet);
+
+  // ==========================================================================
+  // ENSURE PHYSICAL A:AJ WIDTH
+  // ==========================================================================
+
+  const requiredColumns =
+    NBA_UNIVERSAL_PROP_HEADERS.length;
+
+
+  if (
+    sheet.getMaxColumns() <
+    requiredColumns
+  ) {
+
+    sheet.insertColumnsAfter(
+      sheet.getMaxColumns(),
+      requiredColumns -
+      sheet.getMaxColumns()
+    );
+  }
+
+
+  // ==========================================================================
+  // WRITE EXACT UNIVERSAL HEADERS
+  // ==========================================================================
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      requiredColumns
+    )
+    .setValues([
+      NBA_UNIVERSAL_PROP_HEADERS
+    ]);
+
+
+  // ==========================================================================
+  // CLEAR OLD PRODUCTION + LEGACY ROW-2 FORMULAS
+  // ==========================================================================
+
+  const maxRows =
+    sheet.getMaxRows();
+
+
+  if (
+    maxRows >= 2
+  ) {
+
+    sheet
+      .getRange(
+        2,
+        1,
+        maxRows - 1,
+        requiredColumns
+      )
+      .clearContent();
+  }
+
+
+  // ==========================================================================
+  // SCHEDULE
+  // ==========================================================================
+
+  const games =
+    getGamesFromScheduleSheet_(
+      scheduleSheet
+    );
+
 
   if (!games.length) {
-    clearPlayerPropsData_(sheet);
-    Logger.log("No schedule rows found, so Player Props was cleared.");
+
+    Logger.log(
+      "No schedule rows found. NBA Player Props now contains universal A:AJ headers with no stale prop rows."
+    );
+
     return;
   }
 
-  const gameMap = {};
-  games.forEach(game => {
-    gameMap[String(game.id)] = {
-      game_date: game.game_date || "",
-      away_team: game.away_team || "",
-      home_team: game.home_team || ""
-    };
-  });
 
-  let allRows = [];
+  // ==========================================================================
+  // BUILD FROZEN HISTORICAL + TREND CONTEXT ONCE
+  // ==========================================================================
 
-  games.forEach((game, index) => {
-    Logger.log(`Fetching props for game ${index + 1}/${games.length} (ID: ${game.id})`);
+  Logger.log(
+    "Building NBA Player Props historical and trend context indexes..."
+  );
 
-    const props = fetchAllNBAPlayerPropsForGame_(game.id);
-    const gameInfo = gameMap[String(game.id)] || {};
 
-    props.forEach(prop => {
-      const playerId =
-        prop.player_id ||
-        (prop.player && prop.player.id) ||
-        "";
+  const contextMap =
+    buildNBAPlayerPropContextMap_();
 
-      const vendor =
-        prop.vendor ||
-        prop.sportsbook ||
-        prop.bookmaker ||
-        "";
 
-      const propType =
-        prop.prop_type ||
-        prop.market ||
-        "";
+  const trendIndex =
+    buildNBAPlayerPropsTrendIndex_();
 
-      const lineValue =
-        prop.line ||
-        prop.line_value ||
-        "";
 
-      const typeValue =
-        (prop.market && prop.market.type) ||
-        "";
+  Logger.log(
+    "NBA Player Props universal context indexes built."
+  );
 
-      const odds =
-        (prop.market && prop.market.odds) ||
-        "";
 
-      const updatedAt =
-        prop.updated_at ||
-        "";
+  // ==========================================================================
+  // FETCH + BUILD UNIVERSAL ROWS
+  // ==========================================================================
 
-      const overOdds =
-        (prop.market && prop.market.over_odds) ||
-        "";
+  const allRows = [];
 
-      const underOdds =
-        (prop.market && prop.market.under_odds) ||
-        "";
 
-      allRows.push([
-        game.id,                  // A Game Id
-        gameInfo.game_date,       // B Game Date
-        gameInfo.away_team,       // C Away Team
-        gameInfo.home_team,       // D Home Team
-        prop.id || "",            // E Id
-        playerId,                 // F Player Id
-        vendor,                   // G Vendor
-        propType,                 // H Prop Type
-        lineValue,                // I Line Value
-        typeValue,                // J Type
-        odds,                     // K Odds
-        updatedAt,                // L Updated At
-        overOdds,                 // M Over Odds
-        underOdds                 // N Under Odds
-      ]);
-    });
+  games.forEach(
+    (game, index) => {
 
-    Utilities.sleep(200);
-  });
+      Logger.log(
+        `Fetching NBA props for game ${index + 1}/${games.length} (ID: ${game.id})`
+      );
 
-  clearPlayerPropsData_(sheet);
 
-  if (!allRows.length) {
-    Logger.log("No NBA player props were returned for the schedule slate.");
+      const props =
+        fetchAllNBAPlayerPropsForGame_(
+          game.id
+        );
+
+
+      props.forEach(prop => {
+
+        const market =
+          (
+            prop.market &&
+            typeof prop.market ===
+              "object"
+          )
+            ? prop.market
+            : {};
+
+
+        const playerId =
+          String(
+            prop.player_id ??
+            (
+              prop.player &&
+              prop.player.id
+            ) ??
+            ""
+          ).trim();
+
+
+        const propType =
+          String(
+            prop.prop_type ??
+            (
+              typeof prop.market ===
+                "string"
+                ? prop.market
+                : ""
+            ) ??
+            ""
+          ).trim();
+
+
+        const marketKey =
+          normalizeNBAPropMarket_(
+            propType
+          );
+
+
+        const rawContext =
+          (
+            playerId &&
+            marketKey &&
+            contextMap[
+              playerId
+            ]
+          )
+            ? contextMap[
+                playerId
+              ][
+                marketKey
+              ] ||
+              null
+            : null;
+
+
+        const context =
+          enrichNBAPlayerPropContextWithTrend_(
+            rawContext,
+            playerId,
+            marketKey,
+            trendIndex
+          );
+
+
+        const rawProp = {
+
+          gameId:
+            game.id ?? "",
+
+          gameDate:
+            game.game_date ?? "",
+
+          awayTeam:
+            game.away_team ?? "",
+
+          homeTeam:
+            game.home_team ?? "",
+
+          id:
+            prop.id ?? "",
+
+          playerId,
+
+          vendor:
+            prop.vendor ??
+            prop.sportsbook ??
+            prop.bookmaker ??
+            "",
+
+          propType,
+
+          lineValue:
+            prop.line ??
+            prop.line_value ??
+            "",
+
+          type:
+            market.type ??
+            "",
+
+          odds:
+            market.odds ??
+            "",
+
+          updatedAt:
+            prop.updated_at ??
+            "",
+
+          overOdds:
+            market.over_odds ??
+            "",
+
+          underOdds:
+            market.under_odds ??
+            ""
+        };
+
+
+        const row =
+          buildNBAUniversalPropRowFromProvider_(
+            rawProp,
+            context
+          );
+
+
+        if (
+          !Array.isArray(row) ||
+          row.length !==
+            requiredColumns
+        ) {
+
+          throw new Error(
+            `Invalid NBA universal Player Props row for player ${playerId || "UNKNOWN"}.`
+          );
+        }
+
+
+        allRows.push(
+          row
+        );
+      });
+
+
+      Utilities.sleep(
+        200
+      );
+    }
+  );
+
+
+  // ==========================================================================
+  // NO PROVIDER PROPS
+  // ==========================================================================
+
+  if (
+    !allRows.length
+  ) {
+
+    Logger.log(
+      "No NBA player props were returned for the schedule slate. Universal A:AJ headers remain with no stale rows."
+    );
+
     return;
   }
 
-  sheet.getRange(3, 1, allRows.length, 14).setValues(allRows);
 
-  copyFormulaTemplatesDown_(sheet, allRows.length);
+  // ==========================================================================
+  // WRITE DIRECT A:AJ VALUES STARTING ROW 2
+  // ==========================================================================
 
-  Logger.log(`Wrote ${allRows.length} NBA player props rows to "${sheetName}"`);
+  sheet
+    .getRange(
+      2,
+      1,
+      allRows.length,
+      requiredColumns
+    )
+    .setValues(
+      allRows
+    );
+
+
+  Logger.log(
+    `Wrote ${allRows.length} NBA universal Player Props rows to "${sheetName}" across A:AJ.`
+  );
 }
 
 function debugNBAFirstOverUnderPropObject() {
@@ -2765,6 +3256,8761 @@ function debugNBAFirstPropObject() {
   Logger.log("FIRST GAME ID: " + firstGame.id);
   Logger.log("FIRST PROP OBJECT:");
   Logger.log(JSON.stringify(props[0], null, 2));
+}
+
+// ============================================================================
+// NBA PLAYER PROP PROJECTION WEIGHT BACKTEST
+// P4/18
+//
+// READ-ONLY with respect to production data.
+// Reads:  NBA Player Game Logs
+// Writes: NBA Projection Backtest
+//
+// Method:
+// - Groups historical games by player.
+// - Sorts each player's games chronologically.
+// - Requires at least 10 PRIOR games before making a prediction.
+// - Season average uses ALL prior games.
+// - Recent average uses the previous 5 games.
+// - Tests Season/Recent weights from 100/0 through 0/100 in 5% steps.
+// - Evaluates MAE and RMSE independently for each supported NBA prop market.
+// ============================================================================
+
+function backtestNBAProjectionWeights() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const logSheet =
+    ss.getSheetByName("NBA Player Game Logs");
+
+  if (!logSheet) {
+    throw new Error(
+      'Missing required sheet: "NBA Player Game Logs".'
+    );
+  }
+
+  const logs =
+    getNBAObjectsFromSheet_(logSheet);
+
+  if (!logs.length) {
+    throw new Error(
+      "NBA Player Game Logs contains no historical data."
+    );
+  }
+
+  const markets = [
+    {
+      market: "Points",
+      key: "points"
+    },
+    {
+      market: "Rebounds",
+      key: "rebounds"
+    },
+    {
+      market: "Assists",
+      key: "assists"
+    },
+    {
+      market: "Threes",
+      key: "threes"
+    },
+    {
+      market: "Steals",
+      key: "steals"
+    },
+    {
+      market: "Blocks",
+      key: "blocks"
+    },
+    {
+      market: "Turnovers",
+      key: "turnovers"
+    },
+    {
+      market: "Points + Rebounds",
+      key: "pointsRebounds"
+    },
+    {
+      market: "Points + Assists",
+      key: "pointsAssists"
+    },
+    {
+      market: "Rebounds + Assists",
+      key: "reboundsAssists"
+    },
+    {
+      market: "PRA",
+      key: "pra"
+    },
+    {
+      market: "Blocks + Steals",
+      key: "blocksSteals"
+    }
+  ];
+
+  const MIN_PRIOR_GAMES = 10;
+  const RECENT_GAMES = 5;
+
+  // --------------------------------------------------------------------------
+  // Build player histories
+  // --------------------------------------------------------------------------
+
+  const players = {};
+
+  logs.forEach(row => {
+    const playerId =
+      String(row["Player ID"] || "").trim();
+
+    if (!playerId) return;
+
+    const date =
+      new Date(row["Game Date"]);
+
+    if (
+      !date ||
+      Number.isNaN(date.getTime())
+    ) {
+      return;
+    }
+
+    const points =
+      Number(row["Points"] || 0);
+
+    const rebounds =
+      Number(row["Rebounds"] || 0);
+
+    const assists =
+      Number(row["Assists"] || 0);
+
+    const steals =
+      Number(row["Steals"] || 0);
+
+    const blocks =
+      Number(row["Blocks"] || 0);
+
+    if (!players[playerId]) {
+      players[playerId] = {
+        playerId,
+        playerName:
+          row["Player Name"] || "",
+        games: []
+      };
+    }
+
+    players[playerId].games.push({
+      date,
+
+      points,
+      rebounds,
+      assists,
+
+      threes:
+        Number(row["Threes"] || 0),
+
+      steals,
+      blocks,
+
+      turnovers:
+        Number(row["Turnovers"] || 0),
+
+      pointsRebounds:
+        points + rebounds,
+
+      pointsAssists:
+        points + assists,
+
+      reboundsAssists:
+        rebounds + assists,
+
+      pra:
+        points + rebounds + assists,
+
+      blocksSteals:
+        blocks + steals
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Sort each player's games OLDEST -> NEWEST
+  // --------------------------------------------------------------------------
+
+  Object.values(players).forEach(player => {
+    player.games.sort(
+      (a, b) =>
+        a.date.getTime() -
+        b.date.getTime()
+    );
+  });
+
+  // --------------------------------------------------------------------------
+  // Weight grid
+  // --------------------------------------------------------------------------
+
+  const weightPairs = [];
+
+  for (
+    let recentPct = 0;
+    recentPct <= 100;
+    recentPct += 5
+  ) {
+    weightPairs.push({
+      seasonWeight:
+        (100 - recentPct) / 100,
+
+      recentWeight:
+        recentPct / 100
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // Prepare result accumulators
+  // --------------------------------------------------------------------------
+
+  const results = {};
+
+  markets.forEach(market => {
+    results[market.key] = {};
+
+    weightPairs.forEach(pair => {
+      const key =
+        `${pair.seasonWeight.toFixed(2)}|` +
+        `${pair.recentWeight.toFixed(2)}`;
+
+      results[market.key][key] = {
+        market: market.market,
+        seasonWeight:
+          pair.seasonWeight,
+        recentWeight:
+          pair.recentWeight,
+        count: 0,
+        absoluteErrorSum: 0,
+        squaredErrorSum: 0
+      };
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Chronological walk-forward backtest
+  // --------------------------------------------------------------------------
+
+  Object.values(players).forEach(player => {
+    const games = player.games;
+
+    if (
+      games.length <= MIN_PRIOR_GAMES
+    ) {
+      return;
+    }
+
+    for (
+      let targetIndex = MIN_PRIOR_GAMES;
+      targetIndex < games.length;
+      targetIndex++
+    ) {
+      const priorGames =
+        games.slice(0, targetIndex);
+
+      const recentGames =
+        priorGames.slice(-RECENT_GAMES);
+
+      const targetGame =
+        games[targetIndex];
+
+      markets.forEach(market => {
+        const seasonValues =
+          priorGames.map(
+            game =>
+              Number(game[market.key] || 0)
+          );
+
+        const recentValues =
+          recentGames.map(
+            game =>
+              Number(game[market.key] || 0)
+          );
+
+        const actual =
+          Number(
+            targetGame[market.key] || 0
+          );
+
+        const seasonAverage =
+          avgNBA_(seasonValues);
+
+        const recentAverage =
+          avgNBA_(recentValues);
+
+        weightPairs.forEach(pair => {
+          const projection =
+            seasonAverage *
+              pair.seasonWeight +
+            recentAverage *
+              pair.recentWeight;
+
+          const error =
+            projection - actual;
+
+          const key =
+            `${pair.seasonWeight.toFixed(2)}|` +
+            `${pair.recentWeight.toFixed(2)}`;
+
+          const result =
+            results[market.key][key];
+
+          result.count++;
+
+          result.absoluteErrorSum +=
+            Math.abs(error);
+
+          result.squaredErrorSum +=
+            error * error;
+        });
+      });
+    }
+  });
+
+  // --------------------------------------------------------------------------
+  // Calculate MAE / RMSE
+  // --------------------------------------------------------------------------
+
+  const detailRows = [];
+
+  markets.forEach(market => {
+    Object.values(
+      results[market.key]
+    ).forEach(result => {
+      if (!result.count) return;
+
+      const mae =
+        result.absoluteErrorSum /
+        result.count;
+
+      const rmse =
+        Math.sqrt(
+          result.squaredErrorSum /
+          result.count
+        );
+
+      detailRows.push({
+        market:
+          result.market,
+
+        seasonWeight:
+          result.seasonWeight,
+
+        recentWeight:
+          result.recentWeight,
+
+        sampleSize:
+          result.count,
+
+        mae,
+        rmse
+      });
+    });
+  });
+
+  if (!detailRows.length) {
+    throw new Error(
+      "NBA projection backtest produced no predictions."
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // Determine winners by market
+  // --------------------------------------------------------------------------
+
+  const summaryRows = [];
+
+  markets.forEach(market => {
+    const marketRows =
+      detailRows.filter(
+        row =>
+          row.market === market.market
+      );
+
+    if (!marketRows.length) return;
+
+    const bestMAE =
+      marketRows
+        .slice()
+        .sort(
+          (a, b) =>
+            a.mae - b.mae ||
+            a.recentWeight -
+              b.recentWeight
+        )[0];
+
+    const bestRMSE =
+      marketRows
+        .slice()
+        .sort(
+          (a, b) =>
+            a.rmse - b.rmse ||
+            a.recentWeight -
+              b.recentWeight
+        )[0];
+
+    const seasonOnly =
+      marketRows.find(
+        row =>
+          row.recentWeight === 0
+      );
+
+    summaryRows.push([
+      market.market,
+
+      bestMAE.sampleSize,
+
+      bestMAE.seasonWeight,
+      bestMAE.recentWeight,
+      bestMAE.mae,
+
+      bestRMSE.seasonWeight,
+      bestRMSE.recentWeight,
+      bestRMSE.rmse,
+
+      seasonOnly
+        ? seasonOnly.mae
+        : "",
+
+      seasonOnly
+        ? seasonOnly.rmse
+        : "",
+
+      seasonOnly
+        ? (
+            (
+              seasonOnly.mae -
+              bestMAE.mae
+            ) /
+            seasonOnly.mae
+          )
+        : "",
+
+      seasonOnly
+        ? (
+            (
+              seasonOnly.rmse -
+              bestRMSE.rmse
+            ) /
+            seasonOnly.rmse
+          )
+        : ""
+    ]);
+  });
+
+  // --------------------------------------------------------------------------
+  // Create / refresh output sheet
+  // --------------------------------------------------------------------------
+
+  const SHEET_NAME =
+    "NBA Projection Backtest";
+
+  let outputSheet =
+    ss.getSheetByName(SHEET_NAME);
+
+  if (!outputSheet) {
+    outputSheet =
+      ss.insertSheet(SHEET_NAME);
+  } else {
+    outputSheet.clearContents();
+  }
+
+  const summaryHeaders = [
+    "Market",
+    "Predictions",
+    "Best MAE Season Weight",
+    "Best MAE Recent Weight",
+    "Best MAE",
+    "Best RMSE Season Weight",
+    "Best RMSE Recent Weight",
+    "Best RMSE",
+    "Season-Only MAE",
+    "Season-Only RMSE",
+    "MAE Improvement vs Season",
+    "RMSE Improvement vs Season"
+  ];
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      1,
+      summaryHeaders.length
+    )
+    .setValues([summaryHeaders]);
+
+  if (summaryRows.length) {
+    outputSheet
+      .getRange(
+        2,
+        1,
+        summaryRows.length,
+        summaryHeaders.length
+      )
+      .setValues(summaryRows);
+  }
+
+  // --------------------------------------------------------------------------
+  // Detailed grid underneath summary
+  // --------------------------------------------------------------------------
+
+  const detailStartRow =
+    summaryRows.length + 4;
+
+  const detailHeaders = [
+    "Market",
+    "Season Weight",
+    "Recent Weight",
+    "Predictions",
+    "MAE",
+    "RMSE"
+  ];
+
+  outputSheet
+    .getRange(
+      detailStartRow,
+      1,
+      1,
+      detailHeaders.length
+    )
+    .setValues([detailHeaders]);
+
+  const detailValues =
+    detailRows
+      .sort((a, b) => {
+        const marketCompare =
+          a.market.localeCompare(
+            b.market
+          );
+
+        if (marketCompare !== 0) {
+          return marketCompare;
+        }
+
+        return (
+          b.seasonWeight -
+          a.seasonWeight
+        );
+      })
+      .map(row => [
+        row.market,
+        row.seasonWeight,
+        row.recentWeight,
+        row.sampleSize,
+        row.mae,
+        row.rmse
+      ]);
+
+  outputSheet
+    .getRange(
+      detailStartRow + 1,
+      1,
+      detailValues.length,
+      detailHeaders.length
+    )
+    .setValues(detailValues);
+
+  // --------------------------------------------------------------------------
+  // Formatting
+  // --------------------------------------------------------------------------
+
+  outputSheet
+    .getRange(
+      2,
+      3,
+      summaryRows.length,
+      2
+    )
+    .setNumberFormat("0%");
+
+  outputSheet
+    .getRange(
+      2,
+      6,
+      summaryRows.length,
+      2
+    )
+    .setNumberFormat("0%");
+
+  outputSheet
+    .getRange(
+      2,
+      11,
+      summaryRows.length,
+      2
+    )
+    .setNumberFormat("0.00%");
+
+  if (detailValues.length) {
+    outputSheet
+      .getRange(
+        detailStartRow + 1,
+        2,
+        detailValues.length,
+        2
+      )
+      .setNumberFormat("0%");
+  }
+
+  outputSheet.setFrozenRows(1);
+  outputSheet.autoResizeColumns(
+    1,
+    summaryHeaders.length
+  );
+
+  Logger.log(
+    `NBA projection backtest complete: ` +
+    `${summaryRows.length} markets evaluated.`
+  );
+}
+
+// ============================================================================
+// NBA PROJECTION WEIGHT HOLDOUT VALIDATION
+// P4/18
+//
+// READ-ONLY with respect to production data.
+// Reads:  NBA Player Game Logs
+// Writes: NBA Projection Holdout
+//
+// Method:
+// - Sorts every player's games chronologically.
+// - First 75% = model-development/training history.
+// - Final 25% = untouched holdout.
+// - For every holdout prediction:
+//     Season Avg = all PRIOR games
+//     Recent Avg = previous 5 games
+// - Compares:
+//     1. Season Only
+//     2. Best-MAE candidate from NBA Projection Backtest
+//     3. Best-RMSE candidate from NBA Projection Backtest
+//
+// No future game is used to predict an earlier game.
+// ============================================================================
+
+function validateNBAProjectionHoldout() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const logSheet =
+    ss.getSheetByName(
+      "NBA Player Game Logs"
+    );
+
+  if (!logSheet) {
+    throw new Error(
+      'Missing required sheet: "NBA Player Game Logs".'
+    );
+  }
+
+  const logs =
+    getNBAObjectsFromSheet_(logSheet);
+
+  if (!logs.length) {
+    throw new Error(
+      "NBA Player Game Logs contains no historical data."
+    );
+  }
+
+  const markets = [
+    {
+      market: "Points",
+      key: "points",
+      maeRecent: 0.40,
+      rmseRecent: 0.40
+    },
+    {
+      market: "Rebounds",
+      key: "rebounds",
+      maeRecent: 0.30,
+      rmseRecent: 0.30
+    },
+    {
+      market: "Assists",
+      key: "assists",
+      maeRecent: 0.35,
+      rmseRecent: 0.35
+    },
+    {
+      market: "Threes",
+      key: "threes",
+      maeRecent: 0.25,
+      rmseRecent: 0.20
+    },
+    {
+      market: "Steals",
+      key: "steals",
+      maeRecent: 0.20,
+      rmseRecent: 0.15
+    },
+    {
+      market: "Blocks",
+      key: "blocks",
+      maeRecent: 0.15,
+      rmseRecent: 0.10
+    },
+    {
+      market: "Turnovers",
+      key: "turnovers",
+      maeRecent: 0.25,
+      rmseRecent: 0.20
+    },
+    {
+      market: "Points + Rebounds",
+      key: "pointsRebounds",
+      maeRecent: 0.45,
+      rmseRecent: 0.45
+    },
+    {
+      market: "Points + Assists",
+      key: "pointsAssists",
+      maeRecent: 0.45,
+      rmseRecent: 0.45
+    },
+    {
+      market: "Rebounds + Assists",
+      key: "reboundsAssists",
+      maeRecent: 0.40,
+      rmseRecent: 0.40
+    },
+    {
+      market: "PRA",
+      key: "pra",
+      maeRecent: 0.50,
+      rmseRecent: 0.50
+    },
+    {
+      market: "Blocks + Steals",
+      key: "blocksSteals",
+      maeRecent: 0.20,
+      rmseRecent: 0.15
+    }
+  ];
+
+  const MIN_PRIOR_GAMES = 10;
+  const RECENT_GAMES = 5;
+
+  // --------------------------------------------------------------------------
+  // Build player histories
+  // --------------------------------------------------------------------------
+
+  const players = {};
+
+  logs.forEach(row => {
+    const playerId =
+      String(
+        row["Player ID"] || ""
+      ).trim();
+
+    if (!playerId) return;
+
+    const date =
+      new Date(row["Game Date"]);
+
+    if (
+      !date ||
+      Number.isNaN(date.getTime())
+    ) {
+      return;
+    }
+
+    const points =
+      Number(row["Points"] || 0);
+
+    const rebounds =
+      Number(row["Rebounds"] || 0);
+
+    const assists =
+      Number(row["Assists"] || 0);
+
+    const steals =
+      Number(row["Steals"] || 0);
+
+    const blocks =
+      Number(row["Blocks"] || 0);
+
+    if (!players[playerId]) {
+      players[playerId] = {
+        playerId,
+        games: []
+      };
+    }
+
+    players[playerId].games.push({
+      date,
+
+      points,
+      rebounds,
+      assists,
+
+      threes:
+        Number(
+          row["Threes"] || 0
+        ),
+
+      steals,
+      blocks,
+
+      turnovers:
+        Number(
+          row["Turnovers"] || 0
+        ),
+
+      pointsRebounds:
+        points + rebounds,
+
+      pointsAssists:
+        points + assists,
+
+      reboundsAssists:
+        rebounds + assists,
+
+      pra:
+        points +
+        rebounds +
+        assists,
+
+      blocksSteals:
+        blocks + steals
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Sort oldest -> newest
+  // --------------------------------------------------------------------------
+
+  Object.values(players)
+    .forEach(player => {
+      player.games.sort(
+        (a, b) =>
+          a.date.getTime() -
+          b.date.getTime()
+      );
+    });
+
+  // --------------------------------------------------------------------------
+  // Accumulators
+  // --------------------------------------------------------------------------
+
+  const results = {};
+
+  markets.forEach(market => {
+    results[market.key] = {
+      season: createNBAHoldoutAccumulator_(),
+      maeCandidate:
+        createNBAHoldoutAccumulator_(),
+      rmseCandidate:
+        createNBAHoldoutAccumulator_()
+    };
+  });
+
+  // --------------------------------------------------------------------------
+  // Walk forward through untouched final 25%
+  // --------------------------------------------------------------------------
+
+  Object.values(players)
+    .forEach(player => {
+      const games = player.games;
+
+      if (
+        games.length <=
+        MIN_PRIOR_GAMES
+      ) {
+        return;
+      }
+
+      const holdoutStart =
+        Math.max(
+          MIN_PRIOR_GAMES,
+          Math.floor(
+            games.length * 0.75
+          )
+        );
+
+      for (
+        let targetIndex =
+          holdoutStart;
+
+        targetIndex <
+          games.length;
+
+        targetIndex++
+      ) {
+        const priorGames =
+          games.slice(
+            0,
+            targetIndex
+          );
+
+        if (
+          priorGames.length <
+          MIN_PRIOR_GAMES
+        ) {
+          continue;
+        }
+
+        const recentGames =
+          priorGames.slice(
+            -RECENT_GAMES
+          );
+
+        const targetGame =
+          games[targetIndex];
+
+        markets.forEach(
+          market => {
+            const seasonValues =
+              priorGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const recentValues =
+              recentGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const seasonAverage =
+              avgNBA_(
+                seasonValues
+              );
+
+            const recentAverage =
+              avgNBA_(
+                recentValues
+              );
+
+            const actual =
+              Number(
+                targetGame[
+                  market.key
+                ] || 0
+              );
+
+            // Season-only baseline
+            addNBAHoldoutError_(
+              results[
+                market.key
+              ].season,
+              seasonAverage,
+              actual
+            );
+
+            // Best-MAE candidate
+            const maeProjection =
+              seasonAverage *
+                (
+                  1 -
+                  market.maeRecent
+                ) +
+              recentAverage *
+                market.maeRecent;
+
+            addNBAHoldoutError_(
+              results[
+                market.key
+              ].maeCandidate,
+              maeProjection,
+              actual
+            );
+
+            // Best-RMSE candidate
+            const rmseProjection =
+              seasonAverage *
+                (
+                  1 -
+                  market.rmseRecent
+                ) +
+              recentAverage *
+                market.rmseRecent;
+
+            addNBAHoldoutError_(
+              results[
+                market.key
+              ].rmseCandidate,
+              rmseProjection,
+              actual
+            );
+          }
+        );
+      }
+    });
+
+  // --------------------------------------------------------------------------
+  // Build output
+  // --------------------------------------------------------------------------
+
+  const outputRows = [];
+
+  markets.forEach(market => {
+    const marketResults =
+      results[market.key];
+
+    const season =
+      finalizeNBAHoldoutAccumulator_(
+        marketResults.season
+      );
+
+    const maeCandidate =
+      finalizeNBAHoldoutAccumulator_(
+        marketResults.maeCandidate
+      );
+
+    const rmseCandidate =
+      finalizeNBAHoldoutAccumulator_(
+        marketResults.rmseCandidate
+      );
+
+    const maeImprovement =
+      season.mae > 0
+        ? (
+            season.mae -
+            maeCandidate.mae
+          ) / season.mae
+        : "";
+
+    const maeCandidateRMSEImprovement =
+      season.rmse > 0
+        ? (
+            season.rmse -
+            maeCandidate.rmse
+          ) / season.rmse
+        : "";
+
+    const rmseCandidateMAEImprovement =
+      season.mae > 0
+        ? (
+            season.mae -
+            rmseCandidate.mae
+          ) / season.mae
+        : "";
+
+    const rmseImprovement =
+      season.rmse > 0
+        ? (
+            season.rmse -
+            rmseCandidate.rmse
+          ) / season.rmse
+        : "";
+
+    outputRows.push([
+      market.market,
+
+      season.count,
+
+      season.mae,
+      season.rmse,
+
+      1 - market.maeRecent,
+      market.maeRecent,
+      maeCandidate.mae,
+      maeCandidate.rmse,
+      maeImprovement,
+      maeCandidateRMSEImprovement,
+
+      1 - market.rmseRecent,
+      market.rmseRecent,
+      rmseCandidate.mae,
+      rmseCandidate.rmse,
+      rmseCandidateMAEImprovement,
+      rmseImprovement,
+
+      (
+        maeImprovement > 0 &&
+        maeCandidateRMSEImprovement > 0
+      )
+        ? "PASS"
+        : "FAIL",
+
+      (
+        rmseCandidateMAEImprovement > 0 &&
+        rmseImprovement > 0
+      )
+        ? "PASS"
+        : "FAIL"
+    ]);
+  });
+
+  // --------------------------------------------------------------------------
+  // Output sheet
+  // --------------------------------------------------------------------------
+
+  const SHEET_NAME =
+    "NBA Projection Holdout";
+
+  let outputSheet =
+    ss.getSheetByName(
+      SHEET_NAME
+    );
+
+  if (!outputSheet) {
+    outputSheet =
+      ss.insertSheet(
+        SHEET_NAME
+      );
+  } else {
+    outputSheet.clearContents();
+  }
+
+  const headers = [
+    "Market",
+    "Holdout Predictions",
+
+    "Season-Only MAE",
+    "Season-Only RMSE",
+
+    "MAE Candidate Season Weight",
+    "MAE Candidate Recent Weight",
+    "MAE Candidate MAE",
+    "MAE Candidate RMSE",
+    "MAE Candidate MAE Improvement",
+    "MAE Candidate RMSE Improvement",
+
+    "RMSE Candidate Season Weight",
+    "RMSE Candidate Recent Weight",
+    "RMSE Candidate MAE",
+    "RMSE Candidate RMSE",
+    "RMSE Candidate MAE Improvement",
+    "RMSE Candidate RMSE Improvement",
+
+    "MAE Candidate Verdict",
+    "RMSE Candidate Verdict"
+  ];
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([headers]);
+
+  outputSheet
+    .getRange(
+      2,
+      1,
+      outputRows.length,
+      headers.length
+    )
+    .setValues(outputRows);
+
+  // Weight columns
+  outputSheet
+    .getRange(
+      2,
+      5,
+      outputRows.length,
+      2
+    )
+    .setNumberFormat("0%");
+
+  outputSheet
+    .getRange(
+      2,
+      11,
+      outputRows.length,
+      2
+    )
+    .setNumberFormat("0%");
+
+  // Improvement columns
+  outputSheet
+    .getRange(
+      2,
+      9,
+      outputRows.length,
+      2
+    )
+    .setNumberFormat("0.00%");
+
+  outputSheet
+    .getRange(
+      2,
+      15,
+      outputRows.length,
+      2
+    )
+    .setNumberFormat("0.00%");
+
+  outputSheet.setFrozenRows(1);
+
+  outputSheet.autoResizeColumns(
+    1,
+    headers.length
+  );
+
+  Logger.log(
+    "NBA projection holdout validation complete."
+  );
+}
+
+
+// ============================================================================
+// P4 HOLDOUT HELPERS
+// ============================================================================
+
+function createNBAHoldoutAccumulator_() {
+  return {
+    count: 0,
+    absoluteErrorSum: 0,
+    squaredErrorSum: 0
+  };
+}
+
+
+function addNBAHoldoutError_(
+  accumulator,
+  projection,
+  actual
+) {
+  const error =
+    projection - actual;
+
+  accumulator.count++;
+
+  accumulator.absoluteErrorSum +=
+    Math.abs(error);
+
+  accumulator.squaredErrorSum +=
+    error * error;
+}
+
+
+function finalizeNBAHoldoutAccumulator_(
+  accumulator
+) {
+  if (!accumulator.count) {
+    return {
+      count: 0,
+      mae: 0,
+      rmse: 0
+    };
+  }
+
+  return {
+    count:
+      accumulator.count,
+
+    mae:
+      accumulator.absoluteErrorSum /
+      accumulator.count,
+
+    rmse:
+      Math.sqrt(
+        accumulator.squaredErrorSum /
+        accumulator.count
+      )
+  };
+}
+
+// ============================================================================
+// NBA PROP PROJECTION WEIGHTS
+// P4/18 — chronologically validated production weights
+// ============================================================================
+
+const NBA_PROP_PROJECTION_WEIGHTS = {
+  points: {
+    season: 0.60,
+    recent: 0.40
+  },
+
+  rebounds: {
+    season: 0.70,
+    recent: 0.30
+  },
+
+  assists: {
+    season: 0.65,
+    recent: 0.35
+  },
+
+  threes: {
+    season: 0.80,
+    recent: 0.20
+  },
+
+  steals: {
+    season: 0.85,
+    recent: 0.15
+  },
+
+  blocks: {
+    season: 0.90,
+    recent: 0.10
+  },
+
+  turnovers: {
+    season: 0.80,
+    recent: 0.20
+  },
+
+  points_rebounds: {
+    season: 0.55,
+    recent: 0.45
+  },
+
+  points_assists: {
+    season: 0.55,
+    recent: 0.45
+  },
+
+  rebounds_assists: {
+    season: 0.60,
+    recent: 0.40
+  },
+
+  points_rebounds_assists: {
+    season: 0.50,
+    recent: 0.50
+  },
+
+  blocks_steals: {
+    season: 0.85,
+    recent: 0.15
+  }
+};
+
+// ============================================================================
+// NBA PROP MARKET NORMALIZATION
+//
+// Converts provider Prop Type values into Sportacular's frozen
+// 12-market production contract.
+//
+// Unknown/unsupported markets return null.
+// ============================================================================
+
+function normalizeNBAPropMarket_(propType) {
+  const raw =
+    String(
+      propType || ""
+    )
+      .trim()
+      .toLowerCase();
+
+  if (!raw) {
+    return null;
+  }
+
+  const normalized =
+    raw
+      .replace(/[\s-]+/g, "_")
+      .replace(/\+/g, "_")
+      .replace(/__+/g, "_")
+      .replace(/^_+|_+$/g, "");
+
+  const aliases = {
+    // ----------------------------------------------------------
+    // Direct markets
+    // ----------------------------------------------------------
+
+    points:
+      "points",
+
+    player_points:
+      "points",
+
+    rebounds:
+      "rebounds",
+
+    player_rebounds:
+      "rebounds",
+
+    assists:
+      "assists",
+
+    player_assists:
+      "assists",
+
+    threes:
+      "threes",
+
+    three_pointers:
+      "threes",
+
+    three_pointers_made:
+      "threes",
+
+    threes_made:
+      "threes",
+
+    player_threes:
+      "threes",
+
+    player_threes_made:
+      "threes",
+
+    steals:
+      "steals",
+
+    player_steals:
+      "steals",
+
+    blocks:
+      "blocks",
+
+    player_blocks:
+      "blocks",
+
+    turnovers:
+      "turnovers",
+
+    player_turnovers:
+      "turnovers",
+
+    // ----------------------------------------------------------
+    // Combination markets
+    // ----------------------------------------------------------
+
+    points_rebounds:
+      "points_rebounds",
+
+    points_and_rebounds:
+      "points_rebounds",
+
+    player_points_rebounds:
+      "points_rebounds",
+
+    points_assists:
+      "points_assists",
+
+    points_and_assists:
+      "points_assists",
+
+    player_points_assists:
+      "points_assists",
+
+    rebounds_assists:
+      "rebounds_assists",
+
+    rebounds_and_assists:
+      "rebounds_assists",
+
+    player_rebounds_assists:
+      "rebounds_assists",
+
+    points_rebounds_assists:
+      "points_rebounds_assists",
+
+    points_rebounds_assists_pra:
+      "points_rebounds_assists",
+
+    pra:
+      "points_rebounds_assists",
+
+    player_points_rebounds_assists:
+      "points_rebounds_assists",
+
+    blocks_steals:
+      "blocks_steals",
+
+    blocks_and_steals:
+      "blocks_steals",
+
+    steals_blocks:
+      "blocks_steals",
+
+    player_blocks_steals:
+      "blocks_steals"
+  };
+
+  return (
+    aliases[normalized] ||
+    null
+  );
+}
+
+// ============================================================================
+// NBA PRODUCTION PROJECTION
+//
+// Universal contract:
+//
+// Player Baseline
+//      +
+// Trend Adjustment
+//      =
+// Projected Stat
+//
+// Baseline = season average.
+// Trend adjustment moves the baseline toward the recent-5 average
+// according to the chronologically validated P4 market weight.
+// ============================================================================
+
+function calculateNBAPropProjection_(
+  marketKey,
+  seasonAverage,
+  recentAverage
+) {
+  const weights =
+    NBA_PROP_PROJECTION_WEIGHTS[
+      marketKey
+    ];
+
+  if (!weights) {
+    return {
+      baseline: null,
+      trendAdjustment: null,
+      projection: null
+    };
+  }
+
+  const season =
+    Number(
+      seasonAverage
+    );
+
+  const recent =
+    Number(
+      recentAverage
+    );
+
+  if (
+    !Number.isFinite(season) ||
+    !Number.isFinite(recent)
+  ) {
+    return {
+      baseline: null,
+      trendAdjustment: null,
+      projection: null
+    };
+  }
+
+  const baseline =
+    season;
+
+  const trendAdjustment =
+    (
+      recent -
+      season
+    ) *
+    weights.recent;
+
+  const projection =
+    baseline +
+    trendAdjustment;
+
+  return {
+    baseline,
+    trendAdjustment,
+    projection
+  };
+}
+
+// ============================================================================
+// NBA PROP HISTORICAL CONTEXT
+// P7/18
+//
+// Builds production-ready player/market context from NBA Player Game Logs.
+//
+// No API calls.
+// No Player Props writes.
+// No production sheet changes.
+// ============================================================================
+
+const NBA_PROP_GAME_LOG_KEYS = {
+  points: "points",
+  rebounds: "rebounds",
+  assists: "assists",
+  threes: "threes",
+  steals: "steals",
+  blocks: "blocks",
+  turnovers: "turnovers",
+
+  points_rebounds:
+    "pointsRebounds",
+
+  points_assists:
+    "pointsAssists",
+
+  rebounds_assists:
+    "reboundsAssists",
+
+  points_rebounds_assists:
+    "pra",
+
+  blocks_steals:
+    "blocksSteals"
+};
+
+
+// ============================================================================
+// BUILD ONE PLAYER'S GAME-LEVEL PROP HISTORY
+// ============================================================================
+
+function buildNBAPropGameFromLogRow_(row) {
+  const points =
+    Number(
+      row["Points"] || 0
+    );
+
+  const rebounds =
+    Number(
+      row["Rebounds"] || 0
+    );
+
+  const assists =
+    Number(
+      row["Assists"] || 0
+    );
+
+  const steals =
+    Number(
+      row["Steals"] || 0
+    );
+
+  const blocks =
+    Number(
+      row["Blocks"] || 0
+    );
+
+  return {
+    date:
+      row["Game Date"],
+
+    points,
+
+    rebounds,
+
+    assists,
+
+    threes:
+      Number(
+        row["Threes"] || 0
+      ),
+
+    steals,
+
+    blocks,
+
+    turnovers:
+      Number(
+        row["Turnovers"] || 0
+      ),
+
+    pointsRebounds:
+      points +
+      rebounds,
+
+    pointsAssists:
+      points +
+      assists,
+
+    reboundsAssists:
+      rebounds +
+      assists,
+
+    pra:
+      points +
+      rebounds +
+      assists,
+
+    blocksSteals:
+      blocks +
+      steals
+  };
+}
+
+
+// ============================================================================
+// BUILD COMPLETE NBA PLAYER PROP CONTEXT MAP
+//
+// Return structure:
+//
+// contextMap[playerId][marketKey] = {
+//   playerId,
+//   playerName,
+//   team,
+//   marketKey,
+//   gamesPlayed,
+//   seasonAverage,
+//   recentAverage,
+//   statStdDev,
+//   baseline,
+//   trendAdjustment,
+//   projection
+// }
+// ============================================================================
+
+function buildNBAPlayerPropContextMap_() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const logSheet =
+    ss.getSheetByName(
+      "NBA Player Game Logs"
+    );
+
+  if (!logSheet) {
+    throw new Error(
+      'Missing required sheet: "NBA Player Game Logs".'
+    );
+  }
+
+  const rows =
+    getNBAObjectsFromSheet_(
+      logSheet
+    );
+
+  const players = {};
+
+  rows.forEach(row => {
+    const playerId =
+      String(
+        row["Player ID"] || ""
+      ).trim();
+
+    if (!playerId) {
+      return;
+    }
+
+    if (!players[playerId]) {
+      players[playerId] = {
+        playerId,
+
+        playerName:
+          row["Player Name"] || "",
+
+        team:
+          row["Team"] || "",
+
+        games: []
+      };
+    }
+
+    // Keep the most recently encountered
+    // nonblank identity information.
+    if (row["Player Name"]) {
+      players[playerId].playerName =
+        row["Player Name"];
+    }
+
+    if (row["Team"]) {
+      players[playerId].team =
+        row["Team"];
+    }
+
+    players[playerId].games.push(
+      buildNBAPropGameFromLogRow_(
+        row
+      )
+    );
+  });
+
+  const contextMap = {};
+
+  Object.values(players)
+    .forEach(player => {
+
+      // Oldest -> newest.
+      //
+      // This makes the last five entries
+      // unambiguously the player's latest
+      // five historical games.
+      player.games.sort(
+        (a, b) =>
+          new Date(a.date) -
+          new Date(b.date)
+      );
+
+      contextMap[
+        player.playerId
+      ] = {};
+
+      Object.keys(
+        NBA_PROP_GAME_LOG_KEYS
+      ).forEach(marketKey => {
+
+        const gameLogKey =
+          NBA_PROP_GAME_LOG_KEYS[
+            marketKey
+          ];
+
+        const values =
+          player.games
+            .map(game =>
+              Number(
+                game[
+                  gameLogKey
+                ]
+              )
+            )
+            .filter(
+              value =>
+                Number.isFinite(
+                  value
+                )
+            );
+
+        if (!values.length) {
+          return;
+        }
+
+        const recentValues =
+          values.slice(-5);
+
+        const seasonAverage =
+          avgNBA_(
+            values
+          );
+
+        const recentAverage =
+          avgNBA_(
+            recentValues
+          );
+
+        const statStdDev =
+          stdDevNBA_(
+            values
+          );
+
+        const projection =
+          calculateNBAPropProjection_(
+            marketKey,
+            seasonAverage,
+            recentAverage
+          );
+
+        contextMap[
+          player.playerId
+        ][
+          marketKey
+        ] = {
+          playerId:
+            player.playerId,
+
+          playerName:
+            player.playerName,
+
+          team:
+            player.team,
+
+          marketKey,
+
+          gamesPlayed:
+            values.length,
+
+          seasonAverage,
+
+          recentAverage,
+
+          statStdDev,
+
+          baseline:
+            projection.baseline,
+
+          trendAdjustment:
+            projection.trendAdjustment,
+
+          projection:
+            projection.projection
+        };
+      });
+    });
+
+  return contextMap;
+}
+
+function auditNBAPlayerPropContext() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const contextMap =
+    buildNBAPlayerPropContextMap_();
+
+  const rows = [];
+
+  Object.keys(contextMap)
+    .forEach(playerId => {
+
+      const playerMarkets =
+        contextMap[playerId];
+
+      Object.keys(playerMarkets)
+        .forEach(marketKey => {
+
+          const context =
+            playerMarkets[
+              marketKey
+            ];
+
+          rows.push([
+            context.playerId,
+            context.playerName,
+            context.team,
+            context.marketKey,
+            context.gamesPlayed,
+            context.seasonAverage,
+            context.recentAverage,
+            context.statStdDev,
+            context.baseline,
+            context.trendAdjustment,
+            context.projection
+          ]);
+        });
+    });
+
+  rows.sort(
+    (a, b) => {
+      const nameCompare =
+        String(a[1] || "")
+          .localeCompare(
+            String(b[1] || "")
+          );
+
+      if (nameCompare !== 0) {
+        return nameCompare;
+      }
+
+      return String(
+        a[3] || ""
+      ).localeCompare(
+        String(
+          b[3] || ""
+        )
+      );
+    }
+  );
+
+  const sheetName =
+    "NBA Prop Context Audit";
+
+  let sheet =
+    ss.getSheetByName(
+      sheetName
+    );
+
+  if (!sheet) {
+    sheet =
+      ss.insertSheet(
+        sheetName
+      );
+  } else {
+    sheet.clearContents();
+  }
+
+  const headers = [
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Market",
+    "Games Played",
+    "Season Average",
+    "Recent 5 Average",
+    "Stat Std Dev",
+    "Player Baseline",
+    "Trend Adjustment",
+    "Projected Stat"
+  ];
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([
+      headers
+    ]);
+
+  if (rows.length) {
+    sheet
+      .getRange(
+        2,
+        1,
+        rows.length,
+        headers.length
+      )
+      .setValues(
+        rows
+      );
+
+    sheet
+      .getRange(
+        2,
+        6,
+        rows.length,
+        6
+      )
+      .setNumberFormat(
+        "0.0000"
+      );
+  }
+
+  sheet.setFrozenRows(1);
+
+  sheet.autoResizeColumns(
+    1,
+    headers.length
+  );
+
+  Logger.log(
+    "NBA prop context audit complete: " +
+    rows.length +
+    " player-market rows."
+  );
+}
+
+// ============================================================================
+// NBA LIVE PLAYER PROP INTEGRATION AUDIT
+// P7/18
+//
+// READ-ONLY with respect to production Player Props.
+//
+// Reads:
+// - Player Props
+// - NBA Player Game Logs through buildNBAPlayerPropContextMap_()
+//
+// Writes:
+// - NBA Live Prop Audit
+//
+// Purpose:
+// - Verify actual provider market names and Type values.
+// - Join live props to historical player context.
+// - Calculate raw + calibrated probabilities.
+// - Calculate EV and price edge when usable prices exist.
+// - Preserve unsupported / missing data as null.
+// ============================================================================
+
+function auditNBALivePropIntegration() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const propSheet =
+    ss.getSheetByName(
+      "Player Props"
+    );
+
+  if (!propSheet) {
+    throw new Error(
+      'Missing required sheet: "Player Props".'
+    );
+  }
+
+  const lastRow =
+    propSheet.getLastRow();
+
+  if (lastRow < 2) {
+    throw new Error(
+      "Player Props contains no prop rows."
+    );
+  }
+
+  const contextMap =
+    buildNBAPlayerPropContextMap_();
+
+  // Current production raw schema:
+  //
+  // A Game Id
+  // B Game Date
+  // C Away Team
+  // D Home Team
+  // E Id
+  // F Player Id
+  // G Vendor
+  // H Prop Type
+  // I Line Value
+  // J Type
+  // K Odds
+  // L Updated At
+  // M Over Odds
+  // N Under Odds
+
+  const propRows =
+    propSheet
+      .getRange(
+        2,
+        1,
+        lastRow - 1,
+        14
+      )
+      .getValues();
+
+  const outputRows = [];
+
+  propRows.forEach(row => {
+
+    // Skip completely empty/non-prop rows.
+    //
+    // A valid production prop should have at least
+    // a Game Id, Player Id, Prop Type, or Line Value.
+    const hasPropData =
+      row[0] !== "" ||
+      row[5] !== "" ||
+      row[7] !== "" ||
+      row[8] !== "";
+
+    if (!hasPropData) {
+      return;
+    }
+    const gameId =
+      row[0];
+
+    const playerId =
+      String(
+        row[5] || ""
+      ).trim();
+
+    const vendor =
+      row[6];
+
+    const rawPropType =
+      row[7];
+
+    const lineRaw =
+      row[8];
+
+    const type =
+      String(
+        row[9] || ""
+      )
+        .trim()
+        .toLowerCase();
+
+    const generalOdds =
+      parseNBAAmericanOdds_(
+        row[10]
+      );
+
+    const overOdds =
+      parseNBAAmericanOdds_(
+        row[12]
+      );
+
+    const underOdds =
+      parseNBAAmericanOdds_(
+        row[13]
+      );
+
+    const marketKey =
+      normalizeNBAPropMarket_(
+        rawPropType
+      );
+
+    const line =
+      parseNBANumberOrNull_(
+        lineRaw
+      );
+
+    const playerContext =
+      playerId &&
+      contextMap[playerId]
+        ? contextMap[playerId]
+        : null;
+
+    const context =
+      playerContext &&
+      marketKey
+        ? playerContext[
+            marketKey
+          ] || null
+        : null;
+
+    let rawOverProbability =
+      null;
+
+    let rawUnderProbability =
+      null;
+
+    let calibratedOverProbability =
+      null;
+
+    let calibratedUnderProbability =
+      null;
+
+    let evOver =
+      null;
+
+    let evUnder =
+      null;
+
+    let overPriceEdge =
+      null;
+
+    let underPriceEdge =
+      null;
+
+    let status = "";
+
+    // ------------------------------------------------------------------------
+    // Determine whether this row is modelable.
+    // ------------------------------------------------------------------------
+
+    if (!marketKey) {
+      status =
+        "UNSUPPORTED MARKET";
+    } else if (!playerId) {
+      status =
+        "MISSING PLAYER ID";
+    } else if (!context) {
+      status =
+        "NO PLAYER CONTEXT";
+    } else if (line === null) {
+      status =
+        "MISSING LINE";
+    } else if (
+      context.projection === null ||
+      context.projection === undefined ||
+      !Number.isFinite(
+        Number(
+          context.projection
+        )
+      )
+    ) {
+      status =
+        "MISSING PROJECTION";
+    } else {
+
+      const probabilities =
+        calculateNBAPropProbabilities_(
+          marketKey,
+          context.projection,
+          context.statStdDev,
+          line
+        );
+
+      rawOverProbability =
+        probabilities.over;
+
+      rawUnderProbability =
+        probabilities.under;
+
+      if (
+        rawOverProbability !== null
+      ) {
+        calibratedOverProbability =
+          applyNBAPropCalibration_(
+            marketKey,
+            rawOverProbability
+          );
+      }
+
+      if (
+        rawUnderProbability !== null
+      ) {
+        calibratedUnderProbability =
+          applyNBAPropCalibration_(
+            marketKey,
+            rawUnderProbability
+          );
+      }
+
+      // ----------------------------------------------------------------------
+      // Price interpretation
+      //
+      // Conventional over_under:
+      //   M = Over Odds
+      //   N = Under Odds
+      //
+      // Milestone / one-sided:
+      //   K = general Odds for the offered threshold.
+      //
+      // We are NOT forcing unknown Type values into either category.
+      // ----------------------------------------------------------------------
+
+      if (
+        type === "over_under"
+      ) {
+        if (
+          calibratedOverProbability !== null &&
+          overOdds !== null
+        ) {
+          evOver =
+            calculateNBAExpectedValue_(
+              calibratedOverProbability,
+              overOdds
+            );
+
+          overPriceEdge =
+            calculateNBAPriceEdge_(
+              calibratedOverProbability,
+              overOdds
+            );
+        }
+
+        if (
+          calibratedUnderProbability !== null &&
+          underOdds !== null
+        ) {
+          evUnder =
+            calculateNBAExpectedValue_(
+              calibratedUnderProbability,
+              underOdds
+            );
+
+          underPriceEdge =
+            calculateNBAPriceEdge_(
+              calibratedUnderProbability,
+              underOdds
+            );
+        }
+
+        status =
+          (
+            overOdds !== null ||
+            underOdds !== null
+          )
+            ? "MODELED OVER_UNDER"
+            : "MODELED - MISSING SIDE ODDS";
+
+      } else if (
+        type === "milestone"
+      ) {
+
+        // IMPORTANT:
+        // This is only an audit interpretation.
+        //
+        // We retain the calculated raw probability in the output,
+        // but P7 does NOT yet declare ordinary Over probability to
+        // be the correct milestone threshold probability.
+        //
+        // Actual milestone semantics will be frozen after inspecting
+        // these live rows.
+
+        if (
+          calibratedOverProbability !== null &&
+          generalOdds !== null
+        ) {
+          evOver =
+            calculateNBAExpectedValue_(
+              calibratedOverProbability,
+              generalOdds
+            );
+
+          overPriceEdge =
+            calculateNBAPriceEdge_(
+              calibratedOverProbability,
+              generalOdds
+            );
+        }
+
+        status =
+          "MILESTONE - REVIEW SEMANTICS";
+
+      } else {
+        status =
+          type
+            ? "UNKNOWN TYPE: " +
+              type
+            : "MISSING TYPE";
+      }
+    }
+
+    outputRows.push([
+      gameId,                         // A
+      playerId,                       // B
+      context
+        ? context.playerName
+        : "",                         // C
+      context
+        ? context.team
+        : "",                         // D
+      vendor,                         // E
+      rawPropType,                    // F
+      marketKey || "",                // G
+      type,                           // H
+      line === null
+        ? ""
+        : line,                       // I
+      generalOdds === null
+        ? ""
+        : generalOdds,                // J
+      overOdds === null
+        ? ""
+        : overOdds,                   // K
+      underOdds === null
+        ? ""
+        : underOdds,                  // L
+      context
+        ? context.gamesPlayed
+        : "",                         // M
+      context
+        ? context.baseline
+        : "",                         // N
+      context
+        ? context.recentAverage
+        : "",                         // O
+      context
+        ? context.trendAdjustment
+        : "",                         // P
+      context
+        ? context.projection
+        : "",                         // Q
+      context
+        ? context.statStdDev
+        : "",                         // R
+      rawOverProbability,             // S
+      rawUnderProbability,            // T
+      calibratedOverProbability,      // U
+      calibratedUnderProbability,     // V
+      evOver,                         // W
+      evUnder,                        // X
+      overPriceEdge,                  // Y
+      underPriceEdge,                 // Z
+      status                          // AA
+    ]);
+  });
+
+  const sheetName =
+    "NBA Live Prop Audit";
+
+  let outputSheet =
+    ss.getSheetByName(
+      sheetName
+    );
+
+  if (!outputSheet) {
+    outputSheet =
+      ss.insertSheet(
+        sheetName
+      );
+  } else {
+    outputSheet.clearContents();
+  }
+
+  const headers = [
+    "Game Id",
+    "Player Id",
+    "Player Name",
+    "Team",
+    "Vendor",
+    "Raw Prop Type",
+    "Normalized Market",
+    "Type",
+    "Line",
+    "General Odds",
+    "Over Odds",
+    "Under Odds",
+    "Games",
+    "Player Baseline",
+    "Recent 5 Average",
+    "Trend Adjustment",
+    "Projected Stat",
+    "Stat Std Dev",
+    "Raw Prob Over",
+    "Raw Prob Under",
+    "Calibrated Prob Over",
+    "Calibrated Prob Under",
+    "EV Over",
+    "EV Under",
+    "Price Edge Over",
+    "Price Edge Under",
+    "Status"
+  ];
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([
+      headers
+    ]);
+
+  if (outputRows.length) {
+    outputSheet
+      .getRange(
+        2,
+        1,
+        outputRows.length,
+        headers.length
+      )
+      .setValues(
+        outputRows
+      );
+
+    // Probability / price-edge columns.
+    outputSheet
+      .getRange(
+        2,
+        19,
+        outputRows.length,
+        4
+      )
+      .setNumberFormat(
+        "0.0000%"
+      );
+
+    outputSheet
+      .getRange(
+        2,
+        25,
+        outputRows.length,
+        2
+      )
+      .setNumberFormat(
+        "0.0000%"
+      );
+
+    // EV columns.
+    outputSheet
+      .getRange(
+        2,
+        23,
+        outputRows.length,
+        2
+      )
+      .setNumberFormat(
+        "0.000000"
+      );
+
+    // Projection/context columns.
+    outputSheet
+      .getRange(
+        2,
+        14,
+        outputRows.length,
+        5
+      )
+      .setNumberFormat(
+        "0.0000"
+      );
+  }
+
+  outputSheet.setFrozenRows(1);
+
+  outputSheet.autoResizeColumns(
+    1,
+    headers.length
+  );
+
+  Logger.log(
+    "NBA live prop integration audit complete: " +
+    outputRows.length +
+    " rows."
+  );
+}
+
+
+// ============================================================================
+// STRICT NBA NUMBER PARSER
+//
+// Empty / invalid stays null.
+// Critically, blank does NOT become zero.
+// ============================================================================
+
+function parseNBANumberOrNull_(
+  value
+) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const number =
+    Number(value);
+
+  return Number.isFinite(number)
+    ? number
+    : null;
+}
+
+
+// ============================================================================
+// STRICT NBA AMERICAN ODDS PARSER
+//
+// Accepts:
+//   -110
+//   +120
+//   "120"
+//   "-105"
+//
+// Empty / invalid stays null.
+// Zero is rejected because it is not a valid American price.
+// ============================================================================
+
+function parseNBAAmericanOdds_(
+  value
+) {
+  const number =
+    parseNBANumberOrNull_(
+      value
+    );
+
+  if (
+    number === null ||
+    number === 0
+  ) {
+    return null;
+  }
+
+  return number;
+}
+
+// ============================================================================
+// NBA UNIVERSAL PLAYER PROP ROW BUILDER
+// P7/18
+//
+// Builds the frozen universal A:AJ Player Props contract.
+//
+// IMPORTANT:
+// - Does not write to Player Props.
+// - Does not assume live feed availability.
+// - Unsupported/unavailable values remain blank.
+// - P15 fields intentionally remain blank until the universal scoring
+//   contract is frozen.
+// ============================================================================
+
+const NBA_UNIVERSAL_PROP_HEADERS = [
+  "Game Id",                 // A
+  "Game Date",               // B
+  "Away Team",               // C
+  "Home Team",               // D
+  "Id",                      // E
+  "Player Id",               // F
+  "Vendor",                  // G
+  "Prop Type",               // H
+  "Line Value",              // I
+  "Type",                    // J
+  "Odds",                    // K
+  "Updated At",              // L
+  "Over Odds",               // M
+  "Under Odds",              // N
+  "Player Name",             // O
+  "Team",                    // P
+  "Player Baseline",         // Q
+  "Trend Adjustment",        // R
+  "Projected Stat",          // S
+  "Stat Std Dev",            // T
+  "Model Prob Over",         // U
+  "Model Prob Under",        // V
+  "EV Over",                 // W
+  "EV Under",                // X
+  "Best Side",               // Y
+  "Best EV",                 // Z
+  "Best Model Probability",  // AA
+  "Best Price Edge",         // AB
+  "Trend Score",             // AC
+  "Trend Strength",          // AD
+  "Risk Score",              // AE
+  "Risk Tier",               // AF
+  "Model Confidence",        // AG
+  "Sportacular Score",       // AH
+  "Sportacular Edge",        // AI
+  "Confidence Tier"          // AJ
+];
+
+
+function buildNBAUniversalPropRow_(rawProp, context) {
+  const safeProp =
+    rawProp || {};
+
+  const safeContext =
+    context || null;
+
+  return [
+    safeProp.gameId ?? "",          // A
+    safeProp.gameDate ?? "",        // B
+    safeProp.awayTeam ?? "",        // C
+    safeProp.homeTeam ?? "",        // D
+    safeProp.id ?? "",              // E
+    safeProp.playerId ?? "",        // F
+    safeProp.vendor ?? "",          // G
+    safeProp.propType ?? "",        // H
+    safeProp.lineValue ?? "",       // I
+    safeProp.type ?? "",            // J
+    safeProp.odds ?? "",            // K
+    safeProp.updatedAt ?? "",       // L
+    safeProp.overOdds ?? "",        // M
+    safeProp.underOdds ?? "",       // N
+
+    safeContext
+      ? safeContext.playerName ?? ""
+      : "",                         // O
+
+    safeContext
+      ? safeContext.team ?? ""
+      : "",                         // P
+
+    safeContext
+      ? safeContext.baseline ?? ""
+      : "",                         // Q
+
+    safeContext
+      ? safeContext.trendAdjustment ?? ""
+      : "",                         // R
+
+    safeContext
+      ? safeContext.projection ?? ""
+      : "",                         // S
+
+    safeContext
+      ? safeContext.statStdDev ?? ""
+      : "",                         // T
+
+    safeContext
+      ? safeContext.modelProbOver ?? ""
+      : "",                         // U
+
+    safeContext
+      ? safeContext.modelProbUnder ?? ""
+      : "",                         // V
+
+    safeContext
+      ? safeContext.evOver ?? ""
+      : "",                         // W
+
+    safeContext
+      ? safeContext.evUnder ?? ""
+      : "",                         // X
+
+    safeContext
+      ? safeContext.bestSide ?? ""
+      : "",                         // Y
+
+    safeContext
+      ? safeContext.bestEV ?? ""
+      : "",                         // Z
+
+    safeContext
+      ? safeContext.bestModelProbability ?? ""
+      : "",                         // AA
+
+    safeContext
+      ? safeContext.bestPriceEdge ?? ""
+      : "",                         // AB
+
+    safeContext
+      ? safeContext.trendScore ?? ""
+      : "",                         // AC
+
+    safeContext
+      ? safeContext.trendStrength ?? ""
+      : "",                         // AD
+
+    safeContext
+      ? safeContext.riskScore ?? ""
+      : "",                         // AE
+
+    safeContext
+      ? safeContext.riskTier ?? ""
+      : "",                         // AF
+
+    safeContext
+      ? safeContext.modelConfidence ?? ""
+      : "",                         // AG
+
+    safeContext
+      ? safeContext.sportacularScore ?? ""
+      : "",                         // AH
+
+    safeContext
+      ? safeContext.sportacularEdge ?? ""
+      : "",                         // AI
+
+    safeContext
+      ? safeContext.confidenceTier ?? ""
+      : ""                          // AJ
+  ];
+}
+
+/**
+ * ============================================================================
+ * P15 D7D — NBA UNIVERSAL PRODUCTION ROW FROM PROVIDER
+ * ============================================================================
+ *
+ * Preserves the frozen P4-P7 NBA model.
+ *
+ * Q:T   historical/projection context
+ * U:X   calibrated probability + EV
+ * Z:AB  strongest-side decision fields
+ *
+ * P15 owns final:
+ * Y     actionable Best Side
+ * AE    Risk Score
+ * AF    Risk Tier
+ * AH    Sportacular Score
+ * AI    Sportacular Edge
+ * AJ    Confidence Tier
+ *
+ * AC:AD and AG remain unavailable here unless validated NBA trend/confidence
+ * data is supplied. Missing stays missing.
+ * ============================================================================
+ */
+function buildNBAUniversalPropRowFromProvider_(
+  rawProp,
+  context
+) {
+
+  const safeProp =
+    rawProp || {};
+
+  const safeContext =
+    context || null;
+
+
+  const marketKey =
+    normalizeNBAPropMarket_(
+      safeProp.propType
+    );
+
+
+  // --------------------------------------------------------------------------
+  // Q:T — FROZEN NBA HISTORICAL / PROJECTION CONTEXT
+  // --------------------------------------------------------------------------
+
+  const playerBaseline =
+    safeContext
+      ? parseNBANumberOrNull_(
+          safeContext.baseline
+        )
+      : null;
+
+
+  const trendAdjustment =
+    safeContext
+      ? parseNBANumberOrNull_(
+          safeContext.trendAdjustment
+        )
+      : null;
+
+
+  const projectedStat =
+    safeContext
+      ? parseNBANumberOrNull_(
+          safeContext.projection
+        )
+      : null;
+
+
+  const statStdDev =
+    safeContext
+      ? parseNBANumberOrNull_(
+          safeContext.statStdDev
+        )
+      : null;
+
+
+  const lineValue =
+    parseNBANumberOrNull_(
+      safeProp.lineValue
+    );
+
+
+  const type =
+    String(
+      safeProp.type ?? ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  // --------------------------------------------------------------------------
+  // U:V — FROZEN NBA PROBABILITY ENGINE
+  //
+  // P7 live acceptance for integer/push and milestone semantics remains
+  // deferred. Therefore production probability pricing is limited here to
+  // conventional over_under rows.
+  // --------------------------------------------------------------------------
+
+  let modelProbOver =
+    null;
+
+  let modelProbUnder =
+    null;
+
+
+  if (
+    type === "over_under" &&
+    marketKey &&
+    projectedStat !== null &&
+    lineValue !== null
+  ) {
+
+    const rawProbabilities =
+      calculateNBAPropProbabilities_(
+        marketKey,
+        projectedStat,
+        statStdDev,
+        lineValue
+      );
+
+
+    if (
+      rawProbabilities.over !== null &&
+      rawProbabilities.under !== null
+    ) {
+
+      const shrink =
+        NBA_PROP_CALIBRATION_SHRINK[
+          marketKey
+        ] ?? 0;
+
+
+      modelProbOver =
+        0.5 +
+        (
+          rawProbabilities.over -
+          0.5
+        ) *
+        (
+          1 -
+          shrink
+        );
+
+
+      modelProbUnder =
+        0.5 +
+        (
+          rawProbabilities.under -
+          0.5
+        ) *
+        (
+          1 -
+          shrink
+        );
+
+
+      modelProbOver =
+        clampNBAProbability_(
+          modelProbOver
+        );
+
+
+      modelProbUnder =
+        clampNBAProbability_(
+          modelProbUnder
+        );
+    }
+  }
+
+
+  // --------------------------------------------------------------------------
+  // W:X — EV
+  // --------------------------------------------------------------------------
+
+  const overOdds =
+    parseNBAAmericanOdds_(
+      safeProp.overOdds
+    );
+
+
+  const underOdds =
+    parseNBAAmericanOdds_(
+      safeProp.underOdds
+    );
+
+
+  const evOver =
+    (
+      modelProbOver !== null &&
+      overOdds !== null
+    )
+      ? calculateNBAExpectedValue_(
+          modelProbOver,
+          overOdds
+        )
+      : null;
+
+
+  const evUnder =
+    (
+      modelProbUnder !== null &&
+      underOdds !== null
+    )
+      ? calculateNBAExpectedValue_(
+          modelProbUnder,
+          underOdds
+        )
+      : null;
+
+
+  // --------------------------------------------------------------------------
+  // PRE-P15 STRONGEST AVAILABLE SIDE
+  // --------------------------------------------------------------------------
+
+  let candidateSide =
+    null;
+
+  let bestEV =
+    null;
+
+  let bestModelProbability =
+    null;
+
+  let bestPriceEdge =
+    null;
+
+
+  if (
+    evOver !== null ||
+    evUnder !== null
+  ) {
+
+    if (
+      evOver !== null &&
+      (
+        evUnder === null ||
+        evOver > evUnder
+      )
+    ) {
+
+      candidateSide =
+        "Over";
+
+      bestEV =
+        evOver;
+
+      bestModelProbability =
+        modelProbOver;
+
+      bestPriceEdge =
+        calculateNBAPriceEdge_(
+          modelProbOver,
+          overOdds
+        );
+
+    } else if (
+      evUnder !== null &&
+      (
+        evOver === null ||
+        evUnder > evOver
+      )
+    ) {
+
+      candidateSide =
+        "Under";
+
+      bestEV =
+        evUnder;
+
+      bestModelProbability =
+        modelProbUnder;
+
+      bestPriceEdge =
+        calculateNBAPriceEdge_(
+          modelProbUnder,
+          underOdds
+        );
+    }
+  }
+
+
+  // --------------------------------------------------------------------------
+  // NBA TREND / CONFIDENCE
+  //
+  // Do not manufacture unavailable fields.
+  // --------------------------------------------------------------------------
+
+  const trendScore =
+    safeContext
+      ? parseNBANumberOrNull_(
+          safeContext.trendScore
+        )
+      : null;
+
+
+  const trendStrength =
+    safeContext &&
+    safeContext.trendStrength !== null &&
+    safeContext.trendStrength !== undefined &&
+    safeContext.trendStrength !== ""
+      ? safeContext.trendStrength
+      : null;
+
+
+  const modelConfidence =
+    safeContext
+      ? parseNBANumberOrNull_(
+          safeContext.modelConfidence
+        )
+      : null;
+
+
+  // --------------------------------------------------------------------------
+  // P15 UNIVERSAL SCORING
+  // --------------------------------------------------------------------------
+
+  const sportacularScoring =
+    buildUniversalSportacularScoring_({
+
+      lineValue,
+
+      projectedStat,
+
+      statStdDev,
+
+      evOver,
+
+      evUnder,
+
+      bestModelProbability,
+
+      bestPriceEdge,
+
+      trendScore,
+
+      modelConfidence
+    });
+
+
+  // --------------------------------------------------------------------------
+  // FINAL A:AJ CONTEXT
+  // --------------------------------------------------------------------------
+
+  const universalContext = {
+
+    playerName:
+      safeContext
+        ? safeContext.playerName ?? ""
+        : "",
+
+    team:
+      safeContext
+        ? safeContext.team ?? ""
+        : "",
+
+
+    // Q:T
+    baseline:
+      playerBaseline,
+
+    trendAdjustment,
+
+    projection:
+      projectedStat,
+
+    statStdDev,
+
+
+    // U:X
+    modelProbOver,
+
+    modelProbUnder,
+
+    evOver,
+
+    evUnder,
+
+
+    // Y — P15 FINAL SIDE
+    bestSide:
+      sportacularScoring.finalBestSide,
+
+
+    // Z:AD
+    bestEV,
+
+    bestModelProbability,
+
+    bestPriceEdge,
+
+    trendScore,
+
+    trendStrength,
+
+
+    // AE:AF — P15
+    riskScore:
+      sportacularScoring.riskScore,
+
+    riskTier:
+      sportacularScoring.riskTier,
+
+
+    // AG
+    modelConfidence,
+
+
+    // AH:AJ — P15
+    sportacularScore:
+      sportacularScoring.sportacularScore,
+
+    sportacularEdge:
+      sportacularScoring.sportacularEdge,
+
+    confidenceTier:
+      sportacularScoring.confidenceTier
+  };
+
+
+  const row =
+    buildNBAUniversalPropRow_(
+      safeProp,
+      universalContext
+    );
+
+
+  if (
+    row.length !==
+    NBA_UNIVERSAL_PROP_HEADERS.length
+  ) {
+    throw new Error(
+      `Invalid NBA universal Player Props row width. Expected ${NBA_UNIVERSAL_PROP_HEADERS.length}, received ${row.length}.`
+    );
+  }
+
+
+  return row;
+}
+
+function testNBAUniversalPropRowContract() {
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P15 D7D — NBA FULL UNIVERSAL ROW + SPORTACULAR SCORING TEST"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  const rawProp = {
+    gameId: "P15-D7D-GAME",
+    gameDate: "2026-10-20",
+    awayTeam: "Milwaukee Bucks",
+    homeTeam: "Chicago Bulls",
+    id: "P15-D7D-PROP",
+    playerId: "P15-D7D-NBA-PLAYER",
+    vendor: "Test Sportsbook",
+    propType: "points",
+    lineValue: 25.5,
+    type: "over_under",
+    odds: "",
+    updatedAt: "2026-10-20T12:00:00Z",
+    overOdds: -110,
+    underOdds: -110
+  };
+
+
+  /*
+   * Frozen NBA Points projection:
+   *
+   * baseline          = 24
+   * trend adjustment  = +2
+   * projection        = 26
+   *
+   * Points uses the frozen NBA Normal distribution.
+   */
+  const context = {
+
+    playerName:
+      "P15 NBA Test Player",
+
+    team:
+      "Milwaukee Bucks",
+
+    baseline:
+      24,
+
+    trendAdjustment:
+      2,
+
+    projection:
+      26,
+
+    statStdDev:
+      5,
+
+    trendScore:
+      12,
+
+    trendStrength:
+      "Strong",
+
+    modelConfidence:
+      82
+  };
+
+
+  const row =
+    buildNBAUniversalPropRowFromProvider_(
+      rawProp,
+      context
+    );
+
+
+  Logger.log(
+    JSON.stringify({
+      rowLength:
+        row.length,
+      row
+    })
+  );
+
+
+  let totalTests = 0;
+  let passedTests = 0;
+  let failedTests = 0;
+
+
+  function assertTest(
+    name,
+    condition,
+    details
+  ) {
+
+    totalTests++;
+
+
+    const pass =
+      Boolean(condition);
+
+
+    if (pass) {
+      passedTests++;
+    } else {
+      failedTests++;
+    }
+
+
+    Logger.log(
+      JSON.stringify({
+        name,
+        pass,
+        details:
+          details || {}
+      })
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        "P15 D7D NBA full-row test failed: " +
+        name
+      );
+    }
+  }
+
+
+  function isPopulated(value) {
+    return (
+      value !== null &&
+      value !== undefined &&
+      value !== ""
+    );
+  }
+
+
+  function nearlyEqual(
+    a,
+    b,
+    tolerance
+  ) {
+
+    const x =
+      Number(a);
+
+    const y =
+      Number(b);
+
+
+    return (
+      Number.isFinite(x) &&
+      Number.isFinite(y) &&
+      Math.abs(x - y) <=
+        (tolerance || 0.000000001)
+    );
+  }
+
+
+  // ==========================================================================
+  // 1 — EXACT UNIVERSAL WIDTH
+  // ==========================================================================
+
+  assertTest(
+    "Universal row contains exactly 36 columns",
+    row.length === 36,
+    {
+      actual:
+        row.length,
+      expected:
+        36
+    }
+  );
+
+
+  // ==========================================================================
+  // 2 — PROVIDER A:N
+  // ==========================================================================
+
+  assertTest(
+    "A:N provider fields survive universal assembly",
+    (
+      row[0] ===
+        rawProp.gameId &&
+
+      row[5] ===
+        rawProp.playerId &&
+
+      row[6] ===
+        rawProp.vendor &&
+
+      row[7] ===
+        rawProp.propType &&
+
+      row[8] ===
+        rawProp.lineValue &&
+
+      row[9] ===
+        rawProp.type &&
+
+      row[12] ===
+        rawProp.overOdds &&
+
+      row[13] ===
+        rawProp.underOdds
+    )
+  );
+
+
+  // ==========================================================================
+  // 3 — IDENTITY O:P
+  // ==========================================================================
+
+  assertTest(
+    "O:P player identity survives universal assembly",
+    (
+      row[14] ===
+        context.playerName &&
+
+      row[15] ===
+        context.team
+    ),
+    {
+      playerName:
+        row[14],
+
+      team:
+        row[15]
+    }
+  );
+
+
+  // ==========================================================================
+  // 4 — FROZEN NBA PROJECTION Q:T
+  // ==========================================================================
+
+  assertTest(
+    "Q:T frozen NBA historical/projection fields populate",
+    (
+      nearlyEqual(
+        row[16],
+        24
+      ) &&
+
+      nearlyEqual(
+        row[17],
+        2
+      ) &&
+
+      nearlyEqual(
+        row[18],
+        26
+      ) &&
+
+      nearlyEqual(
+        row[19],
+        5
+      )
+    ),
+    {
+      playerBaseline:
+        row[16],
+
+      trendAdjustment:
+        row[17],
+
+      projectedStat:
+        row[18],
+
+      statStdDev:
+        row[19]
+    }
+  );
+
+
+  // ==========================================================================
+  // 5 — FROZEN NBA PROBABILITY + EV U:X
+  // ==========================================================================
+
+  assertTest(
+    "U:X frozen NBA probability and EV fields populate",
+    (
+      isPopulated(
+        row[20]
+      ) &&
+
+      isPopulated(
+        row[21]
+      ) &&
+
+      isPopulated(
+        row[22]
+      ) &&
+
+      isPopulated(
+        row[23]
+      )
+    ),
+    {
+      modelProbOver:
+        row[20],
+
+      modelProbUnder:
+        row[21],
+
+      evOver:
+        row[22],
+
+      evUnder:
+        row[23]
+    }
+  );
+
+
+  // ==========================================================================
+  // 6 — NORMAL MARKET COMPLEMENT
+  // ==========================================================================
+
+  assertTest(
+    "NBA conventional Over/Under probabilities remain complementary",
+    nearlyEqual(
+      Number(row[20]) +
+      Number(row[21]),
+      1,
+      0.000000001
+    ),
+    {
+      over:
+        row[20],
+
+      under:
+        row[21],
+
+      sum:
+        Number(row[20]) +
+        Number(row[21])
+    }
+  );
+
+
+  // ==========================================================================
+  // 7 — Z:AB DECISION FIELDS
+  // ==========================================================================
+
+  assertTest(
+    "Z:AB decision fields populate",
+    (
+      isPopulated(
+        row[25]
+      ) &&
+
+      isPopulated(
+        row[26]
+      ) &&
+
+      isPopulated(
+        row[27]
+      )
+    ),
+    {
+      bestEV:
+        row[25],
+
+      bestModelProbability:
+        row[26],
+
+      bestPriceEdge:
+        row[27]
+    }
+  );
+
+
+  // ==========================================================================
+  // 8 — AC:AD VALIDATED NBA TREND SIGNALS
+  // ==========================================================================
+
+  assertTest(
+    "AC:AD preserve validated NBA trend signals",
+    (
+      nearlyEqual(
+        row[28],
+        12
+      ) &&
+
+      row[29] ===
+        "Strong"
+    ),
+    {
+      trendScore:
+        row[28],
+
+      trendStrength:
+        row[29]
+    }
+  );
+
+
+  // ==========================================================================
+  // 9 — AE UNIVERSAL RISK SCORE
+  // ==========================================================================
+
+  assertTest(
+    "AE universal Risk Score populates on 0-100 scale",
+    (
+      isPopulated(
+        row[30]
+      ) &&
+
+      Number(row[30]) >= 0 &&
+      Number(row[30]) <= 100
+    ),
+    {
+      riskScore:
+        row[30]
+    }
+  );
+
+
+  // ==========================================================================
+  // 10 — AF UNIVERSAL RISK TIER
+  // ==========================================================================
+
+  assertTest(
+    "AF universal Risk Tier follows AE",
+    [
+      "Low",
+      "Medium",
+      "High",
+      "Very High"
+    ].includes(
+      row[31]
+    ),
+    {
+      riskScore:
+        row[30],
+
+      riskTier:
+        row[31]
+    }
+  );
+
+
+  // ==========================================================================
+  // 11 — AG MODEL CONFIDENCE
+  // ==========================================================================
+
+  assertTest(
+    "AG preserves validated NBA Model Confidence",
+    nearlyEqual(
+      row[32],
+      82
+    ),
+    {
+      actual:
+        row[32],
+
+      expected:
+        82
+    }
+  );
+
+
+  // ==========================================================================
+  // REBUILD MASTER P15 RESULT INDEPENDENTLY
+  // ==========================================================================
+
+  const rebuilt =
+    buildUniversalSportacularScoring_({
+
+      lineValue:
+        rawProp.lineValue,
+
+      projectedStat:
+        row[18],
+
+      statStdDev:
+        row[19],
+
+      evOver:
+        row[22],
+
+      evUnder:
+        row[23],
+
+      bestModelProbability:
+        row[26],
+
+      bestPriceEdge:
+        row[27],
+
+      trendScore:
+        row[28],
+
+      modelConfidence:
+        row[32]
+    });
+
+
+  // ==========================================================================
+  // 12 — AI SPORTACULAR EDGE
+  // ==========================================================================
+
+  assertTest(
+    "AI Sportacular Edge follows frozen P15 D3 contract",
+    nearlyEqual(
+      row[34],
+      rebuilt.sportacularEdge
+    ),
+    {
+      actual:
+        row[34],
+
+      expected:
+        rebuilt.sportacularEdge
+    }
+  );
+
+
+  // ==========================================================================
+  // 13 — AH SPORTACULAR SCORE
+  // ==========================================================================
+
+  assertTest(
+    "AH Sportacular Score follows frozen P15 D4 contract",
+    nearlyEqual(
+      row[33],
+      rebuilt.sportacularScore
+    ),
+    {
+      candidateSide:
+        rebuilt.candidateSide,
+
+      actual:
+        row[33],
+
+      expected:
+        rebuilt.sportacularScore
+    }
+  );
+
+
+  // ==========================================================================
+  // 14 — FINAL Y
+  // ==========================================================================
+
+  assertTest(
+    "Y contains final P15 actionable Best Side",
+    (
+      row[24] ===
+        rebuilt.finalBestSide
+    ),
+    {
+      actual:
+        row[24],
+
+      expected:
+        rebuilt.finalBestSide
+    }
+  );
+
+
+  // ==========================================================================
+  // 15 — FINAL AJ
+  // ==========================================================================
+
+  assertTest(
+    "AJ contains valid P15 Confidence Tier",
+    (
+      row[35] ===
+        rebuilt.confidenceTier
+    ),
+    {
+      actual:
+        row[35],
+
+      expected:
+        rebuilt.confidenceTier
+    }
+  );
+
+
+  // ==========================================================================
+  // 16 — ACTIONABILITY CONSISTENCY
+  // ==========================================================================
+
+  assertTest(
+    "Y Best Side and AJ Confidence Tier agree on actionability",
+    (
+      rebuilt.actionable
+        ? (
+            row[24] !==
+              "No Play" &&
+            row[35] !==
+              "No Play"
+          )
+        : (
+            row[24] ===
+              "No Play" &&
+            row[35] ===
+              "No Play"
+          )
+    ),
+    {
+      bestSide:
+        row[24],
+
+      confidenceTier:
+        row[35],
+
+      sportacularScore:
+        row[33],
+
+      actionable:
+        rebuilt.actionable
+    }
+  );
+
+
+  // ==========================================================================
+  // 17 — FULL P15 MASTER AGREEMENT
+  // ==========================================================================
+
+  assertTest(
+    "NBA A:AJ exactly agrees with universal P15 master scorer",
+    (
+      nearlyEqual(
+        row[30],
+        rebuilt.riskScore
+      ) &&
+
+      row[31] ===
+        rebuilt.riskTier &&
+
+      nearlyEqual(
+        row[33],
+        rebuilt.sportacularScore
+      ) &&
+
+      nearlyEqual(
+        row[34],
+        rebuilt.sportacularEdge
+      ) &&
+
+      row[35] ===
+        rebuilt.confidenceTier &&
+
+      row[24] ===
+        rebuilt.finalBestSide
+    ),
+    {
+      production: {
+        bestSide:
+          row[24],
+
+        riskScore:
+          row[30],
+
+        riskTier:
+          row[31],
+
+        modelConfidence:
+          row[32],
+
+        sportacularScore:
+          row[33],
+
+        sportacularEdge:
+          row[34],
+
+        confidenceTier:
+          row[35]
+      },
+
+      rebuilt
+    }
+  );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "P15 D7D NBA UNIVERSAL PRODUCTION ROW",
+
+      totalTests,
+
+      passedTests,
+
+      failedTests,
+
+      passed:
+        failedTests === 0
+    })
+  );
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  if (
+    failedTests === 0
+  ) {
+
+    Logger.log(
+      "P15 D7D TEST PASS — NBA UNIVERSAL SPORTACULAR ROW COMPLETE"
+    );
+
+    Logger.log(
+      "NBA IS READY FOR P15 LIVE PRODUCTION REFRESH."
+    );
+
+  } else {
+
+    throw new Error(
+      `P15 D7D NBA regression failed: ${failedTests} test(s) failed.`
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+}
+
+function testNBAProductionProjectionEngine() {
+  const tests = [
+    {
+      market: "points",
+      season: 25,
+      recent: 30,
+      expectedProjection: 27
+    },
+
+    {
+      market: "rebounds",
+      season: 10,
+      recent: 12,
+      expectedProjection: 10.6
+    },
+
+    {
+      market: "assists",
+      season: 8,
+      recent: 10,
+      expectedProjection: 8.7
+    },
+
+    {
+      market:
+        "points_rebounds_assists",
+      season: 40,
+      recent: 46,
+      expectedProjection: 43
+    },
+
+    {
+      market: "blocks_steals",
+      season: 2,
+      recent: 4,
+      expectedProjection: 2.3
+    }
+  ];
+
+  tests.forEach(test => {
+    const result =
+      calculateNBAPropProjection_(
+        test.market,
+        test.season,
+        test.recent
+      );
+
+    Logger.log(
+      JSON.stringify({
+        market:
+          test.market,
+
+        baseline:
+          result.baseline,
+
+        trendAdjustment:
+          result.trendAdjustment,
+
+        projection:
+          result.projection,
+
+        expected:
+          test.expectedProjection,
+
+        pass:
+          Math.abs(
+            result.projection -
+            test.expectedProjection
+          ) < 0.000001
+      })
+    );
+  });
+
+  const normalizationTests = [
+    "points",
+    "player_points",
+    "points_rebounds",
+    "PRA",
+    "blocks_steals",
+    "fantasy_points",
+    "first_basket"
+  ];
+
+  normalizationTests.forEach(
+    propType => {
+      Logger.log(
+        propType +
+        " -> " +
+        normalizeNBAPropMarket_(
+          propType
+        )
+      );
+    }
+  );
+}
+
+// ============================================================================
+// NBA PROP PROBABILITY ENGINE
+// P5/18
+//
+// Pure calculation helpers.
+// No sheet writes.
+// No production Player Props changes.
+//
+// Normal:
+//   Points, Rebounds, Assists and combination markets.
+//
+// Poisson:
+//   Threes, Steals, Blocks, Turnovers, Blocks + Steals.
+// ============================================================================
+
+const NBA_PROP_DISTRIBUTIONS = {
+  points: "normal",
+  rebounds: "normal",
+  assists: "normal",
+
+  threes: "poisson",
+  steals: "poisson",
+  blocks: "poisson",
+  turnovers: "poisson",
+
+  points_rebounds: "normal",
+  points_assists: "normal",
+  rebounds_assists: "normal",
+  points_rebounds_assists: "normal",
+
+  blocks_steals: "poisson"
+};
+
+const NBA_PROP_CALIBRATION_SHRINK = {
+  points: 0.00,
+  rebounds: 0.20,
+  assists: 0.25,
+  threes: 0.00,
+  steals: 0.00,
+  blocks: 0.00,
+  turnovers: 0.15,
+  points_rebounds: 0.00,
+  points_assists: 0.00,
+  rebounds_assists: 0.00,
+  points_rebounds_assists: 0.00,
+  blocks_steals: 0.00
+};
+
+// ============================================================================
+// UNIVERSAL NBA PROBABILITY ENTRY POINT
+// ============================================================================
+
+function calculateNBAPropProbabilities_(
+  marketKey,
+  projection,
+  statStdDev,
+  line
+) {
+  const distribution =
+    NBA_PROP_DISTRIBUTIONS[marketKey];
+
+  const projectedValue =
+    Number(projection);
+
+  const lineValue =
+    Number(line);
+
+  if (
+    !distribution ||
+    !Number.isFinite(projectedValue) ||
+    !Number.isFinite(lineValue) ||
+    projectedValue < 0
+  ) {
+    return {
+      over: null,
+      under: null,
+      distribution: null
+    };
+  }
+
+  if (distribution === "normal") {
+    const sd =
+      Number(statStdDev);
+
+    if (
+      !Number.isFinite(sd) ||
+      sd <= 0
+    ) {
+      return {
+        over: null,
+        under: null,
+        distribution
+      };
+    }
+
+    return calculateNBANormalProbabilities_(
+      projectedValue,
+      sd,
+      lineValue
+    );
+  }
+
+  if (distribution === "poisson") {
+    return calculateNBAPoissonProbabilities_(
+      projectedValue,
+      lineValue
+    );
+  }
+
+  return {
+    over: null,
+    under: null,
+    distribution: null
+  };
+}
+
+
+// ============================================================================
+// NORMAL DISTRIBUTION
+// ============================================================================
+
+function calculateNBANormalProbabilities_(
+  mean,
+  stdDev,
+  line
+) {
+  if (
+    !Number.isFinite(mean) ||
+    !Number.isFinite(stdDev) ||
+    !Number.isFinite(line) ||
+    stdDev <= 0
+  ) {
+    return {
+      over: null,
+      under: null,
+      distribution: "normal"
+    };
+  }
+
+  const z =
+    (line - mean) / stdDev;
+
+  const under =
+    normalCDFNBA_(z);
+
+  const over =
+    1 - under;
+
+  return {
+    over:
+      clampNBAProbability_(over),
+
+    under:
+      clampNBAProbability_(under),
+
+    distribution: "normal"
+  };
+}
+
+
+// ============================================================================
+// NORMAL CDF
+// Abramowitz-Stegun style approximation.
+// ============================================================================
+
+function normalCDFNBA_(z) {
+  const sign =
+    z < 0 ? -1 : 1;
+
+  const x =
+    Math.abs(z) /
+    Math.sqrt(2);
+
+  const t =
+    1 /
+    (
+      1 +
+      0.3275911 * x
+    );
+
+  const a1 =
+    0.254829592;
+
+  const a2 =
+    -0.284496736;
+
+  const a3 =
+    1.421413741;
+
+  const a4 =
+    -1.453152027;
+
+  const a5 =
+    1.061405429;
+
+  const erf =
+    1 -
+    (
+      (
+        (
+          (
+            (
+              a5 * t +
+              a4
+            ) * t +
+            a3
+          ) * t +
+          a2
+        ) * t +
+        a1
+      ) *
+      t *
+      Math.exp(
+        -x * x
+      )
+    );
+
+  return (
+    0.5 *
+    (
+      1 +
+      sign * erf
+    )
+  );
+}
+
+
+// ============================================================================
+// POISSON DISTRIBUTION
+//
+// Handles standard NBA half-point lines:
+// 2.5 threes -> Over = P(X >= 3)
+// 0.5 blocks -> Over = P(X >= 1)
+// etc.
+// ============================================================================
+
+function calculateNBAPoissonProbabilities_(
+  lambda,
+  line
+) {
+  if (
+    !Number.isFinite(lambda) ||
+    !Number.isFinite(line) ||
+    lambda < 0
+  ) {
+    return {
+      over: null,
+      under: null,
+      distribution: "poisson"
+    };
+  }
+
+  const threshold =
+    Math.floor(line);
+
+  const under =
+    poissonCDFNBA_(
+      threshold,
+      lambda
+    );
+
+  const over =
+    1 - under;
+
+  return {
+    over:
+      clampNBAProbability_(over),
+
+    under:
+      clampNBAProbability_(under),
+
+    distribution: "poisson"
+  };
+}
+
+
+// ============================================================================
+// POISSON CDF
+// P(X <= k)
+// ============================================================================
+
+function poissonCDFNBA_(
+  k,
+  lambda
+) {
+  if (k < 0) {
+    return 0;
+  }
+
+  if (lambda === 0) {
+    return 1;
+  }
+
+  let probability =
+    Math.exp(-lambda);
+
+  let cumulative =
+    probability;
+
+  for (
+    let i = 1;
+    i <= k;
+    i++
+  ) {
+    probability *=
+      lambda / i;
+
+    cumulative +=
+      probability;
+  }
+
+  return Math.min(
+    1,
+    Math.max(
+      0,
+      cumulative
+    )
+  );
+}
+
+
+// ============================================================================
+// PROBABILITY SAFETY
+//
+// IMPORTANT:
+// This clamp is numerical protection only.
+// It is NOT calibration.
+// P6 handles actual probability calibration.
+// ============================================================================
+
+function clampNBAProbability_(
+  probability
+) {
+  if (
+    probability === null ||
+    probability === undefined ||
+    !Number.isFinite(
+      Number(probability)
+    )
+  ) {
+    return null;
+  }
+
+  return Math.min(
+    0.999,
+    Math.max(
+      0.001,
+      Number(probability)
+    )
+  );
+}
+
+
+// ============================================================================
+// AMERICAN ODDS -> IMPLIED PROBABILITY
+// ============================================================================
+
+function americanOddsToNBAImpliedProbability_(
+  odds
+) {
+  const value =
+    Number(odds);
+
+  if (
+    !Number.isFinite(value) ||
+    value === 0
+  ) {
+    return null;
+  }
+
+  if (value > 0) {
+    return (
+      100 /
+      (value + 100)
+    );
+  }
+
+  return (
+    Math.abs(value) /
+    (
+      Math.abs(value) +
+      100
+    )
+  );
+}
+
+
+// ============================================================================
+// AMERICAN ODDS -> PROFIT PER $1
+//
+// +150 => 1.50 profit
+// -120 => 0.833333 profit
+// ============================================================================
+
+function americanOddsToNBAProfitPerDollar_(
+  odds
+) {
+  const value =
+    Number(odds);
+
+  if (
+    !Number.isFinite(value) ||
+    value === 0
+  ) {
+    return null;
+  }
+
+  if (value > 0) {
+    return value / 100;
+  }
+
+  return (
+    100 /
+    Math.abs(value)
+  );
+}
+
+
+// ============================================================================
+// EXPECTED VALUE PER $1
+//
+// EV = P(win) * profit_if_win
+//      - P(loss) * 1
+//
+// Equivalent to:
+// EV = P * (profit + 1) - 1
+// ============================================================================
+
+function calculateNBAExpectedValue_(
+  probability,
+  americanOdds
+) {
+  const p =
+    Number(probability);
+
+  const profit =
+    americanOddsToNBAProfitPerDollar_(
+      americanOdds
+    );
+
+  if (
+    !Number.isFinite(p) ||
+    p < 0 ||
+    p > 1 ||
+    profit === null
+  ) {
+    return null;
+  }
+
+  return (
+    p * profit -
+    (1 - p)
+  );
+}
+
+
+// ============================================================================
+// PRICE EDGE
+//
+// Model probability minus sportsbook implied probability.
+// Distinct from EV.
+// ============================================================================
+
+function calculateNBAPriceEdge_(
+  probability,
+  americanOdds
+) {
+  const p =
+    Number(probability);
+
+  const implied =
+    americanOddsToNBAImpliedProbability_(
+      americanOdds
+    );
+
+  if (
+    !Number.isFinite(p) ||
+    implied === null
+  ) {
+    return null;
+  }
+
+  return p - implied;
+}
+
+// ============================================================================
+// NBA RAW PROBABILITY AUDIT
+// P5/18
+//
+// READ-ONLY with respect to production data.
+// Reads:  NBA Player Game Logs
+// Writes: NBA Probability Audit
+//
+// Purpose:
+// - Recreates the frozen P4 projection model chronologically.
+// - Calculates historical stat SD using PRIOR games only.
+// - Converts projection + line into raw probabilities using the P5 engine.
+// - Tests probabilities against actual subsequent outcomes.
+// - Produces probability buckets for calibration inspection.
+//
+// IMPORTANT:
+// This is NOT production calibration.
+// P6 will perform formal chronological calibration/validation.
+// ============================================================================
+
+function auditNBARawProbabilities() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const logSheet =
+    ss.getSheetByName(
+      "NBA Player Game Logs"
+    );
+
+  if (!logSheet) {
+    throw new Error(
+      'Missing required sheet: "NBA Player Game Logs".'
+    );
+  }
+
+  const logs =
+    getNBAObjectsFromSheet_(logSheet);
+
+  if (!logs.length) {
+    throw new Error(
+      "NBA Player Game Logs contains no historical data."
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // Frozen P4 production projection weights
+  // --------------------------------------------------------------------------
+
+  const markets = [
+    {
+      market: "Points",
+      key: "points",
+      modelKey: "points",
+      recentWeight: 0.40,
+      distribution: "normal"
+    },
+    {
+      market: "Rebounds",
+      key: "rebounds",
+      modelKey: "rebounds",
+      recentWeight: 0.30,
+      distribution: "normal"
+    },
+    {
+      market: "Assists",
+      key: "assists",
+      modelKey: "assists",
+      recentWeight: 0.35,
+      distribution: "normal"
+    },
+    {
+      market: "Threes",
+      key: "threes",
+      modelKey: "threes",
+      recentWeight: 0.20,
+      distribution: "poisson"
+    },
+    {
+      market: "Steals",
+      key: "steals",
+      modelKey: "steals",
+      recentWeight: 0.15,
+      distribution: "poisson"
+    },
+    {
+      market: "Blocks",
+      key: "blocks",
+      modelKey: "blocks",
+      recentWeight: 0.10,
+      distribution: "poisson"
+    },
+    {
+      market: "Turnovers",
+      key: "turnovers",
+      modelKey: "turnovers",
+      recentWeight: 0.20,
+      distribution: "poisson"
+    },
+    {
+      market: "Points + Rebounds",
+      key: "pointsRebounds",
+      modelKey: "points_rebounds",
+      recentWeight: 0.45,
+      distribution: "normal"
+    },
+    {
+      market: "Points + Assists",
+      key: "pointsAssists",
+      modelKey: "points_assists",
+      recentWeight: 0.45,
+      distribution: "normal"
+    },
+    {
+      market: "Rebounds + Assists",
+      key: "reboundsAssists",
+      modelKey: "rebounds_assists",
+      recentWeight: 0.40,
+      distribution: "normal"
+    },
+    {
+      market: "PRA",
+      key: "pra",
+      modelKey: "points_rebounds_assists",
+      recentWeight: 0.50,
+      distribution: "normal"
+    },
+    {
+      market: "Blocks + Steals",
+      key: "blocksSteals",
+      modelKey: "blocks_steals",
+      recentWeight: 0.15,
+      distribution: "poisson"
+    }
+  ];
+
+  const MIN_PRIOR_GAMES = 10;
+  const RECENT_GAMES = 5;
+
+  // --------------------------------------------------------------------------
+  // Build player histories
+  // --------------------------------------------------------------------------
+
+  const players = {};
+
+  logs.forEach(row => {
+    const playerId =
+      String(
+        row["Player ID"] || ""
+      ).trim();
+
+    if (!playerId) return;
+
+    const date =
+      new Date(
+        row["Game Date"]
+      );
+
+    if (
+      !date ||
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return;
+    }
+
+    const points =
+      Number(
+        row["Points"] || 0
+      );
+
+    const rebounds =
+      Number(
+        row["Rebounds"] || 0
+      );
+
+    const assists =
+      Number(
+        row["Assists"] || 0
+      );
+
+    const steals =
+      Number(
+        row["Steals"] || 0
+      );
+
+    const blocks =
+      Number(
+        row["Blocks"] || 0
+      );
+
+    if (!players[playerId]) {
+      players[playerId] = {
+        playerId,
+        playerName:
+          row["Player Name"] || "",
+        games: []
+      };
+    }
+
+    players[playerId].games.push({
+      date,
+
+      points,
+      rebounds,
+      assists,
+
+      threes:
+        Number(
+          row["Threes"] || 0
+        ),
+
+      steals,
+      blocks,
+
+      turnovers:
+        Number(
+          row["Turnovers"] || 0
+        ),
+
+      pointsRebounds:
+        points + rebounds,
+
+      pointsAssists:
+        points + assists,
+
+      reboundsAssists:
+        rebounds + assists,
+
+      pra:
+        points +
+        rebounds +
+        assists,
+
+      blocksSteals:
+        blocks + steals
+    });
+  });
+
+  Object.values(players)
+    .forEach(player => {
+      player.games.sort(
+        (a, b) =>
+          a.date.getTime() -
+          b.date.getTime()
+      );
+    });
+
+  // --------------------------------------------------------------------------
+  // Create probability buckets
+  //
+  // We audit model confidence from the selected side:
+  //
+  // 50-55%
+  // 55-60%
+  // ...
+  // 90-95%
+  // 95-100%
+  // --------------------------------------------------------------------------
+
+  const bucketStarts = [
+    0.50,
+    0.55,
+    0.60,
+    0.65,
+    0.70,
+    0.75,
+    0.80,
+    0.85,
+    0.90,
+    0.95
+  ];
+
+  const audit = {};
+
+  markets.forEach(market => {
+    audit[market.key] = {};
+
+    bucketStarts.forEach(start => {
+      audit[market.key][
+        start.toFixed(2)
+      ] = {
+        count: 0,
+        probabilitySum: 0,
+        wins: 0
+      };
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Chronological probability audit
+  // --------------------------------------------------------------------------
+
+  Object.values(players)
+    .forEach(player => {
+      const games =
+        player.games;
+
+      if (
+        games.length <=
+        MIN_PRIOR_GAMES
+      ) {
+        return;
+      }
+
+      for (
+        let targetIndex =
+          MIN_PRIOR_GAMES;
+
+        targetIndex <
+          games.length;
+
+        targetIndex++
+      ) {
+        const priorGames =
+          games.slice(
+            0,
+            targetIndex
+          );
+
+        const recentGames =
+          priorGames.slice(
+            -RECENT_GAMES
+          );
+
+        const targetGame =
+          games[targetIndex];
+
+        markets.forEach(
+          market => {
+            const seasonValues =
+              priorGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const recentValues =
+              recentGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const seasonAverage =
+              avgNBA_(
+                seasonValues
+              );
+
+            const recentAverage =
+              avgNBA_(
+                recentValues
+              );
+
+            const projection =
+              seasonAverage *
+                (
+                  1 -
+                  market.recentWeight
+                ) +
+              recentAverage *
+                market.recentWeight;
+
+            const statStdDev =
+              stdDevNBA_(
+                seasonValues
+              );
+
+            // --------------------------------------------------------------
+            // Historical synthetic test line:
+            //
+            // Nearest half-point to the projection.
+            //
+            // Example:
+            // projection 24.2 -> line 24.5
+            // projection 7.8  -> line 7.5
+            //
+            // This is for probability calibration research ONLY.
+            // Production P5 will use actual sportsbook lines.
+            // --------------------------------------------------------------
+
+            const line =
+              Math.floor(
+                projection
+              ) + 0.5;
+
+            const probabilities =
+              calculateNBAPropProbabilities_(
+                market.modelKey,
+                projection,
+                statStdDev,
+                line
+              );
+
+            if (
+              probabilities.over === null ||
+              probabilities.under === null
+            ) {
+              return;
+            }
+
+            // --------------------------------------------------------------
+            // Audit whichever side model considers more likely.
+            // --------------------------------------------------------------
+
+            let selectedProbability;
+            let won;
+
+            const actual =
+              Number(
+                targetGame[
+                  market.key
+                ] || 0
+              );
+
+            if (
+              probabilities.over >=
+              probabilities.under
+            ) {
+              selectedProbability =
+                probabilities.over;
+
+              won =
+                actual > line;
+            } else {
+              selectedProbability =
+                probabilities.under;
+
+              won =
+                actual < line;
+            }
+
+            if (
+              selectedProbability <
+              0.50
+            ) {
+              return;
+            }
+
+            const bucketIndex =
+              Math.min(
+                9,
+                Math.floor(
+                  (
+                    selectedProbability -
+                    0.50
+                  ) / 0.05
+                )
+              );
+
+            if (
+              bucketIndex < 0 ||
+              bucketIndex >
+              9
+            ) {
+              return;
+            }
+
+            const bucketStart =
+              bucketStarts[
+                bucketIndex
+              ];
+
+            const bucket =
+              audit[
+                market.key
+              ][
+                bucketStart.toFixed(2)
+              ];
+
+            bucket.count++;
+
+            bucket.probabilitySum +=
+              selectedProbability;
+
+            if (won) {
+              bucket.wins++;
+            }
+          }
+        );
+      }
+    });
+
+  // --------------------------------------------------------------------------
+  // Output
+  // --------------------------------------------------------------------------
+
+  const outputRows = [];
+
+  markets.forEach(market => {
+    bucketStarts.forEach(start => {
+      const bucket =
+        audit[
+          market.key
+        ][
+          start.toFixed(2)
+        ];
+
+      if (!bucket.count) {
+        return;
+      }
+
+      const averageProbability =
+        bucket.probabilitySum /
+        bucket.count;
+
+      const actualHitRate =
+        bucket.wins /
+        bucket.count;
+
+      const calibrationError =
+        actualHitRate -
+        averageProbability;
+
+      outputRows.push([
+        market.market,
+
+        market.distribution,
+
+        start,
+
+        start + 0.05,
+
+        bucket.count,
+
+        averageProbability,
+
+        actualHitRate,
+
+        calibrationError,
+
+        Math.abs(
+          calibrationError
+        )
+      ]);
+    });
+  });
+
+  const SHEET_NAME =
+    "NBA Probability Audit";
+
+  let outputSheet =
+    ss.getSheetByName(
+      SHEET_NAME
+    );
+
+  if (!outputSheet) {
+    outputSheet =
+      ss.insertSheet(
+        SHEET_NAME
+      );
+  } else {
+    outputSheet.clearContents();
+  }
+
+  const headers = [
+    "Market",
+    "Distribution",
+    "Bucket Start",
+    "Bucket End",
+    "Predictions",
+    "Avg Model Probability",
+    "Actual Hit Rate",
+    "Calibration Error",
+    "Absolute Calibration Error"
+  ];
+
+  outputSheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([
+      headers
+    ]);
+
+  if (outputRows.length) {
+    outputSheet
+      .getRange(
+        2,
+        1,
+        outputRows.length,
+        headers.length
+      )
+      .setValues(
+        outputRows
+      );
+
+    outputSheet
+      .getRange(
+        2,
+        3,
+        outputRows.length,
+        2
+      )
+      .setNumberFormat(
+        "0%"
+      );
+
+    outputSheet
+      .getRange(
+        2,
+        6,
+        outputRows.length,
+        4
+      )
+      .setNumberFormat(
+        "0.00%"
+      );
+  }
+
+  outputSheet.setFrozenRows(1);
+
+  outputSheet.autoResizeColumns(
+    1,
+    headers.length
+  );
+
+  Logger.log(
+    "NBA raw probability audit complete: " +
+    outputRows.length +
+    " populated calibration buckets."
+  );
+}
+
+
+// ============================================================================
+// SAMPLE STANDARD DEVIATION
+//
+// Uses n - 1 denominator.
+// Returns null when fewer than two observations exist.
+// ============================================================================
+
+function stdDevNBA_(values) {
+  const clean =
+    values
+      .map(Number)
+      .filter(
+        value =>
+          Number.isFinite(value)
+      );
+
+  if (clean.length < 2) {
+    return null;
+  }
+
+  const mean =
+    clean.reduce(
+      (sum, value) =>
+        sum + value,
+      0
+    ) /
+    clean.length;
+
+  const squaredDifferenceSum =
+    clean.reduce(
+      (sum, value) => {
+        const difference =
+          value - mean;
+
+        return (
+          sum +
+          difference *
+          difference
+        );
+      },
+      0
+    );
+
+  return Math.sqrt(
+    squaredDifferenceSum /
+    (
+      clean.length - 1
+    )
+  );
+}
+
+function testNBAProbabilityAndEVIntegrity() {
+  const tests = [
+    {
+      name: "55% at -110",
+      probability: 0.55,
+      odds: -110
+    },
+    {
+      name: "60% at +120",
+      probability: 0.60,
+      odds: 120
+    },
+    {
+      name: "45% at +150",
+      probability: 0.45,
+      odds: 150
+    },
+    {
+      name: "70% at -200",
+      probability: 0.70,
+      odds: -200
+    },
+    {
+      name: "Missing probability",
+      probability: null,
+      odds: -110
+    },
+    {
+      name: "Missing odds",
+      probability: 0.55,
+      odds: null
+    }
+  ];
+
+  const rows = tests.map(test => {
+    const probability =
+      test.probability;
+
+    const odds =
+      test.odds;
+
+    const impliedProbability =
+      odds === null
+        ? null
+        : americanOddsToNBAImpliedProbability_(
+            odds
+          );
+
+    const expectedValue =
+      probability === null ||
+      odds === null
+        ? null
+        : calculateNBAExpectedValue_(
+            probability,
+            odds
+          );
+
+    const priceEdge =
+      probability === null ||
+      odds === null
+        ? null
+        : calculateNBAPriceEdge_(
+            probability,
+            odds
+          );
+
+    return [
+      test.name,
+      probability,
+      odds,
+      impliedProbability,
+      expectedValue,
+      priceEdge
+    ];
+  });
+
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheetName =
+    "NBA EV Integrity";
+
+  let sheet =
+    ss.getSheetByName(sheetName);
+
+  if (!sheet) {
+    sheet =
+      ss.insertSheet(sheetName);
+  } else {
+    sheet.clearContents();
+  }
+
+  const headers = [
+    "Test",
+    "Model Probability",
+    "American Odds",
+    "Implied Probability",
+    "EV Per $1",
+    "Price Edge"
+  ];
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([headers]);
+
+  sheet
+    .getRange(
+      2,
+      1,
+      rows.length,
+      headers.length
+    )
+    .setValues(rows);
+
+  sheet
+    .getRange(
+      2,
+      2,
+      rows.length,
+      1
+    )
+    .setNumberFormat("0.0000%");
+
+  sheet
+    .getRange(
+      2,
+      4,
+      rows.length,
+      1
+    )
+    .setNumberFormat("0.0000%");
+
+  sheet
+    .getRange(
+      2,
+      5,
+      rows.length,
+      1
+    )
+    .setNumberFormat("0.000000");
+
+  sheet
+    .getRange(
+      2,
+      6,
+      rows.length,
+      1
+    )
+    .setNumberFormat("0.0000%");
+
+  sheet.autoResizeColumns(
+    1,
+    headers.length
+  );
+}
+
+// ============================================================================
+// NBA PROBABILITY CALIBRATION STRENGTH RESEARCH
+// P6/18
+//
+// READ-ONLY with respect to production data.
+// Reads:  NBA Player Game Logs
+// Writes: NBA Calibration Research
+//
+// Uses:
+// - Frozen P4 projection weights
+// - Frozen P5 distribution families
+// - Chronological prior-game information only
+//
+// Research split:
+// - First 75% of each player's eligible prediction sequence
+//
+// Tests:
+// - 0% through 100% shrink toward 50%, in 5% increments
+//
+// Scores:
+// - Brier Score
+// - Log Loss
+//
+// IMPORTANT:
+// Final 25% is intentionally NOT used here.
+// It is reserved for P6 holdout validation.
+// ============================================================================
+
+function researchNBAProbabilityCalibration() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const logSheet =
+    ss.getSheetByName(
+      "NBA Player Game Logs"
+    );
+
+  if (!logSheet) {
+    throw new Error(
+      'Missing required sheet: "NBA Player Game Logs".'
+    );
+  }
+
+  const logs =
+    getNBAObjectsFromSheet_(logSheet);
+
+  if (!logs.length) {
+    throw new Error(
+      "NBA Player Game Logs contains no historical data."
+    );
+  }
+
+  const markets = [
+    {
+      market: "Points",
+      key: "points",
+      modelKey: "points",
+      recentWeight: 0.40
+    },
+    {
+      market: "Rebounds",
+      key: "rebounds",
+      modelKey: "rebounds",
+      recentWeight: 0.30
+    },
+    {
+      market: "Assists",
+      key: "assists",
+      modelKey: "assists",
+      recentWeight: 0.35
+    },
+    {
+      market: "Threes",
+      key: "threes",
+      modelKey: "threes",
+      recentWeight: 0.20
+    },
+    {
+      market: "Steals",
+      key: "steals",
+      modelKey: "steals",
+      recentWeight: 0.15
+    },
+    {
+      market: "Blocks",
+      key: "blocks",
+      modelKey: "blocks",
+      recentWeight: 0.10
+    },
+    {
+      market: "Turnovers",
+      key: "turnovers",
+      modelKey: "turnovers",
+      recentWeight: 0.20
+    },
+    {
+      market: "Points + Rebounds",
+      key: "pointsRebounds",
+      modelKey: "points_rebounds",
+      recentWeight: 0.45
+    },
+    {
+      market: "Points + Assists",
+      key: "pointsAssists",
+      modelKey: "points_assists",
+      recentWeight: 0.45
+    },
+    {
+      market: "Rebounds + Assists",
+      key: "reboundsAssists",
+      modelKey: "rebounds_assists",
+      recentWeight: 0.40
+    },
+    {
+      market: "PRA",
+      key: "pra",
+      modelKey: "points_rebounds_assists",
+      recentWeight: 0.50
+    },
+    {
+      market: "Blocks + Steals",
+      key: "blocksSteals",
+      modelKey: "blocks_steals",
+      recentWeight: 0.15
+    }
+  ];
+
+  const MIN_PRIOR_GAMES = 10;
+  const RECENT_GAMES = 5;
+
+  const players = {};
+
+  // --------------------------------------------------------------------------
+  // Build player histories
+  // --------------------------------------------------------------------------
+
+  logs.forEach(row => {
+    const playerId =
+      String(
+        row["Player ID"] || ""
+      ).trim();
+
+    if (!playerId) return;
+
+    const date =
+      new Date(
+        row["Game Date"]
+      );
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return;
+    }
+
+    const points =
+      Number(
+        row["Points"] || 0
+      );
+
+    const rebounds =
+      Number(
+        row["Rebounds"] || 0
+      );
+
+    const assists =
+      Number(
+        row["Assists"] || 0
+      );
+
+    const steals =
+      Number(
+        row["Steals"] || 0
+      );
+
+    const blocks =
+      Number(
+        row["Blocks"] || 0
+      );
+
+    if (!players[playerId]) {
+      players[playerId] = {
+        games: []
+      };
+    }
+
+    players[playerId].games.push({
+      date,
+
+      points,
+      rebounds,
+      assists,
+
+      threes:
+        Number(
+          row["Threes"] || 0
+        ),
+
+      steals,
+      blocks,
+
+      turnovers:
+        Number(
+          row["Turnovers"] || 0
+        ),
+
+      pointsRebounds:
+        points + rebounds,
+
+      pointsAssists:
+        points + assists,
+
+      reboundsAssists:
+        rebounds + assists,
+
+      pra:
+        points +
+        rebounds +
+        assists,
+
+      blocksSteals:
+        blocks + steals
+    });
+  });
+
+  Object.values(players)
+    .forEach(player => {
+      player.games.sort(
+        (a, b) =>
+          a.date.getTime() -
+          b.date.getTime()
+      );
+    });
+
+  // --------------------------------------------------------------------------
+  // Calibration candidates
+  // --------------------------------------------------------------------------
+
+  const shrinkValues = [];
+
+  for (
+    let shrinkPct = 0;
+    shrinkPct <= 100;
+    shrinkPct += 5
+  ) {
+    shrinkValues.push(
+      shrinkPct / 100
+    );
+  }
+
+  const results = {};
+
+  markets.forEach(market => {
+    results[market.key] = {};
+
+    shrinkValues.forEach(shrink => {
+      results[market.key][
+        shrink.toFixed(2)
+      ] = {
+        count: 0,
+        brierSum: 0,
+        logLossSum: 0
+      };
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Chronological research sample
+  // --------------------------------------------------------------------------
+
+  Object.values(players)
+    .forEach(player => {
+      const games =
+        player.games;
+
+      if (
+        games.length <=
+        MIN_PRIOR_GAMES
+      ) {
+        return;
+      }
+
+      const eligibleCount =
+        games.length -
+        MIN_PRIOR_GAMES;
+
+      if (eligibleCount <= 0) {
+        return;
+      }
+
+      const researchCount =
+        Math.floor(
+          eligibleCount * 0.75
+        );
+
+      if (researchCount <= 0) {
+        return;
+      }
+
+      const researchEnd =
+        MIN_PRIOR_GAMES +
+        researchCount;
+
+      for (
+        let targetIndex =
+          MIN_PRIOR_GAMES;
+
+        targetIndex <
+          researchEnd;
+
+        targetIndex++
+      ) {
+        const priorGames =
+          games.slice(
+            0,
+            targetIndex
+          );
+
+        const recentGames =
+          priorGames.slice(
+            -RECENT_GAMES
+          );
+
+        const targetGame =
+          games[targetIndex];
+
+        markets.forEach(
+          market => {
+            const seasonValues =
+              priorGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const recentValues =
+              recentGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const seasonAverage =
+              avgNBA_(
+                seasonValues
+              );
+
+            const recentAverage =
+              avgNBA_(
+                recentValues
+              );
+
+            const projection =
+              seasonAverage *
+                (
+                  1 -
+                  market.recentWeight
+                ) +
+              recentAverage *
+                market.recentWeight;
+
+            const statStdDev =
+              stdDevNBA_(
+                seasonValues
+              );
+
+            // Same synthetic half-point line
+            // used by the P5 probability audit.
+            const line =
+              Math.floor(
+                projection
+              ) + 0.5;
+
+            const probabilities =
+              calculateNBAPropProbabilities_(
+                market.modelKey,
+                projection,
+                statStdDev,
+                line
+              );
+
+            if (
+              probabilities.over === null ||
+              probabilities.under === null
+            ) {
+              return;
+            }
+
+            let rawProbability;
+            let actualOutcome;
+
+            const actual =
+              Number(
+                targetGame[
+                  market.key
+                ] || 0
+              );
+
+            // Score the side that the raw model
+            // considers more likely.
+            if (
+              probabilities.over >=
+              probabilities.under
+            ) {
+              rawProbability =
+                probabilities.over;
+
+              actualOutcome =
+                actual > line
+                  ? 1
+                  : 0;
+            } else {
+              rawProbability =
+                probabilities.under;
+
+              actualOutcome =
+                actual < line
+                  ? 1
+                  : 0;
+            }
+
+            shrinkValues.forEach(
+              shrink => {
+                const calibratedProbability =
+                  calibrateNBAProbabilityShrink_(
+                    rawProbability,
+                    shrink
+                  );
+
+                const accumulator =
+                  results[
+                    market.key
+                  ][
+                    shrink.toFixed(2)
+                  ];
+
+                const error =
+                  calibratedProbability -
+                  actualOutcome;
+
+                accumulator.count++;
+
+                accumulator.brierSum +=
+                  error * error;
+
+                accumulator.logLossSum +=
+                  nbaLogLoss_(
+                    calibratedProbability,
+                    actualOutcome
+                  );
+              }
+            );
+          }
+        );
+      }
+    });
+
+  // --------------------------------------------------------------------------
+  // Calculate detail results
+  // --------------------------------------------------------------------------
+
+  const detailRows = [];
+
+  markets.forEach(market => {
+    shrinkValues.forEach(
+      shrink => {
+        const result =
+          results[
+            market.key
+          ][
+            shrink.toFixed(2)
+          ];
+
+        if (!result.count) {
+          return;
+        }
+
+        detailRows.push({
+          market:
+            market.market,
+
+          shrink,
+
+          predictions:
+            result.count,
+
+          brier:
+            result.brierSum /
+            result.count,
+
+          logLoss:
+            result.logLossSum /
+            result.count
+        });
+      }
+    );
+  });
+
+  // --------------------------------------------------------------------------
+  // Select development winners
+  // --------------------------------------------------------------------------
+
+  const summaryRows = [];
+
+  markets.forEach(market => {
+    const marketRows =
+      detailRows.filter(
+        row =>
+          row.market ===
+          market.market
+      );
+
+    if (!marketRows.length) {
+      return;
+    }
+
+    const raw =
+      marketRows.find(
+        row =>
+          row.shrink === 0
+      );
+
+    const bestBrier =
+      marketRows
+        .slice()
+        .sort(
+          (a, b) =>
+            a.brier -
+              b.brier ||
+            a.shrink -
+              b.shrink
+        )[0];
+
+    const bestLogLoss =
+      marketRows
+        .slice()
+        .sort(
+          (a, b) =>
+            a.logLoss -
+              b.logLoss ||
+            a.shrink -
+              b.shrink
+        )[0];
+
+    const brierImprovement =
+      raw &&
+      raw.brier > 0
+        ? (
+            raw.brier -
+            bestBrier.brier
+          ) /
+          raw.brier
+        : "";
+
+    const logLossImprovement =
+      raw &&
+      raw.logLoss > 0
+        ? (
+            raw.logLoss -
+            bestLogLoss.logLoss
+          ) /
+          raw.logLoss
+        : "";
+
+    summaryRows.push([
+      market.market,
+
+      bestBrier.predictions,
+
+      raw
+        ? raw.brier
+        : "",
+
+      raw
+        ? raw.logLoss
+        : "",
+
+      bestBrier.shrink,
+      bestBrier.brier,
+      brierImprovement,
+
+      bestLogLoss.shrink,
+      bestLogLoss.logLoss,
+      logLossImprovement
+    ]);
+  });
+
+  // --------------------------------------------------------------------------
+  // Write sheet
+  // --------------------------------------------------------------------------
+
+  const SHEET_NAME =
+    "NBA Calibration Research";
+
+  let sheet =
+    ss.getSheetByName(
+      SHEET_NAME
+    );
+
+  if (!sheet) {
+    sheet =
+      ss.insertSheet(
+        SHEET_NAME
+      );
+  } else {
+    sheet.clearContents();
+  }
+
+  const summaryHeaders = [
+    "Market",
+    "Research Predictions",
+    "Raw Brier",
+    "Raw Log Loss",
+    "Best Brier Shrink",
+    "Best Brier",
+    "Brier Improvement",
+    "Best Log Loss Shrink",
+    "Best Log Loss",
+    "Log Loss Improvement"
+  ];
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      summaryHeaders.length
+    )
+    .setValues([
+      summaryHeaders
+    ]);
+
+  if (summaryRows.length) {
+    sheet
+      .getRange(
+        2,
+        1,
+        summaryRows.length,
+        summaryHeaders.length
+      )
+      .setValues(
+        summaryRows
+      );
+
+    sheet
+      .getRange(
+        2,
+        5,
+        summaryRows.length,
+        1
+      )
+      .setNumberFormat(
+        "0%"
+      );
+
+    sheet
+      .getRange(
+        2,
+        8,
+        summaryRows.length,
+        1
+      )
+      .setNumberFormat(
+        "0%"
+      );
+
+    sheet
+      .getRange(
+        2,
+        7,
+        summaryRows.length,
+        1
+      )
+      .setNumberFormat(
+        "0.00%"
+      );
+
+    sheet
+      .getRange(
+        2,
+        10,
+        summaryRows.length,
+        1
+      )
+      .setNumberFormat(
+        "0.00%"
+      );
+  }
+
+  const detailStartRow =
+    summaryRows.length + 4;
+
+  const detailHeaders = [
+    "Market",
+    "Shrink Toward 50%",
+    "Predictions",
+    "Brier Score",
+    "Log Loss"
+  ];
+
+  sheet
+    .getRange(
+      detailStartRow,
+      1,
+      1,
+      detailHeaders.length
+    )
+    .setValues([
+      detailHeaders
+    ]);
+
+  const detailValues =
+    detailRows.map(
+      row => [
+        row.market,
+        row.shrink,
+        row.predictions,
+        row.brier,
+        row.logLoss
+      ]
+    );
+
+  if (detailValues.length) {
+    sheet
+      .getRange(
+        detailStartRow + 1,
+        1,
+        detailValues.length,
+        detailHeaders.length
+      )
+      .setValues(
+        detailValues
+      );
+
+    sheet
+      .getRange(
+        detailStartRow + 1,
+        2,
+        detailValues.length,
+        1
+      )
+      .setNumberFormat(
+        "0%"
+      );
+  }
+
+  sheet.setFrozenRows(1);
+
+  sheet.autoResizeColumns(
+    1,
+    summaryHeaders.length
+  );
+
+  Logger.log(
+    "NBA calibration research complete."
+  );
+}
+
+
+// ============================================================================
+// SHRINK RAW PROBABILITY TOWARD 50%
+// ============================================================================
+
+function calibrateNBAProbabilityShrink_(
+  rawProbability,
+  shrink
+) {
+  const p =
+    Number(
+      rawProbability
+    );
+
+  const s =
+    Number(
+      shrink
+    );
+
+  if (
+    !Number.isFinite(p) ||
+    !Number.isFinite(s)
+  ) {
+    return null;
+  }
+
+  const calibrated =
+    0.50 +
+    (
+      p - 0.50
+    ) *
+    (
+      1 - s
+    );
+
+  return Math.min(
+    0.999,
+    Math.max(
+      0.001,
+      calibrated
+    )
+  );
+}
+
+
+// ============================================================================
+// BINARY LOG LOSS
+// ============================================================================
+
+function nbaLogLoss_(
+  probability,
+  actualOutcome
+) {
+  const epsilon =
+    0.000001;
+
+  const p =
+    Math.min(
+      1 - epsilon,
+      Math.max(
+        epsilon,
+        Number(
+          probability
+        )
+      )
+    );
+
+  const y =
+    Number(
+      actualOutcome
+    );
+
+  return -(
+    y * Math.log(p) +
+    (
+      1 - y
+    ) *
+    Math.log(
+      1 - p
+    )
+  );
+}
+
+// ============================================================================
+// NBA PROBABILITY CALIBRATION HOLDOUT
+// P6/18
+//
+// READ-ONLY with respect to production data.
+// Reads:  NBA Player Game Logs
+// Writes: NBA Calibration Holdout
+//
+// Uses the untouched final 25% of each player's eligible predictions.
+//
+// Compares:
+// 1. Raw probability
+// 2. Best-Brier calibration candidate
+// 3. Best-Log-Loss calibration candidate
+//
+// Lower Brier / Log Loss = better.
+// ============================================================================
+
+function validateNBAProbabilityCalibrationHoldout() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const logSheet =
+    ss.getSheetByName(
+      "NBA Player Game Logs"
+    );
+
+  if (!logSheet) {
+    throw new Error(
+      'Missing required sheet: "NBA Player Game Logs".'
+    );
+  }
+
+  const logs =
+    getNBAObjectsFromSheet_(logSheet);
+
+  if (!logs.length) {
+    throw new Error(
+      "NBA Player Game Logs contains no historical data."
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // Frozen P4 projection weights + P6 research winners
+  // --------------------------------------------------------------------------
+
+  const markets = [
+    {
+      market: "Points",
+      key: "points",
+      modelKey: "points",
+      recentWeight: 0.40,
+      brierShrink: 0.00,
+      logLossShrink: 0.00
+    },
+    {
+      market: "Rebounds",
+      key: "rebounds",
+      modelKey: "rebounds",
+      recentWeight: 0.30,
+      brierShrink: 0.20,
+      logLossShrink: 0.20
+    },
+    {
+      market: "Assists",
+      key: "assists",
+      modelKey: "assists",
+      recentWeight: 0.35,
+      brierShrink: 0.25,
+      logLossShrink: 0.25
+    },
+    {
+      market: "Threes",
+      key: "threes",
+      modelKey: "threes",
+      recentWeight: 0.20,
+      brierShrink: 0.05,
+      logLossShrink: 0.05
+    },
+    {
+      market: "Steals",
+      key: "steals",
+      modelKey: "steals",
+      recentWeight: 0.15,
+      brierShrink: 0.15,
+      logLossShrink: 0.20
+    },
+    {
+      market: "Blocks",
+      key: "blocks",
+      modelKey: "blocks",
+      recentWeight: 0.10,
+      brierShrink: 0.10,
+      logLossShrink: 0.10
+    },
+    {
+      market: "Turnovers",
+      key: "turnovers",
+      modelKey: "turnovers",
+      recentWeight: 0.20,
+      brierShrink: 0.15,
+      logLossShrink: 0.20
+    },
+    {
+      market: "Points + Rebounds",
+      key: "pointsRebounds",
+      modelKey: "points_rebounds",
+      recentWeight: 0.45,
+      brierShrink: 0.50,
+      logLossShrink: 0.50
+    },
+    {
+      market: "Points + Assists",
+      key: "pointsAssists",
+      modelKey: "points_assists",
+      recentWeight: 0.45,
+      brierShrink: 0.05,
+      logLossShrink: 0.05
+    },
+    {
+      market: "Rebounds + Assists",
+      key: "reboundsAssists",
+      modelKey: "rebounds_assists",
+      recentWeight: 0.40,
+      brierShrink: 0.05,
+      logLossShrink: 0.10
+    },
+    {
+      market: "PRA",
+      key: "pra",
+      modelKey: "points_rebounds_assists",
+      recentWeight: 0.50,
+      brierShrink: 0.40,
+      logLossShrink: 0.40
+    },
+    {
+      market: "Blocks + Steals",
+      key: "blocksSteals",
+      modelKey: "blocks_steals",
+      recentWeight: 0.15,
+      brierShrink: 0.15,
+      logLossShrink: 0.20
+    }
+  ];
+
+  const MIN_PRIOR_GAMES = 10;
+  const RECENT_GAMES = 5;
+
+  const players = {};
+
+  // --------------------------------------------------------------------------
+  // Build histories
+  // --------------------------------------------------------------------------
+
+  logs.forEach(row => {
+    const playerId =
+      String(
+        row["Player ID"] || ""
+      ).trim();
+
+    if (!playerId) return;
+
+    const date =
+      new Date(
+        row["Game Date"]
+      );
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return;
+    }
+
+    const points =
+      Number(row["Points"] || 0);
+
+    const rebounds =
+      Number(row["Rebounds"] || 0);
+
+    const assists =
+      Number(row["Assists"] || 0);
+
+    const steals =
+      Number(row["Steals"] || 0);
+
+    const blocks =
+      Number(row["Blocks"] || 0);
+
+    if (!players[playerId]) {
+      players[playerId] = {
+        games: []
+      };
+    }
+
+    players[playerId].games.push({
+      date,
+
+      points,
+      rebounds,
+      assists,
+
+      threes:
+        Number(row["Threes"] || 0),
+
+      steals,
+      blocks,
+
+      turnovers:
+        Number(row["Turnovers"] || 0),
+
+      pointsRebounds:
+        points + rebounds,
+
+      pointsAssists:
+        points + assists,
+
+      reboundsAssists:
+        rebounds + assists,
+
+      pra:
+        points +
+        rebounds +
+        assists,
+
+      blocksSteals:
+        blocks + steals
+    });
+  });
+
+  Object.values(players)
+    .forEach(player => {
+      player.games.sort(
+        (a, b) =>
+          a.date.getTime() -
+          b.date.getTime()
+      );
+    });
+
+  // --------------------------------------------------------------------------
+  // Accumulators
+  // --------------------------------------------------------------------------
+
+  const results = {};
+
+  markets.forEach(market => {
+    results[market.key] = {
+      raw:
+        createNBACalibrationAccumulator_(),
+
+      brier:
+        createNBACalibrationAccumulator_(),
+
+      logLoss:
+        createNBACalibrationAccumulator_()
+    };
+  });
+
+  // --------------------------------------------------------------------------
+  // Final 25% holdout
+  // --------------------------------------------------------------------------
+
+  Object.values(players)
+    .forEach(player => {
+      const games =
+        player.games;
+
+      if (
+        games.length <=
+        MIN_PRIOR_GAMES
+      ) {
+        return;
+      }
+
+      const eligibleCount =
+        games.length -
+        MIN_PRIOR_GAMES;
+
+      const researchCount =
+        Math.floor(
+          eligibleCount * 0.75
+        );
+
+      const holdoutStart =
+        MIN_PRIOR_GAMES +
+        researchCount;
+
+      if (
+        holdoutStart >=
+        games.length
+      ) {
+        return;
+      }
+
+      for (
+        let targetIndex =
+          holdoutStart;
+
+        targetIndex <
+          games.length;
+
+        targetIndex++
+      ) {
+        const priorGames =
+          games.slice(
+            0,
+            targetIndex
+          );
+
+        const recentGames =
+          priorGames.slice(
+            -RECENT_GAMES
+          );
+
+        const targetGame =
+          games[targetIndex];
+
+        markets.forEach(
+          market => {
+            const seasonValues =
+              priorGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const recentValues =
+              recentGames.map(
+                game =>
+                  Number(
+                    game[
+                      market.key
+                    ] || 0
+                  )
+              );
+
+            const seasonAverage =
+              avgNBA_(
+                seasonValues
+              );
+
+            const recentAverage =
+              avgNBA_(
+                recentValues
+              );
+
+            const projection =
+              seasonAverage *
+                (
+                  1 -
+                  market.recentWeight
+                ) +
+              recentAverage *
+                market.recentWeight;
+
+            const statStdDev =
+              stdDevNBA_(
+                seasonValues
+              );
+
+            const line =
+              Math.floor(
+                projection
+              ) + 0.5;
+
+            const probabilities =
+              calculateNBAPropProbabilities_(
+                market.modelKey,
+                projection,
+                statStdDev,
+                line
+              );
+
+            if (
+              probabilities.over === null ||
+              probabilities.under === null
+            ) {
+              return;
+            }
+
+            let rawProbability;
+            let actualOutcome;
+
+            const actual =
+              Number(
+                targetGame[
+                  market.key
+                ] || 0
+              );
+
+            if (
+              probabilities.over >=
+              probabilities.under
+            ) {
+              rawProbability =
+                probabilities.over;
+
+              actualOutcome =
+                actual > line
+                  ? 1
+                  : 0;
+            } else {
+              rawProbability =
+                probabilities.under;
+
+              actualOutcome =
+                actual < line
+                  ? 1
+                  : 0;
+            }
+
+            const brierProbability =
+              calibrateNBAProbabilityShrink_(
+                rawProbability,
+                market.brierShrink
+              );
+
+            const logLossProbability =
+              calibrateNBAProbabilityShrink_(
+                rawProbability,
+                market.logLossShrink
+              );
+
+            addNBACalibrationObservation_(
+              results[
+                market.key
+              ].raw,
+              rawProbability,
+              actualOutcome
+            );
+
+            addNBACalibrationObservation_(
+              results[
+                market.key
+              ].brier,
+              brierProbability,
+              actualOutcome
+            );
+
+            addNBACalibrationObservation_(
+              results[
+                market.key
+              ].logLoss,
+              logLossProbability,
+              actualOutcome
+            );
+          }
+        );
+      }
+    });
+
+  // --------------------------------------------------------------------------
+  // Build output
+  // --------------------------------------------------------------------------
+
+  const rows = [];
+
+  markets.forEach(market => {
+    const raw =
+      finalizeNBACalibrationAccumulator_(
+        results[
+          market.key
+        ].raw
+      );
+
+    const brier =
+      finalizeNBACalibrationAccumulator_(
+        results[
+          market.key
+        ].brier
+      );
+
+    const logLoss =
+      finalizeNBACalibrationAccumulator_(
+        results[
+          market.key
+        ].logLoss
+      );
+
+    const brierBrierImprovement =
+      raw.brier > 0
+        ? (
+            raw.brier -
+            brier.brier
+          ) /
+          raw.brier
+        : "";
+
+    const brierLogImprovement =
+      raw.logLoss > 0
+        ? (
+            raw.logLoss -
+            brier.logLoss
+          ) /
+          raw.logLoss
+        : "";
+
+    const logBrierImprovement =
+      raw.brier > 0
+        ? (
+            raw.brier -
+            logLoss.brier
+          ) /
+          raw.brier
+        : "";
+
+    const logLogImprovement =
+      raw.logLoss > 0
+        ? (
+            raw.logLoss -
+            logLoss.logLoss
+          ) /
+          raw.logLoss
+        : "";
+
+    rows.push([
+      market.market,
+
+      raw.count,
+
+      raw.brier,
+      raw.logLoss,
+
+      market.brierShrink,
+      brier.brier,
+      brier.logLoss,
+      brierBrierImprovement,
+      brierLogImprovement,
+
+      market.logLossShrink,
+      logLoss.brier,
+      logLoss.logLoss,
+      logBrierImprovement,
+      logLogImprovement,
+
+      (
+        brier.brier <= raw.brier &&
+        brier.logLoss <= raw.logLoss
+      )
+        ? "PASS"
+        : "FAIL",
+
+      (
+        logLoss.brier <= raw.brier &&
+        logLoss.logLoss <= raw.logLoss
+      )
+        ? "PASS"
+        : "FAIL"
+    ]);
+  });
+
+  // --------------------------------------------------------------------------
+  // Write output
+  // --------------------------------------------------------------------------
+
+  const SHEET_NAME =
+    "NBA Calibration Holdout";
+
+  let sheet =
+    ss.getSheetByName(
+      SHEET_NAME
+    );
+
+  if (!sheet) {
+    sheet =
+      ss.insertSheet(
+        SHEET_NAME
+      );
+  } else {
+    sheet.clearContents();
+  }
+
+  const headers = [
+    "Market",
+    "Holdout Predictions",
+
+    "Raw Brier",
+    "Raw Log Loss",
+
+    "Brier Candidate Shrink",
+    "Brier Candidate Brier",
+    "Brier Candidate Log Loss",
+    "Brier Candidate Brier Improvement",
+    "Brier Candidate Log Loss Improvement",
+
+    "Log Loss Candidate Shrink",
+    "Log Loss Candidate Brier",
+    "Log Loss Candidate Log Loss",
+    "Log Loss Candidate Brier Improvement",
+    "Log Loss Candidate Log Loss Improvement",
+
+    "Brier Candidate Verdict",
+    "Log Loss Candidate Verdict"
+  ];
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([headers]);
+
+  sheet
+    .getRange(
+      2,
+      1,
+      rows.length,
+      headers.length
+    )
+    .setValues(rows);
+
+  // Shrink columns
+  sheet
+    .getRange(
+      2,
+      5,
+      rows.length,
+      1
+    )
+    .setNumberFormat("0%");
+
+  sheet
+    .getRange(
+      2,
+      10,
+      rows.length,
+      1
+    )
+    .setNumberFormat("0%");
+
+  // Improvement columns
+  sheet
+    .getRange(
+      2,
+      8,
+      rows.length,
+      2
+    )
+    .setNumberFormat("0.00%");
+
+  sheet
+    .getRange(
+      2,
+      13,
+      rows.length,
+      2
+    )
+    .setNumberFormat("0.00%");
+
+  sheet.setFrozenRows(1);
+
+  sheet.autoResizeColumns(
+    1,
+    headers.length
+  );
+
+  Logger.log(
+    "NBA calibration holdout validation complete."
+  );
+}
+
+
+// ============================================================================
+// P6 HOLDOUT HELPERS
+// ============================================================================
+
+function createNBACalibrationAccumulator_() {
+  return {
+    count: 0,
+    brierSum: 0,
+    logLossSum: 0
+  };
+}
+
+
+function addNBACalibrationObservation_(
+  accumulator,
+  probability,
+  actualOutcome
+) {
+  if (
+    probability === null ||
+    probability === undefined ||
+    !Number.isFinite(
+      Number(probability)
+    )
+  ) {
+    return;
+  }
+
+  const p =
+    Number(probability);
+
+  const y =
+    Number(actualOutcome);
+
+  const error =
+    p - y;
+
+  accumulator.count++;
+
+  accumulator.brierSum +=
+    error * error;
+
+  accumulator.logLossSum +=
+    nbaLogLoss_(
+      p,
+      y
+    );
+}
+
+
+function finalizeNBACalibrationAccumulator_(
+  accumulator
+) {
+  if (!accumulator.count) {
+    return {
+      count: 0,
+      brier: null,
+      logLoss: null
+    };
+  }
+
+  return {
+    count:
+      accumulator.count,
+
+    brier:
+      accumulator.brierSum /
+      accumulator.count,
+
+    logLoss:
+      accumulator.logLossSum /
+      accumulator.count
+  };
+}
+
+function applyNBAPropCalibration_(
+  marketKey,
+  rawProbability
+) {
+  if (
+    rawProbability === null ||
+    rawProbability === undefined ||
+    rawProbability === ""
+  ) {
+    return null;
+  }
+
+  const probability =
+    Number(rawProbability);
+
+  if (
+    !Number.isFinite(probability)
+  ) {
+    return null;
+  }
+
+  const shrink =
+    NBA_PROP_CALIBRATION_SHRINK[
+      marketKey
+    ];
+
+  if (
+    shrink === undefined ||
+    shrink === null
+  ) {
+    return null;
+  }
+
+  return calibrateNBAProbabilityShrink_(
+    probability,
+    shrink
+  );
+}
+
+/**
+ * ============================================================================
+ * P15 D6 — UNIVERSAL SPORTACULAR PLAYER PROPS SCORING ENGINE
+ * ============================================================================
+ *
+ * Implements the frozen P15 D1-D5 contract.
+ *
+ * IMPORTANT:
+ * - This is currently an isolated/tested helper layer.
+ * - It does NOT modify the production Player Props refresh yet.
+ * - D7 will connect this contract to NBA/NHL/MLB/NFL production.
+ *
+ * Universal output ownership:
+ *
+ * AE = Risk Score
+ * AF = Risk Tier
+ * AH = Sportacular Score
+ * AI = Sportacular Edge
+ * AJ = Confidence Tier
+ *
+ * Y  = final actionable Best Side after eligibility gate
+ * ============================================================================
+ */
+
+
+const SPORTACULAR_PLAYER_PROP_SCORING = Object.freeze({
+
+  // --------------------------------------------------------------------------
+  // D2 — RISK
+  // --------------------------------------------------------------------------
+
+  riskTierLowMax:
+    25,
+
+  riskTierMediumMax:
+    50,
+
+  riskTierHighMax:
+    75,
+
+
+  // --------------------------------------------------------------------------
+  // D3 — SPORTACULAR EDGE
+  // --------------------------------------------------------------------------
+
+  priceEdgeNormalizationCeiling:
+    0.15,
+
+  evNormalizationCeiling:
+    0.25,
+
+  priceEdgeWeight:
+    0.75,
+
+  evWeight:
+    0.25,
+
+
+  // --------------------------------------------------------------------------
+  // D4 — SPORTACULAR SCORE
+  // --------------------------------------------------------------------------
+
+  sportacularEdgeWeight:
+    0.55,
+
+  modelConfidenceWeight:
+    0.25,
+
+  riskQualityWeight:
+    0.15,
+
+  trendWeight:
+    0.05,
+
+  trendMultiplier:
+    2,
+
+
+  // --------------------------------------------------------------------------
+  // D5 — ACTIONABLE ELIGIBILITY
+  // --------------------------------------------------------------------------
+
+  minimumBestEV:
+    0.05,
+
+  minimumBestModelProbability:
+    0.52,
+
+  minimumBestPriceEdge:
+    0.03,
+
+  minimumModelConfidence:
+    50,
+
+  minimumSportacularScore:
+    55,
+
+  evTieTolerance:
+    1e-12
+});
+
+
+/**
+ * ---------------------------------------------------------------------------
+ * UNIVERSAL NULLABLE NUMBER
+ * ---------------------------------------------------------------------------
+ *
+ * Preserves the frozen null-integrity rule:
+ *
+ *   missing != 0
+ *
+ * Legitimate zero remains zero.
+ */
+function getUniversalNullableNumber_(value) {
+
+  if (
+    value === "" ||
+    value === null ||
+    value === undefined
+  ) {
+    return null;
+  }
+
+
+  const number =
+    Number(value);
+
+
+  return Number.isFinite(number)
+    ? number
+    : null;
+}
+
+
+/**
+ * ---------------------------------------------------------------------------
+ * UNIVERSAL CLAMP
+ * ---------------------------------------------------------------------------
+ */
+function clampUniversalScore_(
+  value,
+  minimum,
+  maximum
+) {
+
+  return Math.min(
+    maximum,
+    Math.max(
+      minimum,
+      value
+    )
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D2 — UNIVERSAL RISK SCORE
+ * ============================================================================
+ *
+ * Risk Score =
+ *
+ *   100 * Std Dev
+ *   ------------------------------
+ *   MAX(|Projection|, |Line|, 1)
+ *
+ * Higher = riskier.
+ */
+function calculateUniversalRisk_({
+  projectedStat,
+  lineValue,
+  statStdDev
+}) {
+
+  const sd =
+    getUniversalNullableNumber_(
+      statStdDev
+    );
+
+
+  if (
+    sd === null ||
+    sd < 0
+  ) {
+    return {
+      riskScore: null,
+      riskTier: null
+    };
+  }
+
+
+  const projection =
+    getUniversalNullableNumber_(
+      projectedStat
+    );
+
+
+  const line =
+    getUniversalNullableNumber_(
+      lineValue
+    );
+
+
+  const magnitudes =
+    [1];
+
+
+  if (
+    projection !== null
+  ) {
+    magnitudes.push(
+      Math.abs(
+        projection
+      )
+    );
+  }
+
+
+  if (
+    line !== null
+  ) {
+    magnitudes.push(
+      Math.abs(
+        line
+      )
+    );
+  }
+
+
+  const scale =
+    Math.max(
+      ...magnitudes
+    );
+
+
+  const riskScore =
+    clampUniversalScore_(
+      (
+        sd /
+        scale
+      ) *
+      100,
+      0,
+      100
+    );
+
+
+  let riskTier;
+
+
+  if (
+    riskScore <
+    SPORTACULAR_PLAYER_PROP_SCORING
+      .riskTierLowMax
+  ) {
+
+    riskTier =
+      "Low";
+
+  } else if (
+    riskScore <
+    SPORTACULAR_PLAYER_PROP_SCORING
+      .riskTierMediumMax
+  ) {
+
+    riskTier =
+      "Medium";
+
+  } else if (
+    riskScore <
+    SPORTACULAR_PLAYER_PROP_SCORING
+      .riskTierHighMax
+  ) {
+
+    riskTier =
+      "High";
+
+  } else {
+
+    riskTier =
+      "Very High";
+  }
+
+
+  return {
+    riskScore,
+    riskTier
+  };
+}
+
+
+/**
+ * ============================================================================
+ * D3 — UNIVERSAL SPORTACULAR EDGE
+ * ============================================================================
+ *
+ * Price Edge Score =
+ *   CLAMP(AB / 0.15 * 100)
+ *
+ * EV Score =
+ *   CLAMP(Z / 0.25 * 100)
+ *
+ * Sportacular Edge =
+ *   75% Price Edge Score
+ *   25% EV Score
+ */
+function calculateUniversalSportacularEdge_({
+  bestEV,
+  bestPriceEdge
+}) {
+
+  const ev =
+    getUniversalNullableNumber_(
+      bestEV
+    );
+
+
+  const priceEdge =
+    getUniversalNullableNumber_(
+      bestPriceEdge
+    );
+
+
+  if (
+    ev === null ||
+    priceEdge === null
+  ) {
+    return null;
+  }
+
+
+  const priceEdgeScore =
+    clampUniversalScore_(
+      (
+        priceEdge /
+        SPORTACULAR_PLAYER_PROP_SCORING
+          .priceEdgeNormalizationCeiling
+      ) *
+      100,
+      0,
+      100
+    );
+
+
+  const evScore =
+    clampUniversalScore_(
+      (
+        ev /
+        SPORTACULAR_PLAYER_PROP_SCORING
+          .evNormalizationCeiling
+      ) *
+      100,
+      0,
+      100
+    );
+
+
+  return clampUniversalScore_(
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .priceEdgeWeight *
+      priceEdgeScore
+    ) +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .evWeight *
+      evScore
+    ),
+    0,
+    100
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D4 — SIDE-ALIGNED TREND SUPPORT
+ * ============================================================================
+ */
+function calculateUniversalTrendSupport_({
+  candidateSide,
+  trendScore
+}) {
+
+  if (
+    candidateSide !== "Over" &&
+    candidateSide !== "Under"
+  ) {
+    return null;
+  }
+
+
+  const trend =
+    getUniversalNullableNumber_(
+      trendScore
+    );
+
+
+  if (
+    trend === null
+  ) {
+    return null;
+  }
+
+
+  const alignedTrend =
+    candidateSide === "Over"
+      ? trend
+      : -trend;
+
+
+  return clampUniversalScore_(
+    50 +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .trendMultiplier *
+      alignedTrend
+    ),
+    0,
+    100
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D4 — UNIVERSAL SPORTACULAR SCORE
+ * ============================================================================
+ *
+ * Mandatory:
+ *   Sportacular Edge
+ *   Model Confidence
+ *   Risk Score
+ *
+ * Optional:
+ *   Trend Score
+ *
+ * If trend is missing, its 5% weight is removed and the remaining
+ * 95% is renormalized.
+ */
+function calculateUniversalSportacularScore_({
+  candidateSide,
+  sportacularEdge,
+  modelConfidence,
+  riskScore,
+  trendScore
+}) {
+
+  if (
+    candidateSide !== "Over" &&
+    candidateSide !== "Under"
+  ) {
+    return null;
+  }
+
+
+  const edge =
+    getUniversalNullableNumber_(
+      sportacularEdge
+    );
+
+
+  const confidence =
+    getUniversalNullableNumber_(
+      modelConfidence
+    );
+
+
+  const risk =
+    getUniversalNullableNumber_(
+      riskScore
+    );
+
+
+  if (
+    edge === null ||
+    confidence === null ||
+    risk === null
+  ) {
+    return null;
+  }
+
+
+  const boundedEdge =
+    clampUniversalScore_(
+      edge,
+      0,
+      100
+    );
+
+
+  const boundedConfidence =
+    clampUniversalScore_(
+      confidence,
+      0,
+      100
+    );
+
+
+  const boundedRisk =
+    clampUniversalScore_(
+      risk,
+      0,
+      100
+    );
+
+
+  const riskQuality =
+    100 -
+    boundedRisk;
+
+
+  let weightedTotal =
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .sportacularEdgeWeight *
+      boundedEdge
+    ) +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .modelConfidenceWeight *
+      boundedConfidence
+    ) +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .riskQualityWeight *
+      riskQuality
+    );
+
+
+  let totalWeight =
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .sportacularEdgeWeight +
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .modelConfidenceWeight +
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .riskQualityWeight
+    );
+
+
+  const trendSupport =
+    calculateUniversalTrendSupport_({
+      candidateSide,
+      trendScore
+    });
+
+
+  if (
+    trendSupport !== null
+  ) {
+
+    weightedTotal +=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .trendWeight *
+      trendSupport;
+
+
+    totalWeight +=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .trendWeight;
+  }
+
+
+  if (
+    totalWeight <= 0
+  ) {
+    return null;
+  }
+
+
+  return clampUniversalScore_(
+    weightedTotal /
+    totalWeight,
+    0,
+    100
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D5 — CANDIDATE SIDE
+ * ============================================================================
+ *
+ * Candidate side is intentionally separate from final Y Best Side.
+ *
+ * This lets AH be calculated before the final eligibility gate without
+ * creating a circular dependency.
+ */
+function selectUniversalCandidateSide_({
+  evOver,
+  evUnder
+}) {
+
+  const over =
+    getUniversalNullableNumber_(
+      evOver
+    );
+
+
+  const under =
+    getUniversalNullableNumber_(
+      evUnder
+    );
+
+
+  if (
+    over === null &&
+    under === null
+  ) {
+    return null;
+  }
+
+
+  if (
+    over !== null &&
+    under !== null
+  ) {
+
+    if (
+      Math.abs(
+        over -
+        under
+      ) <=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .evTieTolerance
+    ) {
+      return null;
+    }
+
+
+    return over > under
+      ? "Over"
+      : "Under";
+  }
+
+
+  return over !== null
+    ? "Over"
+    : "Under";
+}
+
+
+/**
+ * ============================================================================
+ * D5 — CONFIDENCE TIER
+ * ============================================================================
+ *
+ * This helper is called only after the mandatory data gate can be evaluated.
+ */
+function getUniversalConfidenceTier_(
+  sportacularScore
+) {
+
+  const score =
+    getUniversalNullableNumber_(
+      sportacularScore
+    );
+
+
+  if (
+    score === null
+  ) {
+    return null;
+  }
+
+
+  if (score >= 85) {
+    return "Elite";
+  }
+
+
+  if (score >= 75) {
+    return "Strong";
+  }
+
+
+  if (score >= 65) {
+    return "Solid";
+  }
+
+
+  if (score >= 55) {
+    return "Lean";
+  }
+
+
+  return "No Play";
+}
+
+
+/**
+ * ============================================================================
+ * D5 — FINAL ACTIONABLE ELIGIBILITY
+ * ============================================================================
+ */
+function evaluateUniversalActionability_({
+  candidateSide,
+  bestEV,
+  bestModelProbability,
+  bestPriceEdge,
+  riskScore,
+  modelConfidence,
+  sportacularEdge,
+  sportacularScore
+}) {
+
+  const ev =
+    getUniversalNullableNumber_(
+      bestEV
+    );
+
+
+  const probability =
+    getUniversalNullableNumber_(
+      bestModelProbability
+    );
+
+
+  const priceEdge =
+    getUniversalNullableNumber_(
+      bestPriceEdge
+    );
+
+
+  const risk =
+    getUniversalNullableNumber_(
+      riskScore
+    );
+
+
+  const confidence =
+    getUniversalNullableNumber_(
+      modelConfidence
+    );
+
+
+  const edge =
+    getUniversalNullableNumber_(
+      sportacularEdge
+    );
+
+
+  const score =
+    getUniversalNullableNumber_(
+      sportacularScore
+    );
+
+
+  const mandatoryDataAvailable =
+    (
+      candidateSide === "Over" ||
+      candidateSide === "Under"
+    ) &&
+    ev !== null &&
+    probability !== null &&
+    priceEdge !== null &&
+    risk !== null &&
+    confidence !== null &&
+    edge !== null &&
+    score !== null;
+
+
+  if (
+    !mandatoryDataAvailable
+  ) {
+    return {
+      finalBestSide:
+        "No Play",
+
+      confidenceTier:
+        null,
+
+      actionable:
+        false,
+
+      evaluable:
+        false
+    };
+  }
+
+
+  const passesBettingGate =
+    ev >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumBestEV &&
+    probability >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumBestModelProbability &&
+    priceEdge >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumBestPriceEdge &&
+    confidence >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumModelConfidence;
+
+
+  const passesScoreGate =
+    score >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumSportacularScore;
+
+
+  const actionable =
+    passesBettingGate &&
+    passesScoreGate;
+
+
+  return {
+    finalBestSide:
+      actionable
+        ? candidateSide
+        : "No Play",
+
+    confidenceTier:
+      actionable
+        ? getUniversalConfidenceTier_(
+            score
+          )
+        : "No Play",
+
+    actionable,
+
+    evaluable:
+      true
+  };
+}
+
+
+/**
+ * ============================================================================
+ * MASTER UNIVERSAL SCORING HELPER
+ * ============================================================================
+ *
+ * Input:
+ *   I   Line Value
+ *   S   Projected Stat
+ *   T   Stat Std Dev
+ *   W   EV Over
+ *   X   EV Under
+ *   AA  Best Model Probability
+ *   AB  Best Price Edge
+ *   AC  Trend Score
+ *   AG  Model Confidence
+ *
+ * Output:
+ *   Y   final actionable Best Side
+ *   AE  Risk Score
+ *   AF  Risk Tier
+ *   AH  Sportacular Score
+ *   AI  Sportacular Edge
+ *   AJ  Confidence Tier
+ *
+ * Also returns candidateSide for internal/debugging use.
+ */
+function buildUniversalSportacularScoring_({
+  lineValue,
+  projectedStat,
+  statStdDev,
+  evOver,
+  evUnder,
+  bestModelProbability,
+  bestPriceEdge,
+  trendScore,
+  modelConfidence
+}) {
+
+  const candidateSide =
+    selectUniversalCandidateSide_({
+      evOver,
+      evUnder
+    });
+
+
+  let bestEV =
+    null;
+
+
+  if (
+    candidateSide === "Over"
+  ) {
+    bestEV =
+      getUniversalNullableNumber_(
+        evOver
+      );
+
+  } else if (
+    candidateSide === "Under"
+  ) {
+    bestEV =
+      getUniversalNullableNumber_(
+        evUnder
+      );
+  }
+
+
+  const risk =
+    calculateUniversalRisk_({
+      projectedStat,
+      lineValue,
+      statStdDev
+    });
+
+
+  const sportacularEdge =
+    calculateUniversalSportacularEdge_({
+      bestEV,
+      bestPriceEdge
+    });
+
+
+  const sportacularScore =
+    calculateUniversalSportacularScore_({
+      candidateSide,
+      sportacularEdge,
+      modelConfidence,
+      riskScore:
+        risk.riskScore,
+      trendScore
+    });
+
+
+  const actionability =
+    evaluateUniversalActionability_({
+      candidateSide,
+      bestEV,
+      bestModelProbability,
+      bestPriceEdge,
+      riskScore:
+        risk.riskScore,
+      modelConfidence,
+      sportacularEdge,
+      sportacularScore
+    });
+
+
+  return {
+    candidateSide,
+
+    finalBestSide:
+      actionability.finalBestSide,
+
+    bestEV,
+
+    riskScore:
+      risk.riskScore,
+
+    riskTier:
+      risk.riskTier,
+
+    sportacularScore,
+
+    sportacularEdge,
+
+    confidenceTier:
+      actionability.confidenceTier,
+
+    actionable:
+      actionability.actionable,
+
+    evaluable:
+      actionability.evaluable
+  };
+}
+
+
+/**
+ * ============================================================================
+ * P15 D6 MASTER REGRESSION
+ * ============================================================================
+ *
+ * READ-ONLY.
+ *
+ * Tests the frozen D1-D5 scoring contract without modifying production.
+ */
+function testUniversalSportacularScoringContract() {
+
+  const tests =
+    [];
+
+
+  function assertTest(
+    name,
+    condition,
+    details
+  ) {
+
+    const pass =
+      Boolean(
+        condition
+      );
+
+
+    const result = {
+      name,
+      pass
+    };
+
+
+    if (
+      details !== undefined
+    ) {
+      result.details =
+        details;
+    }
+
+
+    tests.push(
+      result
+    );
+
+
+    Logger.log(
+      JSON.stringify(
+        result
+      )
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        `P15 D6 universal scoring test failed: ${name}`
+      );
+    }
+  }
+
+
+  function approximatelyEqual(
+    actual,
+    expected,
+    tolerance
+  ) {
+
+    return (
+      actual !== null &&
+      Number.isFinite(
+        Number(actual)
+      ) &&
+      Math.abs(
+        Number(actual) -
+        Number(expected)
+      ) <=
+      (
+        tolerance ??
+        1e-9
+      )
+    );
+  }
+
+
+  // ==========================================================================
+  // TEST 1 — D2 RISK SCORE
+  // ==========================================================================
+
+  const riskExample =
+    calculateUniversalRisk_({
+      projectedStat:
+        72,
+
+      lineValue:
+        69.5,
+
+      statStdDev:
+        27
+    });
+
+
+  assertTest(
+    "D2 risk normalization",
+    approximatelyEqual(
+      riskExample.riskScore,
+      37.5
+    ) &&
+    riskExample.riskTier ===
+      "Medium",
+    riskExample
+  );
+
+
+  // ==========================================================================
+  // TEST 2 — D2 ZERO IS VALID
+  // ==========================================================================
+
+  const zeroRisk =
+    calculateUniversalRisk_({
+      projectedStat:
+        20,
+
+      lineValue:
+        19.5,
+
+      statStdDev:
+        0
+    });
+
+
+  assertTest(
+    "D2 legitimate zero standard deviation survives",
+    zeroRisk.riskScore === 0 &&
+    zeroRisk.riskTier === "Low",
+    zeroRisk
+  );
+
+
+  // ==========================================================================
+  // TEST 3 — D2 MISSING STD DEV
+  // ==========================================================================
+
+  const missingRisk =
+    calculateUniversalRisk_({
+      projectedStat:
+        20,
+
+      lineValue:
+        19.5,
+
+      statStdDev:
+        null
+    });
+
+
+  assertTest(
+    "D2 missing standard deviation remains null",
+    missingRisk.riskScore === null &&
+    missingRisk.riskTier === null,
+    missingRisk
+  );
+
+
+  // ==========================================================================
+  // TEST 4 — D3 SPORTACULAR EDGE
+  // ==========================================================================
+
+  const edgeExample =
+    calculateUniversalSportacularEdge_({
+      bestEV:
+        0.14,
+
+      bestPriceEdge:
+        0.08
+    });
+
+
+  assertTest(
+    "D3 Sportacular Edge normalization",
+    approximatelyEqual(
+      edgeExample,
+      54,
+      1e-9
+    ),
+    {
+      sportacularEdge:
+        edgeExample
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 5 — D3 NEGATIVE EDGE FLOORS AT ZERO
+  // ==========================================================================
+
+  const negativeEdge =
+    calculateUniversalSportacularEdge_({
+      bestEV:
+        -0.05,
+
+      bestPriceEdge:
+        -0.02
+    });
+
+
+  assertTest(
+    "D3 negative betting signals produce zero edge",
+    negativeEdge === 0,
+    {
+      sportacularEdge:
+        negativeEdge
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 6 — D3 MISSING INPUT REMAINS NULL
+  // ==========================================================================
+
+  const missingEdge =
+    calculateUniversalSportacularEdge_({
+      bestEV:
+        0.10,
+
+      bestPriceEdge:
+        null
+    });
+
+
+  assertTest(
+    "D3 missing edge input remains null",
+    missingEdge === null,
+    {
+      sportacularEdge:
+        missingEdge
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 7 — D4 OVER TREND ALIGNMENT
+  // ==========================================================================
+
+  const overTrend =
+    calculateUniversalTrendSupport_({
+      candidateSide:
+        "Over",
+
+      trendScore:
+        15
+    });
+
+
+  assertTest(
+    "D4 Over trend alignment",
+    overTrend === 80,
+    {
+      trendSupport:
+        overTrend
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 8 — D4 UNDER TREND ALIGNMENT
+  // ==========================================================================
+
+  const underTrend =
+    calculateUniversalTrendSupport_({
+      candidateSide:
+        "Under",
+
+      trendScore:
+        -18
+    });
+
+
+  assertTest(
+    "D4 Under reverses negative raw trend into support",
+    underTrend === 86,
+    {
+      trendSupport:
+        underTrend
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 9 — D4 FULL SCORE
+  // ==========================================================================
+
+  const scoreExample =
+    calculateUniversalSportacularScore_({
+      candidateSide:
+        "Over",
+
+      sportacularEdge:
+        82,
+
+      modelConfidence:
+        88,
+
+      riskScore:
+        25,
+
+      trendScore:
+        15
+    });
+
+
+  assertTest(
+    "D4 full Sportacular Score",
+    approximatelyEqual(
+      scoreExample,
+      82.35,
+      1e-9
+    ),
+    {
+      sportacularScore:
+        scoreExample
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 10 — D4 MISSING TREND REWEIGHTS 95%
+  // ==========================================================================
+
+  const noTrendScore =
+    calculateUniversalSportacularScore_({
+      candidateSide:
+        "Over",
+
+      sportacularEdge:
+        82,
+
+      modelConfidence:
+        88,
+
+      riskScore:
+        25,
+
+      trendScore:
+        null
+    });
+
+
+  const expectedNoTrend =
+    (
+      (
+        0.55 *
+        82
+      ) +
+      (
+        0.25 *
+        88
+      ) +
+      (
+        0.15 *
+        75
+      )
+    ) /
+    0.95;
+
+
+  assertTest(
+    "D4 missing trend is removed and remaining weights renormalize",
+    approximatelyEqual(
+      noTrendScore,
+      expectedNoTrend,
+      1e-9
+    ),
+    {
+      sportacularScore:
+        noTrendScore,
+
+      expected:
+        expectedNoTrend
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 11 — CANDIDATE SIDE
+  // ==========================================================================
+
+  assertTest(
+    "D5 stronger EV selects candidate side",
+    selectUniversalCandidateSide_({
+      evOver:
+        0.12,
+
+      evUnder:
+        -0.04
+    }) === "Over"
+  );
+
+
+  // ==========================================================================
+  // TEST 12 — EV TIE DOES NOT ARBITRARILY FAVOR OVER
+  // ==========================================================================
+
+  assertTest(
+    "D5 EV tie produces no candidate side",
+    selectUniversalCandidateSide_({
+      evOver:
+        0.10,
+
+      evUnder:
+        0.10
+    }) === null
+  );
+
+
+  // ==========================================================================
+  // TEST 13 — ACTIONABLE ELITE PLAY
+  // ==========================================================================
+
+  const eliteActionability =
+    evaluateUniversalActionability_({
+      candidateSide:
+        "Over",
+
+      bestEV:
+        0.20,
+
+      bestModelProbability:
+        0.68,
+
+      bestPriceEdge:
+        0.12,
+
+      riskScore:
+        20,
+
+      modelConfidence:
+        92,
+
+      sportacularEdge:
+        85,
+
+      sportacularScore:
+        88
+    });
+
+
+  assertTest(
+    "D5 qualifying Elite play is actionable",
+    eliteActionability.actionable ===
+      true &&
+    eliteActionability.finalBestSide ===
+      "Over" &&
+    eliteActionability.confidenceTier ===
+      "Elite",
+    eliteActionability
+  );
+
+
+  // ==========================================================================
+  // TEST 14 — KNOWN THRESHOLD FAILURE = NO PLAY
+  // ==========================================================================
+
+  const failedKnownGate =
+    evaluateUniversalActionability_({
+      candidateSide:
+        "Under",
+
+      bestEV:
+        0.04,
+
+      bestModelProbability:
+        0.60,
+
+      bestPriceEdge:
+        0.08,
+
+      riskScore:
+        25,
+
+      modelConfidence:
+        80,
+
+      sportacularEdge:
+        60,
+
+      sportacularScore:
+        70
+    });
+
+
+  assertTest(
+    "D5 known threshold failure returns evaluated No Play",
+    failedKnownGate.actionable ===
+      false &&
+    failedKnownGate.evaluable ===
+      true &&
+    failedKnownGate.finalBestSide ===
+      "No Play" &&
+    failedKnownGate.confidenceTier ===
+      "No Play",
+    failedKnownGate
+  );
+
+
+  // ==========================================================================
+  // TEST 15 — MISSING MANDATORY DATA = UNEVALUABLE
+  // ==========================================================================
+
+  const missingMandatory =
+    evaluateUniversalActionability_({
+      candidateSide:
+        "Over",
+
+      bestEV:
+        0.15,
+
+      bestModelProbability:
+        0.64,
+
+      bestPriceEdge:
+        0.08,
+
+      riskScore:
+        null,
+
+      modelConfidence:
+        80,
+
+      sportacularEdge:
+        65,
+
+      sportacularScore:
+        null
+    });
+
+
+  assertTest(
+    "D5 missing mandatory data remains unevaluable",
+    missingMandatory.actionable ===
+      false &&
+    missingMandatory.evaluable ===
+      false &&
+    missingMandatory.finalBestSide ===
+      "No Play" &&
+    missingMandatory.confidenceTier ===
+      null,
+    missingMandatory
+  );
+
+
+  // ==========================================================================
+  // TEST 16 — CONFIDENCE TIER BOUNDARIES
+  // ==========================================================================
+
+  assertTest(
+    "D5 confidence tier boundaries",
+    getUniversalConfidenceTier_(85) ===
+      "Elite" &&
+    getUniversalConfidenceTier_(75) ===
+      "Strong" &&
+    getUniversalConfidenceTier_(65) ===
+      "Solid" &&
+    getUniversalConfidenceTier_(55) ===
+      "Lean" &&
+    getUniversalConfidenceTier_(54.999) ===
+      "No Play"
+  );
+
+
+  // ==========================================================================
+  // TEST 17 — MASTER HELPER ACTIONABLE PLAY
+  // ==========================================================================
+
+  const masterActionable =
+    buildUniversalSportacularScoring_({
+      lineValue:
+        69.5,
+
+      projectedStat:
+        75,
+
+      statStdDev:
+        18,
+
+      evOver:
+        0.20,
+
+      evUnder:
+        -0.12,
+
+      bestModelProbability:
+        0.68,
+
+      bestPriceEdge:
+        0.12,
+
+      trendScore:
+        12,
+
+      modelConfidence:
+        90
+    });
+
+
+  assertTest(
+    "D6 master helper produces actionable scored play",
+    masterActionable.candidateSide ===
+      "Over" &&
+    masterActionable.finalBestSide ===
+      "Over" &&
+    masterActionable.riskScore !==
+      null &&
+    masterActionable.riskTier ===
+      "Low" &&
+    masterActionable.sportacularEdge !==
+      null &&
+    masterActionable.sportacularScore !==
+      null &&
+    masterActionable.confidenceTier !==
+      null &&
+    masterActionable.confidenceTier !==
+      "No Play" &&
+    masterActionable.actionable ===
+      true &&
+    masterActionable.evaluable ===
+      true,
+    masterActionable
+  );
+
+
+  // ==========================================================================
+  // TEST 18 — MASTER HELPER KNOWN NO PLAY
+  // ==========================================================================
+
+  const masterNoPlay =
+    buildUniversalSportacularScoring_({
+      lineValue:
+        69.5,
+
+      projectedStat:
+        70,
+
+      statStdDev:
+        20,
+
+      evOver:
+        0.02,
+
+      evUnder:
+        -0.08,
+
+      bestModelProbability:
+        0.55,
+
+      bestPriceEdge:
+        0.015,
+
+      trendScore:
+        20,
+
+      modelConfidence:
+        90
+    });
+
+
+  assertTest(
+    "D6 strong trend cannot manufacture actionable betting value",
+    masterNoPlay.finalBestSide ===
+      "No Play" &&
+    masterNoPlay.actionable ===
+      false &&
+    masterNoPlay.evaluable ===
+      true &&
+    masterNoPlay.confidenceTier ===
+      "No Play" &&
+    masterNoPlay.sportacularEdge !==
+      null &&
+    masterNoPlay.sportacularScore !==
+      null,
+    masterNoPlay
+  );
+
+
+  // ==========================================================================
+  // TEST 19 — MASTER HELPER NULL INTEGRITY
+  // ==========================================================================
+
+  const masterMissing =
+    buildUniversalSportacularScoring_({
+      lineValue:
+        69.5,
+
+      projectedStat:
+        72,
+
+      statStdDev:
+        null,
+
+      evOver:
+        0.15,
+
+      evUnder:
+        -0.05,
+
+      bestModelProbability:
+        0.64,
+
+      bestPriceEdge:
+        0.08,
+
+      trendScore:
+        10,
+
+      modelConfidence:
+        85
+    });
+
+
+  assertTest(
+    "D6 missing uncertainty does not fabricate risk or final score",
+    masterMissing.riskScore ===
+      null &&
+    masterMissing.riskTier ===
+      null &&
+    masterMissing.sportacularScore ===
+      null &&
+    masterMissing.finalBestSide ===
+      "No Play" &&
+    masterMissing.confidenceTier ===
+      null &&
+    masterMissing.evaluable ===
+      false,
+    masterMissing
+  );
+
+
+  // ==========================================================================
+  // FINAL
+  // ==========================================================================
+
+  const passed =
+    tests.every(
+      test =>
+        test.pass
+    );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "P15 D6 UNIVERSAL SPORTACULAR SCORING CONTRACT",
+
+      totalTests:
+        tests.length,
+
+      passedTests:
+        tests.filter(
+          test =>
+            test.pass
+        ).length,
+
+      failedTests:
+        tests.filter(
+          test =>
+            !test.pass
+        ).length,
+
+      passed
+    })
+  );
+
+
+  if (!passed) {
+    throw new Error(
+      "P15 D6 FAIL — Universal Sportacular scoring contract regression failed."
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P15 D6 PASS — UNIVERSAL SPORTACULAR SCORING CONTRACT COMPLETE"
+  );
+
+  Logger.log(
+    "P15 D1-D6 SCORING CONTRACT IS READY FOR FOUR-LEAGUE IMPLEMENTATION."
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return true;
 }
 
 function onOpen() {

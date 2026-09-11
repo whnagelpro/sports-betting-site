@@ -201,44 +201,147 @@ const games = Number(
         props: (props ?? []).map(prop => {
 
             const type =
-
                 String(
                     prop.Type ?? ""
-                ).toLowerCase();
+                )
+                    .trim()
+                    .toLowerCase();
 
-            const oddsFormat = "american";
+            const bestSideRaw =
+                String(
+                    prop["Best Side"] ?? ""
+                )
+                    .trim();
 
-            const odds =
+            const bestSide =
+                bestSideRaw || null;
 
-                type === "milestone"
+            const normalizedBestSide =
+                bestSideRaw.toLowerCase();
 
-                    ? (
-                        prop["Odds"] !== undefined &&
-                        prop["Odds"] !== null &&
-                        prop["Odds"] !== ""
-                            ? Number(prop["Odds"])
-                            : null
-                    )
+            const hasValue = value =>
+                value !== undefined &&
+                value !== null &&
+                value !== "";
 
-                    : (
-                        prop["Over Odds"] !== undefined &&
-                        prop["Over Odds"] !== null &&
-                        prop["Over Odds"] !== ""
-                            ? Number(prop["Over Odds"])
-                            : null
+            const toNullableNumber = value => {
+
+                if (!hasValue(value)) {
+                    return null;
+                }
+
+                const number =
+                    Number(value);
+
+                return Number.isFinite(number)
+                    ? number
+                    : null;
+            };
+
+
+            // --------------------------------------------------
+            // P15 authoritative betting-side values
+            // --------------------------------------------------
+
+            let odds = null;
+            let probability = null;
+            let expectedValue = null;
+
+            if (normalizedBestSide === "over") {
+
+                odds =
+                    toNullableNumber(
+                        prop["Over Odds"]
                     );
+
+                probability =
+                    toNullableNumber(
+                        prop["Model Prob Over"]
+                    );
+
+                expectedValue =
+                    toNullableNumber(
+                        prop["EV Over"]
+                    );
+
+            } else if (normalizedBestSide === "under") {
+
+                odds =
+                    toNullableNumber(
+                        prop["Under Odds"]
+                    );
+
+                probability =
+                    toNullableNumber(
+                        prop["Model Prob Under"]
+                    );
+
+                expectedValue =
+                    toNullableNumber(
+                        prop["EV Under"]
+                    );
+
+            }
+
+
+            // --------------------------------------------------
+            // Universal P15 outputs
+            // --------------------------------------------------
+
+            const bestEV =
+                toNullableNumber(
+                    prop["Best EV"]
+                );
+
+            const bestModelProbability =
+                toNullableNumber(
+                    prop["Best Model Probability"]
+                );
+
+            const bestPriceEdge =
+                toNullableNumber(
+                    prop["Best Price Edge"]
+                );
+
+            const trendScore =
+                toNullableNumber(
+                    prop["Trend Score"]
+                );
+
+            const riskScore =
+                toNullableNumber(
+                    prop["Risk Score"]
+                );
+
+            const modelConfidence =
+                toNullableNumber(
+                    prop["Model Confidence"]
+                );
+
+            const sportacularScore =
+                toNullableNumber(
+                    prop["Sportacular Score"]
+                );
+
+            const sportacularEdge =
+                toNullableNumber(
+                    prop["Sportacular Edge"]
+                );
+
 
             return {
 
                 id:
-                    prop.Id,
+                    prop.Id ?? null,
 
                 type,
 
                 market:
                     String(
                         prop["Prop Type"] ?? ""
-                    ).toLowerCase(),
+                    )
+                        .trim()
+                        .toLowerCase(),
 
                 displayName:
                     String(
@@ -247,59 +350,70 @@ const games = Number(
                         .replaceAll("_", " "),
 
                 line:
-                    Number(
-                        prop["Line Value"] ?? 0
+                    toNullableNumber(
+                        prop["Line Value"]
                     ),
 
                 odds,
 
-                oddsFormat,
+                oddsFormat:
+                    "american",
 
                 sportsbook:
                     prop.Vendor ?? "",
 
-                probability:
-                    String(prop.Type ?? "").toLowerCase() === "milestone"
-                        ? (
-                            prop["Poisson Milestone"] !== undefined &&
-                            prop["Poisson Milestone"] !== null &&
-                            prop["Poisson Milestone"] !== ""
-                                ? Number(prop["Poisson Milestone"])
-                                : null
-                        )
-                        : (
-                            prop["Poisson Over"] !== undefined &&
-                            prop["Poisson Over"] !== null &&
-                            prop["Poisson Over"] !== ""
-                                ? Number(prop["Poisson Over"])
-                                : null
-                        ),
+
+                // ----------------------------------------------
+                // Compatibility fields used by current backend
+                // ----------------------------------------------
+
+                probability,
 
                 probabilitySource:
-                    String(prop.Type ?? "").toLowerCase() === "milestone"
-                        ? (
-                            prop["Poisson Milestone"] !== undefined &&
-                            prop["Poisson Milestone"] !== null &&
-                            prop["Poisson Milestone"] !== ""
-                                ? "poisson_milestone"
-                                : null
-                        )
-                        : (
-                            prop["Poisson Over"] !== undefined &&
-                            prop["Poisson Over"] !== null &&
-                            prop["Poisson Over"] !== ""
-                                ? "poisson_over"
-                                : null
-                        ),
+                    probability === null
+                        ? null
+                        : normalizedBestSide === "under"
+                            ? "model_prob_under"
+                            : "model_prob_over",
 
-                expectedValue:
-                    prop["EV Over/Milestone ($1 Bet)"] !== undefined &&
-                    prop["EV Over/Milestone ($1 Bet)"] !== null &&
-                    prop["EV Over/Milestone ($1 Bet)"] !== ""
-                        ? Number(
-                            prop["EV Over/Milestone ($1 Bet)"]
-                        )
-                        : null,
+                expectedValue,
+
+
+                // ----------------------------------------------
+                // Universal Player Props contract
+                // ----------------------------------------------
+
+                bestSide,
+
+                bestEV,
+
+                bestModelProbability,
+
+                bestPriceEdge,
+
+                trendScore,
+
+                trendStrength:
+                    prop["Trend Strength"] || null,
+
+                riskScore,
+
+                riskTier:
+                    prop["Risk Tier"] || null,
+
+                modelConfidence,
+
+                sportacularScore,
+
+                sportacularEdge,
+
+                confidenceTier:
+                    prop["Confidence Tier"] || null,
+
+
+                // ----------------------------------------------
+                // Preserve original A:AJ row
+                // ----------------------------------------------
 
                 raw: prop
 

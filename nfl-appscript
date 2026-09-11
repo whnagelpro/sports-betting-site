@@ -538,6 +538,19 @@ function getNFLGameAZDate_(game) {
   );
 }
 
+function isNFLRegularSeasonGame_(game) {
+
+  const seasonType =
+    Number(
+      game.season_type ??
+      game.seasonType ??
+      game.season_type_id ??
+      0
+    );
+
+  return seasonType === 2;
+}
+
 function isCompletedNFLGame_(game) {
 
   const statusState =
@@ -610,7 +623,10 @@ function getNFLCompletedGamesForDateRange_(
     Logger.log(`Total games before filter: ${allGames.length}`);
 
     const completedGames =
-      allGames.filter(isCompletedNFLGame_);
+      allGames.filter(game =>
+        isCompletedNFLGame_(game) &&
+        isNFLRegularSeasonGame_(game)
+      );
 
     Logger.log(`Completed games: ${completedGames.length}`);
 
@@ -981,6 +997,5222 @@ function refreshNFLGameOddsSheet() {
   }
 
   Logger.log(`Wrote ${rows.length} NFL game odds rows.`);
+}
+
+/**
+ * ============================================================================
+ * P14 — NFL UNIVERSAL PLAYER PROPS CONTRACT
+ * ============================================================================
+ */
+
+const NFL_UNIVERSAL_PLAYER_PROPS_HEADERS = [
+  "Game Id",                 // A
+  "Game Date",               // B
+  "Away Team",               // C
+  "Home Team",               // D
+  "Id",                      // E
+  "Player Id",               // F
+  "Vendor",                  // G
+  "Prop Type",               // H
+  "Line Value",              // I
+  "Type",                    // J
+  "Odds",                    // K
+  "Updated At",              // L
+  "Over Odds",               // M
+  "Under Odds",              // N
+  "Player Name",             // O
+  "Team",                    // P
+  "Player Baseline",         // Q
+  "Trend Adjustment",        // R
+  "Projected Stat",          // S
+  "Stat Std Dev",            // T
+  "Model Prob Over",         // U
+  "Model Prob Under",        // V
+  "EV Over",                 // W
+  "EV Under",                // X
+  "Best Side",               // Y
+  "Best EV",                 // Z
+  "Best Model Probability",  // AA
+  "Best Price Edge",         // AB
+  "Trend Score",             // AC
+  "Trend Strength",          // AD
+  "Risk Score",              // AE
+  "Risk Tier",               // AF
+  "Model Confidence",        // AG
+  "Sportacular Score",       // AH
+  "Sportacular Edge",        // AI
+  "Confidence Tier"          // AJ
+];
+
+
+function validateNFLUniversalPlayerPropsHeaders_() {
+  const expectedHeaders = [
+    "Game Id",
+    "Game Date",
+    "Away Team",
+    "Home Team",
+    "Id",
+    "Player Id",
+    "Vendor",
+    "Prop Type",
+    "Line Value",
+    "Type",
+    "Odds",
+    "Updated At",
+    "Over Odds",
+    "Under Odds",
+    "Player Name",
+    "Team",
+    "Player Baseline",
+    "Trend Adjustment",
+    "Projected Stat",
+    "Stat Std Dev",
+    "Model Prob Over",
+    "Model Prob Under",
+    "EV Over",
+    "EV Under",
+    "Best Side",
+    "Best EV",
+    "Best Model Probability",
+    "Best Price Edge",
+    "Trend Score",
+    "Trend Strength",
+    "Risk Score",
+    "Risk Tier",
+    "Model Confidence",
+    "Sportacular Score",
+    "Sportacular Edge",
+    "Confidence Tier"
+  ];
+
+
+  if (
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length !==
+    expectedHeaders.length
+  ) {
+    throw new Error(
+      `NFL universal Player Props header count mismatch. Expected ${expectedHeaders.length}, received ${NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length}.`
+    );
+  }
+
+
+  expectedHeaders.forEach(
+    (expectedHeader, index) => {
+
+      const actualHeader =
+        NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[index];
+
+
+      if (
+        actualHeader !==
+        expectedHeader
+      ) {
+        throw new Error(
+          `NFL universal Player Props header mismatch at column ${index + 1}. Expected "${expectedHeader}", received "${actualHeader}".`
+        );
+      }
+    }
+  );
+
+
+  return true;
+}
+
+
+function testNFLUniversalPlayerPropsContract() {
+  const tests = [];
+
+
+  function assertTest(
+    name,
+    condition
+  ) {
+    const pass =
+      Boolean(condition);
+
+
+    tests.push({
+      name,
+      pass
+    });
+
+
+    Logger.log(
+      JSON.stringify({
+        name,
+        pass
+      })
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        `NFL universal Player Props contract test failed: ${name}`
+      );
+    }
+  }
+
+
+  validateNFLUniversalPlayerPropsHeaders_();
+
+
+  assertTest(
+    "Universal header count is 36",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length === 36
+  );
+
+
+  assertTest(
+    "Player Name is column O",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[14] ===
+      "Player Name"
+  );
+
+
+  assertTest(
+    "Player Baseline is column Q",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[16] ===
+      "Player Baseline"
+  );
+
+
+  assertTest(
+    "Projected Stat is column S",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[18] ===
+      "Projected Stat"
+  );
+
+
+  assertTest(
+    "Stat Std Dev is column T",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[19] ===
+      "Stat Std Dev"
+  );
+
+
+  assertTest(
+    "Model Prob Over is column U",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[20] ===
+      "Model Prob Over"
+  );
+
+
+  assertTest(
+    "Model Prob Under is column V",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[21] ===
+      "Model Prob Under"
+  );
+
+
+  assertTest(
+    "EV Over is column W",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[22] ===
+      "EV Over"
+  );
+
+
+  assertTest(
+    "EV Under is column X",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[23] ===
+      "EV Under"
+  );
+
+
+  assertTest(
+    "Best Side is column Y",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[24] ===
+      "Best Side"
+  );
+
+
+  assertTest(
+    "Best Model Probability is AA",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[26] ===
+      "Best Model Probability"
+  );
+
+
+  assertTest(
+    "Best Price Edge is AB",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[27] ===
+      "Best Price Edge"
+  );
+
+
+  assertTest(
+    "Trend fields begin at AC",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[28] ===
+      "Trend Score" &&
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[29] ===
+      "Trend Strength"
+  );
+
+
+  assertTest(
+    "Risk and confidence occupy AE:AG",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[30] ===
+      "Risk Score" &&
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[31] ===
+      "Risk Tier" &&
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[32] ===
+      "Model Confidence"
+  );
+
+
+  assertTest(
+    "P15 fields remain owned by AH:AJ",
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[33] ===
+      "Sportacular Score" &&
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[34] ===
+      "Sportacular Edge" &&
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS[35] ===
+      "Confidence Tier"
+  );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "NFL UNIVERSAL PROP CONTRACT",
+
+      columns:
+        NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length,
+
+      tests:
+        tests.length,
+
+      passed:
+        tests.filter(
+          test => test.pass
+        ).length,
+
+      pass:
+        tests.every(
+          test => test.pass
+        )
+    })
+  );
+
+
+  return true;
+}
+
+/**
+ * ============================================================================
+ * P14 D2 — NFL UNIVERSAL PLAYER PROP HISTORICAL / PROJECTION CONTEXT
+ * ============================================================================
+ *
+ * Builds universal Q:T:
+ *
+ *   Q Player Baseline
+ *   R Trend Adjustment
+ *   S Projected Stat
+ *   T Stat Std Dev
+ *
+ * This preserves the EXISTING NFL production model:
+ *
+ * Baseline:
+ *   - Current + prior available:
+ *       ((4 * priorAvg) + (currentGames * currentAvg))
+ *       / (4 + currentGames)
+ *
+ *   - Current only:
+ *       currentAvg
+ *
+ *   - Prior only:
+ *       priorAvg
+ *
+ * Trend Adjustment:
+ *   - 0.30 * (Last5 - Player Baseline)
+ *   - Existing production behavior returns 0 when Last5/current season
+ *     context is unavailable.
+ *
+ * Projected Stat:
+ *   - Player Baseline + Trend Adjustment
+ *
+ * Stat Std Dev:
+ *   - Current + historical:
+ *       pooled variance using historical pseudo-weight 4
+ *   - Current only:
+ *       current sample SD
+ *   - Historical only:
+ *       historical sample SD
+ *
+ * This is reconciliation only. It does NOT introduce new NFL model math.
+ * ============================================================================
+ */
+
+
+const NFL_UNIVERSAL_PROP_STAT_MAP = {
+  passing_yards: {
+    trendName: "Passing Yards",
+    baselineTotalHeader: "Passing Yards",
+    gameLogHeader: "Passing Yards"
+  },
+
+  passing_tds: {
+    trendName: "Passing TDs",
+    baselineTotalHeader: "Passing TDs",
+    gameLogHeader: "Passing TDs"
+  },
+
+  interceptions: {
+    trendName: "Interceptions",
+    baselineTotalHeader: "Interceptions",
+    gameLogHeader: "Interceptions"
+  },
+
+  passing_completions: {
+    trendName: "Completions",
+    baselineTotalHeader: "Completions",
+    gameLogHeader: "Completions"
+  },
+
+  passing_attempts: {
+    trendName: "Pass Attempts",
+    baselineTotalHeader: "Pass Attempts",
+    gameLogHeader: "Pass Attempts"
+  },
+
+  rushing_yards: {
+    trendName: "Rushing Yards",
+    baselineTotalHeader: "Rushing Yards",
+    gameLogHeader: "Rushing Yards"
+  },
+
+  rushing_attempts: {
+    trendName: "Rushing Attempts",
+    baselineTotalHeader: "Rushing Attempts",
+    gameLogHeader: "Rushing Attempts"
+  },
+
+  rushing_tds: {
+    trendName: "Rushing TDs",
+    baselineTotalHeader: "Rushing TDs",
+    gameLogHeader: "Rushing TDs"
+  },
+
+  receptions: {
+    trendName: "Receptions",
+    baselineTotalHeader: "Receptions",
+    gameLogHeader: "Receptions"
+  },
+
+  receiving_yards: {
+    trendName: "Receiving Yards",
+    baselineTotalHeader: "Receiving Yards",
+    gameLogHeader: "Receiving Yards"
+  },
+
+  receiving_tds: {
+    trendName: "Receiving TDs",
+    baselineTotalHeader: "Receiving TDs",
+    gameLogHeader: "Receiving TDs"
+  }
+};
+
+
+function normalizeNFLUniversalPropType_(propType) {
+  if (
+    propType === null ||
+    propType === undefined
+  ) {
+    return "";
+  }
+
+
+  return String(
+    propType
+  )
+    .trim()
+    .toLowerCase();
+}
+
+
+function sampleStandardDeviationNFL_(values) {
+  const numericValues =
+    (values || [])
+      .map(value =>
+        Number(value)
+      )
+      .filter(value =>
+        Number.isFinite(value)
+      );
+
+
+  if (
+    numericValues.length < 2
+  ) {
+    return null;
+  }
+
+
+  const mean =
+    numericValues.reduce(
+      (sum, value) =>
+        sum + value,
+      0
+    ) /
+    numericValues.length;
+
+
+  const squaredDeviationSum =
+    numericValues.reduce(
+      (sum, value) =>
+        sum +
+        Math.pow(
+          value - mean,
+          2
+        ),
+      0
+    );
+
+
+  return Math.sqrt(
+    squaredDeviationSum /
+    (
+      numericValues.length - 1
+    )
+  );
+}
+
+
+function buildNFLUniversalPropHistoricalContext_({
+  propType,
+  currentGames,
+  currentAvg,
+  priorGames,
+  priorTotal,
+  last5,
+  currentValues,
+  historicalValues
+}) {
+  const normalizedPropType =
+    normalizeNFLUniversalPropType_(
+      propType
+    );
+
+
+  const statConfig =
+    NFL_UNIVERSAL_PROP_STAT_MAP[
+      normalizedPropType
+    ];
+
+
+  // Unsupported market.
+  if (!statConfig) {
+    return {
+      playerBaseline: null,
+      trendAdjustment: null,
+      projectedStat: null,
+      statStdDev: null
+    };
+  }
+
+
+  const parsedCurrentGames =
+    Number(
+      currentGames
+    );
+
+
+  const parsedPriorGames =
+    Number(
+      priorGames
+    );
+
+
+  const hasCurrentGames =
+    Number.isFinite(
+      parsedCurrentGames
+    ) &&
+    parsedCurrentGames > 0;
+
+
+  const hasPriorGames =
+    Number.isFinite(
+      parsedPriorGames
+    ) &&
+    parsedPriorGames > 0;
+
+
+  const hasCurrentAvg =
+    currentAvg !== "" &&
+    currentAvg !== null &&
+    currentAvg !== undefined &&
+    Number.isFinite(
+      Number(currentAvg)
+    );
+
+
+  const hasPriorTotal =
+    priorTotal !== "" &&
+    priorTotal !== null &&
+    priorTotal !== undefined &&
+    Number.isFinite(
+      Number(priorTotal)
+    );
+
+
+  const parsedCurrentAvg =
+    hasCurrentAvg
+      ? Number(currentAvg)
+      : null;
+
+
+  const priorAvg =
+    (
+      hasPriorGames &&
+      hasPriorTotal
+    )
+      ? (
+          Number(priorTotal) /
+          parsedPriorGames
+        )
+      : null;
+
+
+  // --------------------------------------------------------------------------
+  // Q — PLAYER BASELINE
+  //
+  // Exact translation of current X2 production formula.
+  // --------------------------------------------------------------------------
+
+  let playerBaseline =
+    null;
+
+
+  if (
+    hasCurrentGames &&
+    parsedCurrentAvg !== null &&
+    priorAvg !== null
+  ) {
+    playerBaseline =
+      (
+        (
+          4 * priorAvg
+        ) +
+        (
+          parsedCurrentGames *
+          parsedCurrentAvg
+        )
+      ) /
+      (
+        4 +
+        parsedCurrentGames
+      );
+
+  } else if (
+    hasCurrentGames &&
+    parsedCurrentAvg !== null
+  ) {
+    playerBaseline =
+      parsedCurrentAvg;
+
+  } else if (
+    priorAvg !== null
+  ) {
+    playerBaseline =
+      priorAvg;
+  }
+
+
+  // --------------------------------------------------------------------------
+  // R — TREND ADJUSTMENT
+  //
+  // Exact translation of current Y2 production formula:
+  // 0.30 * (Last5 - baseline)
+  //
+  // Existing behavior returns 0 when Last5/currentGames are unavailable.
+  // --------------------------------------------------------------------------
+
+  let trendAdjustment =
+    null;
+
+
+  if (
+    playerBaseline !== null
+  ) {
+    const hasLast5 =
+      last5 !== "" &&
+      last5 !== null &&
+      last5 !== undefined &&
+      Number.isFinite(
+        Number(last5)
+      );
+
+
+    if (
+      !hasLast5 ||
+      !hasCurrentGames
+    ) {
+      trendAdjustment =
+        0;
+
+    } else {
+
+      trendAdjustment =
+        0.30 *
+        (
+          Number(last5) -
+          playerBaseline
+        );
+    }
+  }
+
+
+  // --------------------------------------------------------------------------
+  // S — PROJECTED STAT
+  // --------------------------------------------------------------------------
+
+  const projectedStat =
+    (
+      playerBaseline !== null &&
+      trendAdjustment !== null
+    )
+      ? (
+          playerBaseline +
+          trendAdjustment
+        )
+      : null;
+
+
+  // --------------------------------------------------------------------------
+  // T — STAT STD DEV
+  //
+  // Exact translation of current AA2 production formula.
+  // --------------------------------------------------------------------------
+
+  const cleanCurrentValues =
+    (currentValues || [])
+      .map(value =>
+        Number(value)
+      )
+      .filter(value =>
+        Number.isFinite(value)
+      );
+
+
+  const cleanHistoricalValues =
+    (historicalValues || [])
+      .map(value =>
+        Number(value)
+      )
+      .filter(value =>
+        Number.isFinite(value)
+      );
+
+
+  const currentN =
+    cleanCurrentValues.length;
+
+
+  const historicalN =
+    cleanHistoricalValues.length;
+
+
+  const currentSD =
+    currentN >= 2
+      ? sampleStandardDeviationNFL_(
+          cleanCurrentValues
+        )
+      : null;
+
+
+  const historicalSD =
+    historicalN >= 2
+      ? sampleStandardDeviationNFL_(
+          cleanHistoricalValues
+        )
+      : null;
+
+
+  let statStdDev =
+    null;
+
+
+  if (
+    currentSD !== null &&
+    historicalSD !== null
+  ) {
+    statStdDev =
+      Math.sqrt(
+        (
+          (
+            4 *
+            Math.pow(
+              historicalSD,
+              2
+            )
+          ) +
+          (
+            (currentN - 1) *
+            Math.pow(
+              currentSD,
+              2
+            )
+          )
+        ) /
+        (
+          4 +
+          (
+            currentN - 1
+          )
+        )
+      );
+
+  } else if (
+    currentSD !== null
+  ) {
+    statStdDev =
+      currentSD;
+
+  } else if (
+    historicalSD !== null
+  ) {
+    statStdDev =
+      historicalSD;
+  }
+
+
+  return {
+    playerBaseline,
+    trendAdjustment,
+    projectedStat,
+    statStdDev
+  };
+}
+
+function testNFLUniversalPropHistoricalContext() {
+  const tests = [];
+
+
+  function assertTest(
+    name,
+    condition
+  ) {
+    const pass =
+      Boolean(
+        condition
+      );
+
+
+    tests.push({
+      name,
+      pass
+    });
+
+
+    Logger.log(
+      JSON.stringify({
+        name,
+        pass
+      })
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        `NFL universal historical-context test failed: ${name}`
+      );
+    }
+  }
+
+
+  // --------------------------------------------------------------------------
+  // FULL CURRENT + PRIOR CONTEXT
+  //
+  // Prior:
+  //   1000 yards / 10 games = 100.0
+  //
+  // Current:
+  //   120.0 average across 4 games
+  //
+  // Baseline:
+  //   ((4*100) + (4*120)) / 8 = 110.0
+  //
+  // Last 5:
+  //   130.0
+  //
+  // Adjustment:
+  //   .30 * (130 - 110) = 6.0
+  //
+  // Projection:
+  //   116.0
+  // --------------------------------------------------------------------------
+
+  const fullContext =
+    buildNFLUniversalPropHistoricalContext_({
+      propType:
+        "receiving_yards",
+
+      currentGames:
+        4,
+
+      currentAvg:
+        120,
+
+      priorGames:
+        10,
+
+      priorTotal:
+        1000,
+
+      last5:
+        130,
+
+      currentValues:
+        [100, 110, 125, 145],
+
+      historicalValues:
+        [80, 95, 105, 120, 100]
+    });
+
+
+  assertTest(
+    "Receiving yards baseline preserves current/prior blend",
+    Math.abs(
+      fullContext.playerBaseline -
+      110
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Receiving yards trend adjustment preserves 30 percent Last-5 rule",
+    Math.abs(
+      fullContext.trendAdjustment -
+      6
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Receiving yards projected stat preserves production model",
+    Math.abs(
+      fullContext.projectedStat -
+      116
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Receiving yards pooled standard deviation exists",
+    fullContext.statStdDev !== null &&
+    Number.isFinite(
+      fullContext.statStdDev
+    ) &&
+    fullContext.statStdDev > 0
+  );
+
+
+  // --------------------------------------------------------------------------
+  // CURRENT ONLY
+  // --------------------------------------------------------------------------
+
+  const currentOnly =
+    buildNFLUniversalPropHistoricalContext_({
+      propType:
+        "rushing_yards",
+
+      currentGames:
+        3,
+
+      currentAvg:
+        72,
+
+      priorGames:
+        0,
+
+      priorTotal:
+        null,
+
+      last5:
+        80,
+
+      currentValues:
+        [60, 70, 86],
+
+      historicalValues:
+        []
+    });
+
+
+  assertTest(
+    "Current-only baseline uses current average",
+    Math.abs(
+      currentOnly.playerBaseline -
+      72
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Current-only trend adjustment preserved",
+    Math.abs(
+      currentOnly.trendAdjustment -
+      2.4
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Current-only standard deviation exists",
+    currentOnly.statStdDev !== null &&
+    Number.isFinite(
+      currentOnly.statStdDev
+    )
+  );
+
+
+  // --------------------------------------------------------------------------
+  // PRIOR ONLY
+  //
+  // Existing Y2 behavior gives adjustment = 0 because currentGames = 0.
+  // --------------------------------------------------------------------------
+
+  const priorOnly =
+    buildNFLUniversalPropHistoricalContext_({
+      propType:
+        "passing_yards",
+
+      currentGames:
+        0,
+
+      currentAvg:
+        null,
+
+      priorGames:
+        5,
+
+      priorTotal:
+        1250,
+
+      last5:
+        null,
+
+      currentValues:
+        [],
+
+      historicalValues:
+        [220, 240, 250, 260, 280]
+    });
+
+
+  assertTest(
+    "Prior-only baseline uses prior average",
+    Math.abs(
+      priorOnly.playerBaseline -
+      250
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Prior-only trend adjustment preserves existing zero behavior",
+    priorOnly.trendAdjustment ===
+      0
+  );
+
+
+  assertTest(
+    "Prior-only projection equals baseline",
+    Math.abs(
+      priorOnly.projectedStat -
+      250
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Prior-only historical standard deviation exists",
+    priorOnly.statStdDev !== null &&
+    Number.isFinite(
+      priorOnly.statStdDev
+    )
+  );
+
+
+  // --------------------------------------------------------------------------
+  // SUPPORTED NFL MARKET MAPPING
+  // --------------------------------------------------------------------------
+
+  [
+    "passing_yards",
+    "passing_tds",
+    "interceptions",
+    "passing_completions",
+    "passing_attempts",
+    "rushing_yards",
+    "rushing_attempts",
+    "rushing_tds",
+    "receptions",
+    "receiving_yards",
+    "receiving_tds"
+  ].forEach(
+    propType => {
+
+      assertTest(
+        `${propType} is recognized by universal context`,
+        Object.prototype.hasOwnProperty.call(
+          NFL_UNIVERSAL_PROP_STAT_MAP,
+          propType
+        )
+      );
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // UNSUPPORTED MARKET
+  // --------------------------------------------------------------------------
+
+  const unsupported =
+    buildNFLUniversalPropHistoricalContext_({
+      propType:
+        "made_up_market",
+
+      currentGames:
+        5,
+
+      currentAvg:
+        10,
+
+      priorGames:
+        5,
+
+      priorTotal:
+        50,
+
+      last5:
+        12,
+
+      currentValues:
+        [8, 9, 10, 11, 12],
+
+      historicalValues:
+        [8, 9, 10, 11, 12]
+    });
+
+
+  assertTest(
+    "Unsupported market baseline stays unavailable",
+    unsupported.playerBaseline ===
+      null
+  );
+
+
+  assertTest(
+    "Unsupported market trend adjustment stays unavailable",
+    unsupported.trendAdjustment ===
+      null
+  );
+
+
+  assertTest(
+    "Unsupported market projected stat stays unavailable",
+    unsupported.projectedStat ===
+      null
+  );
+
+
+  assertTest(
+    "Unsupported market standard deviation stays unavailable",
+    unsupported.statStdDev ===
+      null
+  );
+
+
+  // --------------------------------------------------------------------------
+  // NO HISTORY / NO CURRENT CONTEXT
+  // --------------------------------------------------------------------------
+
+  const unavailable =
+    buildNFLUniversalPropHistoricalContext_({
+      propType:
+        "receptions",
+
+      currentGames:
+        0,
+
+      currentAvg:
+        null,
+
+      priorGames:
+        0,
+
+      priorTotal:
+        null,
+
+      last5:
+        null,
+
+      currentValues:
+        [],
+
+      historicalValues:
+        []
+    });
+
+
+  assertTest(
+    "Missing context keeps baseline unavailable",
+    unavailable.playerBaseline ===
+      null
+  );
+
+
+  assertTest(
+    "Missing context keeps projected stat unavailable",
+    unavailable.projectedStat ===
+      null
+  );
+
+
+  assertTest(
+    "Missing context keeps standard deviation unavailable",
+    unavailable.statStdDev ===
+      null
+  );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "NFL UNIVERSAL PROP HISTORICAL CONTEXT",
+
+      tests:
+        tests.length,
+
+      passed:
+        tests.filter(
+          test =>
+            test.pass
+        ).length,
+
+      pass:
+        tests.every(
+          test =>
+            test.pass
+        )
+    })
+  );
+
+
+  return true;
+}
+
+/**
+ * ============================================================================
+ * P14 D3 — NFL UNIVERSAL PLAYER PROP PROBABILITY + EV
+ * ============================================================================
+ *
+ * Builds universal U:X:
+ *
+ *   U Model Prob Over
+ *   V Model Prob Under
+ *   W EV Over
+ *   X EV Under
+ *
+ * Exact reconciliation of the existing NFL production formulas.
+ *
+ * Probability model:
+ *   - Normal distribution
+ *   - Sample-size reliability calibration
+ *   - 2.5% / 97.5% probability caps
+ *
+ * Only the already-supported conventional over_under markets are modeled.
+ * ============================================================================
+ */
+
+
+const NFL_UNIVERSAL_PROBABILITY_MARKETS = new Set([
+  "passing_yards",
+  "passing_completions",
+  "passing_attempts",
+  "rushing_yards",
+  "rushing_attempts",
+  "receptions",
+  "receiving_yards"
+]);
+
+
+/**
+ * Standard normal CDF approximation.
+ *
+ * Replaces Google Sheets NORM.S.DIST(z, TRUE).
+ */
+function standardNormalCDFNFL_(z) {
+  const value =
+    Number(z);
+
+  if (!Number.isFinite(value)) {
+    return null;
+  }
+
+
+  // Abramowitz-Stegun approximation.
+  const sign =
+    value < 0
+      ? -1
+      : 1;
+
+  const x =
+    Math.abs(value) /
+    Math.sqrt(2);
+
+
+  const t =
+    1 /
+    (
+      1 +
+      0.3275911 * x
+    );
+
+
+  const a1 =
+    0.254829592;
+
+  const a2 =
+    -0.284496736;
+
+  const a3 =
+    1.421413741;
+
+  const a4 =
+    -1.453152027;
+
+  const a5 =
+    1.061405429;
+
+
+  const erf =
+    sign *
+    (
+      1 -
+      (
+        (
+          (
+            (
+              (
+                a5 * t +
+                a4
+              ) * t +
+              a3
+            ) * t +
+            a2
+          ) * t +
+          a1
+        ) *
+        t *
+        Math.exp(
+          -x * x
+        )
+      )
+    );
+
+
+  return (
+    1 + erf
+  ) / 2;
+}
+
+
+function americanOddsToDecimalNFL_(
+  americanOdds
+) {
+  if (
+    americanOdds === "" ||
+    americanOdds === null ||
+    americanOdds === undefined
+  ) {
+    return null;
+  }
+
+
+  const odds =
+    Number(
+      americanOdds
+    );
+
+
+  if (
+    !Number.isFinite(odds) ||
+    odds === 0
+  ) {
+    return null;
+  }
+
+
+  if (odds > 0) {
+    return (
+      1 +
+      odds / 100
+    );
+  }
+
+
+  return (
+    1 +
+    100 / Math.abs(odds)
+  );
+}
+
+
+function calculateNFLExpectedValue_(
+  winProbability,
+  americanOdds
+) {
+  if (
+    winProbability === "" ||
+    winProbability === null ||
+    winProbability === undefined
+  ) {
+    return null;
+  }
+
+
+  const probability =
+    Number(
+      winProbability
+    );
+
+
+  if (
+    !Number.isFinite(probability) ||
+    probability < 0 ||
+    probability > 1
+  ) {
+    return null;
+  }
+
+
+  const decimalOdds =
+    americanOddsToDecimalNFL_(
+      americanOdds
+    );
+
+
+  if (decimalOdds === null) {
+    return null;
+  }
+
+
+  // Exact equivalent of existing O/P formulas:
+  //
+  // probability * potential profit
+  //   - probability of losing
+  return (
+    probability *
+    (
+      decimalOdds - 1
+    )
+  ) -
+  (
+    1 - probability
+  );
+}
+
+
+function buildNFLUniversalPropProbabilityEV_({
+  propType,
+  marketType,
+  projectedStat,
+  statStdDev,
+  lineValue,
+  currentGames,
+  overOdds,
+  underOdds
+}) {
+  const normalizedPropType =
+    normalizeNFLUniversalPropType_(
+      propType
+    );
+
+
+  const normalizedMarketType =
+    String(
+      marketType ?? ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  // --------------------------------------------------------------------------
+  // EXISTING SUPPORT CONTRACT
+  // --------------------------------------------------------------------------
+
+  if (
+    normalizedMarketType !==
+      "over_under" ||
+    !NFL_UNIVERSAL_PROBABILITY_MARKETS.has(
+      normalizedPropType
+    )
+  ) {
+    return {
+      modelProbOver: null,
+      modelProbUnder: null,
+      evOver: null,
+      evUnder: null,
+      reliability: null,
+      rawProbOver: null
+    };
+  }
+
+
+  // --------------------------------------------------------------------------
+  // REQUIRED MODEL INPUTS
+  // --------------------------------------------------------------------------
+
+  if (
+    projectedStat === "" ||
+    projectedStat === null ||
+    projectedStat === undefined ||
+    statStdDev === "" ||
+    statStdDev === null ||
+    statStdDev === undefined ||
+    lineValue === "" ||
+    lineValue === null ||
+    lineValue === undefined
+  ) {
+    return {
+      modelProbOver: null,
+      modelProbUnder: null,
+      evOver: null,
+      evUnder: null,
+      reliability: null,
+      rawProbOver: null
+    };
+  }
+
+
+  const projection =
+    Number(
+      projectedStat
+    );
+
+
+  const standardDeviation =
+    Number(
+      statStdDev
+    );
+
+
+  const line =
+    Number(
+      lineValue
+    );
+
+
+  if (
+    !Number.isFinite(projection) ||
+    !Number.isFinite(standardDeviation) ||
+    standardDeviation <= 0 ||
+    !Number.isFinite(line)
+  ) {
+    return {
+      modelProbOver: null,
+      modelProbUnder: null,
+      evOver: null,
+      evUnder: null,
+      reliability: null,
+      rawProbOver: null
+    };
+  }
+
+
+  // --------------------------------------------------------------------------
+  // EXACT TRANSLATION OF EXISTING Q2 FORMULA
+  //
+  // rawOver =
+  //   1 - NORM.S.DIST(
+  //         (Line - Projected Stat) / Std Dev,
+  //         TRUE
+  //       )
+  // --------------------------------------------------------------------------
+
+  const zScore =
+    (
+      line -
+      projection
+    ) /
+    standardDeviation;
+
+
+  const cdf =
+    standardNormalCDFNFL_(
+      zScore
+    );
+
+
+  if (cdf === null) {
+    return {
+      modelProbOver: null,
+      modelProbUnder: null,
+      evOver: null,
+      evUnder: null,
+      reliability: null,
+      rawProbOver: null
+    };
+  }
+
+
+  const rawProbOver =
+    1 - cdf;
+
+
+  // --------------------------------------------------------------------------
+  // EXISTING SAMPLE-SIZE RELIABILITY
+  //
+  // MIN(1, 0.60 + 0.05 * currentGames)
+  // --------------------------------------------------------------------------
+
+  const parsedCurrentGames =
+    (
+      currentGames === "" ||
+      currentGames === null ||
+      currentGames === undefined ||
+      !Number.isFinite(
+        Number(currentGames)
+      )
+    )
+      ? 0
+      : Math.max(
+          0,
+          Number(currentGames)
+        );
+
+
+  const reliability =
+    Math.min(
+      1,
+      0.60 +
+      0.05 *
+      parsedCurrentGames
+    );
+
+
+  // --------------------------------------------------------------------------
+  // CALIBRATION TOWARD 50%
+  // --------------------------------------------------------------------------
+
+  const calibratedOver =
+    0.5 +
+    (
+      rawProbOver -
+      0.5
+    ) *
+    reliability;
+
+
+  // Existing production floor/ceiling.
+  const modelProbOver =
+    Math.min(
+      0.975,
+      Math.max(
+        0.025,
+        calibratedOver
+      )
+    );
+
+
+  const modelProbUnder =
+    1 -
+    modelProbOver;
+
+
+  // --------------------------------------------------------------------------
+  // EV
+  //
+  // Probabilities are model outputs and survive missing prices.
+  // EV requires the sportsbook price.
+  // --------------------------------------------------------------------------
+
+  const evOver =
+    calculateNFLExpectedValue_(
+      modelProbOver,
+      overOdds
+    );
+
+
+  const evUnder =
+    calculateNFLExpectedValue_(
+      modelProbUnder,
+      underOdds
+    );
+
+
+  return {
+    modelProbOver,
+    modelProbUnder,
+    evOver,
+    evUnder,
+
+    // Internal diagnostics only.
+    // These are NOT universal schema columns.
+    reliability,
+    rawProbOver
+  };
+}
+
+function testNFLUniversalPropProbabilityEV() {
+  const tests = [];
+
+
+  function assertTest(
+    name,
+    condition
+  ) {
+    const pass =
+      Boolean(
+        condition
+      );
+
+
+    tests.push({
+      name,
+      pass
+    });
+
+
+    Logger.log(
+      JSON.stringify({
+        name,
+        pass
+      })
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        `NFL universal probability/EV test failed: ${name}`
+      );
+    }
+  }
+
+
+  // --------------------------------------------------------------------------
+  // STANDARD SUPPORTED MARKET
+  // --------------------------------------------------------------------------
+
+  const receivingYards =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "receiving_yards",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        72,
+
+      statStdDev:
+        20,
+
+      lineValue:
+        65.5,
+
+      currentGames:
+        4,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110
+    });
+
+
+  assertTest(
+    "Receiving Yards Model Prob Over exists",
+    receivingYards.modelProbOver !== null &&
+    Number.isFinite(
+      receivingYards.modelProbOver
+    )
+  );
+
+
+  assertTest(
+    "Receiving Yards Model Prob Under exists",
+    receivingYards.modelProbUnder !== null &&
+    Number.isFinite(
+      receivingYards.modelProbUnder
+    )
+  );
+
+
+  assertTest(
+    "NFL Over and Under probabilities sum to 1",
+    Math.abs(
+      (
+        receivingYards.modelProbOver +
+        receivingYards.modelProbUnder
+      ) -
+      1
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Receiving Yards EV Over exists",
+    receivingYards.evOver !== null &&
+    Number.isFinite(
+      receivingYards.evOver
+    )
+  );
+
+
+  assertTest(
+    "Receiving Yards EV Under exists",
+    receivingYards.evUnder !== null &&
+    Number.isFinite(
+      receivingYards.evUnder
+    )
+  );
+
+
+  // --------------------------------------------------------------------------
+  // RELIABILITY — EXACT EXISTING FORMULA
+  //
+  // 4 games:
+  // .60 + .05*4 = .80
+  // --------------------------------------------------------------------------
+
+  assertTest(
+    "Four-game reliability equals 0.80",
+    Math.abs(
+      receivingYards.reliability -
+      0.80
+    ) < 1e-9
+  );
+
+
+  // --------------------------------------------------------------------------
+  // ZERO CURRENT GAMES
+  //
+  // reliability = .60
+  // --------------------------------------------------------------------------
+
+  const zeroGames =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "passing_yards",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        250,
+
+      statStdDev:
+        40,
+
+      lineValue:
+        249.5,
+
+      currentGames:
+        0,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110
+    });
+
+
+  assertTest(
+    "Zero-game reliability equals 0.60",
+    Math.abs(
+      zeroGames.reliability -
+      0.60
+    ) < 1e-9
+  );
+
+
+  // --------------------------------------------------------------------------
+  // RELIABILITY CAPS AT 1
+  //
+  // At 8 games:
+  // .60 + .05*8 = 1.00
+  // --------------------------------------------------------------------------
+
+  const eightGames =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "rushing_yards",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        80,
+
+      statStdDev:
+        25,
+
+      lineValue:
+        74.5,
+
+      currentGames:
+        8,
+
+      overOdds:
+        -105,
+
+      underOdds:
+        -115
+    });
+
+
+  assertTest(
+    "Eight-game reliability reaches 1",
+    Math.abs(
+      eightGames.reliability -
+      1
+    ) < 1e-9
+  );
+
+
+  const twentyGames =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "receptions",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        6,
+
+      statStdDev:
+        2,
+
+      lineValue:
+        5.5,
+
+      currentGames:
+        20,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110
+    });
+
+
+  assertTest(
+    "Reliability never exceeds 1",
+    twentyGames.reliability ===
+      1
+  );
+
+
+  // --------------------------------------------------------------------------
+  // PROBABILITY CAP
+  //
+  // Extreme projection should never exceed .975.
+  // --------------------------------------------------------------------------
+
+  const extremeOver =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "passing_attempts",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        60,
+
+      statStdDev:
+        1,
+
+      lineValue:
+        30.5,
+
+      currentGames:
+        10,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110
+    });
+
+
+  assertTest(
+    "NFL Model Prob Over respects 0.975 cap",
+    extremeOver.modelProbOver <=
+      0.975 + 1e-12
+  );
+
+
+  assertTest(
+    "NFL Model Prob Under respects 0.025 floor",
+    extremeOver.modelProbUnder >=
+      0.025 - 1e-12
+  );
+
+
+  // --------------------------------------------------------------------------
+  // ALL SEVEN FROZEN PROBABILITY MARKETS
+  // --------------------------------------------------------------------------
+
+  [
+    "passing_yards",
+    "passing_completions",
+    "passing_attempts",
+    "rushing_yards",
+    "rushing_attempts",
+    "receptions",
+    "receiving_yards"
+  ].forEach(
+    propType => {
+
+      const result =
+        buildNFLUniversalPropProbabilityEV_({
+          propType,
+
+          marketType:
+            "over_under",
+
+          projectedStat:
+            10,
+
+          statStdDev:
+            3,
+
+          lineValue:
+            9.5,
+
+          currentGames:
+            4,
+
+          overOdds:
+            -110,
+
+          underOdds:
+            -110
+        });
+
+
+      assertTest(
+        `${propType} probability contract is supported`,
+        result.modelProbOver !== null &&
+        result.modelProbUnder !== null
+      );
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // PROJECTION-SUPPORTED BUT PROBABILITY-UNSUPPORTED MARKET
+  //
+  // passing_tds is supported by D2 Q:T but NOT by the existing NFL Q/R
+  // probability formula. It must therefore remain unavailable in D3.
+  // --------------------------------------------------------------------------
+
+  const passingTDs =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "passing_tds",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        2.2,
+
+      statStdDev:
+        1.0,
+
+      lineValue:
+        1.5,
+
+      currentGames:
+        4,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110
+    });
+
+
+  assertTest(
+    "Passing TD probability remains unavailable",
+    passingTDs.modelProbOver === null &&
+    passingTDs.modelProbUnder === null &&
+    passingTDs.evOver === null &&
+    passingTDs.evUnder === null
+  );
+
+
+  // --------------------------------------------------------------------------
+  // MILESTONE MUST NOT USE CONVENTIONAL MODEL
+  // --------------------------------------------------------------------------
+
+  const milestone =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "receiving_yards",
+
+      marketType:
+        "milestone",
+
+      projectedStat:
+        72,
+
+      statStdDev:
+        20,
+
+      lineValue:
+        75,
+
+      currentGames:
+        4,
+
+      overOdds:
+        120,
+
+      underOdds:
+        ""
+    });
+
+
+  assertTest(
+    "Milestone remains unavailable in conventional NFL probability engine",
+    milestone.modelProbOver === null &&
+    milestone.modelProbUnder === null &&
+    milestone.evOver === null &&
+    milestone.evUnder === null
+  );
+
+
+  // --------------------------------------------------------------------------
+  // MISSING ODDS
+  //
+  // Existing probability does not require odds.
+  // EV does.
+  // --------------------------------------------------------------------------
+
+  const missingOdds =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "receiving_yards",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        72,
+
+      statStdDev:
+        20,
+
+      lineValue:
+        65.5,
+
+      currentGames:
+        4,
+
+      overOdds:
+        "",
+
+      underOdds:
+        ""
+    });
+
+
+  assertTest(
+    "Missing odds preserve NFL model probabilities",
+    missingOdds.modelProbOver !== null &&
+    missingOdds.modelProbUnder !== null
+  );
+
+
+  assertTest(
+    "Missing odds keep NFL EV unavailable",
+    missingOdds.evOver === null &&
+    missingOdds.evUnder === null
+  );
+
+
+  // --------------------------------------------------------------------------
+  // INVALID / MISSING STANDARD DEVIATION
+  // --------------------------------------------------------------------------
+
+  const noStdDev =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        "rushing_yards",
+
+      marketType:
+        "over_under",
+
+      projectedStat:
+        70,
+
+      statStdDev:
+        null,
+
+      lineValue:
+        65.5,
+
+      currentGames:
+        4,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110
+    });
+
+
+  assertTest(
+    "Missing Stat Std Dev keeps probability unavailable",
+    noStdDev.modelProbOver === null &&
+    noStdDev.modelProbUnder === null
+  );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "NFL UNIVERSAL PROP PROBABILITY EV",
+
+      tests:
+        tests.length,
+
+      passed:
+        tests.filter(
+          test =>
+            test.pass
+        ).length,
+
+      pass:
+        tests.every(
+          test =>
+            test.pass
+        )
+    })
+  );
+
+
+  return true;
+}
+
+/**
+ * ============================================================================
+ * P14 D4 — NFL UNIVERSAL DECISION + TREND FIELDS
+ * ============================================================================
+ *
+ * Builds universal Y:AG:
+ *
+ *   Y   Best Side
+ *   Z   Best EV
+ *   AA  Best Model Probability
+ *   AB  Best Price Edge
+ *   AC  Trend Score
+ *   AD  Trend Strength
+ *   AE  Risk Score
+ *   AF  Risk Tier
+ *   AG  Model Confidence
+ *
+ * NFL-specific preservation:
+ * - Best Price Edge preserves existing VIG-FREE sportsbook comparison.
+ * - Existing NFL Trend Score / Trend Strength / Risk Tier are reused.
+ * - Existing calculateTrendConfidence_() is reused for Model Confidence.
+ * - NFL does NOT currently have a validated numeric Risk Score.
+ *   Therefore AE remains null until P15.
+ * - No P15 actionable EV threshold is introduced here.
+ * ============================================================================
+ */
+
+
+function buildNFLPlayerTrendIndex_() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+
+  const sheet =
+    ss.getSheetByName(
+      "NFL Player Trends"
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      'Sheet "NFL Player Trends" not found.'
+    );
+  }
+
+
+  const rows =
+    getNFLObjectsFromSheet_(
+      sheet
+    );
+
+
+  const index = {};
+
+
+  rows.forEach(row => {
+
+    const playerId =
+      String(
+        row["Player ID"] ?? ""
+      ).trim();
+
+
+    const statType =
+      String(
+        row["Stat Type"] ?? ""
+      ).trim();
+
+
+    if (
+      !playerId ||
+      !statType
+    ) {
+      return;
+    }
+
+
+    index[
+      `${playerId}::${statType}`
+    ] = row;
+  });
+
+
+  return index;
+}
+
+
+function getNFLTrendStatNameForProp_(
+  propType
+) {
+  const normalizedPropType =
+    normalizeNFLUniversalPropType_(
+      propType
+    );
+
+
+  const config =
+    NFL_UNIVERSAL_PROP_STAT_MAP[
+      normalizedPropType
+    ];
+
+
+  return config
+    ? config.trendName
+    : null;
+}
+
+
+function getNFLTrendRowForProp_(
+  playerId,
+  propType,
+  trendIndex
+) {
+  if (
+    !playerId ||
+    !trendIndex
+  ) {
+    return null;
+  }
+
+
+  const statName =
+    getNFLTrendStatNameForProp_(
+      propType
+    );
+
+
+  if (!statName) {
+    return null;
+  }
+
+
+  return (
+    trendIndex[
+      `${String(playerId)}::${statName}`
+    ] || null
+  );
+}
+
+
+function getNullableNFLNumericField_(
+  row,
+  fieldName
+) {
+  if (!row) {
+    return null;
+  }
+
+
+  const rawValue =
+    row[fieldName];
+
+
+  if (
+    rawValue === "" ||
+    rawValue === null ||
+    rawValue === undefined
+  ) {
+    return null;
+  }
+
+
+  const numericValue =
+    Number(
+      rawValue
+    );
+
+
+  return Number.isFinite(
+    numericValue
+  )
+    ? numericValue
+    : null;
+}
+
+
+function getNullableNFLTextField_(
+  row,
+  fieldName
+) {
+  if (!row) {
+    return null;
+  }
+
+
+  const rawValue =
+    row[fieldName];
+
+
+  if (
+    rawValue === "" ||
+    rawValue === null ||
+    rawValue === undefined
+  ) {
+    return null;
+  }
+
+
+  const textValue =
+    String(
+      rawValue
+    ).trim();
+
+
+  return textValue
+    ? textValue
+    : null;
+}
+
+
+/**
+ * Converts American odds to raw implied probability.
+ */
+function americanOddsToImpliedProbabilityNFL_(
+  americanOdds
+) {
+  if (
+    americanOdds === "" ||
+    americanOdds === null ||
+    americanOdds === undefined
+  ) {
+    return null;
+  }
+
+
+  const odds =
+    Number(
+      americanOdds
+    );
+
+
+  if (
+    !Number.isFinite(odds) ||
+    odds === 0
+  ) {
+    return null;
+  }
+
+
+  if (odds > 0) {
+    return (
+      100 /
+      (
+        odds + 100
+      )
+    );
+  }
+
+
+  return (
+    Math.abs(odds) /
+    (
+      Math.abs(odds) + 100
+    )
+  );
+}
+
+
+/**
+ * Preserves the existing NFL Player Props S-column behavior:
+ *
+ *   impliedOver  -> raw sportsbook implied probability
+ *   impliedUnder -> raw sportsbook implied probability
+ *
+ *   vigFreeOver  = impliedOver / totalImplied
+ *   vigFreeUnder = impliedUnder / totalImplied
+ *
+ *   overEdge  = modelProbOver  - vigFreeOver
+ *   underEdge = modelProbUnder - vigFreeUnder
+ *
+ * Best Price Edge follows the SELECTED Best Side.
+ */
+function getNFLVigFreePriceEdges_({
+  modelProbOver,
+  modelProbUnder,
+  overOdds,
+  underOdds
+}) {
+  if (
+    modelProbOver === null ||
+    modelProbOver === undefined ||
+    modelProbUnder === null ||
+    modelProbUnder === undefined
+  ) {
+    return {
+      overEdge: null,
+      underEdge: null,
+      vigFreeOver: null,
+      vigFreeUnder: null
+    };
+  }
+
+
+  const overProbability =
+    Number(
+      modelProbOver
+    );
+
+
+  const underProbability =
+    Number(
+      modelProbUnder
+    );
+
+
+  if (
+    !Number.isFinite(
+      overProbability
+    ) ||
+    !Number.isFinite(
+      underProbability
+    )
+  ) {
+    return {
+      overEdge: null,
+      underEdge: null,
+      vigFreeOver: null,
+      vigFreeUnder: null
+    };
+  }
+
+
+  const impliedOver =
+    americanOddsToImpliedProbabilityNFL_(
+      overOdds
+    );
+
+
+  const impliedUnder =
+    americanOddsToImpliedProbabilityNFL_(
+      underOdds
+    );
+
+
+  if (
+    impliedOver === null ||
+    impliedUnder === null
+  ) {
+    return {
+      overEdge: null,
+      underEdge: null,
+      vigFreeOver: null,
+      vigFreeUnder: null
+    };
+  }
+
+
+  const totalImplied =
+    impliedOver +
+    impliedUnder;
+
+
+  if (
+    !Number.isFinite(
+      totalImplied
+    ) ||
+    totalImplied <= 0
+  ) {
+    return {
+      overEdge: null,
+      underEdge: null,
+      vigFreeOver: null,
+      vigFreeUnder: null
+    };
+  }
+
+
+  const vigFreeOver =
+    impliedOver /
+    totalImplied;
+
+
+  const vigFreeUnder =
+    impliedUnder /
+    totalImplied;
+
+
+  return {
+    overEdge:
+      overProbability -
+      vigFreeOver,
+
+    underEdge:
+      underProbability -
+      vigFreeUnder,
+
+    vigFreeOver,
+
+    vigFreeUnder
+  };
+}
+
+
+function buildNFLUniversalDecisionTrendFields_({
+  playerId,
+  propType,
+  modelProbOver,
+  modelProbUnder,
+  evOver,
+  evUnder,
+  overOdds,
+  underOdds,
+  trendIndex
+}) {
+
+  // --------------------------------------------------------------------------
+  // TREND
+  // --------------------------------------------------------------------------
+
+  const trendRow =
+    getNFLTrendRowForProp_(
+      playerId,
+      propType,
+      trendIndex
+    );
+
+
+  const trendScore =
+    getNullableNFLNumericField_(
+      trendRow,
+      "Trend Score"
+    );
+
+
+  const trendStrength =
+    getNullableNFLTextField_(
+      trendRow,
+      "Trend Strength"
+    );
+
+
+  // --------------------------------------------------------------------------
+  // BEST SIDE / EV / MODEL PROBABILITY
+  //
+  // This remains the mathematical CANDIDATE side at this stage.
+  // P15 later converts it to actionable Over / Under / No Play.
+  // --------------------------------------------------------------------------
+
+  const overAvailable =
+    evOver !== null &&
+    evOver !== undefined &&
+    Number.isFinite(
+      Number(evOver)
+    ) &&
+    modelProbOver !== null &&
+    modelProbOver !== undefined &&
+    Number.isFinite(
+      Number(modelProbOver)
+    );
+
+
+  const underAvailable =
+    evUnder !== null &&
+    evUnder !== undefined &&
+    Number.isFinite(
+      Number(evUnder)
+    ) &&
+    modelProbUnder !== null &&
+    modelProbUnder !== undefined &&
+    Number.isFinite(
+      Number(modelProbUnder)
+    );
+
+
+  let bestSide =
+    "No Play";
+
+
+  let bestEV =
+    null;
+
+
+  let bestModelProbability =
+    null;
+
+
+  if (
+    overAvailable &&
+    underAvailable
+  ) {
+
+    if (
+      Number(evOver) >=
+      Number(evUnder)
+    ) {
+
+      bestSide =
+        "Over";
+
+      bestEV =
+        Number(evOver);
+
+      bestModelProbability =
+        Number(modelProbOver);
+
+    } else {
+
+      bestSide =
+        "Under";
+
+      bestEV =
+        Number(evUnder);
+
+      bestModelProbability =
+        Number(modelProbUnder);
+    }
+
+  } else if (
+    overAvailable
+  ) {
+
+    bestSide =
+      "Over";
+
+    bestEV =
+      Number(evOver);
+
+    bestModelProbability =
+      Number(modelProbOver);
+
+  } else if (
+    underAvailable
+  ) {
+
+    bestSide =
+      "Under";
+
+    bestEV =
+      Number(evUnder);
+
+    bestModelProbability =
+      Number(modelProbUnder);
+  }
+
+
+  // --------------------------------------------------------------------------
+  // BEST PRICE EDGE — PRESERVE VALIDATED NFL VIG-FREE CONTRACT
+  // --------------------------------------------------------------------------
+
+  const priceEdges =
+    getNFLVigFreePriceEdges_({
+      modelProbOver,
+      modelProbUnder,
+      overOdds,
+      underOdds
+    });
+
+
+  let bestPriceEdge =
+    null;
+
+
+  if (
+    bestSide === "Over"
+  ) {
+
+    bestPriceEdge =
+      priceEdges.overEdge;
+
+  } else if (
+    bestSide === "Under"
+  ) {
+
+    bestPriceEdge =
+      priceEdges.underEdge;
+  }
+
+
+  // --------------------------------------------------------------------------
+  // MODEL CONFIDENCE — PRESERVE LEGACY NFL PLAYER PROPS CONTRACT
+  //
+  // Old production formula:
+  //
+  // MIN(
+  //   100,
+  //   MAX(Model Prob Over, Model Prob Under) * 100
+  //   + Best Price Edge * 25
+  // )
+  // --------------------------------------------------------------------------
+
+  let modelConfidence =
+    null;
+
+
+  const overProbability =
+    getUniversalNullableNumber_(
+      modelProbOver
+    );
+
+
+  const underProbability =
+    getUniversalNullableNumber_(
+      modelProbUnder
+    );
+
+
+  const selectedPriceEdge =
+    getUniversalNullableNumber_(
+      bestPriceEdge
+    );
+
+
+  if (
+    overProbability !== null &&
+    underProbability !== null &&
+    selectedPriceEdge !== null
+  ) {
+
+    modelConfidence =
+      Math.min(
+        100,
+        (
+          Math.max(
+            overProbability,
+            underProbability
+          ) *
+          100
+        ) +
+        (
+          selectedPriceEdge *
+          25
+        )
+      );
+  }
+
+
+  // AE / AF now belong to P15 universal scoring.
+  // They are intentionally not generated here.
+  const riskScore =
+    null;
+
+
+  const riskTier =
+    null;
+
+
+  return {
+    bestSide,
+    bestEV,
+    bestModelProbability,
+    bestPriceEdge,
+    trendScore,
+    trendStrength,
+    riskScore,
+    riskTier,
+    modelConfidence
+  };
+}
+
+function testNFLUniversalDecisionTrendFields() {
+  const tests = [];
+
+
+  function assertTest(
+    name,
+    condition
+  ) {
+    const pass =
+      Boolean(
+        condition
+      );
+
+
+    tests.push({
+      name,
+      pass
+    });
+
+
+    Logger.log(
+      JSON.stringify({
+        name,
+        pass
+      })
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        `NFL universal decision/trend test failed: ${name}`
+      );
+    }
+  }
+
+
+  const playerId =
+    "P14_D4_TEST_PLAYER";
+
+
+  const trendIndex = {};
+
+
+  trendIndex[
+    `${playerId}::Receiving Yards`
+  ] = {
+    "Player ID":
+      playerId,
+
+    "Player Name":
+      "Test Receiver",
+
+    "Team":
+      "ARI",
+
+    "Stat Type":
+      "Receiving Yards",
+
+    "Season Avg":
+      70,
+
+    "Last 3 Avg":
+      82,
+
+    "Last 5 Avg":
+      80,
+
+    "Last 10 Avg":
+      75,
+
+    "Trend Direction":
+      "Heating Up",
+
+    "Trend Score":
+      14.2857142857,
+
+    "Consistency":
+      80,
+
+    "Risk Tier":
+      "Medium",
+
+    "Hit Rate Last 3":
+      0.6666666667,
+
+    "Hit Rate Last 5":
+      0.80,
+
+    "Hit Rate Last 10":
+      0.70,
+
+    "Above Season %":
+      14.2857142857,
+
+    "Trend Strength":
+      "Strong"
+  };
+
+
+  // --------------------------------------------------------------------------
+  // OVER SELECTED
+  // --------------------------------------------------------------------------
+
+  const overDecision =
+    buildNFLUniversalDecisionTrendFields_({
+      playerId,
+
+      propType:
+        "receiving_yards",
+
+      modelProbOver:
+        0.62,
+
+      modelProbUnder:
+        0.38,
+
+      evOver:
+        0.18,
+
+      evUnder:
+        -0.12,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110,
+
+      trendIndex
+    });
+
+
+  assertTest(
+    "Best Side chooses Over",
+    overDecision.bestSide ===
+      "Over"
+  );
+
+
+  assertTest(
+    "Best EV follows selected Over",
+    Math.abs(
+      overDecision.bestEV -
+      0.18
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Best Model Probability follows selected Over",
+    Math.abs(
+      overDecision.bestModelProbability -
+      0.62
+    ) < 1e-9
+  );
+
+
+  // At equal -110 / -110 prices, vig-free probability is exactly 0.50.
+  assertTest(
+    "NFL Best Price Edge preserves vig-free calculation",
+    Math.abs(
+      overDecision.bestPriceEdge -
+      0.12
+    ) < 1e-9
+  );
+
+
+  // --------------------------------------------------------------------------
+  // UNDER SELECTED
+  // --------------------------------------------------------------------------
+
+  const underDecision =
+    buildNFLUniversalDecisionTrendFields_({
+      playerId,
+
+      propType:
+        "receiving_yards",
+
+      modelProbOver:
+        0.42,
+
+      modelProbUnder:
+        0.58,
+
+      evOver:
+        -0.10,
+
+      evUnder:
+        0.11,
+
+      overOdds:
+        -105,
+
+      underOdds:
+        -115,
+
+      trendIndex
+    });
+
+
+  assertTest(
+    "Under can be selected as Best Side",
+    underDecision.bestSide ===
+      "Under"
+  );
+
+
+  assertTest(
+    "Under Best EV is preserved",
+    Math.abs(
+      underDecision.bestEV -
+      0.11
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Under Best Model Probability is preserved",
+    Math.abs(
+      underDecision.bestModelProbability -
+      0.58
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "Under Best Price Edge exists",
+    underDecision.bestPriceEdge !== null &&
+    Number.isFinite(
+      underDecision.bestPriceEdge
+    )
+  );
+
+
+  // --------------------------------------------------------------------------
+  // EXISTING NFL TREND PIPELINE
+  // --------------------------------------------------------------------------
+
+  assertTest(
+    "NFL Trend Score populates AC",
+    Math.abs(
+      overDecision.trendScore -
+      14.2857142857
+    ) < 1e-9
+  );
+
+
+  assertTest(
+    "NFL Trend Strength populates AD",
+    overDecision.trendStrength ===
+      "Strong"
+  );
+
+
+  assertTest(
+    "NFL numeric Risk Score remains deferred to P15",
+    overDecision.riskScore ===
+      null
+  );
+
+
+  assertTest(
+    "NFL existing Risk Tier populates AF",
+    overDecision.riskTier ===
+      "Medium"
+  );
+
+
+  assertTest(
+    "NFL Model Confidence reuses existing trend engine",
+    overDecision.modelConfidence !== null &&
+    Number.isFinite(
+      overDecision.modelConfidence
+    ) &&
+    overDecision.modelConfidence >= 0 &&
+    overDecision.modelConfidence <= 100
+  );
+
+
+  // --------------------------------------------------------------------------
+  // NEGATIVE EV
+  //
+  // D4 selects the strongest available side.
+  // P15 owns the eventual actionable No Play threshold.
+  // --------------------------------------------------------------------------
+
+  const negativeEV =
+    buildNFLUniversalDecisionTrendFields_({
+      playerId,
+
+      propType:
+        "receiving_yards",
+
+      modelProbOver:
+        0.48,
+
+      modelProbUnder:
+        0.52,
+
+      evOver:
+        -0.08,
+
+      evUnder:
+        -0.03,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110,
+
+      trendIndex
+    });
+
+
+  assertTest(
+    "Negative EV still selects strongest available side before P15",
+    negativeEV.bestSide ===
+      "Under"
+  );
+
+
+  assertTest(
+    "Negative Best EV remains preserved before P15",
+    Math.abs(
+      negativeEV.bestEV -
+      (-0.03)
+    ) < 1e-9
+  );
+
+
+  // --------------------------------------------------------------------------
+  // NO AVAILABLE MODEL / EV
+  // --------------------------------------------------------------------------
+
+  const unavailable =
+    buildNFLUniversalDecisionTrendFields_({
+      playerId,
+
+      propType:
+        "receiving_yards",
+
+      modelProbOver:
+        null,
+
+      modelProbUnder:
+        null,
+
+      evOver:
+        null,
+
+      evUnder:
+        null,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110,
+
+      trendIndex
+    });
+
+
+  assertTest(
+    "Unavailable decision becomes No Play",
+    unavailable.bestSide ===
+      "No Play"
+  );
+
+
+  assertTest(
+    "Unavailable Best EV stays null",
+    unavailable.bestEV ===
+      null
+  );
+
+
+  assertTest(
+    "Unavailable Best Model Probability stays null",
+    unavailable.bestModelProbability ===
+      null
+  );
+
+
+  assertTest(
+    "Unavailable Best Price Edge stays null",
+    unavailable.bestPriceEdge ===
+      null
+  );
+
+
+  // --------------------------------------------------------------------------
+  // MISSING TREND ROW
+  // --------------------------------------------------------------------------
+
+  const noTrend =
+    buildNFLUniversalDecisionTrendFields_({
+      playerId:
+        "NO_TREND_PLAYER",
+
+      propType:
+        "receiving_yards",
+
+      modelProbOver:
+        0.60,
+
+      modelProbUnder:
+        0.40,
+
+      evOver:
+        0.12,
+
+      evUnder:
+        -0.08,
+
+      overOdds:
+        -110,
+
+      underOdds:
+        -110,
+
+      trendIndex
+    });
+
+
+  assertTest(
+    "Missing trend leaves Trend Score unavailable",
+    noTrend.trendScore ===
+      null
+  );
+
+
+  assertTest(
+    "Missing trend leaves Trend Strength unavailable",
+    noTrend.trendStrength ===
+      null
+  );
+
+
+  assertTest(
+    "Missing trend leaves Risk Score unavailable",
+    noTrend.riskScore ===
+      null
+  );
+
+
+  assertTest(
+    "Missing trend leaves Risk Tier unavailable",
+    noTrend.riskTier ===
+      null
+  );
+
+
+  assertTest(
+    "Missing trend leaves Model Confidence unavailable",
+    noTrend.modelConfidence ===
+      null
+  );
+
+
+  // --------------------------------------------------------------------------
+  // VIG-FREE EDGE IS NOT RAW IMPLIED EDGE
+  //
+  // Unequal prices ensure we're genuinely testing the existing NFL S-column
+  // normalization rather than accidentally reproducing raw implied edge.
+  // --------------------------------------------------------------------------
+
+  const unequalPriceEdges =
+    getNFLVigFreePriceEdges_({
+      modelProbOver:
+        0.60,
+
+      modelProbUnder:
+        0.40,
+
+      overOdds:
+        -120,
+
+      underOdds:
+        100
+    });
+
+
+  const rawImpliedOver =
+    120 / 220;
+
+
+  const rawImpliedUnder =
+    100 / 200;
+
+
+  const totalImplied =
+    rawImpliedOver +
+    rawImpliedUnder;
+
+
+  const expectedVigFreeOver =
+    rawImpliedOver /
+    totalImplied;
+
+
+  assertTest(
+    "NFL unequal-price Over edge uses vig-free probability",
+    Math.abs(
+      unequalPriceEdges.overEdge -
+      (
+        0.60 -
+        expectedVigFreeOver
+      )
+    ) < 1e-9
+  );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "NFL UNIVERSAL DECISION + TREND FIELDS",
+
+      tests:
+        tests.length,
+
+      passed:
+        tests.filter(
+          test =>
+            test.pass
+        ).length,
+
+      pass:
+        tests.every(
+          test =>
+            test.pass
+        )
+    })
+  );
+
+
+  return true;
+}
+
+/**
+ * ============================================================================
+ * P14 D5 — NFL FULL UNIVERSAL PLAYER PROP ROW ASSEMBLER
+ * ============================================================================
+ *
+ * Produces the complete frozen 36-column A:AJ universal row.
+ *
+ * A:N   Provider data
+ * O:P   Player identity
+ * Q:T   Historical/projection context
+ * U:X   Probability + EV
+ * Y:AG  Decision/trend/risk/confidence
+ * AH:AJ Reserved for P15
+ *
+ * This does NOT modify the production Player Props sheet.
+ * ============================================================================
+ */
+
+
+/**
+ * Build NFL roster identity index.
+ *
+ * Preserves the existing Player Props identity behavior:
+ *   Player Name <- Rosters Full Name
+ *   Team        <- Rosters Team Name
+ */
+function buildNFLPlayerIdentityIndex_() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet =
+    ss.getSheetByName(
+      "Rosters"
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      'Sheet "Rosters" not found.'
+    );
+  }
+
+
+  const rows =
+    getNFLObjectsFromSheet_(
+      sheet
+    );
+
+
+  const index = {};
+
+
+  rows.forEach(row => {
+
+    const playerId =
+      String(
+        row["Id"] ?? ""
+      ).trim();
+
+
+    if (!playerId) {
+      return;
+    }
+
+
+    index[playerId] = {
+      playerName:
+        row["Full Name"] ?? "",
+
+      team:
+        row["Team Name"] ?? ""
+    };
+  });
+
+
+  return index;
+}
+
+
+/**
+ * Build current NFL season-stat index.
+ *
+ * Needed for:
+ *   currentGames
+ *
+ * Current average itself comes from NFL Player Trends,
+ * matching the existing X-column production formula.
+ */
+function buildNFLPlayerSeasonStatIndex_() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet =
+    ss.getSheetByName(
+      "NFL Player Season Stats"
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      'Sheet "NFL Player Season Stats" not found.'
+    );
+  }
+
+
+  const rows =
+    getNFLObjectsFromSheet_(
+      sheet
+    );
+
+
+  const index = {};
+
+
+  rows.forEach(row => {
+
+    const playerId =
+      String(
+        row["Player ID"] ?? ""
+      ).trim();
+
+
+    if (!playerId) {
+      return;
+    }
+
+
+    index[playerId] = row;
+  });
+
+
+  return index;
+}
+
+
+/**
+ * Build prior-season NFL baseline index.
+ */
+function buildNFLPlayerBaselineIndex_() {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet =
+    ss.getSheetByName(
+      "NFL Player Baselines"
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      'Sheet "NFL Player Baselines" not found.'
+    );
+  }
+
+
+  const rows =
+    getNFLObjectsFromSheet_(
+      sheet
+    );
+
+
+  const index = {};
+
+
+  rows.forEach(row => {
+
+    const playerId =
+      String(
+        row["Player ID"] ?? ""
+      ).trim();
+
+
+    if (!playerId) {
+      return;
+    }
+
+
+    index[playerId] = row;
+  });
+
+
+  return index;
+}
+
+
+/**
+ * Build per-player arrays from an NFL game-log sheet.
+ *
+ * We retain complete row objects so the requested stat can be selected
+ * according to NFL_UNIVERSAL_PROP_STAT_MAP.
+ */
+function buildNFLPlayerGameLogIndexFromSheet_(
+  sheetName
+) {
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet =
+    ss.getSheetByName(
+      sheetName
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      `Sheet "${sheetName}" not found.`
+    );
+  }
+
+
+  const rows =
+    getNFLObjectsFromSheet_(
+      sheet
+    );
+
+
+  const index = {};
+
+
+  rows.forEach(row => {
+
+    const playerId =
+      String(
+        row["Player ID"] ?? ""
+      ).trim();
+
+
+    if (!playerId) {
+      return;
+    }
+
+
+    if (!index[playerId]) {
+      index[playerId] = [];
+    }
+
+
+    index[playerId].push(
+      row
+    );
+  });
+
+
+  return index;
+}
+
+
+/**
+ * Extract a historical/game-log stat without turning a genuinely
+ * missing value into zero.
+ */
+function getNullableNFLGameLogStat_(
+  row,
+  propType
+) {
+  if (!row) {
+    return null;
+  }
+
+
+  const normalizedPropType =
+    normalizeNFLUniversalPropType_(
+      propType
+    );
+
+
+  const config =
+    NFL_UNIVERSAL_PROP_STAT_MAP[
+      normalizedPropType
+    ];
+
+
+  if (!config) {
+    return null;
+  }
+
+
+  const rawValue =
+    row[
+      config.gameLogHeader
+    ];
+
+
+  if (
+    rawValue === "" ||
+    rawValue === null ||
+    rawValue === undefined
+  ) {
+    return null;
+  }
+
+
+  const numericValue =
+    Number(
+      rawValue
+    );
+
+
+  return Number.isFinite(
+    numericValue
+  )
+    ? numericValue
+    : null;
+}
+
+
+/**
+ * Translate the prior-season total column used by the existing X formula.
+ */
+function getNFLPriorTotalForProp_(
+  baselineRow,
+  propType
+) {
+  if (!baselineRow) {
+    return null;
+  }
+
+
+  const normalizedPropType =
+    normalizeNFLUniversalPropType_(
+      propType
+    );
+
+
+  const config =
+    NFL_UNIVERSAL_PROP_STAT_MAP[
+      normalizedPropType
+    ];
+
+
+  if (!config) {
+    return null;
+  }
+
+
+  const rawValue =
+    baselineRow[
+      config.baselineTotalHeader
+    ];
+
+
+  if (
+    rawValue === "" ||
+    rawValue === null ||
+    rawValue === undefined
+  ) {
+    return null;
+  }
+
+
+  const numericValue =
+    Number(
+      rawValue
+    );
+
+
+  return Number.isFinite(
+    numericValue
+  )
+    ? numericValue
+    : null;
+}
+
+
+/**
+ * Build Q:T inputs for one actual player + prop.
+ */
+function buildNFLUniversalHistoricalContextFromIndexes_({
+  playerId,
+  propType,
+  seasonStatIndex,
+  baselineIndex,
+  trendIndex,
+  currentLogIndex,
+  historicalLogIndex
+}) {
+  const normalizedPlayerId =
+    String(
+      playerId ?? ""
+    ).trim();
+
+
+  const seasonRow =
+    seasonStatIndex[
+      normalizedPlayerId
+    ] || null;
+
+
+  const baselineRow =
+    baselineIndex[
+      normalizedPlayerId
+    ] || null;
+
+
+  const trendRow =
+    getNFLTrendRowForProp_(
+      normalizedPlayerId,
+      propType,
+      trendIndex
+    );
+
+
+  const currentGames =
+    getNullableNFLNumericField_(
+      seasonRow,
+      "Games Played"
+    );
+
+
+  const currentAvg =
+    getNullableNFLNumericField_(
+      trendRow,
+      "Season Avg"
+    );
+
+
+  const last5 =
+    getNullableNFLNumericField_(
+      trendRow,
+      "Last 5 Avg"
+    );
+
+
+  const priorGames =
+    getNullableNFLNumericField_(
+      baselineRow,
+      "Games Played"
+    );
+
+
+  const priorTotal =
+    getNFLPriorTotalForProp_(
+      baselineRow,
+      propType
+    );
+
+
+  const currentRows =
+    currentLogIndex[
+      normalizedPlayerId
+    ] || [];
+
+
+  const historicalRows =
+    historicalLogIndex[
+      normalizedPlayerId
+    ] || [];
+
+
+  const currentValues =
+    currentRows
+      .map(row =>
+        getNullableNFLGameLogStat_(
+          row,
+          propType
+        )
+      )
+      .filter(value =>
+        value !== null
+      );
+
+
+  const historicalValues =
+    historicalRows
+      .map(row =>
+        getNullableNFLGameLogStat_(
+          row,
+          propType
+        )
+      )
+      .filter(value =>
+        value !== null
+      );
+
+
+  return buildNFLUniversalPropHistoricalContext_({
+    propType,
+    currentGames,
+    currentAvg,
+    priorGames,
+    priorTotal,
+    last5,
+    currentValues,
+    historicalValues
+  });
+}
+
+/**
+ * Assemble exactly one universal NFL Player Props A:AJ row.
+ *
+ * P15 production ownership:
+ *
+ * Y  = final actionable Best Side
+ * AE = universal Risk Score
+ * AF = universal Risk Tier
+ * AH = Sportacular Score
+ * AI = Sportacular Edge
+ * AJ = Confidence Tier
+ */
+function buildNFLUniversalPlayerPropRow_({
+  providerRow,
+  identity,
+  historicalContext,
+  probabilityEV,
+  decisionTrend,
+  sportacularScoring
+}) {
+
+  const scoring =
+    sportacularScoring || {};
+
+
+  const row = [
+
+    // ------------------------------------------------------------------------
+    // A:N — PROVIDER
+    // ------------------------------------------------------------------------
+
+    providerRow.gameId ?? "",        // A
+    providerRow.gameDate ?? "",      // B
+    providerRow.awayTeam ?? "",      // C
+    providerRow.homeTeam ?? "",      // D
+    providerRow.id ?? "",            // E
+    providerRow.playerId ?? "",      // F
+    providerRow.vendor ?? "",        // G
+    providerRow.propType ?? "",      // H
+    providerRow.lineValue ?? "",     // I
+    providerRow.type ?? "",          // J
+    providerRow.odds ?? "",          // K
+    providerRow.updatedAt ?? "",     // L
+    providerRow.overOdds ?? "",      // M
+    providerRow.underOdds ?? "",     // N
+
+
+    // ------------------------------------------------------------------------
+    // O:P — IDENTITY
+    // ------------------------------------------------------------------------
+
+    identity
+      ? identity.playerName ?? ""
+      : "",                          // O
+
+    identity
+      ? identity.team ?? ""
+      : "",                          // P
+
+
+    // ------------------------------------------------------------------------
+    // Q:T — HISTORICAL / PROJECTION
+    // ------------------------------------------------------------------------
+
+    historicalContext.playerBaseline ??
+      "",                            // Q
+
+    historicalContext.trendAdjustment ??
+      "",                            // R
+
+    historicalContext.projectedStat ??
+      "",                            // S
+
+    historicalContext.statStdDev ??
+      "",                            // T
+
+
+    // ------------------------------------------------------------------------
+    // U:X — PROBABILITY / EV
+    // ------------------------------------------------------------------------
+
+    probabilityEV.modelProbOver ??
+      "",                            // U
+
+    probabilityEV.modelProbUnder ??
+      "",                            // V
+
+    probabilityEV.evOver ??
+      "",                            // W
+
+    probabilityEV.evUnder ??
+      "",                            // X
+
+
+    // ------------------------------------------------------------------------
+    // Y:AD — FINAL DECISION + EXISTING MODEL/TRND SIGNALS
+    // ------------------------------------------------------------------------
+
+    scoring.finalBestSide ??
+      "No Play",                     // Y
+
+    decisionTrend.bestEV ??
+      "",                            // Z
+
+    decisionTrend.bestModelProbability ??
+      "",                            // AA
+
+    decisionTrend.bestPriceEdge ??
+      "",                            // AB
+
+    decisionTrend.trendScore ??
+      "",                            // AC
+
+    decisionTrend.trendStrength ??
+      "",                            // AD
+
+
+    // ------------------------------------------------------------------------
+    // AE:AF — P15 UNIVERSAL RISK
+    // ------------------------------------------------------------------------
+
+    scoring.riskScore ??
+      "",                            // AE
+
+    scoring.riskTier ??
+      "",                            // AF
+
+
+    // ------------------------------------------------------------------------
+    // AG — NFL VALIDATED MODEL CONFIDENCE
+    // ------------------------------------------------------------------------
+
+    decisionTrend.modelConfidence ??
+      "",                            // AG
+
+
+    // ------------------------------------------------------------------------
+    // AH:AJ — P15 SPORTACULAR SCORING
+    // ------------------------------------------------------------------------
+
+    scoring.sportacularScore ??
+      "",                            // AH
+
+    scoring.sportacularEdge ??
+      "",                            // AI
+
+    scoring.confidenceTier ??
+      ""                             // AJ
+  ];
+
+
+  if (
+    row.length !==
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length
+  ) {
+
+    throw new Error(
+      `NFL universal Player Props row width mismatch. Expected ${NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length}, received ${row.length}.`
+    );
+  }
+
+
+  return row;
+}
+
+/**
+ * Full one-provider-row NFL universal production pipeline.
+ *
+ * P15 order:
+ *
+ * provider
+ *   ↓
+ * projection Q:T
+ *   ↓
+ * probability / EV U:X
+ *   ↓
+ * candidate decision Z:AD + AG
+ *   ↓
+ * universal Sportacular scoring
+ *   ↓
+ * final actionable Y + AE:AF + AH:AJ
+ */
+function buildNFLUniversalPropRowFromProvider_({
+  providerRow,
+  playerIdentityIndex,
+  seasonStatIndex,
+  baselineIndex,
+  trendIndex,
+  currentLogIndex,
+  historicalLogIndex
+}) {
+
+  const playerId =
+    String(
+      providerRow.playerId ?? ""
+    ).trim();
+
+
+  const identity =
+    playerIdentityIndex[
+      playerId
+    ] || {
+      playerName:
+        "",
+
+      team:
+        ""
+    };
+
+
+  // --------------------------------------------------------------------------
+  // Q:T — HISTORICAL / PROJECTION
+  // --------------------------------------------------------------------------
+
+  const historicalContext =
+    buildNFLUniversalHistoricalContextFromIndexes_({
+      playerId,
+
+      propType:
+        providerRow.propType,
+
+      seasonStatIndex,
+      baselineIndex,
+      trendIndex,
+      currentLogIndex,
+      historicalLogIndex
+    });
+
+
+  const currentGames =
+    getNullableNFLNumericField_(
+      seasonStatIndex[
+        playerId
+      ] || null,
+      "Games Played"
+    );
+
+
+  // --------------------------------------------------------------------------
+  // U:X — PROBABILITY / EV
+  // --------------------------------------------------------------------------
+
+  const probabilityEV =
+    buildNFLUniversalPropProbabilityEV_({
+      propType:
+        providerRow.propType,
+
+      marketType:
+        providerRow.type,
+
+      projectedStat:
+        historicalContext.projectedStat,
+
+      statStdDev:
+        historicalContext.statStdDev,
+
+      lineValue:
+        providerRow.lineValue,
+
+      currentGames,
+
+      overOdds:
+        providerRow.overOdds,
+
+      underOdds:
+        providerRow.underOdds
+    });
+
+
+  // --------------------------------------------------------------------------
+  // PRE-P15 DECISION DATA
+  //
+  // Gives us:
+  //   candidate best side
+  //   Z Best EV
+  //   AA Best Model Probability
+  //   AB NFL vig-free Best Price Edge
+  //   AC Trend Score
+  //   AD Trend Strength
+  //   AG Model Confidence
+  // --------------------------------------------------------------------------
+
+  const decisionTrend =
+    buildNFLUniversalDecisionTrendFields_({
+      playerId,
+
+      propType:
+        providerRow.propType,
+
+      modelProbOver:
+        probabilityEV.modelProbOver,
+
+      modelProbUnder:
+        probabilityEV.modelProbUnder,
+
+      evOver:
+        probabilityEV.evOver,
+
+      evUnder:
+        probabilityEV.evUnder,
+
+      overOdds:
+        providerRow.overOdds,
+
+      underOdds:
+        providerRow.underOdds,
+
+      trendIndex
+    });
+
+
+  // --------------------------------------------------------------------------
+  // P15 UNIVERSAL SPORTACULAR SCORING
+  // --------------------------------------------------------------------------
+
+  const sportacularScoring =
+    buildUniversalSportacularScoring_({
+
+      // I
+      lineValue:
+        providerRow.lineValue,
+
+      // S
+      projectedStat:
+        historicalContext.projectedStat,
+
+      // T
+      statStdDev:
+        historicalContext.statStdDev,
+
+      // W
+      evOver:
+        probabilityEV.evOver,
+
+      // X
+      evUnder:
+        probabilityEV.evUnder,
+
+      // AA
+      bestModelProbability:
+        decisionTrend.bestModelProbability,
+
+      // AB
+      bestPriceEdge:
+        decisionTrend.bestPriceEdge,
+
+      // AC
+      trendScore:
+        decisionTrend.trendScore,
+
+      // AG
+      modelConfidence:
+        decisionTrend.modelConfidence
+    });
+
+
+  // --------------------------------------------------------------------------
+  // FINAL A:AJ
+  // --------------------------------------------------------------------------
+
+  return buildNFLUniversalPlayerPropRow_({
+    providerRow,
+    identity,
+    historicalContext,
+    probabilityEV,
+    decisionTrend,
+    sportacularScoring
+  });
+}
+
+/**
+ * ============================================================================
+ * P15 D7A — NFL FULL UNIVERSAL ROW + SPORTACULAR SCORING TEST
+ * ============================================================================
+ *
+ * Validates:
+ *
+ * A:N   provider contract
+ * O:P   player identity
+ * Q:T   historical/projection model
+ * U:X   probability + EV
+ * Y     final actionable Best Side
+ * Z:AD  decision/trend fields
+ * AE:AF universal Risk Score / Risk Tier
+ * AG    validated NFL Player Props Model Confidence
+ * AH:AJ Sportacular Score / Edge / Confidence Tier
+ *
+ * READ-ONLY.
+ * ============================================================================
+ */
+function testNFLUniversalFullPropRow() {
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P15 D7A — NFL FULL UNIVERSAL ROW + SPORTACULAR SCORING TEST"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  // ==========================================================================
+  // SYNTHETIC INDEXES
+  // ==========================================================================
+
+  const playerId =
+    "P15-D7A-NFL-PLAYER";
+
+
+  const playerIdentityIndex = {};
+
+  playerIdentityIndex[
+    playerId
+  ] = {
+    playerName:
+      "P15 NFL Test Player",
+
+    team:
+      "Arizona Cardinals"
+  };
+
+
+  const seasonStatIndex = {};
+
+  seasonStatIndex[
+    playerId
+  ] = {
+    "Player ID":
+      playerId,
+
+    "Games Played":
+      8,
+
+    "Receiving Yards":
+      75
+  };
+
+
+  const baselineIndex = {};
+
+  baselineIndex[
+    playerId
+  ] = {
+    "Player ID":
+      playerId,
+
+    "Games Played":
+      4,
+
+    "Receiving Yards":
+      280
+  };
+
+
+  const trendIndex = {};
+
+  trendIndex[
+    `${playerId}::Receiving Yards`
+  ] = {
+    "Player ID":
+      playerId,
+
+    "Stat Type":
+      "receiving_yards",
+
+    "Season Avg":
+      75,
+
+    "Last 5 Avg":
+      82,
+
+    "Trend Score":
+      12,
+
+    "Trend Strength":
+      "Strong",
+
+    "Consistency":
+      75,
+
+    "Hit Rate Last 5":
+      0.8,
+
+    "Above Season %":
+      20
+  };
+
+
+  // ==========================================================================
+  // GAME LOGS
+  //
+  // Deliberately provide enough variation for a valid non-zero standard
+  // deviation.
+  // ==========================================================================
+
+  const currentLogIndex = {};
+
+  currentLogIndex[
+    playerId
+  ] = [
+    {
+      "Receiving Yards":
+        72
+    },
+    {
+      "Receiving Yards":
+        85
+    },
+    {
+      "Receiving Yards":
+        78
+    },
+    {
+      "Receiving Yards":
+        91
+    },
+    {
+      "Receiving Yards":
+        74
+    },
+    {
+      "Receiving Yards":
+        88
+    },
+    {
+      "Receiving Yards":
+        81
+    },
+    {
+      "Receiving Yards":
+        76
+    }
+  ];
+
+
+  const historicalLogIndex = {};
+
+  historicalLogIndex[
+    playerId
+  ] = [
+    {
+      "Receiving Yards":
+        68
+    },
+    {
+      "Receiving Yards":
+        75
+    },
+    {
+      "Receiving Yards":
+        82
+    },
+    {
+      "Receiving Yards":
+        71
+    }
+  ];
+
+
+  // ==========================================================================
+  // PROVIDER ROW
+  //
+  // We intentionally use strong favorable Over pricing/model conditions so
+  // this row should clear the P15 actionable gate.
+  // ==========================================================================
+
+  const providerRow = {
+    gameId:
+      "P15-D7A-GAME",
+
+    gameDate:
+      "2026-09-10",
+
+    awayTeam:
+      "Arizona Cardinals",
+
+    homeTeam:
+      "Los Angeles Rams",
+
+    id:
+      "P15-D7A-PROP",
+
+    playerId,
+
+    vendor:
+      "Test Sportsbook",
+
+    propType:
+      "receiving_yards",
+
+    lineValue:
+      69.5,
+
+    type:
+      "over_under",
+
+    odds:
+      "",
+
+    updatedAt:
+      "2026-09-10T12:00:00",
+
+    overOdds:
+      -110,
+
+    underOdds:
+      -110
+  };
+
+
+  // ==========================================================================
+  // BUILD UNIVERSAL ROW
+  // ==========================================================================
+
+  const row =
+    buildNFLUniversalPropRowFromProvider_({
+      providerRow,
+      playerIdentityIndex,
+      seasonStatIndex,
+      baselineIndex,
+      trendIndex,
+      currentLogIndex,
+      historicalLogIndex
+    });
+
+
+  Logger.log(
+    JSON.stringify({
+      rowLength:
+        row.length,
+
+      row
+    })
+  );
+
+
+  // ==========================================================================
+  // ASSERTION HELPER
+  // ==========================================================================
+
+  const tests = [];
+
+
+  function assertTest(
+    name,
+    condition,
+    details
+  ) {
+
+    const pass =
+      Boolean(
+        condition
+      );
+
+
+    const result = {
+      name,
+      pass
+    };
+
+
+    if (
+      details !== undefined
+    ) {
+      result.details =
+        details;
+    }
+
+
+    tests.push(
+      result
+    );
+
+
+    Logger.log(
+      JSON.stringify(
+        result
+      )
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        `P15 D7A NFL full-row test failed: ${name}`
+      );
+    }
+  }
+
+
+  function hasFiniteNumber(
+    value
+  ) {
+
+    return (
+      value !== "" &&
+      value !== null &&
+      value !== undefined &&
+      Number.isFinite(
+        Number(value)
+      )
+    );
+  }
+
+
+  // ==========================================================================
+  // TEST 1 — EXACT UNIVERSAL WIDTH
+  // ==========================================================================
+
+  assertTest(
+    "Universal row contains exactly 36 columns",
+    row.length === 36,
+    {
+      actual:
+        row.length,
+
+      expected:
+        36
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 2 — A:N PROVIDER CONTRACT
+  // ==========================================================================
+
+  assertTest(
+    "A:N provider fields survive universal assembly",
+    row[0] ===
+      "P15-D7A-GAME" &&
+    row[5] ===
+      playerId &&
+    row[7] ===
+      "receiving_yards" &&
+    Number(row[8]) ===
+      69.5 &&
+    row[9] ===
+      "over_under" &&
+    Number(row[12]) ===
+      -110 &&
+    Number(row[13]) ===
+      -110
+  );
+
+
+  // ==========================================================================
+  // TEST 3 — O:P IDENTITY
+  // ==========================================================================
+
+  assertTest(
+    "O:P player identity survives universal assembly",
+    row[14] ===
+      "P15 NFL Test Player" &&
+    row[15] ===
+      "Arizona Cardinals",
+    {
+      playerName:
+        row[14],
+
+      team:
+        row[15]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 4 — Q:T HISTORICAL / PROJECTION
+  // ==========================================================================
+
+  assertTest(
+    "Q:T historical/projection fields populate",
+    hasFiniteNumber(
+      row[16]
+    ) &&
+    hasFiniteNumber(
+      row[17]
+    ) &&
+    hasFiniteNumber(
+      row[18]
+    ) &&
+    hasFiniteNumber(
+      row[19]
+    ),
+    {
+      playerBaseline:
+        row[16],
+
+      trendAdjustment:
+        row[17],
+
+      projectedStat:
+        row[18],
+
+      statStdDev:
+        row[19]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 5 — U:X PROBABILITY / EV
+  // ==========================================================================
+
+  assertTest(
+    "U:X probability and EV fields populate",
+    hasFiniteNumber(
+      row[20]
+    ) &&
+    hasFiniteNumber(
+      row[21]
+    ) &&
+    hasFiniteNumber(
+      row[22]
+    ) &&
+    hasFiniteNumber(
+      row[23]
+    ),
+    {
+      modelProbOver:
+        row[20],
+
+      modelProbUnder:
+        row[21],
+
+      evOver:
+        row[22],
+
+      evUnder:
+        row[23]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 6 — PROBABILITY COMPLEMENT
+  // ==========================================================================
+
+  assertTest(
+    "NFL Over/Under probabilities remain complementary",
+    Math.abs(
+      (
+        Number(
+          row[20]
+        ) +
+        Number(
+          row[21]
+        )
+      ) -
+      1
+    ) <=
+      1e-8,
+    {
+      over:
+        row[20],
+
+      under:
+        row[21],
+
+      sum:
+        Number(
+          row[20]
+        ) +
+        Number(
+          row[21]
+        )
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 7 — Z:AD DECISION / TREND FIELDS
+  // ==========================================================================
+
+  assertTest(
+    "Z:AD decision/trend fields populate",
+    hasFiniteNumber(
+      row[25]
+    ) &&
+    hasFiniteNumber(
+      row[26]
+    ) &&
+    hasFiniteNumber(
+      row[27]
+    ) &&
+    hasFiniteNumber(
+      row[28]
+    ) &&
+    row[29] !== "" &&
+    row[29] !== null,
+    {
+      bestEV:
+        row[25],
+
+      bestModelProbability:
+        row[26],
+
+      bestPriceEdge:
+        row[27],
+
+      trendScore:
+        row[28],
+
+      trendStrength:
+        row[29]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 8 — AE UNIVERSAL RISK SCORE
+  // ==========================================================================
+
+  assertTest(
+    "AE universal Risk Score populates on 0-100 scale",
+    hasFiniteNumber(
+      row[30]
+    ) &&
+    Number(
+      row[30]
+    ) >= 0 &&
+    Number(
+      row[30]
+    ) <= 100,
+    {
+      riskScore:
+        row[30]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 9 — AF UNIVERSAL RISK TIER
+  // ==========================================================================
+
+  assertTest(
+    "AF universal Risk Tier matches AE",
+    (
+      row[31] === "Low" ||
+      row[31] === "Medium" ||
+      row[31] === "High" ||
+      row[31] === "Very High"
+    ),
+    {
+      riskScore:
+        row[30],
+
+      riskTier:
+        row[31]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 10 — AG VALIDATED NFL MODEL CONFIDENCE
+  // ==========================================================================
+
+  const expectedNFLConfidence =
+    Math.min(
+      100,
+      (
+        Math.max(
+          Number(
+            row[20]
+          ),
+          Number(
+            row[21]
+          )
+        ) *
+        100
+      ) +
+      (
+        Number(
+          row[27]
+        ) *
+        25
+      )
+    );
+
+
+  assertTest(
+    "AG preserves validated NFL Player Props Model Confidence",
+    hasFiniteNumber(
+      row[32]
+    ) &&
+    Math.abs(
+      Number(
+        row[32]
+      ) -
+      expectedNFLConfidence
+    ) <=
+      1e-8,
+    {
+      actual:
+        row[32],
+
+      expected:
+        expectedNFLConfidence
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 11 — AI SPORTACULAR EDGE
+  // ==========================================================================
+
+  const expectedSportacularEdge =
+    calculateUniversalSportacularEdge_({
+      bestEV:
+        row[25],
+
+      bestPriceEdge:
+        row[27]
+    });
+
+
+  assertTest(
+    "AI Sportacular Edge populates from frozen D3 contract",
+    hasFiniteNumber(
+      row[34]
+    ) &&
+    Math.abs(
+      Number(
+        row[34]
+      ) -
+      Number(
+        expectedSportacularEdge
+      )
+    ) <=
+      1e-8,
+    {
+      actual:
+        row[34],
+
+      expected:
+        expectedSportacularEdge
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 12 — AH SPORTACULAR SCORE
+  // ==========================================================================
+
+  const expectedSportacularScore =
+    calculateUniversalSportacularScore_({
+      candidateSide:
+        Number(
+          row[22]
+        ) >
+        Number(
+          row[23]
+        )
+          ? "Over"
+          : "Under",
+
+      sportacularEdge:
+        row[34],
+
+      modelConfidence:
+        row[32],
+
+      riskScore:
+        row[30],
+
+      trendScore:
+        row[28]
+    });
+
+
+  assertTest(
+    "AH Sportacular Score populates from frozen D4 contract",
+    hasFiniteNumber(
+      row[33]
+    ) &&
+    Math.abs(
+      Number(
+        row[33]
+      ) -
+      Number(
+        expectedSportacularScore
+      )
+    ) <=
+      1e-8,
+    {
+      actual:
+        row[33],
+
+      expected:
+        expectedSportacularScore
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 13 — Y FINAL ACTIONABLE BEST SIDE
+  // ==========================================================================
+
+  assertTest(
+    "Y contains final P15 actionable Best Side",
+    (
+      row[24] === "Over" ||
+      row[24] === "Under" ||
+      row[24] === "No Play"
+    ),
+    {
+      bestSide:
+        row[24]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 14 — AJ CONFIDENCE TIER
+  // ==========================================================================
+
+  assertTest(
+    "AJ contains valid P15 Confidence Tier",
+    (
+      row[35] === "Elite" ||
+      row[35] === "Strong" ||
+      row[35] === "Solid" ||
+      row[35] === "Lean" ||
+      row[35] === "No Play"
+    ),
+    {
+      confidenceTier:
+        row[35]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 15 — FINAL Y / AJ ACTIONABILITY COHERENCE
+  // ==========================================================================
+
+  const actionable =
+    row[24] === "Over" ||
+    row[24] === "Under";
+
+
+  assertTest(
+    "Final Best Side and Confidence Tier agree on actionability",
+    actionable
+      ? (
+          row[35] !==
+            "No Play" &&
+          row[35] !==
+            ""
+        )
+      : (
+          row[24] ===
+            "No Play" &&
+          row[35] ===
+            "No Play"
+        ),
+    {
+      bestSide:
+        row[24],
+
+      confidenceTier:
+        row[35],
+
+      sportacularScore:
+        row[33]
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 16 — REBUILD MASTER SCORING AND COMPARE OUTPUTS
+  // ==========================================================================
+
+  const rebuiltScoring =
+    buildUniversalSportacularScoring_({
+      lineValue:
+        row[8],
+
+      projectedStat:
+        row[18],
+
+      statStdDev:
+        row[19],
+
+      evOver:
+        row[22],
+
+      evUnder:
+        row[23],
+
+      bestModelProbability:
+        row[26],
+
+      bestPriceEdge:
+        row[27],
+
+      trendScore:
+        row[28],
+
+      modelConfidence:
+        row[32]
+    });
+
+
+  assertTest(
+    "A:AJ row exactly agrees with universal P15 master scorer",
+    row[24] ===
+      rebuiltScoring.finalBestSide &&
+    Math.abs(
+      Number(
+        row[30]
+      ) -
+      Number(
+        rebuiltScoring.riskScore
+      )
+    ) <=
+      1e-8 &&
+    row[31] ===
+      rebuiltScoring.riskTier &&
+    Math.abs(
+      Number(
+        row[33]
+      ) -
+      Number(
+        rebuiltScoring.sportacularScore
+      )
+    ) <=
+      1e-8 &&
+    Math.abs(
+      Number(
+        row[34]
+      ) -
+      Number(
+        rebuiltScoring.sportacularEdge
+      )
+    ) <=
+      1e-8 &&
+    row[35] ===
+      rebuiltScoring.confidenceTier,
+    {
+      production: {
+        bestSide:
+          row[24],
+
+        riskScore:
+          row[30],
+
+        riskTier:
+          row[31],
+
+        sportacularScore:
+          row[33],
+
+        sportacularEdge:
+          row[34],
+
+        confidenceTier:
+          row[35]
+      },
+
+      rebuilt:
+        rebuiltScoring
+    }
+  );
+
+
+  // ==========================================================================
+  // FINAL
+  // ==========================================================================
+
+  const passed =
+    tests.every(
+      test =>
+        test.pass
+    );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "P15 D7A NFL UNIVERSAL PRODUCTION ROW",
+
+      totalTests:
+        tests.length,
+
+      passedTests:
+        tests.filter(
+          test =>
+            test.pass
+        ).length,
+
+      failedTests:
+        tests.filter(
+          test =>
+            !test.pass
+        ).length,
+
+      passed
+    })
+  );
+
+
+  if (!passed) {
+
+    throw new Error(
+      "P15 D7A FAIL — NFL universal production row regression failed."
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P15 D7A TEST PASS — NFL UNIVERSAL SPORTACULAR ROW COMPLETE"
+  );
+
+  Logger.log(
+    "NFL IS READY FOR P15 LIVE PRODUCTION REFRESH."
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return true;
 }
 
 function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
@@ -1575,10 +6807,40 @@ function ensureNFLPlayerPropsHeadersAndFormulas_(sheet) {
 }
 
 function clearNFLPlayerPropsSheet_(sheet) {
-  const maxRows = sheet.getMaxRows();
+  const universalColumnCount =
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length; // 36 = A:AJ
 
-  if (maxRows > 2) {
-    sheet.getRange(3, 1, maxRows - 2, 30).clearContent();
+  const currentMaxColumns =
+    sheet.getMaxColumns();
+
+
+  if (
+    currentMaxColumns <
+    universalColumnCount
+  ) {
+    sheet.insertColumnsAfter(
+      currentMaxColumns,
+      universalColumnCount -
+      currentMaxColumns
+    );
+  }
+
+
+  const maxRows =
+    sheet.getMaxRows();
+
+
+  // Universal production begins at row 2.
+  // This intentionally removes the old O2:AD2 formula template.
+  if (maxRows > 1) {
+    sheet
+      .getRange(
+        2,
+        1,
+        maxRows - 1,
+        universalColumnCount
+      )
+      .clearContent();
   }
 }
 
@@ -1608,75 +6870,436 @@ function copyNFLPlayerPropsFormulasDown_(sheet, rowCount) {
 }
 
 function refreshNFLPlayerPropsSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("Player Props");
-  const scheduleSheet = ss.getSheetByName("Schedule");
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
 
-  if (!sheet) throw new Error('Sheet "Player Props" not found.');
-  if (!scheduleSheet) throw new Error('Sheet "Schedule" not found.');
 
-  ensureNFLPlayerPropsHeadersAndFormulas_(sheet);
+  const sheet =
+    ss.getSheetByName(
+      "Player Props"
+    );
 
-  const games = getNFLGamesFromScheduleSheet_(scheduleSheet);
+
+  const scheduleSheet =
+    ss.getSheetByName(
+      "Schedule"
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      'Sheet "Player Props" not found.'
+    );
+  }
+
+
+  if (!scheduleSheet) {
+    throw new Error(
+      'Sheet "Schedule" not found.'
+    );
+  }
+
+
+  Logger.log(
+    "Refreshing NFL player props using universal A:AJ production output..."
+  );
+
+
+  // --------------------------------------------------------------------------
+  // UNIVERSAL CONTRACT
+  // --------------------------------------------------------------------------
+
+  validateNFLUniversalPlayerPropsHeaders_();
+
+
+  const universalColumnCount =
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length;
+
+
+  if (
+    universalColumnCount !== 36
+  ) {
+    throw new Error(
+      `NFL universal Player Props contract expected 36 columns; received ${universalColumnCount}.`
+    );
+  }
+
+
+  // Ensure the physical sheet reaches AJ.
+  const currentMaxColumns =
+    sheet.getMaxColumns();
+
+
+  if (
+    currentMaxColumns <
+    universalColumnCount
+  ) {
+    sheet.insertColumnsAfter(
+      currentMaxColumns,
+      universalColumnCount -
+      currentMaxColumns
+    );
+  }
+
+
+  // Write the frozen universal row-1 contract.
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      universalColumnCount
+    )
+    .setValues([
+      NFL_UNIVERSAL_PLAYER_PROPS_HEADERS
+    ]);
+
+
+  // Remove all previous production rows AND the old row-2 formula template.
+  clearNFLPlayerPropsSheet_(
+    sheet
+  );
+
+
+  // --------------------------------------------------------------------------
+  // SCHEDULE
+  // --------------------------------------------------------------------------
+
+  const games =
+    getNFLGamesFromScheduleSheet_(
+      scheduleSheet
+    );
+
 
   if (!games.length) {
-    clearNFLPlayerPropsSheet_(sheet);
-    Logger.log("No NFL Schedule rows found. Player Props cleared.");
+    Logger.log(
+      'No NFL Schedule rows found. Universal Player Props A:AJ left in valid empty state.'
+    );
+
     return;
   }
 
+
   const gameMap = {};
+
+
   games.forEach(game => {
-    gameMap[String(game.id)] = {
-      game_date: game.game_date || "",
-      away_team: game.away_team || "",
-      home_team: game.home_team || ""
+
+    gameMap[
+      String(game.id)
+    ] = {
+      game_date:
+        game.game_date ?? "",
+
+      away_team:
+        game.away_team ?? "",
+
+      home_team:
+        game.home_team ?? ""
     };
   });
 
+
+  // --------------------------------------------------------------------------
+  // BUILD UNIVERSAL CONTEXT INDEXES ONCE
+  // --------------------------------------------------------------------------
+
+  Logger.log(
+    "Building NFL Player Props historical, trend, season, baseline, and identity indexes..."
+  );
+
+
+  const playerIdentityIndex =
+    buildNFLPlayerIdentityIndex_();
+
+
+  const seasonStatIndex =
+    buildNFLPlayerSeasonStatIndex_();
+
+
+  const baselineIndex =
+    buildNFLPlayerBaselineIndex_();
+
+
+  const trendIndex =
+    buildNFLPlayerTrendIndex_();
+
+
+  const currentLogIndex =
+    buildNFLPlayerGameLogIndexFromSheet_(
+      "NFL Player Game Logs"
+    );
+
+
+  const historicalLogIndex =
+    buildNFLPlayerGameLogIndexFromSheet_(
+      "NFL Player Historical Logs"
+    );
+
+
+  Logger.log(
+    "NFL Player Props universal context indexes built."
+  );
+
+
+  // --------------------------------------------------------------------------
+  // FETCH + ASSEMBLE UNIVERSAL ROWS
+  // --------------------------------------------------------------------------
+
   const rows = [];
-  const seen = new Set();
 
-  games.forEach((game, index) => {
-    Logger.log(`Fetching NFL props for game ${index + 1}/${games.length} ID ${game.id}`);
+  const seen =
+    new Set();
 
-    const props = fetchAllNFLPlayerPropsForGame_(game.id);
-    const gameInfo = gameMap[String(game.id)] || {};
 
-    props.forEach(prop => {
-      const propId = String(prop.id || "");
-      if (propId && seen.has(propId)) return;
-      if (propId) seen.add(propId);
+  games.forEach(
+    (game, index) => {
 
-      rows.push([
-        game.id,
-        gameInfo.game_date,
-        gameInfo.away_team,
-        gameInfo.home_team,
-        prop.id || "",
-        prop.player_id || (prop.player && prop.player.id) || "",
-        prop.vendor || prop.sportsbook || prop.bookmaker || "",
-        prop.prop_type || prop.market || "",
-        prop.line || prop.line_value || "",
-        (prop.market && prop.market.type) || "",
-        (prop.market && prop.market.odds) || "",
-        prop.updated_at || "",
-        (prop.market && prop.market.over_odds) || prop.over_odds || "",
-        (prop.market && prop.market.under_odds) || prop.under_odds || ""
-      ]);
-    });
+      Logger.log(
+        `Fetching NFL props for game ${index + 1}/${games.length} ID ${game.id}`
+      );
 
-    Utilities.sleep(150);
-  });
 
-  clearNFLPlayerPropsSheet_(sheet);
+      const props =
+        fetchAllNFLPlayerPropsForGame_(
+          game.id
+        );
+
+
+      const gameInfo =
+        gameMap[
+          String(game.id)
+        ] || {};
+
+
+      props.forEach(prop => {
+
+        const propId =
+          String(
+            prop.id ?? ""
+          );
+
+
+        if (
+          propId &&
+          seen.has(propId)
+        ) {
+          return;
+        }
+
+
+        if (propId) {
+          seen.add(propId);
+        }
+
+
+        // --------------------------------------------------------------
+        // A:N PROVIDER CONTRACT
+        //
+        // Explicit nullish handling preserves legitimate zero values.
+        // --------------------------------------------------------------
+
+        const playerId =
+          prop.player_id ??
+          (
+            prop.player
+              ? prop.player.id
+              : null
+          ) ??
+          "";
+
+
+        const vendor =
+          prop.vendor ??
+          prop.sportsbook ??
+          prop.bookmaker ??
+          "";
+
+
+        const propType =
+          prop.prop_type ??
+          (
+            typeof prop.market === "string"
+              ? prop.market
+              : null
+          ) ??
+          "";
+
+
+        const lineValue =
+          prop.line ??
+          prop.line_value ??
+          (
+            prop.market &&
+            typeof prop.market === "object"
+              ? (
+                  prop.market.line ??
+                  prop.market.line_value
+                )
+              : null
+          ) ??
+          "";
+
+
+        const marketType =
+          (
+            prop.market &&
+            typeof prop.market === "object"
+          )
+            ? (
+                prop.market.type ??
+                ""
+              )
+            : (
+                prop.type ??
+                ""
+              );
+
+
+        const odds =
+          (
+            prop.market &&
+            typeof prop.market === "object"
+          )
+            ? (
+                prop.market.odds ??
+                prop.odds ??
+                ""
+              )
+            : (
+                prop.odds ??
+                ""
+              );
+
+
+        const overOdds =
+          (
+            prop.market &&
+            typeof prop.market === "object"
+          )
+            ? (
+                prop.market.over_odds ??
+                prop.over_odds ??
+                ""
+              )
+            : (
+                prop.over_odds ??
+                ""
+              );
+
+
+        const underOdds =
+          (
+            prop.market &&
+            typeof prop.market === "object"
+          )
+            ? (
+                prop.market.under_odds ??
+                prop.under_odds ??
+                ""
+              )
+            : (
+                prop.under_odds ??
+                ""
+              );
+
+
+        const providerRow = {
+          gameId:
+            game.id ?? "",
+
+          gameDate:
+            gameInfo.game_date ?? "",
+
+          awayTeam:
+            gameInfo.away_team ?? "",
+
+          homeTeam:
+            gameInfo.home_team ?? "",
+
+          id:
+            prop.id ?? "",
+
+          playerId,
+
+          vendor,
+
+          propType,
+
+          lineValue,
+
+          type:
+            marketType,
+
+          odds,
+
+          updatedAt:
+            prop.updated_at ?? "",
+
+          overOdds,
+
+          underOdds
+        };
+
+
+        const universalRow =
+          buildNFLUniversalPropRowFromProvider_({
+            providerRow,
+            playerIdentityIndex,
+            seasonStatIndex,
+            baselineIndex,
+            trendIndex,
+            currentLogIndex,
+            historicalLogIndex
+          });
+
+
+        if (
+          universalRow.length !==
+          universalColumnCount
+        ) {
+          throw new Error(
+            `NFL universal row width mismatch for prop ${providerRow.id}. Expected ${universalColumnCount}, received ${universalRow.length}.`
+          );
+        }
+
+
+        rows.push(
+          universalRow
+        );
+      });
+
+
+      Utilities.sleep(
+        150
+      );
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // WRITE DIRECT VALUES TO ROW 2+
+  //
+  // No formulas. No template row. No copy-down.
+  // --------------------------------------------------------------------------
 
   if (rows.length > 0) {
-    sheet.getRange(3, 1, rows.length, 14).setValues(rows);
-    copyNFLPlayerPropsFormulasDown_(sheet, rows.length);
+    sheet
+      .getRange(
+        2,
+        1,
+        rows.length,
+        universalColumnCount
+      )
+      .setValues(
+        rows
+      );
   }
 
-  Logger.log(`Wrote ${rows.length} NFL player props rows.`);
+
+  Logger.log(
+    `Wrote ${rows.length} NFL universal Player Props rows to "Player Props" across A:AJ.`
+  );
 }
 
 // ============================================================================
@@ -1717,7 +7340,7 @@ function writeNFLOutputSheet_(sheet, headers, rows) {
   sheet.autoResizeColumns(1, headers.length);
 }
 
-function fetchAllNFLStatsForGameIds_(gameIds, season = 2026, seasonType = 1) {
+function fetchAllNFLStatsForGameIds_(gameIds, season = 2026, seasonType = 2) {
   const allStats = [];
 
   gameIds.forEach((gameId, index) => {
@@ -1904,7 +7527,13 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
   if (!games.length) {
 
     Logger.log(
-      `No completed NFL games found from ${startDate} to ${endDate}`
+      `No completed NFL regular-season games found from ${startDate} to ${endDate}`
+    );
+
+    writeNFLOutputSheet_(
+      sheet,
+      headers,
+      []
     );
 
     return;
@@ -2392,9 +8021,17 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
   }
 
   if (!games.length) {
+
     Logger.log(
-      `No completed NFL games found from ${startDate} to ${endDate}`
+      `No completed NFL regular-season games found from ${startDate} to ${endDate}`
     );
+
+    writeNFLOutputSheet_(
+      sheet,
+      headers,
+      []
+    );
+
     return;
   }
 
@@ -2568,7 +8205,7 @@ function clearNFLTeamGameLogsSheetOnly() {
 function refreshNFLPlayerGameLogsSheet() {
 
   refreshNFLPlayerGameLogsForDateRange_(
-    "2026-08-01",
+    "2026-09-01",
     getTodayString_()
   );
 
@@ -2577,7 +8214,7 @@ function refreshNFLPlayerGameLogsSheet() {
 function refreshNFLTeamGameLogsSheet() {
 
   refreshNFLTeamGameLogsForDateRange_(
-    "2026-08-01",
+    "2026-09-01",
     getTodayString_()
   );
 
@@ -3982,6 +9619,2593 @@ function refreshNFLTopTeamTrendsSheet() {
   sheet.getRange("G:J").setNumberFormat("0.0");
 
   Logger.log(`Wrote ${outputRows.length} rows to NFL Top Team Trends.`);
+}
+
+/**
+ * ============================================================================
+ * P14 D7 — NFL FINAL UNIVERSAL PLAYER PROPS REGRESSION
+ * ============================================================================
+ *
+ * Final regression gate before freezing NFL P14.
+ *
+ * READ-ONLY:
+ * This function does NOT refresh or modify production data.
+ *
+ * Verifies:
+ *   1. Frozen universal A:AJ contract
+ *   2. Historical/projection Q:T
+ *   3. Probability/EV U:X
+ *   4. Decision/trend Y:AG
+ *   5. Complete 36-column row assembly
+ *   6. Production Player Props sheet exists
+ *   7. Production row-1 headers exactly match A:AJ
+ *   8. Old row-2 formula-template dependency is gone
+ *   9. Live production rows preserve provider identity
+ *  10. Supported conventional markets behave correctly
+ *  11. Unsupported markets do not fabricate probability/EV
+ *  12. NFL AE Risk Score remains blank before P15
+ *  13. AH:AJ remain blank before P15
+ *  14. Null integrity is preserved
+ * ============================================================================
+ */
+function testNFLFinalUniversalPlayerPropsRegression() {
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P14 D7 — NFL FINAL UNIVERSAL PLAYER PROPS REGRESSION"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  // ==========================================================================
+  // D7.1 — UNIVERSAL CONTRACT
+  // ==========================================================================
+
+  Logger.log(
+    "D7.1 — Testing frozen 36-column universal contract..."
+  );
+
+
+  validateNFLUniversalPlayerPropsHeaders_();
+
+  testNFLUniversalPlayerPropsContract();
+
+
+  Logger.log(
+    "D7.1 PASS — Universal A:AJ contract."
+  );
+
+
+  // ==========================================================================
+  // D7.2 — HISTORICAL / PROJECTION Q:T
+  // ==========================================================================
+
+  Logger.log(
+    "D7.2 — Testing historical/projection context Q:T..."
+  );
+
+
+  testNFLUniversalPropHistoricalContext();
+
+
+  Logger.log(
+    "D7.2 PASS — Historical/projection context Q:T."
+  );
+
+
+  // ==========================================================================
+  // D7.3 — PROBABILITY / EV U:X
+  // ==========================================================================
+
+  Logger.log(
+    "D7.3 — Testing calibrated probability + EV U:X..."
+  );
+
+
+  testNFLUniversalPropProbabilityEV();
+
+
+  Logger.log(
+    "D7.3 PASS — Probability + EV U:X."
+  );
+
+
+  // ==========================================================================
+  // D7.4 — DECISION / TREND Y:AG
+  // ==========================================================================
+
+  Logger.log(
+    "D7.4 — Testing decision/trend/risk/confidence Y:AG..."
+  );
+
+
+  testNFLUniversalDecisionTrendFields();
+
+
+  Logger.log(
+    "D7.4 PASS — Decision/trend/risk/confidence Y:AG."
+  );
+
+
+  // ==========================================================================
+  // D7.5 — FULL A:AJ ASSEMBLER
+  // ==========================================================================
+
+  Logger.log(
+    "D7.5 — Testing complete universal A:AJ row..."
+  );
+
+
+  testNFLUniversalFullPropRow();
+
+
+  Logger.log(
+    "D7.5 PASS — Complete universal A:AJ row."
+  );
+
+
+  // ==========================================================================
+  // D7.6 — PRODUCTION SHEET EXISTS / PHYSICAL WIDTH
+  // ==========================================================================
+
+  Logger.log(
+    "D7.6 — Inspecting live production Player Props sheet..."
+  );
+
+
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+
+  const sheet =
+    ss.getSheetByName(
+      "Player Props"
+    );
+
+
+  if (!sheet) {
+    throw new Error(
+      'D7 FAIL — Sheet "Player Props" not found.'
+    );
+  }
+
+
+  const universalColumnCount =
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.length;
+
+
+  if (
+    universalColumnCount !== 36
+  ) {
+    throw new Error(
+      `D7 FAIL — Expected 36 universal columns; received ${universalColumnCount}.`
+    );
+  }
+
+
+  if (
+    sheet.getMaxColumns() <
+    universalColumnCount
+  ) {
+    throw new Error(
+      `D7 FAIL — Player Props has only ${sheet.getMaxColumns()} physical columns; A:AJ requires 36.`
+    );
+  }
+
+
+  Logger.log(
+    "D7.6 PASS — Production Player Props sheet supports A:AJ."
+  );
+
+
+  // ==========================================================================
+  // D7.7 — EXACT PRODUCTION HEADERS
+  // ==========================================================================
+
+  const actualHeaders =
+    sheet
+      .getRange(
+        1,
+        1,
+        1,
+        universalColumnCount
+      )
+      .getValues()[0];
+
+
+  const headerMismatches = [];
+
+
+  NFL_UNIVERSAL_PLAYER_PROPS_HEADERS.forEach(
+    (expectedHeader, index) => {
+
+      const actualHeader =
+        String(
+          actualHeaders[index] ?? ""
+        ).trim();
+
+
+      if (
+        actualHeader !==
+        expectedHeader
+      ) {
+        headerMismatches.push({
+          column:
+            index + 1,
+
+          expected:
+            expectedHeader,
+
+          actual:
+            actualHeader
+        });
+      }
+    }
+  );
+
+
+  if (headerMismatches.length) {
+    throw new Error(
+      "D7 FAIL — Production header mismatch: " +
+      JSON.stringify(
+        headerMismatches
+      )
+    );
+  }
+
+
+  Logger.log(
+    "D7.7 PASS — Production row-1 headers exactly match frozen A:AJ contract."
+  );
+
+
+  // ==========================================================================
+  // D7.8 — OLD ROW-2 FORMULA TEMPLATE MUST BE GONE
+  // ==========================================================================
+
+  const row2Formulas =
+    sheet
+      .getRange(
+        2,
+        1,
+        1,
+        universalColumnCount
+      )
+      .getFormulas()[0];
+
+
+  const formulaColumns = [];
+
+
+  row2Formulas.forEach(
+    (formula, index) => {
+
+      if (
+        String(
+          formula ?? ""
+        ).trim()
+      ) {
+        formulaColumns.push(
+          index + 1
+        );
+      }
+    }
+  );
+
+
+  if (formulaColumns.length) {
+    throw new Error(
+      "D7 FAIL — Legacy row-2 formula dependency remains in columns: " +
+      formulaColumns.join(", ")
+    );
+  }
+
+
+  Logger.log(
+    "D7.8 PASS — No legacy row-2 formula dependency remains."
+  );
+
+
+  // ==========================================================================
+  // D7.9 — READ LIVE PRODUCTION
+  // ==========================================================================
+
+  const lastRow =
+    sheet.getLastRow();
+
+
+  if (lastRow < 2) {
+    throw new Error(
+      "D7 FAIL — No live NFL Player Props production rows found."
+    );
+  }
+
+
+  const rows =
+    sheet
+      .getRange(
+        2,
+        1,
+        lastRow - 1,
+        universalColumnCount
+      )
+      .getValues();
+
+
+  let populatedRows =
+    0;
+
+  let conventionalRows =
+    0;
+
+  let supportedConventionalRows =
+    0;
+
+  let supportedRowsWithModel =
+    0;
+
+  let unsupportedRows =
+    0;
+
+  let unsupportedProbabilityViolations =
+    0;
+
+  let missingIdentityRows =
+    0;
+
+  let invalidBestSideRows =
+    0;
+
+  let riskScoreViolations =
+    0;
+
+  let prematureP15Rows =
+    0;
+
+  let nullIntegrityViolations =
+    0;
+
+
+  rows.forEach(
+    (row, index) => {
+
+      const sheetRow =
+        index + 2;
+
+
+      const hasData =
+        row.some(
+          value =>
+            value !== "" &&
+            value !== null
+        );
+
+
+      if (!hasData) {
+        return;
+      }
+
+
+      populatedRows++;
+
+
+      if (
+        row.length !==
+        universalColumnCount
+      ) {
+        throw new Error(
+          `D7 FAIL — Production row ${sheetRow} does not contain 36 universal columns.`
+        );
+      }
+
+
+      // ----------------------------------------------------------------------
+      // PROVIDER / IDENTITY
+      // ----------------------------------------------------------------------
+
+      const gameId =
+        row[0];   // A
+
+      const playerId =
+        row[5];   // F
+
+      const propType =
+        String(
+          row[7] ?? ""
+        )
+          .trim()
+          .toLowerCase();
+
+      const marketType =
+        String(
+          row[9] ?? ""
+        )
+          .trim()
+          .toLowerCase();
+
+      const playerName =
+        row[14];  // O
+
+
+      if (
+        gameId === "" ||
+        gameId === null
+      ) {
+        throw new Error(
+          `D7 FAIL — Row ${sheetRow} is missing Game Id.`
+        );
+      }
+
+
+      if (
+        playerId === "" ||
+        playerId === null
+      ) {
+        throw new Error(
+          `D7 FAIL — Row ${sheetRow} is missing Player Id.`
+        );
+      }
+
+
+      if (!propType) {
+        throw new Error(
+          `D7 FAIL — Row ${sheetRow} is missing Prop Type.`
+        );
+      }
+
+
+      if (
+        playerName === "" ||
+        playerName === null
+      ) {
+        missingIdentityRows++;
+      }
+
+
+      // ----------------------------------------------------------------------
+      // UNIVERSAL MODEL FIELDS
+      // ----------------------------------------------------------------------
+
+      const projectedStat =
+        row[18];  // S
+
+      const statStdDev =
+        row[19];  // T
+
+      const modelProbOver =
+        row[20];  // U
+
+      const modelProbUnder =
+        row[21];  // V
+
+      const evOver =
+        row[22];  // W
+
+      const evUnder =
+        row[23];  // X
+
+      const bestSide =
+        String(
+          row[24] ?? ""
+        ).trim();
+
+      const bestEV =
+        row[25];  // Z
+
+      const bestModelProbability =
+        row[26];  // AA
+
+      const bestPriceEdge =
+        row[27];  // AB
+
+
+      // ----------------------------------------------------------------------
+      // AE — NFL NUMERIC RISK SCORE IS DEFERRED TO P15
+      // ----------------------------------------------------------------------
+
+      if (
+        row[30] !== "" &&
+        row[30] !== null
+      ) {
+        riskScoreViolations++;
+      }
+
+
+      // ----------------------------------------------------------------------
+      // AH:AJ — MUST REMAIN BLANK UNTIL P15
+      // ----------------------------------------------------------------------
+
+      if (
+        (
+          row[33] !== "" &&
+          row[33] !== null
+        ) ||
+        (
+          row[34] !== "" &&
+          row[34] !== null
+        ) ||
+        (
+          row[35] !== "" &&
+          row[35] !== null
+        )
+      ) {
+        prematureP15Rows++;
+      }
+
+
+      // ----------------------------------------------------------------------
+      // CONVENTIONAL SUPPORT CONTRACT
+      // ----------------------------------------------------------------------
+
+      const probabilitySupported =
+        marketType ===
+          "over_under" &&
+        NFL_UNIVERSAL_PROBABILITY_MARKETS.has(
+          propType
+        );
+
+
+      if (
+        marketType ===
+        "over_under"
+      ) {
+        conventionalRows++;
+      }
+
+
+      if (probabilitySupported) {
+
+        supportedConventionalRows++;
+
+
+        const hasProjectionInputs =
+          projectedStat !== "" &&
+          projectedStat !== null &&
+          statStdDev !== "" &&
+          statStdDev !== null &&
+          Number.isFinite(
+            Number(projectedStat)
+          ) &&
+          Number.isFinite(
+            Number(statStdDev)
+          ) &&
+          Number(statStdDev) > 0;
+
+
+        const hasModel =
+          modelProbOver !== "" &&
+          modelProbOver !== null &&
+          modelProbUnder !== "" &&
+          modelProbUnder !== null;
+
+
+        if (
+          hasProjectionInputs &&
+          hasModel
+        ) {
+          supportedRowsWithModel++;
+
+
+          const over =
+            Number(
+              modelProbOver
+            );
+
+          const under =
+            Number(
+              modelProbUnder
+            );
+
+
+          if (
+            !Number.isFinite(over) ||
+            !Number.isFinite(under) ||
+            over < 0.025 - 1e-9 ||
+            over > 0.975 + 1e-9 ||
+            under < 0.025 - 1e-9 ||
+            under > 0.975 + 1e-9 ||
+            Math.abs(
+              (
+                over +
+                under
+              ) -
+              1
+            ) > 1e-8
+          ) {
+            nullIntegrityViolations++;
+          }
+        }
+
+
+        // If a priced decision exists, Y:AB must stay coherent.
+        const hasEV =
+          evOver !== "" &&
+          evOver !== null &&
+          evUnder !== "" &&
+          evUnder !== null &&
+          Number.isFinite(
+            Number(evOver)
+          ) &&
+          Number.isFinite(
+            Number(evUnder)
+          );
+
+
+        if (
+          hasModel &&
+          hasEV
+        ) {
+          if (
+            bestSide !== "Over" &&
+            bestSide !== "Under"
+          ) {
+            invalidBestSideRows++;
+          }
+
+
+          if (
+            bestEV === "" ||
+            bestEV === null ||
+            bestModelProbability === "" ||
+            bestModelProbability === null ||
+            bestPriceEdge === "" ||
+            bestPriceEdge === null
+          ) {
+            nullIntegrityViolations++;
+          }
+        }
+
+      } else {
+
+        unsupportedRows++;
+
+
+        // D3 intentionally does not generate U:X for unsupported
+        // markets or non-over_under market types.
+        if (
+          (
+            modelProbOver !== "" &&
+            modelProbOver !== null
+          ) ||
+          (
+            modelProbUnder !== "" &&
+            modelProbUnder !== null
+          ) ||
+          (
+            evOver !== "" &&
+            evOver !== null
+          ) ||
+          (
+            evUnder !== "" &&
+            evUnder !== null
+          )
+        ) {
+          unsupportedProbabilityViolations++;
+        }
+
+
+        // Without U:X, there must not be a fabricated actionable side.
+        if (
+          bestSide === "Over" ||
+          bestSide === "Under"
+        ) {
+          invalidBestSideRows++;
+        }
+      }
+    }
+  );
+
+
+  // ==========================================================================
+  // D7.10 — LIVE ACCEPTANCE GATES
+  // ==========================================================================
+
+  if (
+    populatedRows === 0
+  ) {
+    throw new Error(
+      "D7 FAIL — No populated NFL production rows found."
+    );
+  }
+
+
+  if (
+    supportedConventionalRows === 0
+  ) {
+    throw new Error(
+      "D7 FAIL — No supported conventional NFL markets were found in live production."
+    );
+  }
+
+
+  if (
+    supportedRowsWithModel === 0
+  ) {
+    throw new Error(
+      "D7 FAIL — Supported conventional markets exist, but none contain valid U:V model output."
+    );
+  }
+
+
+  if (
+    unsupportedProbabilityViolations > 0
+  ) {
+    throw new Error(
+      `D7 FAIL — ${unsupportedProbabilityViolations} unsupported/non-conventional rows contain fabricated U:X probability/EV values.`
+    );
+  }
+
+
+  if (
+    invalidBestSideRows > 0
+  ) {
+    throw new Error(
+      `D7 FAIL — ${invalidBestSideRows} production rows contain inconsistent Best Side behavior.`
+    );
+  }
+
+
+  if (
+    riskScoreViolations > 0
+  ) {
+    throw new Error(
+      `D7 FAIL — ${riskScoreViolations} NFL rows contain AE Risk Score values before P15.`
+    );
+  }
+
+
+  if (
+    prematureP15Rows > 0
+  ) {
+    throw new Error(
+      `D7 FAIL — ${prematureP15Rows} production rows contain premature AH:AJ scoring values.`
+    );
+  }
+
+
+  if (
+    nullIntegrityViolations > 0
+  ) {
+    throw new Error(
+      `D7 FAIL — ${nullIntegrityViolations} live rows violate probability/decision null integrity.`
+    );
+  }
+
+
+  // Missing roster identity is diagnostic rather than a model-contract
+  // failure because provider/player roster timing can differ.
+  Logger.log(
+    JSON.stringify({
+      test:
+        "NFL LIVE PRODUCTION INTEGRITY",
+
+      populatedRows,
+
+      conventionalRows,
+
+      supportedConventionalRows,
+
+      supportedRowsWithModel,
+
+      unsupportedRows,
+
+      unsupportedProbabilityViolations,
+
+      missingIdentityRows,
+
+      invalidBestSideRows,
+
+      riskScoreViolations,
+
+      prematureP15Rows,
+
+      nullIntegrityViolations,
+
+      pass:
+        true
+    })
+  );
+
+
+  Logger.log(
+    "D7.10 PASS — Live NFL production preserves universal contract."
+  );
+
+
+  // ==========================================================================
+  // FINAL FREEZE GATE
+  // ==========================================================================
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P14 D7 PASS — NFL UNIVERSAL PLAYER PROPS REGRESSION COMPLETE"
+  );
+
+  Logger.log(
+    "NFL P14 IS READY TO FREEZE."
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return true;
+}
+
+/**
+ * ============================================================================
+ * P15 D6 — UNIVERSAL SPORTACULAR PLAYER PROPS SCORING ENGINE
+ * ============================================================================
+ *
+ * Implements the frozen P15 D1-D5 contract.
+ *
+ * IMPORTANT:
+ * - This is currently an isolated/tested helper layer.
+ * - It does NOT modify the production Player Props refresh yet.
+ * - D7 will connect this contract to NBA/NHL/MLB/NFL production.
+ *
+ * Universal output ownership:
+ *
+ * AE = Risk Score
+ * AF = Risk Tier
+ * AH = Sportacular Score
+ * AI = Sportacular Edge
+ * AJ = Confidence Tier
+ *
+ * Y  = final actionable Best Side after eligibility gate
+ * ============================================================================
+ */
+
+
+const SPORTACULAR_PLAYER_PROP_SCORING = Object.freeze({
+
+  // --------------------------------------------------------------------------
+  // D2 — RISK
+  // --------------------------------------------------------------------------
+
+  riskTierLowMax:
+    25,
+
+  riskTierMediumMax:
+    50,
+
+  riskTierHighMax:
+    75,
+
+
+  // --------------------------------------------------------------------------
+  // D3 — SPORTACULAR EDGE
+  // --------------------------------------------------------------------------
+
+  priceEdgeNormalizationCeiling:
+    0.15,
+
+  evNormalizationCeiling:
+    0.25,
+
+  priceEdgeWeight:
+    0.75,
+
+  evWeight:
+    0.25,
+
+
+  // --------------------------------------------------------------------------
+  // D4 — SPORTACULAR SCORE
+  // --------------------------------------------------------------------------
+
+  sportacularEdgeWeight:
+    0.55,
+
+  modelConfidenceWeight:
+    0.25,
+
+  riskQualityWeight:
+    0.15,
+
+  trendWeight:
+    0.05,
+
+  trendMultiplier:
+    2,
+
+
+  // --------------------------------------------------------------------------
+  // D5 — ACTIONABLE ELIGIBILITY
+  // --------------------------------------------------------------------------
+
+  minimumBestEV:
+    0.05,
+
+  minimumBestModelProbability:
+    0.52,
+
+  minimumBestPriceEdge:
+    0.03,
+
+  minimumModelConfidence:
+    50,
+
+  minimumSportacularScore:
+    55,
+
+  evTieTolerance:
+    1e-12
+});
+
+
+/**
+ * ---------------------------------------------------------------------------
+ * UNIVERSAL NULLABLE NUMBER
+ * ---------------------------------------------------------------------------
+ *
+ * Preserves the frozen null-integrity rule:
+ *
+ *   missing != 0
+ *
+ * Legitimate zero remains zero.
+ */
+function getUniversalNullableNumber_(value) {
+
+  if (
+    value === "" ||
+    value === null ||
+    value === undefined
+  ) {
+    return null;
+  }
+
+
+  const number =
+    Number(value);
+
+
+  return Number.isFinite(number)
+    ? number
+    : null;
+}
+
+
+/**
+ * ---------------------------------------------------------------------------
+ * UNIVERSAL CLAMP
+ * ---------------------------------------------------------------------------
+ */
+function clampUniversalScore_(
+  value,
+  minimum,
+  maximum
+) {
+
+  return Math.min(
+    maximum,
+    Math.max(
+      minimum,
+      value
+    )
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D2 — UNIVERSAL RISK SCORE
+ * ============================================================================
+ *
+ * Risk Score =
+ *
+ *   100 * Std Dev
+ *   ------------------------------
+ *   MAX(|Projection|, |Line|, 1)
+ *
+ * Higher = riskier.
+ */
+function calculateUniversalRisk_({
+  projectedStat,
+  lineValue,
+  statStdDev
+}) {
+
+  const sd =
+    getUniversalNullableNumber_(
+      statStdDev
+    );
+
+
+  if (
+    sd === null ||
+    sd < 0
+  ) {
+    return {
+      riskScore: null,
+      riskTier: null
+    };
+  }
+
+
+  const projection =
+    getUniversalNullableNumber_(
+      projectedStat
+    );
+
+
+  const line =
+    getUniversalNullableNumber_(
+      lineValue
+    );
+
+
+  const magnitudes =
+    [1];
+
+
+  if (
+    projection !== null
+  ) {
+    magnitudes.push(
+      Math.abs(
+        projection
+      )
+    );
+  }
+
+
+  if (
+    line !== null
+  ) {
+    magnitudes.push(
+      Math.abs(
+        line
+      )
+    );
+  }
+
+
+  const scale =
+    Math.max(
+      ...magnitudes
+    );
+
+
+  const riskScore =
+    clampUniversalScore_(
+      (
+        sd /
+        scale
+      ) *
+      100,
+      0,
+      100
+    );
+
+
+  let riskTier;
+
+
+  if (
+    riskScore <
+    SPORTACULAR_PLAYER_PROP_SCORING
+      .riskTierLowMax
+  ) {
+
+    riskTier =
+      "Low";
+
+  } else if (
+    riskScore <
+    SPORTACULAR_PLAYER_PROP_SCORING
+      .riskTierMediumMax
+  ) {
+
+    riskTier =
+      "Medium";
+
+  } else if (
+    riskScore <
+    SPORTACULAR_PLAYER_PROP_SCORING
+      .riskTierHighMax
+  ) {
+
+    riskTier =
+      "High";
+
+  } else {
+
+    riskTier =
+      "Very High";
+  }
+
+
+  return {
+    riskScore,
+    riskTier
+  };
+}
+
+
+/**
+ * ============================================================================
+ * D3 — UNIVERSAL SPORTACULAR EDGE
+ * ============================================================================
+ *
+ * Price Edge Score =
+ *   CLAMP(AB / 0.15 * 100)
+ *
+ * EV Score =
+ *   CLAMP(Z / 0.25 * 100)
+ *
+ * Sportacular Edge =
+ *   75% Price Edge Score
+ *   25% EV Score
+ */
+function calculateUniversalSportacularEdge_({
+  bestEV,
+  bestPriceEdge
+}) {
+
+  const ev =
+    getUniversalNullableNumber_(
+      bestEV
+    );
+
+
+  const priceEdge =
+    getUniversalNullableNumber_(
+      bestPriceEdge
+    );
+
+
+  if (
+    ev === null ||
+    priceEdge === null
+  ) {
+    return null;
+  }
+
+
+  const priceEdgeScore =
+    clampUniversalScore_(
+      (
+        priceEdge /
+        SPORTACULAR_PLAYER_PROP_SCORING
+          .priceEdgeNormalizationCeiling
+      ) *
+      100,
+      0,
+      100
+    );
+
+
+  const evScore =
+    clampUniversalScore_(
+      (
+        ev /
+        SPORTACULAR_PLAYER_PROP_SCORING
+          .evNormalizationCeiling
+      ) *
+      100,
+      0,
+      100
+    );
+
+
+  return clampUniversalScore_(
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .priceEdgeWeight *
+      priceEdgeScore
+    ) +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .evWeight *
+      evScore
+    ),
+    0,
+    100
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D4 — SIDE-ALIGNED TREND SUPPORT
+ * ============================================================================
+ */
+function calculateUniversalTrendSupport_({
+  candidateSide,
+  trendScore
+}) {
+
+  if (
+    candidateSide !== "Over" &&
+    candidateSide !== "Under"
+  ) {
+    return null;
+  }
+
+
+  const trend =
+    getUniversalNullableNumber_(
+      trendScore
+    );
+
+
+  if (
+    trend === null
+  ) {
+    return null;
+  }
+
+
+  const alignedTrend =
+    candidateSide === "Over"
+      ? trend
+      : -trend;
+
+
+  return clampUniversalScore_(
+    50 +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .trendMultiplier *
+      alignedTrend
+    ),
+    0,
+    100
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D4 — UNIVERSAL SPORTACULAR SCORE
+ * ============================================================================
+ *
+ * Mandatory:
+ *   Sportacular Edge
+ *   Model Confidence
+ *   Risk Score
+ *
+ * Optional:
+ *   Trend Score
+ *
+ * If trend is missing, its 5% weight is removed and the remaining
+ * 95% is renormalized.
+ */
+function calculateUniversalSportacularScore_({
+  candidateSide,
+  sportacularEdge,
+  modelConfidence,
+  riskScore,
+  trendScore
+}) {
+
+  if (
+    candidateSide !== "Over" &&
+    candidateSide !== "Under"
+  ) {
+    return null;
+  }
+
+
+  const edge =
+    getUniversalNullableNumber_(
+      sportacularEdge
+    );
+
+
+  const confidence =
+    getUniversalNullableNumber_(
+      modelConfidence
+    );
+
+
+  const risk =
+    getUniversalNullableNumber_(
+      riskScore
+    );
+
+
+  if (
+    edge === null ||
+    confidence === null ||
+    risk === null
+  ) {
+    return null;
+  }
+
+
+  const boundedEdge =
+    clampUniversalScore_(
+      edge,
+      0,
+      100
+    );
+
+
+  const boundedConfidence =
+    clampUniversalScore_(
+      confidence,
+      0,
+      100
+    );
+
+
+  const boundedRisk =
+    clampUniversalScore_(
+      risk,
+      0,
+      100
+    );
+
+
+  const riskQuality =
+    100 -
+    boundedRisk;
+
+
+  let weightedTotal =
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .sportacularEdgeWeight *
+      boundedEdge
+    ) +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .modelConfidenceWeight *
+      boundedConfidence
+    ) +
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .riskQualityWeight *
+      riskQuality
+    );
+
+
+  let totalWeight =
+    (
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .sportacularEdgeWeight +
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .modelConfidenceWeight +
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .riskQualityWeight
+    );
+
+
+  const trendSupport =
+    calculateUniversalTrendSupport_({
+      candidateSide,
+      trendScore
+    });
+
+
+  if (
+    trendSupport !== null
+  ) {
+
+    weightedTotal +=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .trendWeight *
+      trendSupport;
+
+
+    totalWeight +=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .trendWeight;
+  }
+
+
+  if (
+    totalWeight <= 0
+  ) {
+    return null;
+  }
+
+
+  return clampUniversalScore_(
+    weightedTotal /
+    totalWeight,
+    0,
+    100
+  );
+}
+
+
+/**
+ * ============================================================================
+ * D5 — CANDIDATE SIDE
+ * ============================================================================
+ *
+ * Candidate side is intentionally separate from final Y Best Side.
+ *
+ * This lets AH be calculated before the final eligibility gate without
+ * creating a circular dependency.
+ */
+function selectUniversalCandidateSide_({
+  evOver,
+  evUnder
+}) {
+
+  const over =
+    getUniversalNullableNumber_(
+      evOver
+    );
+
+
+  const under =
+    getUniversalNullableNumber_(
+      evUnder
+    );
+
+
+  if (
+    over === null &&
+    under === null
+  ) {
+    return null;
+  }
+
+
+  if (
+    over !== null &&
+    under !== null
+  ) {
+
+    if (
+      Math.abs(
+        over -
+        under
+      ) <=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .evTieTolerance
+    ) {
+      return null;
+    }
+
+
+    return over > under
+      ? "Over"
+      : "Under";
+  }
+
+
+  return over !== null
+    ? "Over"
+    : "Under";
+}
+
+
+/**
+ * ============================================================================
+ * D5 — CONFIDENCE TIER
+ * ============================================================================
+ *
+ * This helper is called only after the mandatory data gate can be evaluated.
+ */
+function getUniversalConfidenceTier_(
+  sportacularScore
+) {
+
+  const score =
+    getUniversalNullableNumber_(
+      sportacularScore
+    );
+
+
+  if (
+    score === null
+  ) {
+    return null;
+  }
+
+
+  if (score >= 85) {
+    return "Elite";
+  }
+
+
+  if (score >= 75) {
+    return "Strong";
+  }
+
+
+  if (score >= 65) {
+    return "Solid";
+  }
+
+
+  if (score >= 55) {
+    return "Lean";
+  }
+
+
+  return "No Play";
+}
+
+
+/**
+ * ============================================================================
+ * D5 — FINAL ACTIONABLE ELIGIBILITY
+ * ============================================================================
+ */
+function evaluateUniversalActionability_({
+  candidateSide,
+  bestEV,
+  bestModelProbability,
+  bestPriceEdge,
+  riskScore,
+  modelConfidence,
+  sportacularEdge,
+  sportacularScore
+}) {
+
+  const ev =
+    getUniversalNullableNumber_(
+      bestEV
+    );
+
+
+  const probability =
+    getUniversalNullableNumber_(
+      bestModelProbability
+    );
+
+
+  const priceEdge =
+    getUniversalNullableNumber_(
+      bestPriceEdge
+    );
+
+
+  const risk =
+    getUniversalNullableNumber_(
+      riskScore
+    );
+
+
+  const confidence =
+    getUniversalNullableNumber_(
+      modelConfidence
+    );
+
+
+  const edge =
+    getUniversalNullableNumber_(
+      sportacularEdge
+    );
+
+
+  const score =
+    getUniversalNullableNumber_(
+      sportacularScore
+    );
+
+
+  const mandatoryDataAvailable =
+    (
+      candidateSide === "Over" ||
+      candidateSide === "Under"
+    ) &&
+    ev !== null &&
+    probability !== null &&
+    priceEdge !== null &&
+    risk !== null &&
+    confidence !== null &&
+    edge !== null &&
+    score !== null;
+
+
+  if (
+    !mandatoryDataAvailable
+  ) {
+    return {
+      finalBestSide:
+        "No Play",
+
+      confidenceTier:
+        null,
+
+      actionable:
+        false,
+
+      evaluable:
+        false
+    };
+  }
+
+
+  const passesBettingGate =
+    ev >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumBestEV &&
+    probability >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumBestModelProbability &&
+    priceEdge >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumBestPriceEdge &&
+    confidence >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumModelConfidence;
+
+
+  const passesScoreGate =
+    score >=
+      SPORTACULAR_PLAYER_PROP_SCORING
+        .minimumSportacularScore;
+
+
+  const actionable =
+    passesBettingGate &&
+    passesScoreGate;
+
+
+  return {
+    finalBestSide:
+      actionable
+        ? candidateSide
+        : "No Play",
+
+    confidenceTier:
+      actionable
+        ? getUniversalConfidenceTier_(
+            score
+          )
+        : "No Play",
+
+    actionable,
+
+    evaluable:
+      true
+  };
+}
+
+
+/**
+ * ============================================================================
+ * MASTER UNIVERSAL SCORING HELPER
+ * ============================================================================
+ *
+ * Input:
+ *   I   Line Value
+ *   S   Projected Stat
+ *   T   Stat Std Dev
+ *   W   EV Over
+ *   X   EV Under
+ *   AA  Best Model Probability
+ *   AB  Best Price Edge
+ *   AC  Trend Score
+ *   AG  Model Confidence
+ *
+ * Output:
+ *   Y   final actionable Best Side
+ *   AE  Risk Score
+ *   AF  Risk Tier
+ *   AH  Sportacular Score
+ *   AI  Sportacular Edge
+ *   AJ  Confidence Tier
+ *
+ * Also returns candidateSide for internal/debugging use.
+ */
+function buildUniversalSportacularScoring_({
+  lineValue,
+  projectedStat,
+  statStdDev,
+  evOver,
+  evUnder,
+  bestModelProbability,
+  bestPriceEdge,
+  trendScore,
+  modelConfidence
+}) {
+
+  const candidateSide =
+    selectUniversalCandidateSide_({
+      evOver,
+      evUnder
+    });
+
+
+  let bestEV =
+    null;
+
+
+  if (
+    candidateSide === "Over"
+  ) {
+    bestEV =
+      getUniversalNullableNumber_(
+        evOver
+      );
+
+  } else if (
+    candidateSide === "Under"
+  ) {
+    bestEV =
+      getUniversalNullableNumber_(
+        evUnder
+      );
+  }
+
+
+  const risk =
+    calculateUniversalRisk_({
+      projectedStat,
+      lineValue,
+      statStdDev
+    });
+
+
+  const sportacularEdge =
+    calculateUniversalSportacularEdge_({
+      bestEV,
+      bestPriceEdge
+    });
+
+
+  const sportacularScore =
+    calculateUniversalSportacularScore_({
+      candidateSide,
+      sportacularEdge,
+      modelConfidence,
+      riskScore:
+        risk.riskScore,
+      trendScore
+    });
+
+
+  const actionability =
+    evaluateUniversalActionability_({
+      candidateSide,
+      bestEV,
+      bestModelProbability,
+      bestPriceEdge,
+      riskScore:
+        risk.riskScore,
+      modelConfidence,
+      sportacularEdge,
+      sportacularScore
+    });
+
+
+  return {
+    candidateSide,
+
+    finalBestSide:
+      actionability.finalBestSide,
+
+    bestEV,
+
+    riskScore:
+      risk.riskScore,
+
+    riskTier:
+      risk.riskTier,
+
+    sportacularScore,
+
+    sportacularEdge,
+
+    confidenceTier:
+      actionability.confidenceTier,
+
+    actionable:
+      actionability.actionable,
+
+    evaluable:
+      actionability.evaluable
+  };
+}
+
+
+/**
+ * ============================================================================
+ * P15 D6 MASTER REGRESSION
+ * ============================================================================
+ *
+ * READ-ONLY.
+ *
+ * Tests the frozen D1-D5 scoring contract without modifying production.
+ */
+function testUniversalSportacularScoringContract() {
+
+  const tests =
+    [];
+
+
+  function assertTest(
+    name,
+    condition,
+    details
+  ) {
+
+    const pass =
+      Boolean(
+        condition
+      );
+
+
+    const result = {
+      name,
+      pass
+    };
+
+
+    if (
+      details !== undefined
+    ) {
+      result.details =
+        details;
+    }
+
+
+    tests.push(
+      result
+    );
+
+
+    Logger.log(
+      JSON.stringify(
+        result
+      )
+    );
+
+
+    if (!pass) {
+      throw new Error(
+        `P15 D6 universal scoring test failed: ${name}`
+      );
+    }
+  }
+
+
+  function approximatelyEqual(
+    actual,
+    expected,
+    tolerance
+  ) {
+
+    return (
+      actual !== null &&
+      Number.isFinite(
+        Number(actual)
+      ) &&
+      Math.abs(
+        Number(actual) -
+        Number(expected)
+      ) <=
+      (
+        tolerance ??
+        1e-9
+      )
+    );
+  }
+
+
+  // ==========================================================================
+  // TEST 1 — D2 RISK SCORE
+  // ==========================================================================
+
+  const riskExample =
+    calculateUniversalRisk_({
+      projectedStat:
+        72,
+
+      lineValue:
+        69.5,
+
+      statStdDev:
+        27
+    });
+
+
+  assertTest(
+    "D2 risk normalization",
+    approximatelyEqual(
+      riskExample.riskScore,
+      37.5
+    ) &&
+    riskExample.riskTier ===
+      "Medium",
+    riskExample
+  );
+
+
+  // ==========================================================================
+  // TEST 2 — D2 ZERO IS VALID
+  // ==========================================================================
+
+  const zeroRisk =
+    calculateUniversalRisk_({
+      projectedStat:
+        20,
+
+      lineValue:
+        19.5,
+
+      statStdDev:
+        0
+    });
+
+
+  assertTest(
+    "D2 legitimate zero standard deviation survives",
+    zeroRisk.riskScore === 0 &&
+    zeroRisk.riskTier === "Low",
+    zeroRisk
+  );
+
+
+  // ==========================================================================
+  // TEST 3 — D2 MISSING STD DEV
+  // ==========================================================================
+
+  const missingRisk =
+    calculateUniversalRisk_({
+      projectedStat:
+        20,
+
+      lineValue:
+        19.5,
+
+      statStdDev:
+        null
+    });
+
+
+  assertTest(
+    "D2 missing standard deviation remains null",
+    missingRisk.riskScore === null &&
+    missingRisk.riskTier === null,
+    missingRisk
+  );
+
+
+  // ==========================================================================
+  // TEST 4 — D3 SPORTACULAR EDGE
+  // ==========================================================================
+
+  const edgeExample =
+    calculateUniversalSportacularEdge_({
+      bestEV:
+        0.14,
+
+      bestPriceEdge:
+        0.08
+    });
+
+
+  assertTest(
+    "D3 Sportacular Edge normalization",
+    approximatelyEqual(
+      edgeExample,
+      54,
+      1e-9
+    ),
+    {
+      sportacularEdge:
+        edgeExample
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 5 — D3 NEGATIVE EDGE FLOORS AT ZERO
+  // ==========================================================================
+
+  const negativeEdge =
+    calculateUniversalSportacularEdge_({
+      bestEV:
+        -0.05,
+
+      bestPriceEdge:
+        -0.02
+    });
+
+
+  assertTest(
+    "D3 negative betting signals produce zero edge",
+    negativeEdge === 0,
+    {
+      sportacularEdge:
+        negativeEdge
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 6 — D3 MISSING INPUT REMAINS NULL
+  // ==========================================================================
+
+  const missingEdge =
+    calculateUniversalSportacularEdge_({
+      bestEV:
+        0.10,
+
+      bestPriceEdge:
+        null
+    });
+
+
+  assertTest(
+    "D3 missing edge input remains null",
+    missingEdge === null,
+    {
+      sportacularEdge:
+        missingEdge
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 7 — D4 OVER TREND ALIGNMENT
+  // ==========================================================================
+
+  const overTrend =
+    calculateUniversalTrendSupport_({
+      candidateSide:
+        "Over",
+
+      trendScore:
+        15
+    });
+
+
+  assertTest(
+    "D4 Over trend alignment",
+    overTrend === 80,
+    {
+      trendSupport:
+        overTrend
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 8 — D4 UNDER TREND ALIGNMENT
+  // ==========================================================================
+
+  const underTrend =
+    calculateUniversalTrendSupport_({
+      candidateSide:
+        "Under",
+
+      trendScore:
+        -18
+    });
+
+
+  assertTest(
+    "D4 Under reverses negative raw trend into support",
+    underTrend === 86,
+    {
+      trendSupport:
+        underTrend
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 9 — D4 FULL SCORE
+  // ==========================================================================
+
+  const scoreExample =
+    calculateUniversalSportacularScore_({
+      candidateSide:
+        "Over",
+
+      sportacularEdge:
+        82,
+
+      modelConfidence:
+        88,
+
+      riskScore:
+        25,
+
+      trendScore:
+        15
+    });
+
+
+  assertTest(
+    "D4 full Sportacular Score",
+    approximatelyEqual(
+      scoreExample,
+      82.35,
+      1e-9
+    ),
+    {
+      sportacularScore:
+        scoreExample
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 10 — D4 MISSING TREND REWEIGHTS 95%
+  // ==========================================================================
+
+  const noTrendScore =
+    calculateUniversalSportacularScore_({
+      candidateSide:
+        "Over",
+
+      sportacularEdge:
+        82,
+
+      modelConfidence:
+        88,
+
+      riskScore:
+        25,
+
+      trendScore:
+        null
+    });
+
+
+  const expectedNoTrend =
+    (
+      (
+        0.55 *
+        82
+      ) +
+      (
+        0.25 *
+        88
+      ) +
+      (
+        0.15 *
+        75
+      )
+    ) /
+    0.95;
+
+
+  assertTest(
+    "D4 missing trend is removed and remaining weights renormalize",
+    approximatelyEqual(
+      noTrendScore,
+      expectedNoTrend,
+      1e-9
+    ),
+    {
+      sportacularScore:
+        noTrendScore,
+
+      expected:
+        expectedNoTrend
+    }
+  );
+
+
+  // ==========================================================================
+  // TEST 11 — CANDIDATE SIDE
+  // ==========================================================================
+
+  assertTest(
+    "D5 stronger EV selects candidate side",
+    selectUniversalCandidateSide_({
+      evOver:
+        0.12,
+
+      evUnder:
+        -0.04
+    }) === "Over"
+  );
+
+
+  // ==========================================================================
+  // TEST 12 — EV TIE DOES NOT ARBITRARILY FAVOR OVER
+  // ==========================================================================
+
+  assertTest(
+    "D5 EV tie produces no candidate side",
+    selectUniversalCandidateSide_({
+      evOver:
+        0.10,
+
+      evUnder:
+        0.10
+    }) === null
+  );
+
+
+  // ==========================================================================
+  // TEST 13 — ACTIONABLE ELITE PLAY
+  // ==========================================================================
+
+  const eliteActionability =
+    evaluateUniversalActionability_({
+      candidateSide:
+        "Over",
+
+      bestEV:
+        0.20,
+
+      bestModelProbability:
+        0.68,
+
+      bestPriceEdge:
+        0.12,
+
+      riskScore:
+        20,
+
+      modelConfidence:
+        92,
+
+      sportacularEdge:
+        85,
+
+      sportacularScore:
+        88
+    });
+
+
+  assertTest(
+    "D5 qualifying Elite play is actionable",
+    eliteActionability.actionable ===
+      true &&
+    eliteActionability.finalBestSide ===
+      "Over" &&
+    eliteActionability.confidenceTier ===
+      "Elite",
+    eliteActionability
+  );
+
+
+  // ==========================================================================
+  // TEST 14 — KNOWN THRESHOLD FAILURE = NO PLAY
+  // ==========================================================================
+
+  const failedKnownGate =
+    evaluateUniversalActionability_({
+      candidateSide:
+        "Under",
+
+      bestEV:
+        0.04,
+
+      bestModelProbability:
+        0.60,
+
+      bestPriceEdge:
+        0.08,
+
+      riskScore:
+        25,
+
+      modelConfidence:
+        80,
+
+      sportacularEdge:
+        60,
+
+      sportacularScore:
+        70
+    });
+
+
+  assertTest(
+    "D5 known threshold failure returns evaluated No Play",
+    failedKnownGate.actionable ===
+      false &&
+    failedKnownGate.evaluable ===
+      true &&
+    failedKnownGate.finalBestSide ===
+      "No Play" &&
+    failedKnownGate.confidenceTier ===
+      "No Play",
+    failedKnownGate
+  );
+
+
+  // ==========================================================================
+  // TEST 15 — MISSING MANDATORY DATA = UNEVALUABLE
+  // ==========================================================================
+
+  const missingMandatory =
+    evaluateUniversalActionability_({
+      candidateSide:
+        "Over",
+
+      bestEV:
+        0.15,
+
+      bestModelProbability:
+        0.64,
+
+      bestPriceEdge:
+        0.08,
+
+      riskScore:
+        null,
+
+      modelConfidence:
+        80,
+
+      sportacularEdge:
+        65,
+
+      sportacularScore:
+        null
+    });
+
+
+  assertTest(
+    "D5 missing mandatory data remains unevaluable",
+    missingMandatory.actionable ===
+      false &&
+    missingMandatory.evaluable ===
+      false &&
+    missingMandatory.finalBestSide ===
+      "No Play" &&
+    missingMandatory.confidenceTier ===
+      null,
+    missingMandatory
+  );
+
+
+  // ==========================================================================
+  // TEST 16 — CONFIDENCE TIER BOUNDARIES
+  // ==========================================================================
+
+  assertTest(
+    "D5 confidence tier boundaries",
+    getUniversalConfidenceTier_(85) ===
+      "Elite" &&
+    getUniversalConfidenceTier_(75) ===
+      "Strong" &&
+    getUniversalConfidenceTier_(65) ===
+      "Solid" &&
+    getUniversalConfidenceTier_(55) ===
+      "Lean" &&
+    getUniversalConfidenceTier_(54.999) ===
+      "No Play"
+  );
+
+
+  // ==========================================================================
+  // TEST 17 — MASTER HELPER ACTIONABLE PLAY
+  // ==========================================================================
+
+  const masterActionable =
+    buildUniversalSportacularScoring_({
+      lineValue:
+        69.5,
+
+      projectedStat:
+        75,
+
+      statStdDev:
+        18,
+
+      evOver:
+        0.20,
+
+      evUnder:
+        -0.12,
+
+      bestModelProbability:
+        0.68,
+
+      bestPriceEdge:
+        0.12,
+
+      trendScore:
+        12,
+
+      modelConfidence:
+        90
+    });
+
+
+  assertTest(
+    "D6 master helper produces actionable scored play",
+    masterActionable.candidateSide ===
+      "Over" &&
+    masterActionable.finalBestSide ===
+      "Over" &&
+    masterActionable.riskScore !==
+      null &&
+    masterActionable.riskTier ===
+      "Low" &&
+    masterActionable.sportacularEdge !==
+      null &&
+    masterActionable.sportacularScore !==
+      null &&
+    masterActionable.confidenceTier !==
+      null &&
+    masterActionable.confidenceTier !==
+      "No Play" &&
+    masterActionable.actionable ===
+      true &&
+    masterActionable.evaluable ===
+      true,
+    masterActionable
+  );
+
+
+  // ==========================================================================
+  // TEST 18 — MASTER HELPER KNOWN NO PLAY
+  // ==========================================================================
+
+  const masterNoPlay =
+    buildUniversalSportacularScoring_({
+      lineValue:
+        69.5,
+
+      projectedStat:
+        70,
+
+      statStdDev:
+        20,
+
+      evOver:
+        0.02,
+
+      evUnder:
+        -0.08,
+
+      bestModelProbability:
+        0.55,
+
+      bestPriceEdge:
+        0.015,
+
+      trendScore:
+        20,
+
+      modelConfidence:
+        90
+    });
+
+
+  assertTest(
+    "D6 strong trend cannot manufacture actionable betting value",
+    masterNoPlay.finalBestSide ===
+      "No Play" &&
+    masterNoPlay.actionable ===
+      false &&
+    masterNoPlay.evaluable ===
+      true &&
+    masterNoPlay.confidenceTier ===
+      "No Play" &&
+    masterNoPlay.sportacularEdge !==
+      null &&
+    masterNoPlay.sportacularScore !==
+      null,
+    masterNoPlay
+  );
+
+
+  // ==========================================================================
+  // TEST 19 — MASTER HELPER NULL INTEGRITY
+  // ==========================================================================
+
+  const masterMissing =
+    buildUniversalSportacularScoring_({
+      lineValue:
+        69.5,
+
+      projectedStat:
+        72,
+
+      statStdDev:
+        null,
+
+      evOver:
+        0.15,
+
+      evUnder:
+        -0.05,
+
+      bestModelProbability:
+        0.64,
+
+      bestPriceEdge:
+        0.08,
+
+      trendScore:
+        10,
+
+      modelConfidence:
+        85
+    });
+
+
+  assertTest(
+    "D6 missing uncertainty does not fabricate risk or final score",
+    masterMissing.riskScore ===
+      null &&
+    masterMissing.riskTier ===
+      null &&
+    masterMissing.sportacularScore ===
+      null &&
+    masterMissing.finalBestSide ===
+      "No Play" &&
+    masterMissing.confidenceTier ===
+      null &&
+    masterMissing.evaluable ===
+      false,
+    masterMissing
+  );
+
+
+  // ==========================================================================
+  // FINAL
+  // ==========================================================================
+
+  const passed =
+    tests.every(
+      test =>
+        test.pass
+    );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "P15 D6 UNIVERSAL SPORTACULAR SCORING CONTRACT",
+
+      totalTests:
+        tests.length,
+
+      passedTests:
+        tests.filter(
+          test =>
+            test.pass
+        ).length,
+
+      failedTests:
+        tests.filter(
+          test =>
+            !test.pass
+        ).length,
+
+      passed
+    })
+  );
+
+
+  if (!passed) {
+    throw new Error(
+      "P15 D6 FAIL — Universal Sportacular scoring contract regression failed."
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P15 D6 PASS — UNIVERSAL SPORTACULAR SCORING CONTRACT COMPLETE"
+  );
+
+  Logger.log(
+    "P15 D1-D6 SCORING CONTRACT IS READY FOR FOUR-LEAGUE IMPLEMENTATION."
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return true;
 }
 
 function onOpen() {
