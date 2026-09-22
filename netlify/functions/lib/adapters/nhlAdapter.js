@@ -134,75 +134,217 @@ export function buildNHLContext({
 
             const type =
                 String(prop.Type ?? "")
+                    .trim()
                     .toLowerCase();
 
-            const oddsFormat =
-                type === "milestone"
-                    ? "decimal"
-                    : "american";
+            const bestSideRaw =
+                String(prop["Best Side"] ?? "")
+                    .trim();
 
-            const odds =
-                oddsFormat === "decimal"
-                    ? Number(prop["Decimal Odds"] ?? 0)
-                    : Number(prop["Over Odds"] ?? 0);
+            const bestSide =
+                bestSideRaw || null;
 
-            const probabilityValue =
-                type === "milestone"
-                    ? prop["Poisson Milestone"]
-                    : prop["Poisson Over"];
+            const normalizedBestSide =
+                bestSideRaw.toLowerCase();
 
-            const probability =
-                probabilityValue !== undefined &&
-                probabilityValue !== null &&
-                probabilityValue !== ""
-                    ? Number(probabilityValue)
+
+            const hasValue = value =>
+                value !== undefined &&
+                value !== null &&
+                value !== "";
+
+
+            const toNullableNumber = value => {
+
+                if (!hasValue(value)) {
+                    return null;
+                }
+
+                const number =
+                    Number(value);
+
+                return Number.isFinite(number)
+                    ? number
                     : null;
+            };
+
+
+            // ==================================================
+            // P15 AUTHORITATIVE SELECTED-SIDE VALUES
+            // ==================================================
+
+            let odds = null;
+            let probability = null;
+            let expectedValue = null;
+
+
+            if (normalizedBestSide === "over") {
+
+                odds =
+                    toNullableNumber(
+                        prop["Over Odds"]
+                    );
+
+                probability =
+                    toNullableNumber(
+                        prop["Model Prob Over"]
+                    );
+
+                expectedValue =
+                    toNullableNumber(
+                        prop["EV Over"]
+                    );
+
+            } else if (normalizedBestSide === "under") {
+
+                odds =
+                    toNullableNumber(
+                        prop["Under Odds"]
+                    );
+
+                probability =
+                    toNullableNumber(
+                        prop["Model Prob Under"]
+                    );
+
+                expectedValue =
+                    toNullableNumber(
+                        prop["EV Under"]
+                    );
+
+            }
+
+
+            // ==================================================
+            // UNIVERSAL P15 OUTPUTS
+            // ==================================================
+
+            const bestEV =
+                toNullableNumber(
+                    prop["Best EV"]
+                );
+
+            const bestModelProbability =
+                toNullableNumber(
+                    prop["Best Model Probability"]
+                );
+
+            const bestPriceEdge =
+                toNullableNumber(
+                    prop["Best Price Edge"]
+                );
+
+            const trendScore =
+                toNullableNumber(
+                    prop["Trend Score"]
+                );
+
+            const riskScore =
+                toNullableNumber(
+                    prop["Risk Score"]
+                );
+
+            const modelConfidence =
+                toNullableNumber(
+                    prop["Model Confidence"]
+                );
+
+            const sportacularScore =
+                toNullableNumber(
+                    prop["Sportacular Score"]
+                );
+
+            const sportacularEdge =
+                toNullableNumber(
+                    prop["Sportacular Edge"]
+                );
+
 
             return {
 
-                id: prop.Id,
+                id:
+                    prop.Id ?? null,
 
                 type,
 
                 market:
                     String(
                         prop["Prop Type"] ?? ""
-                    ).toLowerCase(),
+                    )
+                        .trim()
+                        .toLowerCase(),
 
                 displayName:
                     String(
                         prop["Prop Type"] ?? ""
-                    ).replaceAll("_", " "),
+                    )
+                        .replaceAll("_", " "),
 
                 line:
-                    Number(
-                        prop["Line Value"] ?? 0
+                    toNullableNumber(
+                        prop["Line Value"]
                     ),
 
                 odds,
 
-                oddsFormat,
+                oddsFormat:
+                    "american",
 
                 sportsbook:
                     prop.Vendor ?? "",
+
+
+                // ----------------------------------------------
+                // Compatibility fields used by current backend
+                // ----------------------------------------------
 
                 probability,
 
                 probabilitySource:
                     probability === null
                         ? null
-                        : type === "milestone"
-                            ? "poisson_milestone"
-                            : "poisson_over",
+                        : normalizedBestSide === "under"
+                            ? "model_prob_under"
+                            : "model_prob_over",
 
-                expectedValue:
-                    prop["EV Over/Milestone ($1 Bet)"] !== undefined &&
-                    prop["EV Over/Milestone ($1 Bet)"] !== null &&
-                    prop["EV Over/Milestone ($1 Bet)"] !== ""
-                        ? Number(
-                            prop["EV Over/Milestone ($1 Bet)"]
-                        )
-                        : null,
+                expectedValue,
+
+
+                // ----------------------------------------------
+                // Universal Player Props contract
+                // ----------------------------------------------
+
+                bestSide,
+
+                bestEV,
+
+                bestModelProbability,
+
+                bestPriceEdge,
+
+                trendScore,
+
+                trendStrength:
+                    prop["Trend Strength"] || null,
+
+                riskScore,
+
+                riskTier:
+                    prop["Risk Tier"] || null,
+
+                modelConfidence,
+
+                sportacularScore,
+
+                sportacularEdge,
+
+                confidenceTier:
+                    prop["Confidence Tier"] || null,
+
+
+                // ----------------------------------------------
+                // Preserve original universal A:AJ row
+                // ----------------------------------------------
 
                 raw: prop
 

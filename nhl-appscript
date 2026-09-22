@@ -926,6 +926,186 @@ function normalizeNHLPropMarket_(propType) {
   return config.modelKey || null;
 }
 
+function testNHLPreseasonScheduleFeed() {
+
+  const testDates = [
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-25",
+    "2026-09-26",
+    "2026-09-27",
+    "2026-09-28",
+    "2026-09-29"
+  ];
+
+  testDates.forEach(dateString => {
+
+    Logger.log(
+      `========== NHL DATE ${dateString} ==========`
+    );
+
+    const games =
+      fetchAllNHLGamesForDate_(
+        dateString
+      );
+
+    Logger.log(
+      `Games returned: ${games.length}`
+    );
+
+    games.slice(0, 5).forEach(game => {
+
+      Logger.log({
+        id: game.id ?? null,
+        date:
+          game.game_date ??
+          game.date ??
+          null,
+        status:
+          game.status ??
+          null,
+        season:
+          game.season ??
+          null,
+        postseason:
+          game.postseason ??
+          null,
+        away:
+          game.away_team?.full_name ??
+          null,
+        home:
+          game.home_team?.full_name ??
+          null
+      });
+
+    });
+
+  });
+
+}
+
+function testNHLOpeningNightPlayerPropsFeed() {
+
+  const games = [
+    {
+      id: 3328049,
+      matchup: "Florida Panthers @ Carolina Hurricanes"
+    },
+    {
+      id: 3328050,
+      matchup: "Montreal Canadiens @ Toronto Maple Leafs"
+    },
+    {
+      id: 3328051,
+      matchup: "New York Rangers @ Boston Bruins"
+    },
+    {
+      id: 3328052,
+      matchup: "Vancouver Canucks @ Edmonton Oilers"
+    },
+    {
+      id: 3328053,
+      matchup: "Chicago Blackhawks @ Vegas Golden Knights"
+    }
+  ];
+
+
+  games.forEach(game => {
+
+    Logger.log(
+      `========== ${game.matchup} | ${game.id} ==========`
+    );
+
+    const props =
+      fetchAllNHLPlayerPropsForGame_(
+        game.id
+      );
+
+    Logger.log(
+      `Props returned: ${props.length}`
+    );
+
+
+    const vendors =
+      [
+        ...new Set(
+          props
+            .map(prop => prop.vendor)
+            .filter(Boolean)
+        )
+      ];
+
+    const propTypes =
+      [
+        ...new Set(
+          props
+            .map(prop => prop.prop_type)
+            .filter(Boolean)
+        )
+      ];
+
+    const marketTypes =
+      [
+        ...new Set(
+          props
+            .map(prop => prop.type)
+            .filter(Boolean)
+        )
+      ];
+
+
+    Logger.log(
+      `Vendors: ${JSON.stringify(vendors)}`
+    );
+
+    Logger.log(
+      `Prop types: ${JSON.stringify(propTypes)}`
+    );
+
+    Logger.log(
+      `Market types: ${JSON.stringify(marketTypes)}`
+    );
+
+
+    props.slice(0, 5).forEach(prop => {
+
+      Logger.log({
+        id:
+          prop.id ?? null,
+
+        player_id:
+          prop.player_id ?? null,
+
+        vendor:
+          prop.vendor ?? null,
+
+        prop_type:
+          prop.prop_type ?? null,
+
+        type:
+          prop.type ?? null,
+
+        line_value:
+          prop.line_value ?? null,
+
+        odds:
+          prop.odds ?? null,
+
+        over_odds:
+          prop.over_odds ?? null,
+
+        under_odds:
+          prop.under_odds ?? null
+      });
+
+    });
+
+  });
+
+}
+
 function testNHLProviderMarketMapping() {
   const tests = [
     ["shots_on_goal", "shots_on_goal"],
@@ -12138,7 +12318,7 @@ function auditNHLBoxScoreParticipationFields() {
 // ----------------------------------------------------------------------------
 
 function refreshNHLPlayerGameLogsSheet() {
-  refreshNHLPlayerGameLogsForDateRange_("2025-10-01", "2026-06-30");
+  refreshNHLPlayerGameLogsForDateRange_("2026-09-01", "2027-06-30");
 }
 
 // ============================================================================
@@ -12660,76 +12840,84 @@ function clearNHLTeamGameLogsSheetOnly() {
   writeNHLOutputSheet_(sheet, headers, []);
 }
 
+function refreshNHLPlayerGameLogsSeptember() {
+  refreshNHLPlayerGameLogsForDateRange_("2026-09-28", "2026-09-30");
+}
+
 function refreshNHLPlayerGameLogsOctober() {
-  refreshNHLPlayerGameLogsForDateRange_("2025-10-06", "2025-10-31");
+  refreshNHLPlayerGameLogsForDateRange_("2026-10-01", "2026-10-31");
 }
 
 function refreshNHLPlayerGameLogsNovember() {
-  refreshNHLPlayerGameLogsForDateRange_("2025-11-01", "2025-11-30");
+  refreshNHLPlayerGameLogsForDateRange_("2026-11-01", "2026-11-30");
 }
 
 function refreshNHLPlayerGameLogsDecember() {
-  refreshNHLPlayerGameLogsForDateRange_("2025-12-01", "2025-12-31");
+  refreshNHLPlayerGameLogsForDateRange_("2026-12-01", "2026-12-31");
 }
 
 function refreshNHLPlayerGameLogsJanuary() {
-  refreshNHLPlayerGameLogsForDateRange_("2026-01-01", "2026-01-31");
+  refreshNHLPlayerGameLogsForDateRange_("2027-01-01", "2027-01-31");
 }
 
 function refreshNHLPlayerGameLogsFebruary() {
-  refreshNHLPlayerGameLogsForDateRange_("2026-02-01", "2026-02-28");
+  refreshNHLPlayerGameLogsForDateRange_("2027-02-01", "2027-02-28");
 }
 
 function refreshNHLPlayerGameLogsMarch() {
-  refreshNHLPlayerGameLogsForDateRange_("2026-03-01", "2026-03-31");
+  refreshNHLPlayerGameLogsForDateRange_("2027-03-01", "2027-03-31");
 }
 
 function refreshNHLPlayerGameLogsApril() {
-  refreshNHLPlayerGameLogsForDateRange_("2026-04-01", "2026-04-30");
+  refreshNHLPlayerGameLogsForDateRange_("2027-04-01", "2027-04-30");
 }
 
 function refreshNHLPlayerGameLogsMay() {
-  refreshNHLPlayerGameLogsForDateRange_("2026-05-01", "2026-05-31");
+  refreshNHLPlayerGameLogsForDateRange_("2027-05-01", "2027-05-31");
 }
 
 function refreshNHLPlayerGameLogsJune() {
-  refreshNHLPlayerGameLogsForDateRange_("2026-06-01", "2026-06-14");
+  refreshNHLPlayerGameLogsForDateRange_("2027-06-01", "2027-06-14");
+}
+
+function refreshNHLTeamGameLogsSeptember() {
+  refreshNHLTeamGameLogsForDateRange_("2026-09-28", "2026-09-30");
 }
 
 function refreshNHLTeamGameLogsOctober() {
-  refreshNHLTeamGameLogsForDateRange_("2025-10-06", "2025-10-31");
+  refreshNHLTeamGameLogsForDateRange_("2026-10-01", "2026-10-31");
 }
 
 function refreshNHLTeamGameLogsNovember() {
-  refreshNHLTeamGameLogsForDateRange_("2025-11-01", "2025-11-30");
+  refreshNHLTeamGameLogsForDateRange_("2026-11-01", "2026-11-30");
 }
 
 function refreshNHLTeamGameLogsDecember() {
-  refreshNHLTeamGameLogsForDateRange_("2025-12-01", "2025-12-31");
+  refreshNHLTeamGameLogsForDateRange_("2026-12-01", "2026-12-31");
 }
 
 function refreshNHLTeamGameLogsJanuary() {
-  refreshNHLTeamGameLogsForDateRange_("2026-01-01", "2026-01-31");
+  refreshNHLTeamGameLogsForDateRange_("2027-01-01", "2027-01-31");
 }
 
 function refreshNHLTeamGameLogsFebruary() {
-  refreshNHLTeamGameLogsForDateRange_("2026-02-01", "2026-02-28");
+  refreshNHLTeamGameLogsForDateRange_("2027-02-01", "2027-02-28");
 }
 
 function refreshNHLTeamGameLogsMarch() {
-  refreshNHLTeamGameLogsForDateRange_("2026-03-01", "2026-03-31");
+  refreshNHLTeamGameLogsForDateRange_("2027-03-01", "2027-03-31");
 }
 
 function refreshNHLTeamGameLogsApril() {
-  refreshNHLTeamGameLogsForDateRange_("2026-04-01", "2026-04-30");
+  refreshNHLTeamGameLogsForDateRange_("2027-04-01", "2027-04-30");
 }
 
 function refreshNHLTeamGameLogsMay() {
-  refreshNHLTeamGameLogsForDateRange_("2026-05-01", "2026-05-31");
+  refreshNHLTeamGameLogsForDateRange_("2027-05-01", "2027-05-31");
 }
 
 function refreshNHLTeamGameLogsJune() {
-  refreshNHLTeamGameLogsForDateRange_("2026-06-01", "2026-06-14");
+  refreshNHLTeamGameLogsForDateRange_("2027-06-01", "2027-06-14");
 }
 
 // ----------------------------------------------------------------------------
@@ -12737,7 +12925,7 @@ function refreshNHLTeamGameLogsJune() {
 // ----------------------------------------------------------------------------
 
 function refreshNHLTeamGameLogsSheet() {
-  refreshNHLTeamGameLogsForDateRange_("2025-10-01", "2026-06-30");
+  refreshNHLTeamGameLogsForDateRange_("2026-09-01", "2027-06-30");
 }
 
 function refreshNHLTeamGameLogsForDateRange_(startDate, endDate) {
