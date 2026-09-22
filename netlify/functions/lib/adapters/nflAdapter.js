@@ -400,144 +400,145 @@ export function buildNFLContext({
 
             const type =
                 String(prop.Type ?? "")
-                    .toLowerCase();
-
-            const bestSide =
-                String(
-                    prop["Best Side"] ?? ""
-                )
                     .trim()
                     .toLowerCase();
 
-            const isOverUnder =
-                type === "over_under";
+            const bestSideRaw =
+                String(prop["Best Side"] ?? "")
+                    .trim();
 
-            let odds = 0;
+            const bestSide =
+                bestSideRaw || null;
+
+            const normalizedBestSide =
+                bestSideRaw.toLowerCase();
+
+
+            const hasValue = value =>
+                value !== undefined &&
+                value !== null &&
+                value !== "";
+
+
+            const toNullableNumber = value => {
+
+                if (!hasValue(value)) {
+                    return null;
+                }
+
+                const number = Number(value);
+
+                return Number.isFinite(number)
+                    ? number
+                    : null;
+            };
+
+
+            let odds = null;
             let probability = null;
-            let probabilitySource = null;
             let expectedValue = null;
 
-            if (isOverUnder) {
 
-                if (bestSide === "under") {
-
-                    odds =
-                        Number(
-                            prop["Under Odds"] ?? 0
-                        );
-
-                    if (
-                        prop["Model Prob Under"] !== undefined &&
-                        prop["Model Prob Under"] !== null &&
-                        prop["Model Prob Under"] !== ""
-                    ) {
-                        probability =
-                            Number(
-                                prop["Model Prob Under"]
-                            );
-
-                        probabilitySource =
-                            "model_prob_under";
-                    }
-
-                    if (
-                        prop["EV Under"] !== undefined &&
-                        prop["EV Under"] !== null &&
-                        prop["EV Under"] !== ""
-                    ) {
-                        expectedValue =
-                            Number(
-                                prop["EV Under"]
-                            );
-                    }
-
-                } else {
-
-                    odds =
-                        Number(
-                            prop["Over Odds"] ?? 0
-                        );
-
-                    if (
-                        prop["Model Prob Over"] !== undefined &&
-                        prop["Model Prob Over"] !== null &&
-                        prop["Model Prob Over"] !== ""
-                    ) {
-                        probability =
-                            Number(
-                                prop["Model Prob Over"]
-                            );
-
-                        probabilitySource =
-                            "model_prob_over";
-                    }
-
-                    if (
-                        prop["EV Over"] !== undefined &&
-                        prop["EV Over"] !== null &&
-                        prop["EV Over"] !== ""
-                    ) {
-                        expectedValue =
-                            Number(
-                                prop["EV Over"]
-                            );
-                    }
-
-                }
-
-            } else {
+            if (normalizedBestSide === "over") {
 
                 odds =
-                    Number(
-                        prop.Odds ?? 0
+                    toNullableNumber(
+                        prop["Over Odds"]
                     );
 
-                if (
-                    prop["Best Model Probability"] !== undefined &&
-                    prop["Best Model Probability"] !== null &&
-                    prop["Best Model Probability"] !== ""
-                ) {
-                    probability =
-                        Number(
-                            prop["Best Model Probability"]
-                        );
+                probability =
+                    toNullableNumber(
+                        prop["Model Prob Over"]
+                    );
 
-                    probabilitySource =
-                        "best_model_probability";
-                }
+                expectedValue =
+                    toNullableNumber(
+                        prop["EV Over"]
+                    );
 
-                if (
-                    prop["Best EV"] !== undefined &&
-                    prop["Best EV"] !== null &&
-                    prop["Best EV"] !== ""
-                ) {
-                    expectedValue =
-                        Number(
-                            prop["Best EV"]
-                        );
-                }
+            } else if (normalizedBestSide === "under") {
 
+                odds =
+                    toNullableNumber(
+                        prop["Under Odds"]
+                    );
+
+                probability =
+                    toNullableNumber(
+                        prop["Model Prob Under"]
+                    );
+
+                expectedValue =
+                    toNullableNumber(
+                        prop["EV Under"]
+                    );
             }
+
+
+            const bestEV =
+                toNullableNumber(
+                    prop["Best EV"]
+                );
+
+            const bestModelProbability =
+                toNullableNumber(
+                    prop["Best Model Probability"]
+                );
+
+            const bestPriceEdge =
+                toNullableNumber(
+                    prop["Best Price Edge"]
+                );
+
+            const trendScore =
+                toNullableNumber(
+                    prop["Trend Score"]
+                );
+
+            const riskScore =
+                toNullableNumber(
+                    prop["Risk Score"]
+                );
+
+            const modelConfidence =
+                toNullableNumber(
+                    prop["Model Confidence"]
+                );
+
+            const sportacularScore =
+                toNullableNumber(
+                    prop["Sportacular Score"]
+                );
+
+            const sportacularEdge =
+                toNullableNumber(
+                    prop["Sportacular Edge"]
+                );
+
 
             return {
 
-                id: prop.Id,
+                id:
+                    prop.Id ?? null,
 
                 type,
 
                 market:
                     String(
                         prop["Prop Type"] ?? ""
-                    ).toLowerCase(),
+                    )
+                        .trim()
+                        .toLowerCase(),
 
                 displayName:
                     String(
                         prop["Prop Type"] ?? ""
-                    ).replaceAll("_", " "),
+                    )
+                        .replaceAll("_", " "),
 
                 line:
-                    Number(
-                        prop["Line Value"] ?? 0
+                    toNullableNumber(
+                        prop["Line Value"]
                     ),
 
                 odds,
@@ -549,15 +550,43 @@ export function buildNFLContext({
 
                 probability,
 
-                probabilitySource,
+                probabilitySource:
+                    probability === null
+                        ? null
+                        : normalizedBestSide === "under"
+                            ? "model_prob_under"
+                            : "model_prob_over",
 
                 expectedValue,
 
-                bestSide:
-                    bestSide || null,
+                bestSide,
+
+                bestEV,
+
+                bestModelProbability,
+
+                bestPriceEdge,
+
+                trendScore,
+
+                trendStrength:
+                    prop["Trend Strength"] || null,
+
+                riskScore,
+
+                riskTier:
+                    prop["Risk Tier"] || null,
+
+                modelConfidence,
+
+                sportacularScore,
+
+                sportacularEdge,
+
+                confidenceTier:
+                    prop["Confidence Tier"] || null,
 
                 raw: prop
-
             };
 
         }),
