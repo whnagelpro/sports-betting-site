@@ -724,6 +724,31 @@ function createNFLGameLogRow(game) {
 
 }
 
+function createNBAGameLogRow(game) {
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+        <td>${formatGameDate(game.gameDate)}</td>
+        <td>${game.opponent ?? "-"}</td>
+    `;
+
+    return tr;
+}
+
+
+function createNHLGameLogRow(game) {
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+        <td>${formatGameDate(game.gameDate)}</td>
+        <td>${game.opponent ?? "-"}</td>
+    `;
+
+    return tr;
+}
+
 function renderAnalyticsDashboard() {
 
     const section = document.getElementById(
