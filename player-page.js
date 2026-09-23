@@ -1336,6 +1336,17 @@ function renderTrendCards() {
 
 function formatProbability(value) {
 
+    // Preserve unavailable P15/P16 values.
+    // Number(null) and Number("") both become 0,
+    // which would incorrectly display missing data as 0.0%.
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "-";
+    }
+
     const number = Number(value);
 
     if (!Number.isFinite(number)) {
