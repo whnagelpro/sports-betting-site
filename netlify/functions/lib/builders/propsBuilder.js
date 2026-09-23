@@ -1,68 +1,108 @@
 export function buildProps(context) {
 
-    return context.props.map(prop => ({
+    return context.props.map(prop => {
 
-        id:
-            prop.id ??
-            null,
+        const evaluation =
+            prop.evaluation ?? {};
 
-        displayName:
-            prop.displayName ??
-            prop.market ??
-            "-",
+        const actionable =
+            evaluation.actionable === true;
 
-        propType:
-            prop.market ?? "",
+        return {
 
-        line:
-            prop.line ?? "-",
+            id:
+                prop.id ??
+                null,
 
-        odds:
-            prop.odds ?? "-",
+            displayName:
+                prop.displayName ??
+                prop.market ??
+                "-",
 
-        sportsbook:
-            prop.sportsbook ?? "-",
+            propType:
+                prop.market ??
+                "",
 
-        probability:
-            prop.edge?.probability ??
-            prop.probability ??
-            "-",
+            line:
+                prop.line ??
+                "-",
 
-        impliedProbability:
-            prop.edge?.impliedProbability ??
-            null,
+            odds:
+                actionable
+                    ? prop.odds ?? "-"
+                    : "-",
 
-        modelEdge:
-            prop.edge?.edgePercent ??
-            null,
+            sportsbook:
+                prop.sportsbook ??
+                "-",
 
-        sportacularScore:
-            prop.edge?.score ??
-            prop.score ??
-            null,
+            probability:
+                actionable
+                    ? evaluation.bestModelProbability ?? null
+                    : null,
 
-        confidence:
-            prop.edge?.confidence ??
-            null,
+            impliedProbability:
+                null,
 
-        recommendation:
-            prop.edge?.recommendation ??
-            null,
+            modelEdge:
+                actionable
+                    ? evaluation.sportacularEdge ?? null
+                    : null,
 
-        ev:
-            prop.expectedValue?.expectedValuePercent ??
-            prop.ev ??
-            "-",
+            sportacularScore:
+                actionable
+                    ? evaluation.sportacularScore ?? null
+                    : null,
 
-        analytics: prop.analytics ?? {
-            sportacularScore: prop.sportacularScore ?? null,
-            modelEdge: prop.modelEdge ?? null,
-            probability: prop.probability ?? null,
-            impliedProbability: prop.impliedProbability ?? null,
-            confidence: prop.confidence ?? null,
-            recommendation: prop.recommendation ?? null
-        },
+            confidence:
+                actionable
+                    ? evaluation.confidenceTier ?? null
+                    : null,
 
-    }));
+            recommendation:
+                evaluation.bestSide ??
+                "No Play",
+
+            ev:
+                actionable &&
+                evaluation.bestEV !== null &&
+                evaluation.bestEV !== undefined
+                    ? evaluation.bestEV * 100
+                    : null,
+
+            analytics: {
+
+                sportacularScore:
+                    actionable
+                        ? evaluation.sportacularScore ?? null
+                        : null,
+
+                modelEdge:
+                    actionable
+                        ? evaluation.sportacularEdge ?? null
+                        : null,
+
+                probability:
+                    actionable
+                        ? evaluation.bestModelProbability ?? null
+                        : null,
+
+                impliedProbability:
+                    null,
+
+                confidence:
+                    actionable
+                        ? evaluation.confidenceTier ?? null
+                        : null,
+
+                recommendation:
+                    evaluation.bestSide ??
+                    "No Play"
+
+            }
+
+        };
+
+    });
 
 }
