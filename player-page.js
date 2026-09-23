@@ -938,19 +938,84 @@ function renderProps() {
 
     section.hidden = false;
 
+    const isActionableProp = prop => {
+
+        const recommendation =
+            String(
+                prop?.analytics?.recommendation ??
+                prop?.recommendation ??
+                ""
+            )
+                .trim()
+                .toLowerCase();
+
+        return (
+            recommendation === "over" ||
+            recommendation === "under"
+        );
+
+    };
+
+    const actionableProps =
+        player.props.filter(isActionableProp);
+
     const topProp =
-        player.props.find(
+        actionableProps.find(
             prop =>
                 prop.id != null &&
+                player.analytics?.bestProp?.id != null &&
                 String(prop.id) ===
-                String(player.analytics.bestProp?.id)
+                String(player.analytics.bestProp.id)
         ) ||
-        player.props.find(
+        actionableProps.find(
             prop =>
+                prop.sportacularScore != null &&
+                player.analytics?.bestProp?.score != null &&
                 prop.sportacularScore ===
-                player.analytics.bestProp?.score
+                player.analytics.bestProp.score
         ) ||
-        player.props[0];
+        actionableProps[0] ||
+        null;
+
+    if (!topProp) {
+
+        const topPropBadge =
+            document.getElementById("top-prop-badge");
+
+        if (topPropBadge) {
+            topPropBadge.hidden = true;
+            topPropBadge.style.display = "none";
+        }
+
+        renderFields({
+
+            "top-prop-name":
+                "No Recommended Play",
+
+            "top-prop-line":
+                "-",
+
+            "top-prop-odds":
+                "-",
+
+            "top-prop-book":
+                "-",
+
+            "top-prop-ev":
+                "-",
+
+            "top-prop-probability":
+                "-",
+
+            "top-prop-confidence":
+                "-",
+
+            "top-prop-recommendation":
+                "No Play"
+
+        });
+
+    } else {
 
     const topPropBadge =
         document.getElementById("top-prop-badge");
@@ -1043,7 +1108,9 @@ function renderProps() {
         topProp.recommendation ??
         "-"
 
-});
+    });
+
+    }
 
     const grid =
         document.getElementById(
