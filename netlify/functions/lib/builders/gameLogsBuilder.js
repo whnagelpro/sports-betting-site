@@ -51,6 +51,23 @@ export function buildGameLogs(context) {
 
     }
 
+    if (
+        league === "nba" ||
+        league === "nhl"
+    ) {
+
+        return context.gameLogs.map(game => ({
+
+            gameDate: game.gameDate,
+
+            gameId: game.gameId,
+
+            opponent: game.opponent
+
+        }));
+
+    }
+
     if (context.isPitcher) {
 
         return context.gameLogs.map(game => {
