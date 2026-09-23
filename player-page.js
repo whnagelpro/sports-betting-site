@@ -979,11 +979,25 @@ function renderProps() {
         topProp.sportsbook,
 
     "top-prop-ev":
-        Number.isFinite(Number(analytics?.modelEdge))
+        analytics?.modelEdge !== null &&
+        analytics?.modelEdge !== undefined &&
+        analytics?.modelEdge !== "" &&
+        Number.isFinite(Number(analytics.modelEdge))
             ? `${Number(analytics.modelEdge).toFixed(1)}%`
-            : Number.isFinite(Number(topProp.modelEdge))
+
+            : topProp.modelEdge !== null &&
+            topProp.modelEdge !== undefined &&
+            topProp.modelEdge !== "" &&
+            Number.isFinite(Number(topProp.modelEdge))
                 ? `${Number(topProp.modelEdge).toFixed(1)}%`
-                : topProp.ev,
+
+                : topProp.ev !== null &&
+                topProp.ev !== undefined &&
+                topProp.ev !== "" &&
+                Number.isFinite(Number(topProp.ev))
+                    ? `${Number(topProp.ev).toFixed(1)}%`
+
+                    : "-",
 
     "top-prop-probability":
         formatProbability(
