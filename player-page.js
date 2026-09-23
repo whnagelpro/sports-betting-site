@@ -1692,38 +1692,74 @@ function createInsightCard(insight) {
 
     card.className = "trend-card";
 
+    const formatInsightNumber = (
+        value,
+        decimals = 1
+    ) => {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "-";
+        }
+
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return "-";
+        }
+
+        return number.toFixed(decimals);
+    };
+
+    const displayTrendScore =
+        formatInsightNumber(
+            insight.trendScore ??
+            insight.score
+        );
+
+    const displayTrendStrength =
+        insight.trendStrength ??
+        insight.strength ??
+        "-";
+
+    const displayRisk =
+        insight.riskTier ??
+        insight.risk ??
+        "-";
+
     card.innerHTML = `
 
         <div class="trend-icon">
 
-            ${insight.icon}
+            ${insight.icon ?? "📈"}
 
         </div>
 
         <h3>
 
-            ${insight.title}
+            ${insight.title ?? "-"}
 
         </h3>
 
         <p>
 
-            ${insight.text}
+            ${insight.text ?? ""}
 
         </p>
 
         <div class="trend-footer">
 
             <span>
-
-                ⭐ ${insight.trendScore ?? "-"}
-
+                Trend Score:
+                ${displayTrendScore}
             </span>
 
             <span>
-
-                ${insight.trendStrength ?? "-"}
-
+                Trend Strength:
+                ${displayTrendStrength}
             </span>
 
         </div>
@@ -1731,9 +1767,8 @@ function createInsightCard(insight) {
         <div class="trend-footer">
 
             <span>
-
-                ${insight.riskTier ?? "-"}
-
+                Risk Tier:
+                ${displayRisk}
             </span>
 
         </div>
