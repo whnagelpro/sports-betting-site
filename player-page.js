@@ -1406,6 +1406,77 @@ function renderTrendCards() {
 
             };
 
+        const formatTrendNumber = (
+            value,
+            decimals = 1
+        ) => {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+                return "-";
+            }
+
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return "-";
+            }
+
+            return number.toFixed(decimals);
+
+        };
+
+        const formatTrendPercent = value => {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+                return "-";
+            }
+
+            const number = Number(value);
+
+            if (!Number.isFinite(number)) {
+                return "-";
+            }
+
+            return `${number.toFixed(1)}%`;
+
+        };
+
+        const displayScore =
+            formatTrendNumber(
+                analytics.score ??
+                trend.score
+            );
+
+        const displayModelEdge =
+            formatTrendPercent(
+                analytics.modelEdge ??
+                trend.modelEdge
+            );
+
+        const displayConfidence =
+            analytics.confidence ??
+            trend.confidence ??
+            "-";
+
+        const displayRecommendation =
+            analytics.recommendation ??
+            trend.recommendation ??
+            "-";
+
+        const displayTrendStrength =
+            trend.strength ?? "-";
+
+        const displayRisk =
+            trend.risk ?? "-";
+
         const card = document.createElement("article");
 
         card.className = "trend-card";
@@ -1435,30 +1506,14 @@ function renderTrendCards() {
         <span>
 
             ⭐
-            ${
-                analytics.score ??
-                trend.score ??
-                "-"
-
-            }
+            ${displayScore}
 
         </span>
 
         <span>
 
             📈
-            ${
-                Number.isFinite(Number(
-                    analytics.modelEdge ??
-                    trend.modelEdge
-                ))
-                    ? `${Number(
-                        analytics.modelEdge ??
-                        trend.modelEdge
-                    ).toFixed(1)}%`
-                    : "-"
-
-            }
+            ${displayModelEdge}
 
         </span>
 
@@ -1469,26 +1524,14 @@ function renderTrendCards() {
         <span>
 
             🟢
-            ${
-                analytics.confidence ??
-                trend.confidence ??
-                trend.strength ??
-                "-"
-
-            }
+            ${displayConfidence}
 
         </span>
 
         <span>
 
             🏆
-            ${
-                analytics.recommendation ??
-                trend.recommendation ??
-                trend.risk ??
-                "-"
-
-            }
+            ${displayRecommendation}
 
         </span>
 
@@ -1499,14 +1542,14 @@ function renderTrendCards() {
         <span>
 
             Trend:
-            ${trend.strength ?? "-"}
+            ${displayTrendStrength}
 
         </span>
 
         <span>
 
             Risk:
-            ${trend.risk ?? "-"}
+            ${displayRisk}
 
         </span>
 
