@@ -1389,23 +1389,6 @@ function renderTrendCards() {
 
     (player.trends || []).forEach(trend => {
 
-        const analytics =
-            trend.analytics ?? {
-
-                score:
-                    trend.score,
-
-                modelEdge:
-                    trend.modelEdge,
-
-                confidence:
-                    trend.confidence,
-
-                recommendation:
-                    trend.recommendation
-
-            };
-
         const formatTrendNumber = (
             value,
             decimals = 1
@@ -1429,53 +1412,21 @@ function renderTrendCards() {
 
         };
 
-        const formatTrendPercent = value => {
-
-            if (
-                value === null ||
-                value === undefined ||
-                value === ""
-            ) {
-                return "-";
-            }
-
-            const number = Number(value);
-
-            if (!Number.isFinite(number)) {
-                return "-";
-            }
-
-            return `${number.toFixed(1)}%`;
-
-        };
-
-        const displayScore =
+        const displayTrendScore =
             formatTrendNumber(
-                analytics.score ??
+                trend.trendScore ??
                 trend.score
             );
 
-        const displayModelEdge =
-            formatTrendPercent(
-                analytics.modelEdge ??
-                trend.modelEdge
-            );
-
-        const displayConfidence =
-            analytics.confidence ??
-            trend.confidence ??
-            "-";
-
-        const displayRecommendation =
-            analytics.recommendation ??
-            trend.recommendation ??
-            "-";
-
         const displayTrendStrength =
-            trend.strength ?? "-";
+            trend.trendStrength ??
+            trend.strength ??
+            "-";
 
         const displayRisk =
-            trend.risk ?? "-";
+            trend.riskTier ??
+            trend.risk ??
+            "-";
 
         const card = document.createElement("article");
 
@@ -1504,53 +1455,22 @@ function renderTrendCards() {
     <div class="trend-footer">
 
         <span>
-
-            ⭐
-            ${displayScore}
-
+            Trend Score:
+            ${displayTrendScore}
         </span>
 
         <span>
-
-            📈
-            ${displayModelEdge}
-
-        </span>
-
-    </div>
-
-    <div class="trend-footer">
-
-        <span>
-
-            🟢
-            ${displayConfidence}
-
-        </span>
-
-        <span>
-
-            🏆
-            ${displayRecommendation}
-
-        </span>
-
-    </div>
-
-    <div class="trend-footer">
-
-        <span>
-
-            Trend:
+            Trend Strength:
             ${displayTrendStrength}
-
         </span>
 
+    </div>
+
+    <div class="trend-footer">
+
         <span>
-
-            Risk:
+            Risk Tier:
             ${displayRisk}
-
         </span>
 
     </div>
