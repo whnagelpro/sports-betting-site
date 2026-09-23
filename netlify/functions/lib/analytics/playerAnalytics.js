@@ -1,79 +1,7 @@
 import { calculateConsistency } from "./consistency.js";
-import { scoreProp } from "./scoreProp.js";
 import { findBestProp } from "./bestProp.js";
-import { calculateProjectedProbability } from "./projectedProbability.js";
-import { buildEdgeResult } from "./edge/buildEdgeResult.js";
 import { evaluateProp } from "./evaluateProp.js";
 
-function buildRecommendation(score) {
-
-    if (score >= 90) {
-
-        return "Elite Play";
-
-    }
-
-    if (score >= 80) {
-
-        return "Excellent Play";
-
-    }
-
-    if (score >= 70) {
-
-        return "Strong Play";
-
-    }
-
-    if (score >= 60) {
-
-        return "Solid Play";
-
-    }
-
-    if (score >= 50) {
-
-        return "Lean";
-
-    }
-
-    return "Pass";
-
-}
-
-function buildConfidence(score) {
-
-    if (score >= 80) {
-
-        return "High";
-
-    }
-
-    if (score >= 60) {
-
-        return "Medium";
-
-    }
-
-    return "Low";
-
-}
-
-function buildStars(score) {
-
-    if (score >= 90) return 5;
-
-    if (score >= 80) return 4.5;
-
-    if (score >= 70) return 4;
-
-    if (score >= 60) return 3;
-
-    if (score >= 50) return 2;
-
-    return 1;
-
-}
 
 export function calculatePlayerAnalytics({
 
@@ -83,105 +11,165 @@ export function calculatePlayerAnalytics({
 
 }) {
 
+    const consistency =
+        calculateConsistency(gameLogs);
+
+
     if (!props.length) {
+
         return {
+
             score: 0,
+
             stars: 0,
+
             confidence: "N/A",
+
             recommendation: "No Props Available",
+
             edge: null,
+
             bestProp: null,
+
             propAnalytics: [],
-            consistency: calculateConsistency(gameLogs),
+
+            consistency,
+
             modelEdge: null,
-            analyticsVersion: 2
+
+            analyticsVersion: 3
+
         };
     }
 
-    const consistency =
-
-        calculateConsistency(gameLogs);
 
     const propAnalytics =
-        props.map(prop =>
-            evaluateProp({
+        props
+            .map(prop =>
+                evaluateProp({
 
-                prop,
+                    prop,
 
-                gameLogs,
+                    gameLogs,
 
-                consistency
+                    consistency
 
-            })
-        );
+                })
+            )
+            .filter(Boolean);
+
 
     const bestProp =
-
         findBestProp(propAnalytics);
 
-    const edge = bestProp?.edge ?? null;
+
+    if (!bestProp) {
+
+        return {
+
+            score: 0,
+
+            stars: 0,
+
+            confidence: "N/A",
+
+            recommendation: "No Play",
+
+            edge: null,
+
+            bestProp: null,
+
+            propAnalytics,
+
+            consistency,
+
+            modelEdge: null,
+
+            analyticsVersion: 3
+
+        };
+    }
+
 
     const score =
+        bestProp.evaluation?.sportacularScore ??
+        null;
 
-        bestProp?.score ?? 0;
-
-    const stars =
-
-        buildStars(score);
+    const sportacularEdge =
+        bestProp.evaluation?.sportacularEdge ??
+        null;
 
     const confidence =
-
-        buildConfidence(score);
+        bestProp.evaluation?.confidenceTier ??
+        null;
 
     const recommendation =
+        bestProp.evaluation?.bestSide ??
+        "No Play";
 
-        buildRecommendation(score);
 
-    const dashboardBestProp = bestProp
-        ? {
+    const stars =
+        score === null
+            ? 0
+            : score >= 90
+                ? 5
+                : score >= 80
+                    ? 4.5
+                    : score >= 70
+                        ? 4
+                        : score >= 60
+                            ? 3
+                            : score >= 50
+                                ? 2
+                                : 1;
 
-            id:
-                bestProp.id ??
-                null,
 
-            market:
-                bestProp.displayName ??
-                bestProp.market ??
-                "-",
+    const dashboardBestProp = {
 
-            line:
-                bestProp.line ??
-                "-",
+        id:
+            bestProp.id ??
+            null,
 
-            sportsbook:
-                bestProp.sportsbook ??
-                "-",
+        market:
+            bestProp.displayName ??
+            bestProp.market ??
+            "-",
 
-            probability:
-                bestProp.edge?.probability ?? null,
+        line:
+            bestProp.line ??
+            "-",
 
-            impliedProbability:
-                bestProp.edge?.impliedProbability ?? null,
+        sportsbook:
+            bestProp.sportsbook ??
+            "-",
 
-            edge:
-                bestProp.edge ?? null,
+        probability:
+            bestProp.evaluation?.bestModelProbability ??
+            null,
 
-            ev:
-                bestProp.expectedValue?.expectedValuePercent ?? null,
+        impliedProbability:
+            null,
 
-            score:
-                bestProp.edge?.score ??
-                bestProp.score ??
-                null,
+        edge:
+            bestProp.evaluation?.bestPriceEdge ??
+            null,
 
-            confidence:
-                bestProp.edge?.confidence ?? null,
+        sportacularEdge,
 
-            recommendation:
-                bestProp.edge?.recommendation ?? null
+        ev:
+            bestProp.evaluation?.bestEV !== null &&
+            bestProp.evaluation?.bestEV !== undefined
+                ? bestProp.evaluation.bestEV * 100
+                : null,
 
-        }
-        : null;
+        score,
+
+        confidence,
+
+        recommendation
+
+    };
+
 
     return {
 
@@ -193,18 +181,21 @@ export function calculatePlayerAnalytics({
 
         recommendation,
 
-        edge,
+        edge:
+            bestProp.evaluation?.bestPriceEdge ??
+            null,
 
-        bestProp: dashboardBestProp,
+        bestProp:
+            dashboardBestProp,
 
         propAnalytics,
 
         consistency,
 
-        modelEdge: edge,
+        modelEdge:
+            sportacularEdge,
 
-        analyticsVersion: 2
+        analyticsVersion: 3
 
     };
-
 }
