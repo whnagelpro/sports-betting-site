@@ -1118,7 +1118,7 @@ function renderProps() {
         topProp.ev !== undefined &&
         topProp.ev !== "" &&
         Number.isFinite(Number(topProp.ev))
-            ? `${(Number(topProp.ev) * 100).toFixed(1)}%`
+            ? `${Number(topProp.ev).toFixed(1)}%`
             : "-",
 
     "top-prop-probability":
