@@ -1168,6 +1168,70 @@ function renderProps() {
         const analytics =
             prop.analytics ?? {};
 
+        const recommendation =
+            String(
+                analytics.recommendation ??
+                prop.recommendation ??
+                "No Play"
+            ).trim();
+
+        const normalizedRecommendation =
+            recommendation.toLowerCase();
+
+        const isActionable =
+            normalizedRecommendation === "over" ||
+            normalizedRecommendation === "under";
+
+        const displayOdds =
+            isActionable &&
+            prop.odds !== null &&
+            prop.odds !== undefined &&
+            prop.odds !== ""
+                ? prop.odds
+                : "-";
+
+        const displayProbability =
+            isActionable
+                ? formatProbability(
+                    analytics.probability ??
+                    prop.probability
+                )
+                : "-";
+
+        const modelEdgeValue =
+            analytics.modelEdge ??
+            prop.modelEdge ??
+            null;
+
+        const displayModelEdge =
+            isActionable &&
+            modelEdgeValue !== null &&
+            modelEdgeValue !== undefined &&
+            modelEdgeValue !== "" &&
+            Number.isFinite(Number(modelEdgeValue))
+                ? `${Number(modelEdgeValue).toFixed(1)}%`
+                : "-";
+
+        const displayConfidence =
+            isActionable
+                ? (
+                    analytics.confidence ??
+                    prop.confidence ??
+                    "-"
+                )
+                : "-";
+
+        const displayScore =
+            isActionable
+                ? (
+                    analytics.sportacularScore ??
+                    prop.sportacularScore ??
+                    analytics.score ??
+                    prop.score ??
+                    "-"
+                )
+                : "-";
+
         const card =
             document.createElement("article");
 
@@ -1184,7 +1248,7 @@ function renderProps() {
 
                 <div class="prop-subtitle">
 
-                    ${prop.sportsbook}
+                    ${prop.sportsbook ?? "-"}
 
                 </div>
 
@@ -1192,11 +1256,7 @@ function renderProps() {
 
             <div class="prop-score">
 
-                ${analytics.sportacularScore ??
-                    prop.sportacularScore ??
-                    analytics.score ??
-                    prop.score ??
-                    "-"}
+                ${displayScore}
 
             </div>
 
@@ -1208,7 +1268,15 @@ function renderProps() {
 
                 <span>Line</span>
 
-                <strong>${prop.line}</strong>
+                <strong>
+                    ${
+                        prop.line !== null &&
+                        prop.line !== undefined &&
+                        prop.line !== ""
+                            ? prop.line
+                            : "-"
+                    }
+                </strong>
 
             </div>
 
@@ -1216,7 +1284,7 @@ function renderProps() {
 
                 <span>Odds</span>
 
-                <strong>${prop.odds}</strong>
+                <strong>${displayOdds}</strong>
 
             </div>
 
@@ -1224,25 +1292,7 @@ function renderProps() {
 
                 <span>Model Edge</span>
 
-                <strong>
-
-                    ${
-                        analytics.modelEdge !== null &&
-                        analytics.modelEdge !== undefined &&
-                        analytics.modelEdge !== "" &&
-                        Number.isFinite(Number(analytics.modelEdge))
-                            ? `${Number(analytics.modelEdge).toFixed(1)}%`
-
-                            : prop.modelEdge !== null &&
-                            prop.modelEdge !== undefined &&
-                            prop.modelEdge !== "" &&
-                            Number.isFinite(Number(prop.modelEdge))
-                                ? `${Number(prop.modelEdge).toFixed(1)}%`
-
-                                : "-"
-                    }
-
-                </strong>
+                <strong>${displayModelEdge}</strong>
 
             </div>
 
@@ -1250,13 +1300,7 @@ function renderProps() {
 
                 <span>Confidence</span>
 
-                <strong>
-
-                    ${analytics.confidence ??
-                        prop.confidence ??
-                        "-"}
-
-                </strong>
+                <strong>${displayConfidence}</strong>
 
             </div>
 
@@ -1264,13 +1308,7 @@ function renderProps() {
 
                 <span>Recommendation</span>
 
-                <strong>
-
-                    ${analytics.recommendation ??
-                        prop.recommendation ??
-                        "-"}
-
-                </strong>
+                <strong>${recommendation}</strong>
 
             </div>
 
@@ -1278,14 +1316,7 @@ function renderProps() {
 
                 <span>Probability</span>
 
-                <strong>
-
-                    ${formatProbability(
-                        analytics.probability ??
-                        prop.probability
-                    )}
-
-                </strong>
+                <strong>${displayProbability}</strong>
 
             </div>
 
