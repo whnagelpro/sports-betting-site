@@ -1076,10 +1076,18 @@ function renderProps() {
                 <strong>
 
                     ${
+                        analytics.modelEdge !== null &&
+                        analytics.modelEdge !== undefined &&
+                        analytics.modelEdge !== "" &&
                         Number.isFinite(Number(analytics.modelEdge))
                             ? `${Number(analytics.modelEdge).toFixed(1)}%`
-                            : Number.isFinite(Number(prop.modelEdge))
+
+                            : prop.modelEdge !== null &&
+                            prop.modelEdge !== undefined &&
+                            prop.modelEdge !== "" &&
+                            Number.isFinite(Number(prop.modelEdge))
                                 ? `${Number(prop.modelEdge).toFixed(1)}%`
+
                                 : "-"
                     }
 
