@@ -987,6 +987,27 @@ function renderProps() {
             topPropBadge.style.display = "none";
         }
 
+        const topPropEV =
+            document.getElementById("top-prop-ev");
+
+        const topPropTrendButton =
+            document.getElementById("view-top-prop");
+
+        if (topPropEV) {
+
+            const evCircle =
+                topPropEV.closest(".ev-circle");
+
+            if (evCircle) {
+                evCircle.style.display = "none";
+            }
+
+        }
+
+        if (topPropTrendButton) {
+            topPropTrendButton.style.display = "none";
+        }
+
         renderFields({
 
             "top-prop-name":
@@ -1016,6 +1037,27 @@ function renderProps() {
         });
 
     } else {
+
+    const topPropEV =
+        document.getElementById("top-prop-ev");
+
+    const topPropTrendButton =
+        document.getElementById("view-top-prop");
+
+    if (topPropEV) {
+
+        const evCircle =
+            topPropEV.closest(".ev-circle");
+
+        if (evCircle) {
+            evCircle.style.display = "";
+        }
+
+    }
+
+    if (topPropTrendButton) {
+        topPropTrendButton.style.display = "";
+    }
 
     const topPropBadge =
         document.getElementById("top-prop-badge");
