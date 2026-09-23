@@ -952,6 +952,29 @@ function renderProps() {
         ) ||
         player.props[0];
 
+    const topPropBadge =
+        document.getElementById("top-prop-badge");
+
+    const topPropRecommendation =
+        String(
+            topProp?.analytics?.recommendation ??
+            topProp?.recommendation ??
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+    const topPropIsActionable =
+        topPropRecommendation === "over" ||
+        topPropRecommendation === "under";
+
+    if (topPropBadge) {
+
+        topPropBadge.hidden =
+            !topPropIsActionable;
+
+    }
+
     const analytics = topProp?.analytics ?? null;
 
     console.log("Dashboard Best Prop:", player.analytics.bestProp);
