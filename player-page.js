@@ -973,6 +973,11 @@ function renderProps() {
         topPropBadge.hidden =
             !topPropIsActionable;
 
+        topPropBadge.style.display =
+            topPropIsActionable
+                ? ""
+                : "none";
+
     }
 
     const analytics = topProp?.analytics ?? null;
