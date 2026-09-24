@@ -1,5 +1,7 @@
 export function buildGameLogs(context) {
 
+    console.log("GAME LOGS BUILDER VERSION — NHL TEST 1");
+
     const league = context.league?.toLowerCase() ?? "mlb";
 
     if (league === "nfl") {
