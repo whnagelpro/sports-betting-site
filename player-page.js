@@ -590,76 +590,39 @@ section.hidden = false;
 
 function createMLBGameLogRow(game) {
 
-    const row = document.createElement("tr");
+    const tr = document.createElement("tr");
 
     const isPitcher =
-        player.positionGroup === "PITCHER";
-
-    const isHitter =
-        player.positionGroup === "HITTER";
+        player?.positionGroup === "PITCHER";
 
     if (isPitcher) {
 
-        row.innerHTML = `
-
-            <td>${game.gameDate}</td>
-
-            <td>${game.opponent}</td>
-
-            <td>${game.inningsPitched}</td>
-
-            <td>${game.strikeouts}</td>
-
-            <td>${game.earnedRuns}</td>
-
-            <td>${game.hitsAllowed}</td>
-
-            <td>${game.walks}</td>
-
+        tr.innerHTML = `
+            <td>${formatGameDate(game.gameDate)}</td>
+            <td>${game.opponent ?? "-"}</td>
+            <td>${game.inningsPitched ?? 0}</td>
+            <td>${game.strikeouts ?? 0}</td>
+            <td>${game.earnedRuns ?? 0}</td>
+            <td>${game.hitsAllowed ?? 0}</td>
+            <td>${game.walks ?? 0}</td>
         `;
 
+        return tr;
     }
 
-    else if (isHitter) {
+    tr.innerHTML = `
+        <td>${formatGameDate(game.gameDate)}</td>
+        <td>${game.opponent ?? "-"}</td>
+        <td>${game.hits ?? 0}</td>
+        <td>${game.runs ?? 0}</td>
+        <td>${game.rbis ?? 0}</td>
+        <td>${game.homeRuns ?? 0}</td>
+        <td>${game.totalBases ?? 0}</td>
+        <td>${game.walks ?? 0}</td>
+        <td>${game.strikeouts ?? 0}</td>
+    `;
 
-        row.innerHTML = `
-
-            <td>${game.gameDate}</td>
-
-            <td>${game.opponent}</td>
-
-            <td>${game.hits}</td>
-
-            <td>${game.runs}</td>
-
-            <td>${game.rbis}</td>
-
-            <td>${game.homeRuns}</td>
-
-            <td>${game.totalBases}</td>
-
-            <td>${game.walks}</td>
-
-            <td>${game.strikeouts}</td>
-
-        `;
-
-    }
-
-    else {
-
-        row.innerHTML = `
-
-            <td>${game.gameDate}</td>
-
-            <td>${game.opponent}</td>
-
-        `;
-
-    }
-
-    return row;
-
+    return tr;
 }
 
 function createNFLGameLogRow(game) {
