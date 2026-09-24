@@ -95,15 +95,29 @@ export function buildGameLogs(context) {
 
     if (league === "nhl") {
 
-        return context.gameLogs.map(game => ({
+        return context.gameLogs.map((game, index) => {
 
-            gameDate: game.gameDate,
+            if (index === 0) {
 
-            gameId: game.gameId,
+                console.log("RAW NHL GAME LOG:");
+                console.log(game);
 
-            opponent: game.opponent
+                console.log("RAW NHL GAME LOG KEYS:");
+                console.log(Object.keys(game));
 
-        }));
+            }
+
+            return {
+
+                gameDate: game.gameDate,
+
+                gameId: game.gameId,
+
+                opponent: game.opponent
+
+            };
+
+        });
 
     }
 
