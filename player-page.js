@@ -106,11 +106,37 @@ function applyLeagueLabels(labels) {
 }
 
 function formatGameDate(dateString) {
+
     if (!dateString) return "-";
 
-    const date = new Date(dateString);
+    const raw = String(dateString).trim();
 
-    if (isNaN(date)) return dateString;
+    // Preserve calendar-only dates without UTC/local-time shifting.
+    const dateOnlyMatch =
+        raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+    if (dateOnlyMatch) {
+
+        const month =
+            Number(dateOnlyMatch[2]);
+
+        const day =
+            Number(dateOnlyMatch[3]);
+
+        const monthNames = [
+            "Jan", "Feb", "Mar", "Apr",
+            "May", "Jun", "Jul", "Aug",
+            "Sep", "Oct", "Nov", "Dec"
+        ];
+
+        return `${monthNames[month - 1]} ${day}`;
+    }
+
+    const date = new Date(raw);
+
+    if (Number.isNaN(date.getTime())) {
+        return raw;
+    }
 
     return date.toLocaleDateString("en-US", {
         month: "short",
