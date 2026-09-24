@@ -1157,6 +1157,7 @@ function renderProps() {
 
         const recommendation =
             String(
+                prop.bestSide ??
                 analytics.recommendation ??
                 prop.recommendation ??
                 "No Play"
@@ -1169,39 +1170,59 @@ function renderProps() {
             normalizedRecommendation === "over" ||
             normalizedRecommendation === "under";
 
+        const hasValue = value =>
+            value !== null &&
+            value !== undefined &&
+            value !== "";
+
+        const toFiniteNumber = value => {
+
+            if (!hasValue(value)) {
+                return null;
+            }
+
+            const number = Number(value);
+
+            return Number.isFinite(number)
+                ? number
+                : null;
+        };
+
         const displayOdds =
-            isActionable &&
-            prop.odds !== null &&
-            prop.odds !== undefined &&
-            prop.odds !== ""
+            isActionable && hasValue(prop.odds)
                 ? prop.odds
                 : "-";
 
+        const probabilityValue =
+            prop.bestModelProbability ??
+            analytics.probability ??
+            prop.probability ??
+            null;
+
         const displayProbability =
             isActionable
-                ? formatProbability(
-                    analytics.probability ??
-                    prop.probability
-                )
+                ? formatProbability(probabilityValue)
                 : "-";
 
         const modelEdgeValue =
+            prop.sportacularEdge ??
             analytics.modelEdge ??
             prop.modelEdge ??
             null;
 
+        const numericModelEdge =
+            toFiniteNumber(modelEdgeValue);
+
         const displayModelEdge =
             isActionable &&
-            modelEdgeValue !== null &&
-            modelEdgeValue !== undefined &&
-            modelEdgeValue !== "" &&
-            Number.isFinite(Number(modelEdgeValue))
-                ? `${Number(modelEdgeValue).toFixed(1)}%`
+            numericModelEdge !== null
+                ? `${numericModelEdge.toFixed(1)}%`
                 : "-";
 
         const displayConfidence =
             isActionable
                 ? (
+                    prop.confidenceTier ??
                     analytics.confidence ??
                     prop.confidence ??
                     "-"
@@ -1211,8 +1232,8 @@ function renderProps() {
         const displayScore =
             isActionable
                 ? (
-                    analytics.sportacularScore ??
                     prop.sportacularScore ??
+                    analytics.sportacularScore ??
                     analytics.score ??
                     prop.score ??
                     "-"
