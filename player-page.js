@@ -1229,15 +1229,20 @@ function renderProps() {
                 )
                 : "-";
 
+        const scoreValue =
+            prop.sportacularScore ??
+            analytics.sportacularScore ??
+            analytics.score ??
+            prop.score ??
+            null;
+
+        const numericScore =
+            toFiniteNumber(scoreValue);
+
         const displayScore =
-            isActionable
-                ? (
-                    prop.sportacularScore ??
-                    analytics.sportacularScore ??
-                    analytics.score ??
-                    prop.score ??
-                    "-"
-                )
+            isActionable &&
+            numericScore !== null
+                ? numericScore.toFixed(2)
                 : "-";
 
         const card =
