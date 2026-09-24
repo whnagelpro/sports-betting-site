@@ -270,7 +270,9 @@ export function evaluateProp({
             sportacularEdge,
 
             modelEdge:
-                sportacularEdge,
+                isActionable
+                    ? priceEdge
+                    : null,
 
             probability:
                 isActionable
