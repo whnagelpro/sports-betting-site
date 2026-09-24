@@ -411,6 +411,22 @@ function getGameLogHeaders(league) {
 
         }
 
+        case "nhl": {
+
+            return [
+                "Date",
+                "Opponent",
+                "G",
+                "A",
+                "PTS",
+                "SOG",
+                "PPP",
+                "HIT",
+                "BLK"
+            ];
+
+        }
+
         case "mlb": {
 
             const isPitcher =
@@ -768,6 +784,13 @@ function createNHLGameLogRow(game) {
     tr.innerHTML = `
         <td>${formatGameDate(game.gameDate)}</td>
         <td>${game.opponent ?? "-"}</td>
+        <td>${game.goals ?? 0}</td>
+        <td>${game.assists ?? 0}</td>
+        <td>${game.points ?? 0}</td>
+        <td>${game.shotsOnGoal ?? 0}</td>
+        <td>${game.powerPlayPoints ?? 0}</td>
+        <td>${game.hits ?? 0}</td>
+        <td>${game.blockedShots ?? 0}</td>
     `;
 
     return tr;
