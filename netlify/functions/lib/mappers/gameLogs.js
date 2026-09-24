@@ -46,6 +46,67 @@ function mapGameLogs(gameLogs, position) {
             };
         }
 
+        // --------------------------------------------------
+        // NBA PLAYER GAME LOG
+        // --------------------------------------------------
+
+        if (
+            log["Points"] !== undefined ||
+            log["Rebounds"] !== undefined ||
+            log["Assists"] !== undefined
+        ) {
+
+            return {
+
+                gameDate: log["Game Date"],
+
+                gameId: log["Game ID"],
+
+                opponent: log["Opponent"],
+
+                minutes: Number(
+                    log["Minutes"] || 0
+                ),
+
+                points: Number(
+                    log["Points"] || 0
+                ),
+
+                rebounds: Number(
+                    log["Rebounds"] || 0
+                ),
+
+                assists: Number(
+                    log["Assists"] || 0
+                ),
+
+                threes: Number(
+                    log["Threes"] || 0
+                ),
+
+                steals: Number(
+                    log["Steals"] || 0
+                ),
+
+                blocks: Number(
+                    log["Blocks"] || 0
+                ),
+
+                turnovers: Number(
+                    log["Turnovers"] || 0
+                ),
+
+                pra:
+                    Number(log["Points"] || 0) +
+                    Number(log["Rebounds"] || 0) +
+                    Number(log["Assists"] || 0),
+
+                raw: log
+
+            };
+
+        }
+
         if (
             log["Passing Yards"] !== undefined ||
             log["Rushing Yards"] !== undefined ||
