@@ -53,31 +53,43 @@ export function buildGameLogs(context) {
 
     if (league === "nba") {
 
-        return context.gameLogs.map(game => ({
+        return context.gameLogs.map((game, index) => {
 
-            gameDate: game["Game Date"] ?? game.gameDate,
+            if (index === 0) {
+                console.log("RAW NBA GAME LOG:");
+                console.log(game);
 
-            gameId: game["Game ID"] ?? game.gameId,
+                console.log("RAW NBA GAME LOG KEYS:");
+                console.log(Object.keys(game));
+            }
 
-            opponent: game["Opponent"] ?? game.opponent,
+            return {
 
-            minutes: game["Minutes"] ?? game.minutes,
+                gameDate: game["Game Date"] ?? game.gameDate,
 
-            points: game["Points"] ?? game.points,
+                gameId: game["Game ID"] ?? game.gameId,
 
-            rebounds: game["Rebounds"] ?? game.rebounds,
+                opponent: game["Opponent"] ?? game.opponent,
 
-            assists: game["Assists"] ?? game.assists,
+                minutes: game["Minutes"] ?? game.minutes,
 
-            threes: game["Threes"] ?? game.threes,
+                points: game["Points"] ?? game.points,
 
-            steals: game["Steals"] ?? game.steals,
+                rebounds: game["Rebounds"] ?? game.rebounds,
 
-            blocks: game["Blocks"] ?? game.blocks,
+                assists: game["Assists"] ?? game.assists,
 
-            turnovers: game["Turnovers"] ?? game.turnovers
+                threes: game["Threes"] ?? game.threes,
 
-        }));
+                steals: game["Steals"] ?? game.steals,
+
+                blocks: game["Blocks"] ?? game.blocks,
+
+                turnovers: game["Turnovers"] ?? game.turnovers
+
+            };
+
+        });
 
     }
 
