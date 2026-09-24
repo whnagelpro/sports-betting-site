@@ -46,7 +46,7 @@ export function buildProps(context) {
 
             modelEdge:
                 actionable
-                    ? evaluation.sportacularEdge ?? null
+                    ? evaluation.bestPriceEdge ?? null
                     : null,
 
             sportacularScore:
@@ -79,7 +79,7 @@ export function buildProps(context) {
 
                 modelEdge:
                     actionable
-                        ? evaluation.sportacularEdge ?? null
+                        ? evaluation.bestPriceEdge ?? null
                         : null,
 
                 probability:
