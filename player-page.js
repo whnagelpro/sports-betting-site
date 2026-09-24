@@ -394,6 +394,23 @@ function getGameLogHeaders(league) {
             ];
         }
 
+        case "nba": {
+
+            return [
+                "Date",
+                "Opponent",
+                "MIN",
+                "PTS",
+                "REB",
+                "AST",
+                "3PM",
+                "STL",
+                "BLK",
+                "TO"
+            ];
+
+        }
+
         case "mlb": {
 
             const isPitcher =
@@ -731,11 +748,18 @@ function createNBAGameLogRow(game) {
     tr.innerHTML = `
         <td>${formatGameDate(game.gameDate)}</td>
         <td>${game.opponent ?? "-"}</td>
+        <td>${game.minutes ?? "-"}</td>
+        <td>${game.points ?? "-"}</td>
+        <td>${game.rebounds ?? "-"}</td>
+        <td>${game.assists ?? "-"}</td>
+        <td>${game.threes ?? "-"}</td>
+        <td>${game.steals ?? "-"}</td>
+        <td>${game.blocks ?? "-"}</td>
+        <td>${game.turnovers ?? "-"}</td>
     `;
 
     return tr;
 }
-
 
 function createNHLGameLogRow(game) {
 
