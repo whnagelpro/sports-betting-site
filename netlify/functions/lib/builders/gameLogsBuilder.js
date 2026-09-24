@@ -55,27 +55,27 @@ export function buildGameLogs(context) {
 
         return context.gameLogs.map(game => ({
 
-            gameDate: game.gameDate,
+            gameDate: game["Game Date"] ?? game.gameDate,
 
-            gameId: game.gameId,
+            gameId: game["Game ID"] ?? game.gameId,
 
-            opponent: game.opponent,
+            opponent: game["Opponent"] ?? game.opponent,
 
-            minutes: game.minutes,
+            minutes: game["Minutes"] ?? game.minutes,
 
-            points: game.points,
+            points: game["Points"] ?? game.points,
 
-            rebounds: game.rebounds,
+            rebounds: game["Rebounds"] ?? game.rebounds,
 
-            assists: game.assists,
+            assists: game["Assists"] ?? game.assists,
 
-            threes: game.threes,
+            threes: game["Threes"] ?? game.threes,
 
-            steals: game.steals,
+            steals: game["Steals"] ?? game.steals,
 
-            blocks: game.blocks,
+            blocks: game["Blocks"] ?? game.blocks,
 
-            turnovers: game.turnovers
+            turnovers: game["Turnovers"] ?? game.turnovers
 
         }));
 
