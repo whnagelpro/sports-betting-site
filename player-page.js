@@ -1176,11 +1176,12 @@ function renderProps() {
 
         const recommendation =
             String(
-                prop.bestSide ??
                 analytics.recommendation ??
                 prop.recommendation ??
+                prop.bestSide ??
                 "No Play"
-            ).trim();
+            )
+                .trim();
 
         const normalizedRecommendation =
             recommendation.toLowerCase();
