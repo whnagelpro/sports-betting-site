@@ -1,7 +1,5 @@
 export function buildGameLogs(context) {
 
-    console.log("GAME LOGS BUILDER VERSION — NHL TEST 1");
-
     const league = context.league?.toLowerCase() ?? "mlb";
 
     if (league === "nfl") {
@@ -97,25 +95,52 @@ export function buildGameLogs(context) {
 
     if (league === "nhl") {
 
-        return context.gameLogs.map((game, index) => {
+        return context.gameLogs.map(game => {
 
-            if (index === 0) {
-
-                console.log("RAW NHL GAME LOG:");
-                console.log(game);
-
-                console.log("RAW NHL GAME LOG KEYS:");
-                console.log(Object.keys(game));
-
-            }
+            const raw = game.raw ?? {};
 
             return {
 
-                gameDate: game.gameDate,
+                gameDate:
+                    game.gameDate ??
+                    raw["Game Date"],
 
-                gameId: game.gameId,
+                gameId:
+                    game.gameId ??
+                    raw["Game ID"],
 
-                opponent: game.opponent
+                opponent:
+                    game.opponent ??
+                    raw["Opponent"],
+
+                goals:
+                    Number(raw["Goals"] ?? game.goals ?? 0),
+
+                assists:
+                    Number(raw["Assists"] ?? game.assists ?? 0),
+
+                points:
+                    Number(raw["Points"] ?? game.points ?? 0),
+
+                shotsOnGoal:
+                    Number(raw["Shots On Goal"] ?? game.shotsOnGoal ?? 0),
+
+                powerPlayPoints:
+                    Number(raw["Power Play Points"] ?? game.powerPlayPoints ?? 0),
+
+                blockedShots:
+                    Number(raw["Blocked Shots"] ?? game.blockedShots ?? 0),
+
+                hits:
+                    Number(raw["Hits"] ?? game.hits ?? 0),
+
+                saves:
+                    Number(raw["Saves"] ?? game.saves ?? 0),
+
+                position:
+                    raw["Position"] ??
+                    game.position ??
+                    ""
 
             };
 
