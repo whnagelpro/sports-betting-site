@@ -821,12 +821,31 @@ function renderAnalyticsDashboard() {
 
         <div class="analytics-score-large">
 
-            ${analytics?.sportacularScore ??
-                dashboardProp?.sportacularScore ??
-                dashboardAnalytics?.score ??
-                player.analytics?.sportacularScore ??
-                player.analytics?.score ??
-                "-"}
+            ${
+                (() => {
+                    const score =
+                        analytics?.sportacularScore ??
+                        dashboardProp?.sportacularScore ??
+                        dashboardAnalytics?.score ??
+                        player.analytics?.sportacularScore ??
+                        player.analytics?.score ??
+                        null;
+
+                    if (
+                        score === null ||
+                        score === undefined ||
+                        score === ""
+                    ) {
+                        return "-";
+                    }
+
+                    const number = Number(score);
+
+                    return Number.isFinite(number)
+                        ? number.toFixed(2)
+                        : "-";
+                })()
+            }
 
         </div>
 
