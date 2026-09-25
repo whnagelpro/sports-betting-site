@@ -39,6 +39,51 @@ function loadPlayerContext({
             String(player["Player ID"]) === String(playerId)
         ) || {};
 
+    if (league === "nfl") {
+
+        console.log("========== RAW NFL GAME LOG SOURCE ==========");
+
+        console.log(
+            "NFL total source rows:",
+            gameLogRows?.length ?? 0
+        );
+
+        console.log(
+            "NFL requested player ID:",
+            playerId
+        );
+
+        console.log(
+            "NFL roster player:",
+            {
+                id: profile.Id,
+                name: profile["Full Name"],
+                position: profile.Position
+            }
+        );
+
+        console.log(
+            "NFL first source row:",
+            gameLogRows?.[0] ?? null
+        );
+
+        console.log(
+            "NFL first source row keys:",
+            gameLogRows?.[0]
+                ? Object.keys(gameLogRows[0])
+                : []
+        );
+
+        console.log(
+            "NFL first 10 source Player IDs:",
+            (gameLogRows ?? [])
+                .slice(0, 10)
+                .map(row => row["Player ID"])
+        );
+
+        console.log("=============================================");
+    }
+
     const rawGameLogs = findPlayerGameLogs(
         gameLogRows,
         playerId
