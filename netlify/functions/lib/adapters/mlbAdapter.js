@@ -46,40 +46,63 @@ function buildMLBHitterQuickStats(seasonStats = {}) {
 
 }
 
+function formatPitcherOutsAsIP(outsValue) {
+
+    const averageOuts =
+        Number(outsValue ?? 0);
+
+    if (!Number.isFinite(averageOuts) || averageOuts <= 0) {
+        return "0.0";
+    }
+
+    /*
+     * Avg Pitcher Outs can be fractional because it is
+     * an average across appearances.
+     *
+     * Convert the average number of outs into decimal
+     * innings for a per-game display.
+     *
+     * Example:
+     * 16.2 average outs / 3 = 5.4 innings per game.
+     */
+
+    return (averageOuts / 3).toFixed(1);
+}
+
 function buildMLBPitcherQuickStats(seasonStats = {}) {
 
     return [
 
         {
-            label: "IP",
-            value: Number(
-                seasonStats["Avg Pitcher Outs"] ?? 0
-            ).toFixed(1)
+            label: "IP / Game",
+            value: formatPitcherOutsAsIP(
+                seasonStats["Avg Pitcher Outs"]
+            )
         },
 
         {
-            label: "Strikeouts",
+            label: "SO / Game",
             value: Number(
                 seasonStats["Avg Pitcher Strikeouts"] ?? 0
             ).toFixed(2)
         },
 
         {
-            label: "ER",
+            label: "ER / Game",
             value: Number(
                 seasonStats["Avg Pitcher Earned Runs"] ?? 0
             ).toFixed(2)
         },
 
         {
-            label: "Hits Allowed",
+            label: "H / Game",
             value: Number(
                 seasonStats["Avg Pitcher Hits Allowed"] ?? 0
             ).toFixed(2)
         },
 
         {
-            label: "Walks",
+            label: "BB / Game",
             value: Number(
                 seasonStats["Avg Pitcher Walks"] ?? 0
             ).toFixed(2)
