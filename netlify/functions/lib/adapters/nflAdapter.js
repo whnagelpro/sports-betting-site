@@ -293,6 +293,15 @@ export function buildNFLContext({
 
     console.log("Quick Stat Cards:", quickStatCards);
 
+    console.log("========== NFL GAME LOG DIAGNOSTIC ==========");
+    console.log("NFL Game Logs Count:", gameLogs?.length ?? 0);
+    console.log("First Raw NFL Game Log:", gameLogs?.[0] ?? null);
+    console.log(
+        "First Raw NFL Game Log Keys:",
+        gameLogs?.[0] ? Object.keys(gameLogs[0]) : []
+    );
+    console.log("=============================================");
+
     let allowedTrendStats = [];
 
     if (positionGroup === "QB") {
