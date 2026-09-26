@@ -981,6 +981,33 @@ function renderAnalyticsDashboard() {
             dashboardProp?.sportsbook
         );
 
+    /*
+        D10V — Sample-size-aware dashboard confidence
+
+        Keep the backend confidence untouched.
+
+        When fewer than 3 games are available, the player profile
+        should not present the top dashboard confidence as fully
+        established while the rest of the profile correctly identifies
+        the statistical sample as Early.
+    */
+    const dashboardSampleSize =
+        getTrendSampleSize(
+            player?.trends?.[0] ?? null
+        );
+
+    const rawDashboardConfidence =
+        analytics?.confidence ??
+        dashboardProp?.confidence ??
+        player.analytics?.confidence ??
+        "-";
+
+    const dashboardConfidence =
+        dashboardSampleSize !== null &&
+        dashboardSampleSize < 3
+            ? "Early"
+            : rawDashboardConfidence;
+
     console.log("Analytics Dashboard Object");
     console.log(analytics);
     console.log("Model Edge:", analytics.modelEdge);
@@ -1049,9 +1076,7 @@ function renderAnalyticsDashboard() {
 
             <span>
 
-                ${analytics?.confidence ??
-                    dashboardProp.confidence ??
-                    player.analytics.confidence}
+                ${dashboardConfidence}
 
             </span>
 
