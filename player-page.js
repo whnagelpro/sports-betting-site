@@ -1828,6 +1828,27 @@ function renderTrendCards() {
                         : "games"
                 }`;
 
+        /*
+            D10J — Sample-size-aware displayed trend strength
+
+            Preserve the backend trend-strength value for analytics
+            and confidence calculations. Only adjust the user-facing
+            label when the available sample is still too small to
+            characterize the trend as established.
+        */
+
+        const displayedTrendStrength =
+            momentumSampleSize !== null &&
+            momentumSampleSize < 3
+                ? "Early"
+                : displayTrendStrength;
+
+        const displayedTrendStrengthClass =
+            momentumSampleSize !== null &&
+            momentumSampleSize < 3
+                ? "early"
+                : visualState.strengthClass;
+
         const card = document.createElement("article");
 
         card.className =
@@ -1883,9 +1904,9 @@ function renderTrendCards() {
             </span>
 
             <strong
-                class="trend-badge trend-strength-badge trend-strength-${visualState.strengthClass}"
+                class="trend-badge trend-strength-badge trend-strength-${displayedTrendStrengthClass}"
             >
-                ${displayTrendStrength}
+                ${displayedTrendStrength}
             </strong>
 
         </div>
