@@ -875,6 +875,51 @@ function renderAnalyticsDashboard() {
         player.analytics?.score ??
         null;
 
+    /*
+        D10U — Backend-authoritative Sportacular star rating
+
+        playerAnalytics.js owns the Sportacular Score -> stars
+        conversion. The player profile should consume that value
+        rather than independently applying another star scale.
+    */
+    const dashboardStars =
+        analytics?.stars ??
+        player.analytics?.stars ??
+        null;
+
+    const formatDashboardStars = value => {
+
+        const numericStars =
+            Number(value);
+
+        if (!Number.isFinite(numericStars)) {
+            return "☆☆☆☆☆";
+        }
+
+        const boundedStars =
+            Math.max(
+                0,
+                Math.min(5, numericStars)
+            );
+
+        const fullStars =
+            Math.floor(boundedStars);
+
+        const hasHalfStar =
+            boundedStars - fullStars >= 0.5;
+
+        return (
+            "★".repeat(fullStars) +
+            (hasHalfStar ? "½" : "") +
+            "☆".repeat(
+                Math.max(
+                    0,
+                    5 - fullStars - (hasHalfStar ? 1 : 0)
+                )
+            )
+        );
+    };
+
     const formatDashboardLabel = value => {
 
         if (
@@ -966,7 +1011,7 @@ function renderAnalyticsDashboard() {
 
         <div class="analytics-rating">
 
-            ${getSportacularStarRating(dashboardScore)}
+            ${formatDashboardStars(dashboardStars)}
 
         </div>
 
