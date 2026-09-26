@@ -2299,7 +2299,14 @@ function createInsightCard(insight) {
         return number.toFixed(decimals);
     };
 
-    const displayTrendScore =
+    /*
+        D10Q — Sample-size-aware Analytics Insight Trend Score
+
+        Preserve the underlying Trend Score, but clearly mark
+        scores based on fewer than 3 games as early-sample
+        observations in the Analytics Insights presentation.
+    */
+    const rawInsightTrendScore =
         formatInsightNumber(
             insight.trendScore ??
             insight.score
@@ -2307,6 +2314,16 @@ function createInsightCard(insight) {
 
     const insightSampleSize =
         getTrendSampleSize(insight);
+
+    const displayTrendScore =
+        rawInsightTrendScore === "-"
+            ? "-"
+            : (
+                insightSampleSize !== null &&
+                insightSampleSize < 3
+            )
+                ? `${rawInsightTrendScore} (Early)`
+                : rawInsightTrendScore;
 
     const rawDisplayTrendStrength =
         insight.trendStrength ??
