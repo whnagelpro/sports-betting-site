@@ -1051,3 +1051,108 @@
     margin-bottom: 24px;
 
 }
+
+/* ======================================================
+   D10B — PLAYER MOMENTUM DIRECTION STYLING
+====================================================== */
+
+/* Base momentum icon */
+.player-page .trend-card .trend-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 14px;
+
+    font-size: 1.65rem;
+    line-height: 1;
+
+    border: 1px solid rgba(148, 163, 184, 0.20);
+    background: rgba(148, 163, 184, 0.08);
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+
+/* =========================
+   POSITIVE MOMENTUM
+========================= */
+
+.player-page .trend-card.trend-positive {
+    border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.player-page .trend-card.trend-positive .trend-icon {
+    color: #4ade80;
+
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.35);
+
+    box-shadow:
+        0 0 18px rgba(34, 197, 94, 0.10);
+}
+
+
+/* =========================
+   NEUTRAL MOMENTUM
+========================= */
+
+.player-page .trend-card.trend-neutral {
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.player-page .trend-card.trend-neutral .trend-icon {
+    color: #cbd5e1;
+
+    background: rgba(148, 163, 184, 0.10);
+    border-color: rgba(148, 163, 184, 0.24);
+}
+
+
+/* =========================
+   NEGATIVE MOMENTUM
+========================= */
+
+.player-page .trend-card.trend-negative {
+    border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.player-page .trend-card.trend-negative .trend-icon {
+    color: #f87171;
+
+    background: rgba(239, 68, 68, 0.11);
+    border-color: rgba(239, 68, 68, 0.34);
+
+    box-shadow:
+        0 0 18px rgba(239, 68, 68, 0.08);
+}
+
+
+/* =========================
+   HOVER POLISH
+========================= */
+
+.player-page .trend-card:hover .trend-icon {
+    transform: translateY(-2px);
+}
+
+.player-page .trend-card.trend-positive:hover {
+    border-color: rgba(34, 197, 94, 0.48);
+}
+
+.player-page .trend-card.trend-neutral:hover {
+    border-color: rgba(148, 163, 184, 0.32);
+}
+
+.player-page .trend-card.trend-negative:hover {
+    border-color: rgba(239, 68, 68, 0.48);
+}
