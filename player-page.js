@@ -1503,20 +1503,20 @@ function getTrendVisualState(trend) {
 
     let direction = "neutral";
     let icon = "➡️";
-    let label = "Neutral";
+    let label = "Stable";
 
     if (Number.isFinite(score)) {
 
         if (score >= 10) {
             direction = "positive";
             icon = "↗";
-            label = "Positive";
+            label = "Rising";
         }
 
         else if (score <= -10) {
             direction = "negative";
             icon = "↘";
-            label = "Negative";
+            label = "Falling";
         }
 
     }
@@ -1663,6 +1663,12 @@ function renderTrendCards() {
         title="${visualState.label} trend"
     >
         ${visualState.icon}
+    </div>
+
+    <div
+        class="trend-status trend-status-${visualState.direction}"
+    >
+        ${visualState.label}
     </div>
 
     <h3>

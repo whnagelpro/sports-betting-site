@@ -1287,3 +1287,63 @@
     }
 
 }
+
+/* ======================================================
+   D10D — PLAYER MOMENTUM STATUS LABEL
+====================================================== */
+
+.player-page .trend-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 14px;
+    padding: 5px 11px;
+
+    border-radius: 999px;
+    border: 1px solid transparent;
+
+    font-size: 0.70rem;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    line-height: 1;
+}
+
+
+/* =========================
+   RISING
+========================= */
+
+.player-page .trend-status-positive {
+    color: #4ade80;
+
+    background: rgba(34, 197, 94, 0.10);
+    border-color: rgba(34, 197, 94, 0.28);
+}
+
+
+/* =========================
+   STABLE
+========================= */
+
+.player-page .trend-status-neutral {
+    color: #cbd5e1;
+
+    background: rgba(148, 163, 184, 0.10);
+    border-color: rgba(148, 163, 184, 0.22);
+}
+
+
+/* =========================
+   FALLING
+========================= */
+
+.player-page .trend-status-negative {
+    color: #f87171;
+
+    background: rgba(239, 68, 68, 0.10);
+    border-color: rgba(239, 68, 68, 0.28);
+}
