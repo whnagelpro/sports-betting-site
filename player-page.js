@@ -2381,10 +2381,25 @@ function createInsightCard(insight) {
             ? "Early"
             : rawDisplayTrendStrength;
 
-    const displayRisk =
+    /*
+        D10T — Sample-size-aware Analytics Insight Risk Tier
+
+        Preserve the backend Risk Tier, but when fewer than
+        3 games are available display "Early" so Analytics
+        Insights remain consistent with Player Momentum and
+        Season Overview.
+    */
+
+    const rawDisplayRisk =
         insight.riskTier ??
         insight.risk ??
         "-";
+
+    const displayRisk =
+        insightSampleSize !== null &&
+        insightSampleSize < 3
+            ? "Early"
+            : rawDisplayRisk;
 
     card.innerHTML = `
 
