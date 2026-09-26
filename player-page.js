@@ -2272,10 +2272,19 @@ function createInsightCard(insight) {
             insight.score
         );
 
-    const displayTrendStrength =
+    const insightSampleSize =
+        getTrendSampleSize(insight);
+
+    const rawDisplayTrendStrength =
         insight.trendStrength ??
         insight.strength ??
         "-";
+
+    const displayTrendStrength =
+        insightSampleSize !== null &&
+        insightSampleSize < 3
+            ? "Early"
+            : rawDisplayTrendStrength;
 
     const displayRisk =
         insight.riskTier ??
