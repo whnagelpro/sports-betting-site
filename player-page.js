@@ -843,6 +843,67 @@ function renderAnalyticsDashboard() {
         dashboardProp?.modelEdge ??
         null;
 
+    const formatDashboardLabel = value => {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "-";
+        }
+
+        return String(value)
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, char => char.toUpperCase());
+    };
+
+    const formatSportsbookName = value => {
+
+        const raw = String(value || "")
+            .trim()
+            .toLowerCase();
+
+        const sportsbookNames = {
+            draftkings: "DraftKings",
+            fanduel: "FanDuel",
+            betrivers: "BetRivers",
+            betmgm: "BetMGM",
+            caesars: "Caesars",
+            espnbet: "ESPN BET"
+        };
+
+        return sportsbookNames[raw] ??
+            formatDashboardLabel(value);
+    };
+
+    const dashboardRecommendation =
+        analytics?.recommendation ??
+        dashboardProp?.recommendation ??
+        dashboardAnalytics?.recommendation ??
+        "-";
+
+    const dashboardPropName =
+        formatDashboardLabel(
+            dashboardProp?.displayName ??
+            dashboardProp?.market
+        );
+
+    const dashboardSuggestedPlay =
+        dashboardRecommendation !== "-" &&
+        dashboardProp?.line !== null &&
+        dashboardProp?.line !== undefined &&
+        dashboardProp?.line !== ""
+            ? `${formatDashboardLabel(
+                dashboardRecommendation
+            )} ${dashboardProp.line}`
+            : "-";
+
+    const dashboardSportsbook =
+        formatSportsbookName(
+            dashboardProp?.sportsbook
+        );
+
     console.log("Analytics Dashboard Object");
     console.log(analytics);
     console.log("Model Edge:", analytics.modelEdge);
@@ -942,7 +1003,7 @@ function renderAnalyticsDashboard() {
 
             <span>
 
-                ${dashboardProp.displayName}
+                ${dashboardPropName}
 
             </span>
 
@@ -950,11 +1011,11 @@ function renderAnalyticsDashboard() {
 
         <div class="analytics-item">
 
-            <strong>Suggested Line</strong>
+            <strong>Suggested Play</strong>
 
             <span>
 
-                ${dashboardProp.line}
+                ${dashboardSuggestedPlay}
 
             </span>
 
@@ -966,7 +1027,7 @@ function renderAnalyticsDashboard() {
 
             <span>
 
-                ${dashboardProp.sportsbook}
+                ${dashboardSportsbook}
 
             </span>
 
