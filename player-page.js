@@ -2109,10 +2109,44 @@ function createSeasonPanel(panel) {
 
     const rows = panel.stats.map(stat => {
 
-        const value =
+        let value =
             seasonDataAvailable
                 ? stat.value
                 : null;
+
+        /*
+            D10K — Season Overview trend-strength consistency
+
+            Keep the backend Trend Strength untouched.
+
+            When the profile has fewer than 3 available games,
+            display "Early" in the Season Overview Trend Metrics
+            panel so it agrees with the Player Momentum cards.
+        */
+
+        const isTrendMetricsPanel =
+            String(panel?.title || "")
+                .trim()
+                .toLowerCase() === "trend metrics";
+
+        const isTrendStrengthRow =
+            String(stat?.label || "")
+                .trim()
+                .toLowerCase() === "trend strength";
+
+        const seasonTrendSampleSize =
+            Array.isArray(player?.gameLogs)
+                ? player.gameLogs.length
+                : null;
+
+        if (
+            isTrendMetricsPanel &&
+            isTrendStrengthRow &&
+            seasonTrendSampleSize !== null &&
+            seasonTrendSampleSize < 3
+        ) {
+            value = "Early";
+        }
 
         return `
 
