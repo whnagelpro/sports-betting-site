@@ -835,6 +835,8 @@ function renderAnalyticsDashboard() {
         null;
 
     const modelEdgeValue =
+        dashboardProp?.sportacularEdge ??
+        dashboardAnalytics?.sportacularEdge ??
         dashboardAnalytics?.modelEdge ??
         dashboardProp?.modelEdge ??
         player.analytics?.modelEdge?.edgePercent ??

@@ -331,7 +331,7 @@ function refreshNFLScheduleSheet() {
   // ------------------------------------------
 
   const season = 2026;
-  const week = 1;
+  const week = 3;
   const seasonType = 2; // 1 = Preseason
 
   Logger.log(
@@ -539,16 +539,39 @@ function getNFLGameAZDate_(game) {
 }
 
 function isNFLRegularSeasonGame_(game) {
+  if (!game || typeof game !== "object") {
+    return false;
+  }
 
-  const seasonType =
-    Number(
-      game.season_type ??
-      game.seasonType ??
-      game.season_type_id ??
-      0
-    );
+  // BALLDONTLIE NFL game objects identify playoff games
+  // with the postseason boolean.
+  //
+  // postseason === false -> regular season
+  // postseason === true  -> postseason/playoffs
+  if (typeof game.postseason === "boolean") {
+    return game.postseason === false;
+  }
 
-  return seasonType === 2;
+  // Fallback support in case another response supplies
+  // an explicit season-type field.
+  const seasonType = String(
+    game.season_type ??
+    game.seasonType ??
+    game.season_type_id ??
+    ""
+  )
+    .trim()
+    .toLowerCase();
+
+  if (
+    seasonType === "regular" ||
+    seasonType === "regular season" ||
+    seasonType === "reg"
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 function isCompletedNFLGame_(game) {
@@ -620,7 +643,64 @@ function getNFLCompletedGamesForDateRange_(
     const allGames =
       fetchAllNFLGamesForDate_(apiDateString);
 
-    Logger.log(`Total games before filter: ${allGames.length}`);
+    Logger.log(
+      `Total games before filter: ${allGames.length}`
+    );
+
+    if (allGames.length > 0) {
+
+      Logger.log(
+        "========== NFL GAME FILTER DIAGNOSTIC =========="
+      );
+
+      allGames.slice(0, 3).forEach((game, index) => {
+
+        Logger.log(
+          `GAME ${index + 1}: ` +
+          JSON.stringify({
+            id: game.id,
+
+            rawDate:
+              getNFLGameRawDate_(game),
+
+            azDate:
+              getNFLGameAZDate_(game),
+
+            status:
+              game.status,
+
+            status_state:
+              game.status_state,
+
+            game_state:
+              game.game_state,
+
+            season:
+              game.season,
+
+            season_type:
+              game.season_type,
+
+            seasonType:
+              game.seasonType,
+
+            season_type_id:
+              game.season_type_id,
+
+            completedCheck:
+              isCompletedNFLGame_(game),
+
+            regularSeasonCheck:
+              isNFLRegularSeasonGame_(game)
+          })
+        );
+
+      });
+
+      Logger.log(
+        "==============================================="
+      );
+    }
 
     const completedGames =
       allGames.filter(game =>
@@ -628,7 +708,9 @@ function getNFLCompletedGamesForDateRange_(
         isNFLRegularSeasonGame_(game)
       );
 
-    Logger.log(`Completed games: ${completedGames.length}`);
+    Logger.log(
+      `Completed regular-season games after filter: ${completedGames.length}`
+    );
 
     const games =
       completedGames.filter(game => {
