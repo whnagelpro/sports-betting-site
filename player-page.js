@@ -835,11 +835,12 @@ function renderAnalyticsDashboard() {
         null;
 
     const modelEdgeValue =
+        analytics?.modelEdge ??
+        analytics?.bestProp?.sportacularEdge ??
         dashboardProp?.sportacularEdge ??
         dashboardAnalytics?.sportacularEdge ??
         dashboardAnalytics?.modelEdge ??
         dashboardProp?.modelEdge ??
-        player.analytics?.modelEdge?.edgePercent ??
         null;
 
     console.log("Analytics Dashboard Object");
