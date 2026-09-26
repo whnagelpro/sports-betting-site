@@ -1651,6 +1651,15 @@ function renderTrendCards() {
                     ? `+${numericTrendScore.toFixed(1)}`
                     : numericTrendScore.toFixed(1);
 
+        const trendScoreIntensity =
+            numericTrendScore === null
+                ? "none"
+                : Math.abs(numericTrendScore) >= 25
+                    ? "strong"
+                    : Math.abs(numericTrendScore) >= 10
+                        ? "moderate"
+                        : "subtle";
+
         const displayTrendStrength =
             trend.trendStrength ??
             trend.strength ??
@@ -1705,7 +1714,7 @@ function renderTrendCards() {
             </span>
 
             <strong
-                class="trend-metric-value trend-score-value trend-score-${visualState.direction}"
+                class="trend-metric-value trend-score-value trend-score-${visualState.direction} trend-score-intensity-${trendScoreIntensity}"
             >
                 ${displayTrendScore}
             </strong>

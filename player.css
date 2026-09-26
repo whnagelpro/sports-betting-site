@@ -1393,3 +1393,67 @@
     text-shadow:
         0 0 12px rgba(239, 68, 68, 0.10);
 }
+
+/* ======================================================
+   D10F — PLAYER MOMENTUM SCORE INTENSITY
+====================================================== */
+
+/*
+   Subtle:
+   score magnitude below 10
+*/
+
+.player-page .trend-score-intensity-subtle {
+    opacity: 0.88;
+}
+
+
+/*
+   Moderate:
+   score magnitude 10–24.9
+*/
+
+.player-page .trend-score-intensity-moderate {
+    font-size: 1.04rem;
+}
+
+
+/*
+   Strong:
+   score magnitude 25+
+*/
+
+.player-page .trend-score-intensity-strong {
+    font-size: 1.10rem;
+    letter-spacing: 0.01em;
+}
+
+
+/* Strong positive momentum */
+
+.player-page
+.trend-score-positive.trend-score-intensity-strong {
+    text-shadow:
+        0 0 16px rgba(34, 197, 94, 0.28);
+}
+
+
+/* Strong negative momentum */
+
+.player-page
+.trend-score-negative.trend-score-intensity-strong {
+    text-shadow:
+        0 0 16px rgba(239, 68, 68, 0.24);
+}
+
+
+/*
+   Missing score:
+   preserve quiet unavailable state
+*/
+
+.player-page .trend-score-intensity-none {
+    color: #94a3b8;
+    opacity: 0.72;
+    text-shadow: none;
+}
