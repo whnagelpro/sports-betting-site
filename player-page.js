@@ -785,6 +785,30 @@ function createNHLGameLogRow(game) {
     return tr;
 }
 
+function getSportacularStarRating(score) {
+
+    const number = Number(score);
+
+    if (!Number.isFinite(number)) {
+        return "☆☆☆☆☆";
+    }
+
+    let stars = 1;
+
+    if (number >= 90) {
+        stars = 5;
+    } else if (number >= 80) {
+        stars = 4;
+    } else if (number >= 70) {
+        stars = 3;
+    } else if (number >= 60) {
+        stars = 2;
+    }
+
+    return "★".repeat(stars) +
+        "☆".repeat(5 - stars);
+}
+
 function renderAnalyticsDashboard() {
 
     const section = document.getElementById(
@@ -841,6 +865,14 @@ function renderAnalyticsDashboard() {
         dashboardAnalytics?.sportacularEdge ??
         dashboardAnalytics?.modelEdge ??
         dashboardProp?.modelEdge ??
+        null;
+
+    const dashboardScore =
+        analytics?.sportacularScore ??
+        dashboardProp?.sportacularScore ??
+        dashboardAnalytics?.score ??
+        player.analytics?.sportacularScore ??
+        player.analytics?.score ??
         null;
 
     const formatDashboardLabel = value => {
@@ -922,36 +954,19 @@ function renderAnalyticsDashboard() {
         <div class="analytics-score-large">
 
             ${
-                (() => {
-                    const score =
-                        analytics?.sportacularScore ??
-                        dashboardProp?.sportacularScore ??
-                        dashboardAnalytics?.score ??
-                        player.analytics?.sportacularScore ??
-                        player.analytics?.score ??
-                        null;
-
-                    if (
-                        score === null ||
-                        score === undefined ||
-                        score === ""
-                    ) {
-                        return "-";
-                    }
-
-                    const number = Number(score);
-
-                    return Number.isFinite(number)
-                        ? number.toFixed(2)
-                        : "-";
-                })()
+                dashboardScore !== null &&
+                dashboardScore !== undefined &&
+                dashboardScore !== "" &&
+                Number.isFinite(Number(dashboardScore))
+                    ? Number(dashboardScore).toFixed(2)
+                    : "-"
             }
 
         </div>
 
         <div class="analytics-rating">
 
-            ★★★★★
+            ${getSportacularStarRating(dashboardScore)}
 
         </div>
 
