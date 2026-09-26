@@ -1478,6 +1478,78 @@ function renderProps() {
 
 }
 
+function getTrendVisualState(trend) {
+
+    const score = Number(
+        trend?.trendScore ??
+        trend?.score
+    );
+
+    const strength = String(
+        trend?.trendStrength ??
+        trend?.strength ??
+        ""
+    )
+        .trim()
+        .toLowerCase();
+
+    const risk = String(
+        trend?.riskTier ??
+        trend?.risk ??
+        ""
+    )
+        .trim()
+        .toLowerCase();
+
+    let direction = "neutral";
+    let icon = "➡️";
+    let label = "Neutral";
+
+    if (Number.isFinite(score)) {
+
+        if (score >= 10) {
+            direction = "positive";
+            icon = "↗";
+            label = "Positive";
+        }
+
+        else if (score <= -10) {
+            direction = "negative";
+            icon = "↘";
+            label = "Negative";
+        }
+
+    }
+
+    let strengthClass = "moderate";
+
+    if (strength === "strong") {
+        strengthClass = "strong";
+    }
+
+    else if (strength === "weak") {
+        strengthClass = "weak";
+    }
+
+    let riskClass = "moderate";
+
+    if (risk === "low") {
+        riskClass = "low";
+    }
+
+    else if (risk === "high") {
+        riskClass = "high";
+    }
+
+    return {
+        direction,
+        icon,
+        label,
+        strengthClass,
+        riskClass
+    };
+}
+
 function renderTrendCards() {
     
     console.log(
@@ -1576,16 +1648,21 @@ function renderTrendCards() {
             trend.risk ??
             "-";
 
+        const visualState =
+            getTrendVisualState(trend);
+
         const card = document.createElement("article");
 
-        card.className = "trend-card";
+        card.className =
+            `trend-card trend-${visualState.direction}`;
 
         card.innerHTML = `
 
-    <div class="trend-icon">
-
-        📈
-
+    <div
+        class="trend-icon trend-icon-${visualState.direction}"
+        title="${visualState.label} trend"
+    >
+        ${visualState.icon}
     </div>
 
     <h3>
@@ -1607,18 +1684,22 @@ function renderTrendCards() {
             ${displayTrendScore}
         </span>
 
-        <span>
+        <span
+            class="trend-strength trend-strength-${visualState.strengthClass}"
+        >
             Trend Strength:
-            ${displayTrendStrength}
+            <strong>${displayTrendStrength}</strong>
         </span>
 
     </div>
 
     <div class="trend-footer">
 
-        <span>
+        <span
+            class="trend-risk trend-risk-${visualState.riskClass}"
+        >
             Risk Tier:
-            ${displayRisk}
+            <strong>${displayRisk}</strong>
         </span>
 
     </div>
