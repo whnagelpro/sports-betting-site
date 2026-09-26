@@ -1677,30 +1677,47 @@ function renderTrendCards() {
 
     </p>
 
-    <div class="trend-footer">
+    <div class="trend-metrics">
 
-        <span>
-            Trend Score:
-            ${displayTrendScore}
-        </span>
+        <div class="trend-metric trend-score-metric">
 
-        <span
-            class="trend-strength trend-strength-${visualState.strengthClass}"
-        >
-            Trend Strength:
-            <strong>${displayTrendStrength}</strong>
-        </span>
+            <span class="trend-metric-label">
+                Trend Score
+            </span>
 
-    </div>
+            <strong class="trend-metric-value">
+                ${displayTrendScore}
+            </strong>
 
-    <div class="trend-footer">
+        </div>
 
-        <span
-            class="trend-risk trend-risk-${visualState.riskClass}"
-        >
-            Risk Tier:
-            <strong>${displayRisk}</strong>
-        </span>
+        <div class="trend-metric">
+
+            <span class="trend-metric-label">
+                Trend Strength
+            </span>
+
+            <strong
+                class="trend-badge trend-strength-badge trend-strength-${visualState.strengthClass}"
+            >
+                ${displayTrendStrength}
+            </strong>
+
+        </div>
+
+        <div class="trend-metric">
+
+            <span class="trend-metric-label">
+                Risk Tier
+            </span>
+
+            <strong
+                class="trend-badge trend-risk-badge trend-risk-${visualState.riskClass}"
+            >
+                ${displayRisk}
+            </strong>
+
+        </div>
 
     </div>
 
