@@ -1505,7 +1505,25 @@ function getTrendVisualState(trend) {
     let icon = "➡️";
     let label = "Stable";
 
-    if (Number.isFinite(score)) {
+    /*
+        D10O — Sample-size-aware momentum direction
+
+        Do not characterize a player's momentum as Rising
+        or Falling until at least 3 games are available.
+
+        The underlying Trend Score remains untouched.
+    */
+    const directionSampleSize =
+        getTrendSampleSize(trend);
+
+    const hasEstablishedDirectionSample =
+        directionSampleSize === null ||
+        directionSampleSize >= 3;
+
+    if (
+        Number.isFinite(score) &&
+        hasEstablishedDirectionSample
+    ) {
 
         if (score >= 10) {
             direction = "positive";
@@ -1518,7 +1536,6 @@ function getTrendVisualState(trend) {
             icon = "↘";
             label = "Falling";
         }
-
     }
 
     let strengthClass = "moderate";
