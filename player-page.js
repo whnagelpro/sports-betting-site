@@ -1673,6 +1673,67 @@ function renderTrendCards() {
         const visualState =
             getTrendVisualState(trend);
 
+        const getMomentumConfidence = () => {
+
+            const strength =
+                String(
+                    trend.trendStrength ??
+                    trend.strength ??
+                    ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            const risk =
+                String(
+                    trend.riskTier ??
+                    trend.risk ??
+                    ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            if (numericTrendScore === null) {
+                return {
+                    label: "Unavailable",
+                    className: "unavailable"
+                };
+            }
+
+            const magnitude =
+                Math.abs(numericTrendScore);
+
+            if (
+                magnitude >= 25 &&
+                strength === "strong" &&
+                risk === "low"
+            ) {
+                return {
+                    label: "High",
+                    className: "high"
+                };
+            }
+
+            if (
+                magnitude >= 10 &&
+                strength !== "weak" &&
+                risk !== "high"
+            ) {
+                return {
+                    label: "Moderate",
+                    className: "moderate"
+                };
+            }
+
+            return {
+                label: "Low",
+                className: "low"
+            };
+        };
+
+        const momentumConfidence =
+            getMomentumConfidence();
+
         const card = document.createElement("article");
 
         card.className =
@@ -1745,6 +1806,20 @@ function renderTrendCards() {
                 class="trend-badge trend-risk-badge trend-risk-${visualState.riskClass}"
             >
                 ${displayRisk}
+            </strong>
+
+        </div>
+
+        <div class="trend-metric">
+
+            <span class="trend-metric-label">
+                Momentum Confidence
+            </span>
+
+            <strong
+                class="trend-badge momentum-confidence-badge momentum-confidence-${momentumConfidence.className}"
+            >
+                ${momentumConfidence.label}
             </strong>
 
         </div>
