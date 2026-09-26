@@ -1489,3 +1489,21 @@
     background: rgba(148, 163, 184, 0.08);
     border-color: rgba(148, 163, 184, 0.20);
 }
+
+/* ======================================================
+   D10I — PLAYER MOMENTUM SAMPLE SIZE
+====================================================== */
+
+.player-page .momentum-sample-size {
+    margin-top: 12px;
+
+    color: #64748b;
+
+    font-size: 0.68rem;
+    font-weight: 700;
+
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+
+    text-align: center;
+}

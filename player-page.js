@@ -1794,6 +1794,40 @@ function renderTrendCards() {
         const momentumConfidence =
             getMomentumConfidence();
 
+        /*
+            D10I — Momentum sample-size display
+
+            Keep the displayed sample consistent with the
+            sample used by Momentum Confidence.
+        */
+
+        const rawMomentumSampleSize =
+            trend.sampleSize ??
+            trend.games ??
+            trend.gamesPlayed ??
+            player?.gameLogs?.length ??
+            null;
+
+        const momentumSampleSize =
+            rawMomentumSampleSize !== null &&
+            rawMomentumSampleSize !== undefined &&
+            rawMomentumSampleSize !== "" &&
+            Number.isFinite(Number(rawMomentumSampleSize))
+                ? Math.max(
+                    0,
+                    Math.round(Number(rawMomentumSampleSize))
+                )
+                : null;
+
+        const momentumSampleLabel =
+            momentumSampleSize === null
+                ? "Sample size unavailable"
+                : `Based on ${momentumSampleSize} ${
+                    momentumSampleSize === 1
+                        ? "game"
+                        : "games"
+                }`;
+
         const card = document.createElement("article");
 
         card.className =
@@ -1883,7 +1917,10 @@ function renderTrendCards() {
             </strong>
 
         </div>
+    </div>
 
+    <div class="momentum-sample-size">
+        ${momentumSampleLabel}
     </div>
 
 `;
