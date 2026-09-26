@@ -1259,6 +1259,16 @@
    RISK TIER
 ========================= */
 
+/* ======================================================
+   D10R — EARLY-SAMPLE RISK TIER
+====================================================== */
+
+.player-page .trend-risk-early {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.08);
+    border-color: rgba(148, 163, 184, 0.22);
+}
+
 .player-page .trend-risk-low {
     color: #4ade80;
 

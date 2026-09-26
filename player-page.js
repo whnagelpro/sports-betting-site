@@ -1698,10 +1698,26 @@ function renderTrendCards() {
             trend.strength ??
             "-";
 
-        const displayRisk =
+        /*
+            D10R — Sample-size-aware displayed Risk Tier
+
+            Preserve the backend Risk Tier for analytics and confidence
+            calculations. When fewer than 3 games are available, avoid
+            presenting the risk classification as fully established.
+        */
+        const rawDisplayRisk =
             trend.riskTier ??
             trend.risk ??
             "-";
+
+        const riskSampleSize =
+            getTrendSampleSize(trend);
+
+        const displayRisk =
+            riskSampleSize !== null &&
+            riskSampleSize < 3
+                ? "Early"
+                : rawDisplayRisk;
 
         const visualState =
             getTrendVisualState(trend);
@@ -1924,7 +1940,12 @@ function renderTrendCards() {
             </span>
 
             <strong
-                class="trend-badge trend-risk-badge trend-risk-${visualState.riskClass}"
+                class="trend-badge trend-risk-badge ${
+                    riskSampleSize !== null &&
+                    riskSampleSize < 3
+                        ? "trend-risk-early"
+                        : `trend-risk-${visualState.riskClass}`
+                }"
             >
                 ${displayRisk}
             </strong>
