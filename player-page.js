@@ -1632,11 +1632,24 @@ function renderTrendCards() {
 
         };
 
+        const rawTrendScore =
+            trend.trendScore ??
+            trend.score;
+
+        const numericTrendScore =
+            rawTrendScore !== null &&
+            rawTrendScore !== undefined &&
+            rawTrendScore !== "" &&
+            Number.isFinite(Number(rawTrendScore))
+                ? Number(rawTrendScore)
+                : null;
+
         const displayTrendScore =
-            formatTrendNumber(
-                trend.trendScore ??
-                trend.score
-            );
+            numericTrendScore === null
+                ? "-"
+                : numericTrendScore > 0
+                    ? `+${numericTrendScore.toFixed(1)}`
+                    : numericTrendScore.toFixed(1);
 
         const displayTrendStrength =
             trend.trendStrength ??
@@ -1691,7 +1704,9 @@ function renderTrendCards() {
                 Trend Score
             </span>
 
-            <strong class="trend-metric-value">
+            <strong
+                class="trend-metric-value trend-score-value trend-score-${visualState.direction}"
+            >
                 ${displayTrendScore}
             </strong>
 
