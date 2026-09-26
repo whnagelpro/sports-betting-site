@@ -1703,7 +1703,57 @@ function renderTrendCards() {
             const magnitude =
                 Math.abs(numericTrendScore);
 
+            /*
+                D10H — Sample-size guard
+
+                Prefer a trend-specific sample size when the
+                backend provides one. Otherwise fall back to
+                the number of player game logs currently
+                available to the profile.
+            */
+
+            const rawSampleSize =
+                trend.sampleSize ??
+                trend.games ??
+                trend.gamesPlayed ??
+                player?.gameLogs?.length ??
+                null;
+
+            const sampleSize =
+                rawSampleSize !== null &&
+                rawSampleSize !== undefined &&
+                rawSampleSize !== "" &&
+                Number.isFinite(Number(rawSampleSize))
+                    ? Number(rawSampleSize)
+                    : null;
+
+            /*
+                Fewer than 3 games:
+                confidence must remain Low regardless of
+                score magnitude, strength, or risk tier.
+            */
+
             if (
+                sampleSize !== null &&
+                sampleSize < 3
+            ) {
+                return {
+                    label: "Low",
+                    className: "low"
+                };
+            }
+
+            /*
+                High confidence requires:
+                - at least 5 games
+                - strong score magnitude
+                - Strong trend strength
+                - Low risk
+            */
+
+            if (
+                sampleSize !== null &&
+                sampleSize >= 5 &&
                 magnitude >= 25 &&
                 strength === "strong" &&
                 risk === "low"
@@ -1714,7 +1764,17 @@ function renderTrendCards() {
                 };
             }
 
+            /*
+                Moderate confidence requires:
+                - at least 3 games
+                - meaningful score magnitude
+                - non-Weak strength
+                - non-High risk
+            */
+
             if (
+                sampleSize !== null &&
+                sampleSize >= 3 &&
                 magnitude >= 10 &&
                 strength !== "weak" &&
                 risk !== "high"
