@@ -2199,6 +2199,29 @@ function createSeasonPanel(panel) {
             value = "Early";
         }
 
+        /*
+            D10S — Season Overview Risk Tier consistency
+
+            Preserve the backend Risk Tier, but when fewer than
+            3 games are available display "Early" in the Season
+            Overview Trend Metrics panel so it agrees with the
+            Player Momentum cards.
+        */
+
+        const isRiskTierRow =
+            String(stat?.label || "")
+                .trim()
+                .toLowerCase() === "risk tier";
+
+        if (
+            isTrendMetricsPanel &&
+            isRiskTierRow &&
+            seasonTrendSampleSize !== null &&
+            seasonTrendSampleSize < 3
+        ) {
+            value = "Early";
+        }
+
         const normalizedPanelTitle =
             String(panel?.title || "")
                 .trim()
@@ -2247,7 +2270,8 @@ function createSeasonPanel(panel) {
                 if (
                     riskClass === "low" ||
                     riskClass === "moderate" ||
-                    riskClass === "high"
+                    riskClass === "high" ||
+                    riskClass === "early"
                 ) {
                     valueClass =
                         `trend-badge trend-risk-${riskClass}`;
