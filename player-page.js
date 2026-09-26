@@ -1668,14 +1668,30 @@ function renderTrendCards() {
                     ? `+${numericTrendScore.toFixed(1)}`
                     : numericTrendScore.toFixed(1);
 
+        /*
+            D10P — Sample-size-aware Trend Score intensity
+
+            Preserve the actual Trend Score, but do not give a
+            tiny-sample score strong or moderate visual emphasis.
+
+            Fewer than 3 games always uses the subtle treatment.
+        */
+        const trendScoreSampleSize =
+            getTrendSampleSize(trend);
+
         const trendScoreIntensity =
             numericTrendScore === null
                 ? "none"
-                : Math.abs(numericTrendScore) >= 25
-                    ? "strong"
-                    : Math.abs(numericTrendScore) >= 10
-                        ? "moderate"
-                        : "subtle";
+                : (
+                    trendScoreSampleSize !== null &&
+                    trendScoreSampleSize < 3
+                )
+                    ? "subtle"
+                    : Math.abs(numericTrendScore) >= 25
+                        ? "strong"
+                        : Math.abs(numericTrendScore) >= 10
+                            ? "moderate"
+                            : "subtle";
 
         const displayTrendStrength =
             trend.trendStrength ??
