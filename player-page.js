@@ -2148,23 +2148,75 @@ function createSeasonPanel(panel) {
             value = "Early";
         }
 
+        const normalizedPanelTitle =
+            String(panel?.title || "")
+                .trim()
+                .toLowerCase();
+
+        const normalizedStatLabel =
+            String(stat?.label || "")
+                .trim()
+                .toLowerCase();
+
+        const formattedValue =
+            formatStatValue(
+                value,
+                stat.label
+            );
+
+        let valueClass = "";
+
+        if (normalizedPanelTitle === "trend metrics") {
+
+            if (normalizedStatLabel === "trend strength") {
+
+                const strengthClass =
+                    String(formattedValue || "")
+                        .trim()
+                        .toLowerCase();
+
+                if (
+                    strengthClass === "strong" ||
+                    strengthClass === "moderate" ||
+                    strengthClass === "weak" ||
+                    strengthClass === "early"
+                ) {
+                    valueClass =
+                        `trend-badge trend-strength-${strengthClass}`;
+                }
+            }
+
+            if (normalizedStatLabel === "risk tier") {
+
+                const riskClass =
+                    String(formattedValue || "")
+                        .trim()
+                        .toLowerCase();
+
+                if (
+                    riskClass === "low" ||
+                    riskClass === "moderate" ||
+                    riskClass === "high"
+                ) {
+                    valueClass =
+                        `trend-badge trend-risk-${riskClass}`;
+                }
+            }
+        }
+
         return `
 
         <div class="stat-row">
 
             <span>${stat.label}</span>
 
-            <strong>
+            <strong class="${valueClass}">
 
-                ${formatStatValue(
-                    value,
-                    stat.label
-                )}
+                ${formattedValue}
 
             </strong>
 
         </div>
-
     `;
 
     }).join("");
