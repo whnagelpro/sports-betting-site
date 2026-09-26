@@ -1712,20 +1712,8 @@ function renderTrendCards() {
                 available to the profile.
             */
 
-            const rawSampleSize =
-                trend.sampleSize ??
-                trend.games ??
-                trend.gamesPlayed ??
-                player?.gameLogs?.length ??
-                null;
-
             const sampleSize =
-                rawSampleSize !== null &&
-                rawSampleSize !== undefined &&
-                rawSampleSize !== "" &&
-                Number.isFinite(Number(rawSampleSize))
-                    ? Number(rawSampleSize)
-                    : null;
+                getTrendSampleSize(trend);
 
             /*
                 Fewer than 3 games:
@@ -1801,23 +1789,8 @@ function renderTrendCards() {
             sample used by Momentum Confidence.
         */
 
-        const rawMomentumSampleSize =
-            trend.sampleSize ??
-            trend.games ??
-            trend.gamesPlayed ??
-            player?.gameLogs?.length ??
-            null;
-
         const momentumSampleSize =
-            rawMomentumSampleSize !== null &&
-            rawMomentumSampleSize !== undefined &&
-            rawMomentumSampleSize !== "" &&
-            Number.isFinite(Number(rawMomentumSampleSize))
-                ? Math.max(
-                    0,
-                    Math.round(Number(rawMomentumSampleSize))
-                )
-                : null;
+            getTrendSampleSize(trend);
 
         const momentumSampleLabel =
             momentumSampleSize === null
@@ -2098,6 +2071,30 @@ function createStatCard(label, value) {
 
 }
 
+function getTrendSampleSize(trend = null) {
+
+    const rawSampleSize =
+        trend?.sampleSize ??
+        trend?.games ??
+        trend?.gamesPlayed ??
+        player?.gameLogs?.length ??
+        null;
+
+    if (
+        rawSampleSize === null ||
+        rawSampleSize === undefined ||
+        rawSampleSize === "" ||
+        !Number.isFinite(Number(rawSampleSize))
+    ) {
+        return null;
+    }
+
+    return Math.max(
+        0,
+        Math.round(Number(rawSampleSize))
+    );
+}
+
 function createSeasonPanel(panel) {
 
     const section = document.createElement("section");
@@ -2135,9 +2132,9 @@ function createSeasonPanel(panel) {
                 .toLowerCase() === "trend strength";
 
         const seasonTrendSampleSize =
-            Array.isArray(player?.gameLogs)
-                ? player.gameLogs.length
-                : null;
+            getTrendSampleSize(
+                player?.trends?.[0] ?? null
+            );
 
         if (
             isTrendMetricsPanel &&
