@@ -1403,6 +1403,36 @@ function renderProps() {
 
     const analytics = topProp?.analytics ?? null;
 
+    /*
+        D10AA — Normalized MLB Top Prop metrics
+
+        Keep the backend-authoritative Top Prop selection untouched.
+
+        Once the authoritative prop has been matched back to player.props,
+        consume the same normalized probability and edge fields used by
+        the All Available Props cards.
+    */
+
+    const topPropProbability =
+        topProp.bestModelProbability ??
+        analytics?.probability ??
+        topProp.probability ??
+        null;
+
+    const topPropModelEdge =
+        topProp.sportacularEdge ??
+        analytics?.modelEdge ??
+        topProp.modelEdge ??
+        null;
+
+    const numericTopPropModelEdge =
+        topPropModelEdge !== null &&
+        topPropModelEdge !== undefined &&
+        topPropModelEdge !== "" &&
+        Number.isFinite(Number(topPropModelEdge))
+            ? Number(topPropModelEdge)
+            : null;
+
     console.log("Dashboard Best Prop:", player.analytics.bestProp);
     console.log("Displayed Top Prop:", topProp);
 
@@ -1428,18 +1458,12 @@ function renderProps() {
         topProp.sportsbook,
 
     "top-prop-ev":
-        topProp.ev !== null &&
-        topProp.ev !== undefined &&
-        topProp.ev !== "" &&
-        Number.isFinite(Number(topProp.ev))
-            ? `${Number(topProp.ev).toFixed(1)}%`
+        numericTopPropModelEdge !== null
+            ? `${numericTopPropModelEdge.toFixed(1)}%`
             : "-",
 
     "top-prop-probability":
-        formatProbability(
-            analytics?.probability ??
-            topProp.probability
-        ),
+        formatProbability(topPropProbability),
 
     "top-prop-confidence":
         analytics?.confidence ??
