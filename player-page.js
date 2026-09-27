@@ -1234,6 +1234,9 @@ function renderProps() {
 
     };
 
+    const actionableProps =
+        (player.props || []).filter(isActionableProp);
+
     /*
         D10Z — Backend-authoritative MLB Top Prop consumer
 
