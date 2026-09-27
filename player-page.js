@@ -1234,25 +1234,58 @@ function renderProps() {
 
     };
 
-    const actionableProps =
-        player.props.filter(isActionableProp);
+    /*
+        D10Z — Backend-authoritative MLB Top Prop consumer
+
+        player.analytics.bestProp is the authoritative Top Prop.
+
+        Match that selection back to player.props by ID so the Top Prop
+        section can use the complete prop record without independently
+        selecting another candidate.
+
+        Score matching remains a compatibility fallback only for older
+        responses that do not provide a bestProp ID.
+
+        Do NOT fall back to actionableProps[0]. If the backend does not
+        provide a qualifying Top Prop, the frontend should display
+        "No Recommended Play" rather than inventing its own selection.
+    */
+
+    const authoritativeBestProp =
+        player.analytics?.bestProp ??
+        null;
+
+    const matchedBestProp =
+        authoritativeBestProp?.id != null
+            ? (
+                actionableProps.find(
+                    prop =>
+                        prop?.id != null &&
+                        String(prop.id) ===
+                        String(authoritativeBestProp.id)
+                ) ??
+                null
+            )
+            : null;
+
+    const legacyScoreMatchedProp =
+        !matchedBestProp &&
+        authoritativeBestProp?.id == null &&
+        authoritativeBestProp?.score != null
+            ? (
+                actionableProps.find(
+                    prop =>
+                        prop?.sportacularScore != null &&
+                        Number(prop.sportacularScore) ===
+                        Number(authoritativeBestProp.score)
+                ) ??
+                null
+            )
+            : null;
 
     const topProp =
-        actionableProps.find(
-            prop =>
-                prop.id != null &&
-                player.analytics?.bestProp?.id != null &&
-                String(prop.id) ===
-                String(player.analytics.bestProp.id)
-        ) ||
-        actionableProps.find(
-            prop =>
-                prop.sportacularScore != null &&
-                player.analytics?.bestProp?.score != null &&
-                prop.sportacularScore ===
-                player.analytics.bestProp.score
-        ) ||
-        actionableProps[0] ||
+        matchedBestProp ??
+        legacyScoreMatchedProp ??
         null;
 
     if (!topProp) {
