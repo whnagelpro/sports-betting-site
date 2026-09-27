@@ -2610,7 +2610,9 @@ function buildMLBUniversalPropProbabilityEV_({
   projectedStat,
   lineValue,
   overOdds,
-  underOdds
+  underOdds,
+  currentGames,
+  statStdDev
 }) {
   const normalizedPropType =
     normalizeMLBStatType_(
@@ -2631,7 +2633,8 @@ function buildMLBUniversalPropProbabilityEV_({
       modelProbUnder: null,
       evOver: null,
       evUnder: null,
-      pushProbability: null
+      pushProbability: null,
+      probabilityReliability: null
     };
   }
 
@@ -2649,10 +2652,15 @@ function buildMLBUniversalPropProbabilityEV_({
       modelProbUnder: null,
       evOver: null,
       evUnder: null,
-      pushProbability: null
+      pushProbability: null,
+      probabilityReliability: null
     };
   }
 
+
+  // --------------------------------------------------------------------------
+  // RAW MLB POISSON PROBABILITIES
+  // --------------------------------------------------------------------------
 
   const probabilities =
     getMLBPoissonSideProbabilities_(
@@ -2670,14 +2678,152 @@ function buildMLBUniversalPropProbabilityEV_({
       modelProbUnder: null,
       evOver: null,
       evUnder: null,
-      pushProbability: null
+      pushProbability: null,
+      probabilityReliability: null
     };
   }
 
 
+  // --------------------------------------------------------------------------
+  // D10AB — MLB PROBABILITY RELIABILITY
+  //
+  // Pull extreme raw Poisson probabilities toward 50% when the historical
+  // sample and/or volatility do not justify full confidence.
+  // --------------------------------------------------------------------------
+
+  const probabilityReliability =
+    getMLBPropProbabilityReliability_({
+      currentGames,
+      projectedStat,
+      statStdDev
+    });
+
+
+  // --------------------------------------------------------------------------
+  // D10AB — PUSH-AWARE PROBABILITY CALIBRATION
+  //
+  // For half-point lines:
+  //   pushProbability = 0
+  //   Over + Under = 1
+  //
+  // For integer lines:
+  //   some probability mass belongs to the push.
+  //   We therefore calibrate Over/Under CONDITIONAL on there being a decision,
+  //   then scale them back into the available non-push probability mass.
+  //
+  // This guarantees:
+  //
+  //   calibratedOver +
+  //   calibratedUnder +
+  //   pushProbability
+  //   = 1
+  // --------------------------------------------------------------------------
+
+  const pushProbability =
+    Number.isFinite(
+      Number(
+        probabilities.pushProbability
+      )
+    )
+      ? Math.max(
+          0,
+          Math.min(
+            1,
+            Number(
+              probabilities.pushProbability
+            )
+          )
+        )
+      : 0;
+
+
+  const decisionProbability =
+    Math.max(
+      0,
+      1 -
+      pushProbability
+    );
+
+
+  let calibratedOverProbability =
+    null;
+
+
+  let calibratedUnderProbability =
+    null;
+
+
+  if (decisionProbability > 0) {
+
+    // Convert the raw probabilities into probabilities conditional on
+    // the wager producing a win/loss decision rather than a push.
+
+    const conditionalOverProbability =
+      probabilities.overProbability /
+      decisionProbability;
+
+
+    const conditionalUnderProbability =
+      probabilities.underProbability /
+      decisionProbability;
+
+
+    const calibratedConditionalOver =
+      calibrateMLBPropProbability_(
+        conditionalOverProbability,
+        probabilityReliability
+      );
+
+
+    const calibratedConditionalUnder =
+      calibrateMLBPropProbability_(
+        conditionalUnderProbability,
+        probabilityReliability
+      );
+
+
+    if (
+      calibratedConditionalOver !== null &&
+      calibratedConditionalUnder !== null
+    ) {
+
+      // Scale the calibrated decision probabilities back into the
+      // original non-push probability mass.
+
+      calibratedOverProbability =
+        calibratedConditionalOver *
+        decisionProbability;
+
+
+      calibratedUnderProbability =
+        calibratedConditionalUnder *
+        decisionProbability;
+    }
+  }
+
+  if (
+    calibratedOverProbability === null ||
+    calibratedUnderProbability === null
+  ) {
+    return {
+      modelProbOver: null,
+      modelProbUnder: null,
+      evOver: null,
+      evUnder: null,
+      pushProbability:
+        probabilities.pushProbability,
+      probabilityReliability
+    };
+  }
+
+
+  // --------------------------------------------------------------------------
+  // EV MUST USE THE CALIBRATED PROBABILITIES
+  // --------------------------------------------------------------------------
+
   const evOver =
     calculateMLBExpectedValue_(
-      probabilities.overProbability,
+      calibratedOverProbability,
       overOdds,
       probabilities.pushProbability
     );
@@ -2685,7 +2831,7 @@ function buildMLBUniversalPropProbabilityEV_({
 
   const evUnder =
     calculateMLBExpectedValue_(
-      probabilities.underProbability,
+      calibratedUnderProbability,
       underOdds,
       probabilities.pushProbability
     );
@@ -2693,17 +2839,19 @@ function buildMLBUniversalPropProbabilityEV_({
 
   return {
     modelProbOver:
-      probabilities.overProbability,
+      calibratedOverProbability,
 
     modelProbUnder:
-      probabilities.underProbability,
+      calibratedUnderProbability,
 
     evOver,
 
     evUnder,
 
     pushProbability:
-      probabilities.pushProbability
+      probabilities.pushProbability,
+
+    probabilityReliability
   };
 }
 
@@ -4251,6 +4399,12 @@ function buildMLBUniversalPropRowFromProvider_({
   // U:X — FROZEN MLB PROBABILITY / EV MODEL
   // --------------------------------------------------------------------------
 
+  const playerHistory =
+    historyIndex[
+      String(playerId)
+    ] || [];
+
+
   const probabilityEV =
     buildMLBUniversalPropProbabilityEV_({
       propType,
@@ -4265,7 +4419,14 @@ function buildMLBUniversalPropRowFromProvider_({
         providerRow["Over Odds"],
 
       underOdds:
-        providerRow["Under Odds"]
+        providerRow["Under Odds"],
+
+      // D10AB — reliability inputs
+      currentGames:
+        playerHistory.length,
+
+      statStdDev:
+        historicalContext.statStdDev
     });
 
 
@@ -17019,6 +17180,447 @@ function getTodayMLBGameMapFromGameOdds_() {
   });
 
   return gameMap;
+}
+
+// ============================================================================
+// D10AB — MLB PROP PROBABILITY RELIABILITY CALIBRATION
+//
+// Purpose:
+//   Reduce overconfidence in raw MLB Poisson probabilities when:
+//   1. The historical sample is small.
+//   2. The stat is volatile relative to the player's projection.
+//
+// IMPORTANT:
+//   Step 1 is TEST-ONLY.
+//   Nothing in production calls this helper yet.
+// ============================================================================
+
+function getMLBPropProbabilityReliability_({
+  currentGames,
+  projectedStat,
+  statStdDev
+}) {
+  const games =
+    Number(currentGames);
+
+  const projection =
+    Number(projectedStat);
+
+  const stdDev =
+    Number(statStdDev);
+
+
+  // --------------------------------------------------------------------------
+  // 1. SAMPLE-SIZE RELIABILITY
+  //
+  // MLB stabilizes more slowly than the NFL helper because of the larger
+  // schedule and greater game-to-game variance in many hitter markets.
+  //
+  // 0 games  -> 0.55
+  // 1 game   -> 0.575
+  // 2 games  -> 0.60
+  // 5 games  -> 0.675
+  // 10 games -> 0.80
+  // 18+      -> 1.00
+  // --------------------------------------------------------------------------
+
+  const safeGames =
+    Number.isFinite(games)
+      ? Math.max(0, games)
+      : 0;
+
+
+  const sampleReliability =
+    Math.min(
+      1,
+      0.55 +
+      (
+        Math.min(
+          safeGames,
+          18
+        ) / 18
+      ) * 0.45
+    );
+
+
+  // --------------------------------------------------------------------------
+  // 2. VOLATILITY RELIABILITY
+  //
+  // Compare historical standard deviation with the projected mean.
+  //
+  // Higher relative volatility = less confidence that the raw Poisson
+  // probability should be trusted at full strength.
+  // --------------------------------------------------------------------------
+
+  let volatilityReliability =
+    1;
+
+
+  if (
+    Number.isFinite(projection) &&
+    projection > 0 &&
+    Number.isFinite(stdDev) &&
+    stdDev >= 0
+  ) {
+    const coefficientOfVariation =
+      stdDev / projection;
+
+
+    // Smooth penalty rather than a hard threshold.
+    volatilityReliability =
+      1 /
+      (
+        1 +
+        0.35 *
+        coefficientOfVariation
+      );
+
+
+    // Do not allow volatility alone to destroy the model signal.
+    volatilityReliability =
+      Math.max(
+        0.55,
+        Math.min(
+          1,
+          volatilityReliability
+        )
+      );
+  }
+
+
+  // --------------------------------------------------------------------------
+  // 3. COMBINED RELIABILITY
+  //
+  // Sample size and volatility both matter.
+  // --------------------------------------------------------------------------
+
+  const reliability =
+    Math.max(
+      0.50,
+      Math.min(
+        1,
+        sampleReliability *
+        volatilityReliability
+      )
+    );
+
+
+  return reliability;
+}
+
+
+// ============================================================================
+// Pull a raw probability toward 50% according to reliability.
+//
+// reliability = 1.00 -> raw probability unchanged
+// reliability = 0.50 -> half of the distance from 50% is retained
+// ============================================================================
+
+function calibrateMLBPropProbability_(
+  rawProbability,
+  reliability
+) {
+  const raw =
+    Number(rawProbability);
+
+  const rel =
+    Number(reliability);
+
+
+  if (
+    !Number.isFinite(raw) ||
+    raw < 0 ||
+    raw > 1 ||
+    !Number.isFinite(rel)
+  ) {
+    return null;
+  }
+
+
+  const safeReliability =
+    Math.max(
+      0,
+      Math.min(
+        1,
+        rel
+      )
+    );
+
+
+  return (
+    0.5 +
+    (
+      raw - 0.5
+    ) *
+    safeReliability
+  );
+}
+
+
+// ============================================================================
+// D10AB TEST
+// ============================================================================
+
+function testMLBPlayerPropProbabilityReliability() {
+  const tests = [];
+
+
+  function addTest(
+    name,
+    condition,
+    details
+  ) {
+    tests.push({
+      test: name,
+      pass: Boolean(condition),
+      ...details
+    });
+  }
+
+
+  // --------------------------------------------------------------------------
+  // TEST 1 — Reliability increases with sample size.
+  // --------------------------------------------------------------------------
+
+  const sampleSizes =
+    [
+      0,
+      1,
+      2,
+      5,
+      10,
+      18,
+      30
+    ];
+
+
+  const sampleResults =
+    sampleSizes.map(
+      currentGames => ({
+        currentGames,
+
+        reliability:
+          getMLBPropProbabilityReliability_({
+            currentGames,
+            projectedStat: 1,
+            statStdDev: 0
+          })
+      })
+    );
+
+
+  let samplePass = true;
+
+
+  for (
+    let i = 1;
+    i < sampleResults.length;
+    i++
+  ) {
+    if (
+      sampleResults[i].reliability <
+      sampleResults[i - 1].reliability
+    ) {
+      samplePass = false;
+      break;
+    }
+  }
+
+
+  addTest(
+    "MLB reliability increases with sample size",
+    samplePass &&
+    sampleResults[0].reliability < 1 &&
+    sampleResults[
+      sampleResults.length - 1
+    ].reliability === 1,
+    {
+      results: sampleResults
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // TEST 2 — More volatility lowers reliability.
+  // --------------------------------------------------------------------------
+
+  const lowVolatility =
+    getMLBPropProbabilityReliability_({
+      currentGames: 18,
+      projectedStat: 1,
+      statStdDev: 0.25
+    });
+
+
+  const mediumVolatility =
+    getMLBPropProbabilityReliability_({
+      currentGames: 18,
+      projectedStat: 1,
+      statStdDev: 1
+    });
+
+
+  const highVolatility =
+    getMLBPropProbabilityReliability_({
+      currentGames: 18,
+      projectedStat: 1,
+      statStdDev: 2
+    });
+
+
+  addTest(
+    "MLB volatility reduces reliability",
+    lowVolatility >
+      mediumVolatility &&
+    mediumVolatility >
+      highVolatility,
+    {
+      lowVolatility,
+      mediumVolatility,
+      highVolatility
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // TEST 3 — Reliability stays inside safe bounds.
+  // --------------------------------------------------------------------------
+
+  const extremeReliability =
+    getMLBPropProbabilityReliability_({
+      currentGames: 0,
+      projectedStat: 0.2,
+      statStdDev: 5
+    });
+
+
+  addTest(
+    "MLB reliability stays within safe bounds",
+    extremeReliability >= 0.50 &&
+    extremeReliability <= 1,
+    {
+      extremeReliability
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // TEST 4 — A raw 100% probability gets pulled away from certainty.
+  // --------------------------------------------------------------------------
+
+  const exampleReliability =
+    getMLBPropProbabilityReliability_({
+      currentGames: 10,
+      projectedStat: 0.9,
+      statStdDev: 1.2
+    });
+
+
+  const calibratedExtreme =
+    calibrateMLBPropProbability_(
+      1,
+      exampleReliability
+    );
+
+
+  addTest(
+    "100% raw probability is pulled away from certainty",
+    calibratedExtreme > 0.5 &&
+    calibratedExtreme < 1,
+    {
+      reliability:
+        exampleReliability,
+
+      rawProbability:
+        1,
+
+      calibratedProbability:
+        calibratedExtreme
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // TEST 5 — 50% stays 50%.
+  // --------------------------------------------------------------------------
+
+  const calibratedNeutral =
+    calibrateMLBPropProbability_(
+      0.5,
+      0.6
+    );
+
+
+  addTest(
+    "50% probability remains neutral",
+    Math.abs(
+      calibratedNeutral - 0.5
+    ) < 1e-12,
+    {
+      calibratedProbability:
+        calibratedNeutral
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // TEST 6 — Full reliability leaves probability unchanged.
+  // --------------------------------------------------------------------------
+
+  const rawProbability =
+    0.73;
+
+
+  const fullReliabilityProbability =
+    calibrateMLBPropProbability_(
+      rawProbability,
+      1
+    );
+
+
+  addTest(
+    "Full reliability preserves raw probability",
+    Math.abs(
+      fullReliabilityProbability -
+      rawProbability
+    ) < 1e-12,
+    {
+      rawProbability,
+
+      calibratedProbability:
+        fullReliabilityProbability
+    }
+  );
+
+
+  const pass =
+    tests.every(
+      test =>
+        test.pass === true
+    );
+
+
+  const output = {
+    test:
+      "D10AB MLB PROP PROBABILITY RELIABILITY",
+
+    pass,
+
+    results:
+      tests
+  };
+
+
+  Logger.log(
+    JSON.stringify(
+      output,
+      null,
+      2
+    )
+  );
+
+
+  return output;
 }
 
 // ============================================================================

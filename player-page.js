@@ -54,19 +54,18 @@ async function initPlayerPage() {
 
         renderSeasonPanels();
 
-        if (currentLeague !== "mlb") {
-
+        if (
+            currentLeague === "mlb" ||
+            currentLeague === "nfl"
+        ) {
+            renderProps();
+        } else {
             const propsSection =
                 document.getElementById("player-props-section");
 
             if (propsSection) {
                 propsSection.hidden = true;
             }
-
-        }
-
-        if (currentLeague === "mlb") {
-            renderProps();
         }
 
         renderTrendCards();
