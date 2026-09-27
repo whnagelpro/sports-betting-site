@@ -840,40 +840,121 @@ function renderAnalyticsDashboard() {
 
     const analytics = player.analytics;
 
+    /*
+        D10Y — Backend-authoritative Top Prop consumer
+
+        player.analytics.bestProp is the authoritative selection.
+
+        Match that selection back to player.props by ID so the dashboard
+        can use the complete prop record without independently choosing
+        another prop.
+
+        Score matching remains a compatibility fallback only for older
+        responses that do not provide a bestProp ID.
+    */
+    const authoritativeBestProp =
+        analytics?.bestProp ??
+        null;
+
+    const matchedBestProp =
+        authoritativeBestProp?.id != null
+            ? (
+                player.props?.find(
+                    prop =>
+                        prop?.id != null &&
+                        String(prop.id) ===
+                        String(authoritativeBestProp.id)
+                ) ??
+                null
+            )
+            : null;
+
+    const legacyScoreMatchedProp =
+        !matchedBestProp &&
+        authoritativeBestProp?.id == null &&
+        authoritativeBestProp?.score != null
+            ? (
+                player.props?.find(
+                    prop =>
+                        prop?.sportacularScore != null &&
+                        Number(prop.sportacularScore) ===
+                        Number(authoritativeBestProp.score)
+                ) ??
+                null
+            )
+            : null;
+
     const dashboardProp =
-        player.props.find(
-            prop =>
-                prop.id != null &&
-                String(prop.id) ===
-                String(analytics.bestProp?.id)
-        ) ||
-        player.props.find(
-            prop =>
-                prop.sportacularScore ===
-                analytics.bestProp?.score
-        ) ||
-        analytics.bestProp;
+        matchedBestProp ??
+        legacyScoreMatchedProp ??
+        authoritativeBestProp;
 
     const dashboardAnalytics =
         dashboardProp?.analytics ??
         null;
 
+    /*
+        D10Y — Normalized dashboard analytics contract
+
+        The selected prop remains authoritative for prop-specific analytics.
+        Top-level player.analytics remains the authoritative aggregate
+        source and compatibility fallback.
+    */
+    const dashboardContract = {
+
+        score:
+            dashboardProp?.sportacularScore ??
+            authoritativeBestProp?.score ??
+            analytics?.sportacularScore ??
+            analytics?.score ??
+            null,
+
+        edge:
+            dashboardProp?.sportacularEdge ??
+            dashboardAnalytics?.sportacularEdge ??
+            dashboardAnalytics?.modelEdge ??
+            authoritativeBestProp?.sportacularEdge ??
+            analytics?.modelEdge ??
+            null,
+
+        recommendation:
+            dashboardProp?.recommendation ??
+            dashboardAnalytics?.recommendation ??
+            authoritativeBestProp?.recommendation ??
+            analytics?.recommendation ??
+            "-",
+
+        confidence:
+            dashboardProp?.confidenceTier ??
+            dashboardAnalytics?.confidence ??
+            dashboardProp?.confidence ??
+            authoritativeBestProp?.confidence ??
+            analytics?.confidence ??
+            "-",
+
+        sportsbook:
+            dashboardProp?.sportsbook ??
+            authoritativeBestProp?.sportsbook ??
+            null,
+
+        line:
+            dashboardProp?.line ??
+            authoritativeBestProp?.line ??
+            null,
+
+        propName:
+            dashboardProp?.displayName ??
+            dashboardProp?.market ??
+            authoritativeBestProp?.displayName ??
+            authoritativeBestProp?.market ??
+            null
+    };
+
     const modelEdgeValue =
-        analytics?.modelEdge ??
-        analytics?.bestProp?.sportacularEdge ??
-        dashboardProp?.sportacularEdge ??
-        dashboardAnalytics?.sportacularEdge ??
-        dashboardAnalytics?.modelEdge ??
-        dashboardProp?.modelEdge ??
-        null;
+        dashboardContract.edge;
 
     const dashboardScore =
-        analytics?.sportacularScore ??
-        dashboardProp?.sportacularScore ??
-        dashboardAnalytics?.score ??
-        player.analytics?.sportacularScore ??
-        player.analytics?.score ??
-        null;
+        dashboardContract.score;
 
     /*
         D10U — Backend-authoritative Sportacular star rating
@@ -955,30 +1036,26 @@ function renderAnalyticsDashboard() {
     };
 
     const dashboardRecommendation =
-        analytics?.recommendation ??
-        dashboardProp?.recommendation ??
-        dashboardAnalytics?.recommendation ??
-        "-";
+        dashboardContract.recommendation;
 
     const dashboardPropName =
         formatDashboardLabel(
-            dashboardProp?.displayName ??
-            dashboardProp?.market
+            dashboardContract.propName
         );
 
     const dashboardSuggestedPlay =
         dashboardRecommendation !== "-" &&
-        dashboardProp?.line !== null &&
-        dashboardProp?.line !== undefined &&
-        dashboardProp?.line !== ""
+        dashboardContract.line !== null &&
+        dashboardContract.line !== undefined &&
+        dashboardContract.line !== ""
             ? `${formatDashboardLabel(
                 dashboardRecommendation
-            )} ${dashboardProp.line}`
+            )} ${dashboardContract.line}`
             : "-";
 
     const dashboardSportsbook =
         formatSportsbookName(
-            dashboardProp?.sportsbook
+            dashboardContract.sportsbook
         );
 
     /*
@@ -997,10 +1074,7 @@ function renderAnalyticsDashboard() {
         );
 
     const rawDashboardConfidence =
-        analytics?.confidence ??
-        dashboardProp?.confidence ??
-        player.analytics?.confidence ??
-        "-";
+        dashboardContract.confidence;
 
     const dashboardConfidence =
         dashboardSampleSize !== null &&
@@ -1044,9 +1118,9 @@ function renderAnalyticsDashboard() {
 
         <div class="analytics-recommendation">
 
-            ${analytics?.recommendation ??
-                dashboardProp.recommendation ??
-                player.analytics.recommendation}
+            ${formatDashboardLabel(
+                dashboardRecommendation
+            )}
 
         </div>
 

@@ -2737,6 +2737,371 @@ function buildNFLUniversalPropProbabilityEV_({
   };
 }
 
+/**
+ * ============================================================================
+ * D10W — NFL SAMPLE-SIZE RELIABILITY REGRESSION
+ * ============================================================================
+ *
+ * Protects the existing NFL probability calibration contract:
+ *
+ * reliability = MIN(1, 0.60 + 0.05 * currentGames)
+ *
+ * This verifies that early-season samples are already moderated upstream
+ * before EV, Model Confidence, Sportacular Edge, and Sportacular Score.
+ * ============================================================================
+ */
+function testNFLPlayerPropSampleSizeReliability_D10W() {
+
+  const expectedReliability = {
+    0: 0.60,
+    1: 0.65,
+    2: 0.70,
+    3: 0.75,
+    5: 0.85,
+    8: 1.00,
+    12: 1.00
+  };
+
+  const results = [];
+
+  Object.keys(expectedReliability).forEach(key => {
+
+    const currentGames = Number(key);
+
+    const result =
+      buildNFLUniversalPropProbabilityEV_({
+        propType: "receiving_yards",
+        marketType: "over_under",
+        projectedStat: 80,
+        statStdDev: 20,
+        lineValue: 60,
+        currentGames,
+        overOdds: -110,
+        underOdds: -110
+      });
+
+    const expected =
+      expectedReliability[key];
+
+    const pass =
+      result.reliability !== null &&
+      Math.abs(
+        Number(result.reliability) -
+        expected
+      ) <= 1e-10;
+
+    results.push({
+      currentGames,
+      expectedReliability: expected,
+      actualReliability: result.reliability,
+      pass
+    });
+  });
+
+  const twoGameResult =
+    buildNFLUniversalPropProbabilityEV_({
+      propType: "receiving_yards",
+      marketType: "over_under",
+      projectedStat: 80,
+      statStdDev: 20,
+      lineValue: 60,
+      currentGames: 2,
+      overOdds: -110,
+      underOdds: -110
+    });
+
+  const twoGameProbabilityIsCalibrated =
+    twoGameResult.rawProbOver !== null &&
+    twoGameResult.modelProbOver !== null &&
+    Math.abs(
+      twoGameResult.modelProbOver - 0.5
+    ) <
+    Math.abs(
+      twoGameResult.rawProbOver - 0.5
+    );
+
+  results.push({
+    test: "2-game probability is pulled toward 50%",
+    rawProbOver: twoGameResult.rawProbOver,
+    calibratedProbOver: twoGameResult.modelProbOver,
+    reliability: twoGameResult.reliability,
+    pass: twoGameProbabilityIsCalibrated
+  });
+
+  const pass =
+    results.every(
+      result => result.pass === true
+    );
+
+  Logger.log(
+    JSON.stringify(
+      {
+        test:
+          "D10W NFL SAMPLE-SIZE RELIABILITY",
+        pass,
+        results
+      },
+      null,
+      2
+    )
+  );
+
+  if (!pass) {
+    throw new Error(
+      "D10W NFL sample-size reliability regression failed."
+    );
+  }
+
+  return true;
+}
+
+/**
+ * ============================================================================
+ * D10X — NFL PROBABILITY CALIBRATION PARITY REGRESSION
+ * ============================================================================
+ *
+ * Protects the production probability-calibration contract:
+ *
+ * rawOver =
+ *   1 - NormalCDF((line - projectedStat) / statStdDev)
+ *
+ * reliability =
+ *   MIN(1, 0.60 + 0.05 * currentGames)
+ *
+ * calibratedOver =
+ *   0.5 + (rawOver - 0.5) * reliability
+ *
+ * finalOver =
+ *   clamp(calibratedOver, 0.025, 0.975)
+ *
+ * finalUnder =
+ *   1 - finalOver
+ *
+ * This regression verifies that the universal NFL probability builder
+ * continues to match the same mathematical contract used by the
+ * production Player Props sheet formulas.
+ * ============================================================================
+ */
+function testNFLPlayerPropProbabilityCalibrationParity_D10X() {
+
+  const cases = [
+    {
+      name: "2-game receiving yards",
+      propType: "receiving_yards",
+      projectedStat: 80,
+      statStdDev: 20,
+      lineValue: 60,
+      currentGames: 2
+    },
+    {
+      name: "5-game receptions",
+      propType: "receptions",
+      projectedStat: 6.5,
+      statStdDev: 2.0,
+      lineValue: 5.5,
+      currentGames: 5
+    },
+    {
+      name: "8-game rushing yards",
+      propType: "rushing_yards",
+      projectedStat: 72,
+      statStdDev: 18,
+      lineValue: 69.5,
+      currentGames: 8
+    },
+    {
+      name: "0-game passing yards",
+      propType: "passing_yards",
+      projectedStat: 245,
+      statStdDev: 45,
+      lineValue: 229.5,
+      currentGames: 0
+    }
+  ];
+
+  const results = cases.map(testCase => {
+
+    const actual =
+      buildNFLUniversalPropProbabilityEV_({
+        propType: testCase.propType,
+        marketType: "over_under",
+        projectedStat: testCase.projectedStat,
+        statStdDev: testCase.statStdDev,
+        lineValue: testCase.lineValue,
+        currentGames: testCase.currentGames,
+        overOdds: -110,
+        underOdds: -110
+      });
+
+    const z =
+      (
+        testCase.lineValue -
+        testCase.projectedStat
+      ) /
+      testCase.statStdDev;
+
+    const rawOver =
+      1 - normalCDF_D10X_(z);
+
+    const reliability =
+      Math.min(
+        1,
+        0.60 +
+        0.05 * testCase.currentGames
+      );
+
+    const calibratedOver =
+      0.5 +
+      (rawOver - 0.5) *
+      reliability;
+
+    const expectedOver =
+      Math.min(
+        0.975,
+        Math.max(
+          0.025,
+          calibratedOver
+        )
+      );
+
+    const expectedUnder =
+      1 - expectedOver;
+
+    const overPass =
+      actual.modelProbOver !== null &&
+      Math.abs(
+        actual.modelProbOver -
+        expectedOver
+      ) <= 1e-10;
+
+    const underPass =
+      actual.modelProbUnder !== null &&
+      Math.abs(
+        actual.modelProbUnder -
+        expectedUnder
+      ) <= 1e-10;
+
+    const complementPass =
+      actual.modelProbOver !== null &&
+      actual.modelProbUnder !== null &&
+      Math.abs(
+        (
+          actual.modelProbOver +
+          actual.modelProbUnder
+        ) -
+        1
+      ) <= 1e-10;
+
+    return {
+      name: testCase.name,
+      currentGames:
+        testCase.currentGames,
+      reliability,
+      expectedOver,
+      actualOver:
+        actual.modelProbOver,
+      expectedUnder,
+      actualUnder:
+        actual.modelProbUnder,
+      overPass,
+      underPass,
+      complementPass,
+      pass:
+        overPass &&
+        underPass &&
+        complementPass
+    };
+  });
+
+  const pass =
+    results.every(
+      result =>
+        result.pass === true
+    );
+
+  Logger.log(
+    JSON.stringify(
+      {
+        test:
+          "D10X NFL PROBABILITY CALIBRATION PARITY",
+        pass,
+        results
+      },
+      null,
+      2
+    )
+  );
+
+  if (!pass) {
+    throw new Error(
+      "D10X NFL probability calibration parity regression failed."
+    );
+  }
+
+  return true;
+}
+
+
+/**
+ * Standard normal cumulative distribution function.
+ *
+ * Test-only helper for D10X.
+ * Kept independent from the production probability builder so the
+ * regression does not merely call the same production implementation
+ * twice.
+ */
+function normalCDF_D10X_(x) {
+
+  const sign =
+    x < 0
+      ? -1
+      : 1;
+
+  const absX =
+    Math.abs(x) /
+    Math.sqrt(2);
+
+  const t =
+    1 /
+    (
+      1 +
+      0.3275911 * absX
+    );
+
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+
+  const erf =
+    sign *
+    (
+      1 -
+      (
+        (
+          (
+            (
+              a5 * t +
+              a4
+            ) * t +
+            a3
+          ) * t +
+          a2
+        ) * t +
+        a1
+      ) *
+      t *
+      Math.exp(
+        -absX * absX
+      )
+    );
+
+  return (
+    1 + erf
+  ) / 2;
+}
+
 function testNFLUniversalPropProbabilityEV() {
   const tests = [];
 
@@ -5173,6 +5538,81 @@ function buildNFLUniversalPropRowFromProvider_({
       team:
         ""
     };
+
+  // --------------------------------------------------------------------------
+  // UNSUPPORTED MARKET SHORT-CIRCUIT
+  //
+  // P15 currently models conventional over_under markets only.
+  // Milestone markets such as first_td / anytime_td remain valid provider
+  // rows, but they must not enter the projection / probability / scoring
+  // pipeline until a dedicated milestone model exists.
+  // --------------------------------------------------------------------------
+
+  const normalizedMarketType =
+    String(
+      providerRow.type ?? ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  if (
+    normalizedMarketType !==
+    "over_under"
+  ) {
+
+    const unsupportedHistoricalContext = {
+      playerBaseline: null,
+      trendAdjustment: null,
+      projectedStat: null,
+      statStdDev: null
+    };
+
+
+    const unsupportedProbabilityEV = {
+      modelProbOver: null,
+      modelProbUnder: null,
+      evOver: null,
+      evUnder: null,
+      reliability: null,
+      rawProbOver: null
+    };
+
+
+    const unsupportedDecisionTrend = {
+      bestSide: "No Play",
+      bestEV: null,
+      bestModelProbability: null,
+      bestPriceEdge: null,
+      trendScore: null,
+      trendStrength: null,
+      modelConfidence: null
+    };
+
+
+    const unsupportedSportacularScoring = {
+      finalBestSide: "No Play",
+      riskScore: null,
+      riskTier: null,
+      sportacularScore: null,
+      sportacularEdge: null,
+      confidenceTier: null
+    };
+
+
+    return buildNFLUniversalPlayerPropRow_({
+      providerRow,
+      identity,
+      historicalContext:
+        unsupportedHistoricalContext,
+      probabilityEV:
+        unsupportedProbabilityEV,
+      decisionTrend:
+        unsupportedDecisionTrend,
+      sportacularScoring:
+        unsupportedSportacularScoring
+    });
+  }
 
 
   // --------------------------------------------------------------------------
