@@ -1134,9 +1134,7 @@ function renderAnalyticsDashboard() {
             <span class="positive-ev">
 
                 ${
-                    Number.isFinite(Number(modelEdgeValue))
-                        ? `${Number(modelEdgeValue).toFixed(1)}%`
-                        : "-"
+                    formatEdgePercent(modelEdgeValue)
                 }
 
             </span>
@@ -1457,9 +1455,7 @@ function renderProps() {
         topProp.sportsbook,
 
     "top-prop-ev":
-        numericTopPropModelEdge !== null
-            ? `${numericTopPropModelEdge.toFixed(1)}%`
-            : "-",
+        formatEdgePercent(topPropModelEdge),
 
     "top-prop-probability":
         formatProbability(topPropProbability),
@@ -1552,9 +1548,8 @@ function renderProps() {
             toFiniteNumber(modelEdgeValue);
 
         const displayModelEdge =
-            isActionable &&
-            numericModelEdge !== null
-                ? `${numericModelEdge.toFixed(1)}%`
+            isActionable
+                ? formatEdgePercent(modelEdgeValue)
                 : "-";
 
         const displayConfidence =
@@ -2185,6 +2180,39 @@ function renderTrendCards() {
 // ------------------------------------------------------
 // Utilities
 // ------------------------------------------------------
+
+function formatEdgePercent(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "-";
+    }
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return "-";
+    }
+
+    // Sportacular Edge is stored as a probability-point decimal.
+    // Example:
+    // 0.0997 -> 10.0%
+    //
+    // Preserve compatibility with older values that may already
+    // be stored on a percentage scale.
+    if (Math.abs(number) <= 1) {
+        return `${(number * 100).toFixed(1)}%`;
+    }
+
+    if (Math.abs(number) <= 100) {
+        return `${number.toFixed(1)}%`;
+    }
+
+    return "-";
+}
 
 function formatProbability(value) {
 
