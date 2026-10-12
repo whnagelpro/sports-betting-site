@@ -331,7 +331,7 @@ function refreshNFLScheduleSheet() {
   // ------------------------------------------
 
   const season = 2026;
-  const week = 3;
+  const week = 5;
   const seasonType = 2; // 1 = Preseason
 
   Logger.log(
@@ -477,21 +477,44 @@ function fetchAllNFLGamesForSeason_(season) {
   do {
     const params = {
       "seasons[]": season,
+
+      // 2 = NFL regular season.
+      // Fetch regular-season games directly instead of
+      // mixing preseason / regular season / postseason
+      // and trying to infer the season type afterward.
+      season_type: 2,
+
       per_page: 100
     };
 
-    if (cursor) params.cursor = cursor;
+    if (cursor) {
+      params.cursor = cursor;
+    }
 
-    const response = fetchApi_("/nfl/v1/games", params);
-    const games = Array.isArray(response.data) ? response.data : [];
+    const response =
+      fetchApi_(
+        "/nfl/v1/games",
+        params
+      );
+
+    const games =
+      Array.isArray(response.data)
+        ? response.data
+        : [];
 
     allGames.push(...games);
 
-    cursor = response.meta && response.meta.next_cursor
-      ? response.meta.next_cursor
-      : null;
+    cursor =
+      response.meta &&
+      response.meta.next_cursor
+        ? response.meta.next_cursor
+        : null;
 
   } while (cursor);
+
+  Logger.log(
+    `Fetched ${allGames.length} NFL regular-season games for season ${season}.`
+  );
 
   return allGames;
 }
@@ -603,150 +626,117 @@ function getNFLCompletedGamesForDateRange_(
   endDate
 ) {
 
-  const selectedGamesMap = {};
-
-  const fetchStartDate =
-    addDaysToDateString_(
-      startDate,
-      -1
+  const startYear =
+    Number(
+      String(startDate).slice(0, 4)
     );
 
-  const fetchEndDate =
-    addDaysToDateString_(
-      endDate,
-      1
+  const endYear =
+    Number(
+      String(endDate).slice(0, 4)
     );
 
-  let current =
-    new Date(
-      fetchStartDate + "T00:00:00"
-    );
+  const seasons = [];
 
-  const end =
-    new Date(
-      fetchEndDate + "T00:00:00"
-    );
-
-  while (current <= end) {
-
-    const apiDateString =
-      Utilities.formatDate(
-        current,
-        SPORTACULAR_TIMEZONE,
-        "yyyy-MM-dd"
-      );
-
-    Logger.log(
-      `Checking NFL API games for ${apiDateString}`
-    );
-
-    const allGames =
-      fetchAllNFLGamesForDate_(apiDateString);
-
-    Logger.log(
-      `Total games before filter: ${allGames.length}`
-    );
-
-    if (allGames.length > 0) {
-
-      Logger.log(
-        "========== NFL GAME FILTER DIAGNOSTIC =========="
-      );
-
-      allGames.slice(0, 3).forEach((game, index) => {
-
-        Logger.log(
-          `GAME ${index + 1}: ` +
-          JSON.stringify({
-            id: game.id,
-
-            rawDate:
-              getNFLGameRawDate_(game),
-
-            azDate:
-              getNFLGameAZDate_(game),
-
-            status:
-              game.status,
-
-            status_state:
-              game.status_state,
-
-            game_state:
-              game.game_state,
-
-            season:
-              game.season,
-
-            season_type:
-              game.season_type,
-
-            seasonType:
-              game.seasonType,
-
-            season_type_id:
-              game.season_type_id,
-
-            completedCheck:
-              isCompletedNFLGame_(game),
-
-            regularSeasonCheck:
-              isNFLRegularSeasonGame_(game)
-          })
-        );
-
-      });
-
-      Logger.log(
-        "==============================================="
-      );
-    }
-
-    const completedGames =
-      allGames.filter(game =>
-        isCompletedNFLGame_(game) &&
-        isNFLRegularSeasonGame_(game)
-      );
-
-    Logger.log(
-      `Completed regular-season games after filter: ${completedGames.length}`
-    );
-
-    const games =
-      completedGames.filter(game => {
-
-          const azDate =
-            getNFLGameAZDate_(game);
-
-          return (
-            azDate >= startDate &&
-            azDate <= endDate
-          );
-
-        });
-
-    games.forEach(game => {
-
-      if (game.id) {
-
-        selectedGamesMap[
-          String(game.id)
-        ] = game;
-
-      }
-
-    });
-
-    current.setDate(
-      current.getDate() + 1
-    );
-
-    Utilities.sleep(100);
+  for (
+    let season = startYear;
+    season <= endYear;
+    season++
+  ) {
+    seasons.push(season);
   }
 
-  return Object.values(
-    selectedGamesMap
+  const allGames = [];
+
+  seasons.forEach(season => {
+
+    Logger.log(
+      `Fetching NFL regular-season games for season ${season}`
+    );
+
+    const seasonGames =
+      fetchAllNFLGamesForSeason_(
+        season
+      );
+
+    Logger.log(
+      `NFL regular-season games returned for ${season}: ${seasonGames.length}`
+    );
+
+    allGames.push(
+      ...seasonGames
+    );
+
+  });
+
+  const selectedGamesMap = {};
+
+  allGames.forEach(game => {
+
+    const gameDate =
+      getNFLGameAZDate_(game);
+
+    if (!gameDate) {
+      return;
+    }
+
+    if (
+      gameDate < startDate ||
+      gameDate > endDate
+    ) {
+      return;
+    }
+
+    if (
+      !isCompletedNFLGame_(game)
+    ) {
+      return;
+    }
+
+    const gameId =
+      String(
+        game.id || ""
+      );
+
+    if (!gameId) {
+      return;
+    }
+
+    selectedGamesMap[
+      gameId
+    ] = game;
+
+  });
+
+  const selectedGames =
+    Object.values(
+      selectedGamesMap
+    );
+
+  selectedGames.sort(
+    (a, b) =>
+      getNFLGameAZDate_(a)
+        .localeCompare(
+          getNFLGameAZDate_(b)
+        )
   );
+
+  Logger.log(
+    `Completed NFL regular-season games from ${startDate} to ${endDate}: ${selectedGames.length}`
+  );
+
+  if (selectedGames.length > 0) {
+
+    Logger.log(
+      "First selected NFL game: " +
+      JSON.stringify(
+        selectedGames[0]
+      )
+    );
+
+  }
+
+  return selectedGames;
 }
 
 function fetchAllNFLTeams_() {
@@ -4565,9 +4555,9 @@ function testNFLUniversalDecisionTrendFields() {
 
 
   assertTest(
-    "NFL existing Risk Tier populates AF",
+    "NFL Risk Tier remains deferred to P15",
     overDecision.riskTier ===
-      "Medium"
+      null
   );
 
 
@@ -4758,9 +4748,11 @@ function testNFLUniversalDecisionTrendFields() {
 
 
   assertTest(
-    "Missing trend leaves Model Confidence unavailable",
-    noTrend.modelConfidence ===
-      null
+    "Missing trend preserves probability-price Model Confidence",
+    Math.abs(
+      noTrend.modelConfidence -
+      62.5
+    ) < 1e-9
   );
 
 
@@ -8052,10 +8044,15 @@ function refreshNFLPlayerGameLogsForDateRange_(startDate, endDate) {
       `No completed NFL regular-season games found from ${startDate} to ${endDate}`
     );
 
-    writeNFLOutputSheet_(
+    // Remove only rows belonging to this requested date range.
+    // Never wipe successful game-log data from other months.
+    upsertNFLRowsByKeyForDateRange_(
       sheet,
       headers,
-      []
+      [],
+      [1, 2],
+      startDate,
+      endDate
     );
 
     return;
@@ -8548,10 +8545,15 @@ function refreshNFLTeamGameLogsForDateRange_(startDate, endDate) {
       `No completed NFL regular-season games found from ${startDate} to ${endDate}`
     );
 
-    writeNFLOutputSheet_(
+    // Remove only rows belonging to this requested date range.
+    // Preserve successful game-log data from every other month.
+    upsertNFLRowsByKeyForDateRange_(
       sheet,
       headers,
-      []
+      [],
+      [1, 2],
+      startDate,
+      endDate
     );
 
     return;
@@ -12730,6 +12732,4081 @@ function testUniversalSportacularScoringContract() {
   return true;
 }
 
+// ============================================================================
+// NFL DAILY ANALYTICS MOTHER PIPELINE
+// ============================================================================
+
+const NFL_DAILY_ANALYTICS_STATE_KEY =
+  "NFL_DAILY_ANALYTICS_PIPELINE_STATE";
+
+const NFL_DAILY_ANALYTICS_CONTINUATION_HANDLER =
+  "continueNFLDailyAnalyticsPipeline";
+
+const NFL_DAILY_ANALYTICS_PLAYER_MONTHS = [
+  {
+    label: "2026-08",
+    fn: "refreshNFLPlayerGameLogsAugust"
+  },
+  {
+    label: "2026-09",
+    fn: "refreshNFLPlayerGameLogsSeptember"
+  },
+  {
+    label: "2026-10",
+    fn: "refreshNFLPlayerGameLogsOctober"
+  },
+  {
+    label: "2026-11",
+    fn: "refreshNFLPlayerGameLogsNovember"
+  },
+  {
+    label: "2026-12",
+    fn: "refreshNFLPlayerGameLogsDecember"
+  },
+  {
+    label: "2027-01",
+    fn: "refreshNFLPlayerGameLogsJanuary"
+  },
+  {
+    label: "2027-02",
+    fn: "refreshNFLPlayerGameLogsFebruary"
+  }
+];
+
+const NFL_DAILY_ANALYTICS_TEAM_MONTHS = [
+  {
+    label: "2026-08",
+    fn: "refreshNFLTeamGameLogsAugust"
+  },
+  {
+    label: "2026-09",
+    fn: "refreshNFLTeamGameLogsSeptember"
+  },
+  {
+    label: "2026-10",
+    fn: "refreshNFLTeamGameLogsOctober"
+  },
+  {
+    label: "2026-11",
+    fn: "refreshNFLTeamGameLogsNovember"
+  },
+  {
+    label: "2026-12",
+    fn: "refreshNFLTeamGameLogsDecember"
+  },
+  {
+    label: "2027-01",
+    fn: "refreshNFLTeamGameLogsJanuary"
+  },
+  {
+    label: "2027-02",
+    fn: "refreshNFLTeamGameLogsFebruary"
+  }
+];
+
+function getDefaultNFLDailyAnalyticsState_() {
+
+  return {
+    stage: "PLAYER_GAME_LOGS",
+    playerMonthIndex: 0,
+    teamMonthIndex: 0,
+    completed: false,
+    lastSuccessfulStep: null,
+    lastError: null,
+    updatedAt: new Date().toISOString()
+  };
+
+}
+
+function getNFLDailyAnalyticsState_() {
+
+  const properties =
+    PropertiesService.getScriptProperties();
+
+  const raw =
+    properties.getProperty(
+      NFL_DAILY_ANALYTICS_STATE_KEY
+    );
+
+  if (!raw) {
+    return getDefaultNFLDailyAnalyticsState_();
+  }
+
+  try {
+
+    const parsed = JSON.parse(raw);
+
+    return {
+      ...getDefaultNFLDailyAnalyticsState_(),
+      ...parsed
+    };
+
+  } catch (error) {
+
+    Logger.log(
+      "NFL mother pipeline state could not be parsed. Resetting state."
+    );
+
+    return getDefaultNFLDailyAnalyticsState_();
+  }
+
+}
+
+function saveNFLDailyAnalyticsState_(state) {
+
+  state.updatedAt =
+    new Date().toISOString();
+
+  PropertiesService
+    .getScriptProperties()
+    .setProperty(
+      NFL_DAILY_ANALYTICS_STATE_KEY,
+      JSON.stringify(state)
+    );
+
+}
+
+function clearNFLDailyAnalyticsContinuationTriggers_() {
+
+  ScriptApp
+    .getProjectTriggers()
+    .forEach(trigger => {
+
+      if (
+        trigger.getHandlerFunction() ===
+        NFL_DAILY_ANALYTICS_CONTINUATION_HANDLER
+      ) {
+
+        ScriptApp.deleteTrigger(trigger);
+
+      }
+
+    });
+
+}
+
+function scheduleNFLDailyAnalyticsContinuation_() {
+
+  clearNFLDailyAnalyticsContinuationTriggers_();
+
+  ScriptApp
+    .newTrigger(
+      NFL_DAILY_ANALYTICS_CONTINUATION_HANDLER
+    )
+    .timeBased()
+    .after(60 * 1000)
+    .create();
+
+  Logger.log(
+    "NFL mother pipeline continuation scheduled."
+  );
+
+}
+
+function executeNFLDailyAnalyticsFunction_(
+  functionName,
+  stepLabel,
+  state
+) {
+
+  try {
+
+    const fn =
+      globalThis[functionName];
+
+    if (typeof fn !== "function") {
+
+      throw new Error(
+        `NFL mother pipeline function not found: ${functionName}`
+      );
+
+    }
+
+    Logger.log(
+      `NFL mother pipeline: refreshing ${stepLabel}`
+    );
+
+    fn();
+
+    state.lastSuccessfulStep =
+      stepLabel;
+
+    state.lastError =
+      null;
+
+    saveNFLDailyAnalyticsState_(state);
+
+    return true;
+
+  } catch (error) {
+
+    state.lastError =
+      `${stepLabel}: ${error.message || error}`;
+
+    saveNFLDailyAnalyticsState_(state);
+
+    Logger.log(
+      `NFL mother pipeline step failed: ${state.lastError}`
+    );
+
+    return false;
+
+  }
+
+}
+
+/**
+ * Temporary continuation-trigger entry point.
+ *
+ * Permanent nightly trigger:
+ *   runNFLDailyAnalyticsPipeline
+ *
+ * Temporary continuation trigger:
+ *   continueNFLDailyAnalyticsPipeline
+ *
+ * Keeping these handlers separate prevents continuation cleanup
+ * from deleting the permanent nightly Run trigger.
+ */
+function continueNFLDailyAnalyticsPipeline() {
+
+  Logger.log(
+    "NFL temporary continuation trigger fired."
+  );
+
+  runNFLDailyAnalyticsPipeline();
+}
+
+function runNFLDailyAnalyticsPipeline() {
+
+  const lock =
+    LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+
+    Logger.log(
+      "NFL mother pipeline is already running. Exiting duplicate execution."
+    );
+
+    return;
+
+  }
+
+  try {
+
+    const state =
+      getNFLDailyAnalyticsState_();
+
+    if (state.completed) {
+
+      Logger.log(
+        "NFL daily analytics mother pipeline is already complete."
+      );
+
+      clearNFLDailyAnalyticsContinuationTriggers_();
+
+      return;
+
+    }
+
+    Logger.log(
+      `NFL mother pipeline starting/resuming. Stage: ${state.stage}`
+    );
+
+    // ------------------------------------------------------------------------
+    // PLAYER GAME LOGS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "PLAYER_GAME_LOGS") {
+
+      if (
+        state.playerMonthIndex <
+        NFL_DAILY_ANALYTICS_PLAYER_MONTHS.length
+      ) {
+
+        const month =
+          NFL_DAILY_ANALYTICS_PLAYER_MONTHS[
+            state.playerMonthIndex
+          ];
+
+        const success =
+          executeNFLDailyAnalyticsFunction_(
+            month.fn,
+            `Player Game Logs ${month.label}`,
+            state
+          );
+
+        if (success) {
+
+          state.playerMonthIndex += 1;
+
+          if (
+            state.playerMonthIndex >=
+            NFL_DAILY_ANALYTICS_PLAYER_MONTHS.length
+          ) {
+
+            state.stage =
+              "TEAM_GAME_LOGS";
+
+          }
+
+          saveNFLDailyAnalyticsState_(state);
+
+        }
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "TEAM_GAME_LOGS";
+
+      saveNFLDailyAnalyticsState_(state);
+
+    }
+
+    // ------------------------------------------------------------------------
+    // TEAM GAME LOGS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TEAM_GAME_LOGS") {
+
+      if (
+        state.teamMonthIndex <
+        NFL_DAILY_ANALYTICS_TEAM_MONTHS.length
+      ) {
+
+        const month =
+          NFL_DAILY_ANALYTICS_TEAM_MONTHS[
+            state.teamMonthIndex
+          ];
+
+        const success =
+          executeNFLDailyAnalyticsFunction_(
+            month.fn,
+            `Team Game Logs ${month.label}`,
+            state
+          );
+
+        if (success) {
+
+          state.teamMonthIndex += 1;
+
+          if (
+            state.teamMonthIndex >=
+            NFL_DAILY_ANALYTICS_TEAM_MONTHS.length
+          ) {
+
+            state.stage =
+              "PLAYER_SEASON_STATS";
+
+          }
+
+          saveNFLDailyAnalyticsState_(state);
+
+        }
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "PLAYER_SEASON_STATS";
+
+      saveNFLDailyAnalyticsState_(state);
+
+    }
+
+    // ------------------------------------------------------------------------
+    // PLAYER SEASON STATS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "PLAYER_SEASON_STATS") {
+
+      const success =
+        executeNFLDailyAnalyticsFunction_(
+          "refreshNFLPlayerSeasonStatsSheet",
+          "Player Season Stats",
+          state
+        );
+
+      if (!success) {
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "TEAM_SEASON_STATS";
+
+      saveNFLDailyAnalyticsState_(state);
+
+    }
+
+    // ------------------------------------------------------------------------
+    // TEAM SEASON STATS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TEAM_SEASON_STATS") {
+
+      const success =
+        executeNFLDailyAnalyticsFunction_(
+          "refreshNFLTeamSeasonStatsSheet",
+          "Team Season Stats",
+          state
+        );
+
+      if (!success) {
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "PLAYER_TRENDS";
+
+      saveNFLDailyAnalyticsState_(state);
+
+    }
+
+    // ------------------------------------------------------------------------
+    // PLAYER TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "PLAYER_TRENDS") {
+
+      const success =
+        executeNFLDailyAnalyticsFunction_(
+          "refreshNFLPlayerTrendsSheet",
+          "Player Trends",
+          state
+        );
+
+      if (!success) {
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "TEAM_TRENDS";
+
+      saveNFLDailyAnalyticsState_(state);
+
+    }
+
+    // ------------------------------------------------------------------------
+    // TEAM TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TEAM_TRENDS") {
+
+      const success =
+        executeNFLDailyAnalyticsFunction_(
+          "refreshNFLTeamTrendsOutputSheet",
+          "Team Trends",
+          state
+        );
+
+      if (!success) {
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "TOP_PLAYER_TRENDS";
+
+      saveNFLDailyAnalyticsState_(state);
+
+    }
+
+    // ------------------------------------------------------------------------
+    // TOP PLAYER TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TOP_PLAYER_TRENDS") {
+
+      const success =
+        executeNFLDailyAnalyticsFunction_(
+          "refreshNFLTopPlayerTrendsSheet",
+          "Top Player Trends",
+          state
+        );
+
+      if (!success) {
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "TOP_TEAM_TRENDS";
+
+      saveNFLDailyAnalyticsState_(state);
+
+    }
+
+    // ------------------------------------------------------------------------
+    // TOP TEAM TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TOP_TEAM_TRENDS") {
+
+      const success =
+        executeNFLDailyAnalyticsFunction_(
+          "refreshNFLTopTeamTrendsSheet",
+          "Top Team Trends",
+          state
+        );
+
+      if (!success) {
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      state.stage =
+        "COMPLETE";
+
+      state.completed =
+        true;
+
+      saveNFLDailyAnalyticsState_(state);
+
+      clearNFLDailyAnalyticsContinuationTriggers_();
+
+      Logger.log(
+        "NFL DAILY ANALYTICS MOTHER PIPELINE COMPLETE."
+      );
+
+    }
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
+
+function resetNFLDailyAnalyticsPipeline() {
+
+  Logger.log(
+    "NFL mother pipeline reset starting..."
+  );
+
+  PropertiesService
+    .getScriptProperties()
+    .deleteProperty(
+      NFL_DAILY_ANALYTICS_STATE_KEY
+    );
+
+  Logger.log(
+    "NFL mother pipeline stored state cleared."
+  );
+
+  clearNFLDailyAnalyticsContinuationTriggers_();
+
+  Logger.log(
+    "NFL mother pipeline continuation triggers cleared."
+  );
+
+  Logger.log(
+    "NFL daily analytics mother pipeline state reset."
+  );
+
+}
+
+function logNFLDailyAnalyticsPipelineState() {
+
+  const state =
+    getNFLDailyAnalyticsState_();
+
+  Logger.log(
+    JSON.stringify(
+      state,
+      null,
+      2
+    )
+  );
+
+}
+
+function auditNFLProjectTriggers() {
+
+  const triggers =
+    ScriptApp.getProjectTriggers();
+
+  Logger.log(
+    "=============================================="
+  );
+
+  Logger.log(
+    "NFL PROJECT TRIGGER AUDIT"
+  );
+
+  Logger.log(
+    `Total project triggers: ${triggers.length}`
+  );
+
+  Logger.log(
+    "=============================================="
+  );
+
+  triggers.forEach((trigger, index) => {
+
+    Logger.log(
+      JSON.stringify({
+        number: index + 1,
+        handlerFunction:
+          trigger.getHandlerFunction(),
+        eventType:
+          String(trigger.getEventType()),
+        triggerSource:
+          String(trigger.getTriggerSource()),
+        sourceId:
+          trigger.getTriggerSourceId()
+      })
+    );
+
+  });
+
+  Logger.log(
+    "=============================================="
+  );
+
+}
+
+function removeLegacyNFLAnalyticsTriggers() {
+
+  const KEEP_HANDLERS = new Set([
+    "refreshNFLScheduleSheet",
+    "refreshNFLRostersSheet",
+    "refreshNFLGameOddsSheet",
+    "refreshNFLPlayerPropsSheet"
+  ]);
+
+  const triggers = ScriptApp.getProjectTriggers();
+
+  Logger.log(
+    "=================================================="
+  );
+  Logger.log(
+    "NFL LEGACY ANALYTICS TRIGGER CLEANUP STARTING"
+  );
+  Logger.log(
+    `Triggers before cleanup: ${triggers.length}`
+  );
+  Logger.log(
+    "=================================================="
+  );
+
+  let deletedCount = 0;
+  let keptCount = 0;
+
+  triggers.forEach(trigger => {
+
+    const handler =
+      trigger.getHandlerFunction();
+
+    if (KEEP_HANDLERS.has(handler)) {
+
+      keptCount++;
+
+      Logger.log(
+        `KEEPING: ${handler}`
+      );
+
+      return;
+    }
+
+    const isLegacyAnalyticsTrigger =
+      handler.startsWith("refreshNFLPlayerGameLogs") ||
+      handler.startsWith("refreshNFLTeamGameLogs") ||
+      handler === "refreshNFLPlayerTrendPipeline" ||
+      handler === "refreshNFLTeamTrendPipeline" ||
+      handler === "refreshNFLTopPlayerTrendPipeline" ||
+      handler === "refreshNFLTopTeamTrendPipeline" ||
+      handler === "runNFLDailyAnalyticsPipeline";
+
+    if (isLegacyAnalyticsTrigger) {
+
+      Logger.log(
+        `DELETING LEGACY ANALYTICS TRIGGER: ${handler}`
+      );
+
+      ScriptApp.deleteTrigger(trigger);
+
+      deletedCount++;
+    } else {
+
+      Logger.log(
+        `NOT TOUCHED: ${handler}`
+      );
+    }
+
+  });
+
+  const remaining =
+    ScriptApp.getProjectTriggers();
+
+  Logger.log(
+    "=================================================="
+  );
+
+  Logger.log(
+    `Deleted legacy analytics triggers: ${deletedCount}`
+  );
+
+  Logger.log(
+    `Explicitly kept operational triggers: ${keptCount}`
+  );
+
+  Logger.log(
+    `Triggers remaining: ${remaining.length}`
+  );
+
+  Logger.log(
+    "Remaining handlers:"
+  );
+
+  remaining.forEach((trigger, index) => {
+
+    Logger.log(
+      `${index + 1}. ${trigger.getHandlerFunction()}`
+    );
+
+  });
+
+  Logger.log(
+    "=================================================="
+  );
+
+  Logger.log(
+    "NFL LEGACY ANALYTICS TRIGGER CLEANUP COMPLETE"
+  );
+}
+
+function testNFLGameLogStatsEndpoint() {
+
+  Logger.log(
+    "=================================================="
+  );
+  Logger.log(
+    "NFL GAME LOG STATS ENDPOINT DIAGNOSTIC"
+  );
+  Logger.log(
+    "=================================================="
+  );
+
+  const games =
+    getNFLCompletedGamesForDateRange_(
+      "2026-09-01",
+      "2026-09-30"
+    );
+
+  Logger.log(
+    `Completed September games found: ${games.length}`
+  );
+
+  if (!games.length) {
+    throw new Error(
+      "No completed September NFL games were found."
+    );
+  }
+
+  const game =
+    games[0];
+
+  const gameId =
+    String(game.id || "");
+
+  Logger.log(
+    `Testing game ID: ${gameId}`
+  );
+
+  Logger.log(
+    `Game date: ${getNFLGameAZDate_(game)}`
+  );
+
+  Logger.log(
+    `Away: ${getNFLAwayTeamNameFromGame_(game)}`
+  );
+
+  Logger.log(
+    `Home: ${getNFLHomeTeamNameFromGame_(game)}`
+  );
+
+  const tests = [
+    {
+      name: "GAME ID ONLY",
+      params: {
+        "game_ids[]": gameId,
+        per_page: 100
+      }
+    },
+
+    {
+      name: "GAME ID + SEASON",
+      params: {
+        "game_ids[]": gameId,
+        "seasons[]": 2026,
+        per_page: 100
+      }
+    },
+
+    {
+      name: "GAME ID + SEASON + SEASON TYPE 2",
+      params: {
+        "game_ids[]": gameId,
+        "seasons[]": 2026,
+        season_type: 2,
+        per_page: 100
+      }
+    }
+  ];
+
+  tests.forEach(test => {
+
+    Logger.log(
+      "--------------------------------------------------"
+    );
+
+    Logger.log(
+      `TEST: ${test.name}`
+    );
+
+    try {
+
+      const response =
+        fetchApi_(
+          "/nfl/v1/stats",
+          test.params
+        );
+
+      const rows =
+        Array.isArray(response.data)
+          ? response.data
+          : [];
+
+      Logger.log(
+        `ROWS RETURNED: ${rows.length}`
+      );
+
+      Logger.log(
+        `META: ${JSON.stringify(response.meta || null)}`
+      );
+
+      if (rows.length > 0) {
+
+        Logger.log(
+          `FIRST ROW: ${JSON.stringify(rows[0], null, 2)}`
+        );
+
+      }
+
+    } catch (error) {
+
+      Logger.log(
+        `ERROR: ${error.message || error}`
+      );
+
+    }
+
+  });
+
+  Logger.log(
+    "=================================================="
+  );
+  Logger.log(
+    "NFL GAME LOG STATS ENDPOINT DIAGNOSTIC COMPLETE"
+  );
+  Logger.log(
+    "=================================================="
+  );
+}
+
+function testNFLDailyAnalyticsTriggerSeparation() {
+
+  Logger.log("==============================================");
+  Logger.log("NFL DAILY ANALYTICS TRIGGER SEPARATION TEST");
+  Logger.log("==============================================");
+
+  const permanentRunHandler =
+    "runNFLDailyAnalyticsPipeline";
+
+  const temporaryHandler =
+    NFL_DAILY_ANALYTICS_CONTINUATION_HANDLER;
+
+  const resetHandler =
+    "resetNFLDailyAnalyticsPipeline";
+
+
+  Logger.log(
+    `Permanent Run handler: ${permanentRunHandler}`
+  );
+
+  Logger.log(
+    `Temporary continuation handler: ${temporaryHandler}`
+  );
+
+  Logger.log(
+    `Reset handler: ${resetHandler}`
+  );
+
+
+  const handlersAreSeparated =
+    permanentRunHandler !== temporaryHandler;
+
+  Logger.log(
+    `Permanent Run and temporary continuation are separated: ${handlersAreSeparated}`
+  );
+
+
+  const temporaryHandlerCorrect =
+    temporaryHandler ===
+    "continueNFLDailyAnalyticsPipeline";
+
+  Logger.log(
+    `Temporary handler is correct: ${temporaryHandlerCorrect}`
+  );
+
+
+  const triggers =
+    ScriptApp.getProjectTriggers();
+
+  Logger.log(
+    `Current project trigger count: ${triggers.length}`
+  );
+
+
+  triggers.forEach(
+    (trigger, index) => {
+
+      Logger.log(
+        `Trigger ${index + 1}: ` +
+        `${trigger.getHandlerFunction()} | ` +
+        `${trigger.getEventType()}`
+      );
+
+    }
+  );
+
+
+  if (
+    handlersAreSeparated &&
+    temporaryHandlerCorrect
+  ) {
+
+    Logger.log(
+      "PASS: NFL permanent Run trigger is now isolated from temporary continuation cleanup."
+    );
+
+  } else {
+
+    throw new Error(
+      "FAIL: NFL permanent and temporary trigger handlers are not safely separated."
+    );
+
+  }
+
+
+  Logger.log("==============================================");
+  Logger.log("NFL TRIGGER SEPARATION TEST COMPLETE");
+  Logger.log("==============================================");
+}
+
+/**
+ * Installs the two PERMANENT NFL Daily Analytics triggers.
+ *
+ * Permanent schedule:
+ *   Reset: 12 AM – 1 AM
+ *   Run:   1 AM – 2 AM
+ *
+ * Only existing permanent Reset/Run triggers are replaced.
+ * Schedule, Rosters, Game Odds, Player Props, and temporary
+ * continuation triggers are left untouched.
+ */
+function installNFLDailyAnalyticsPermanentTriggers() {
+
+  Logger.log("==============================================");
+  Logger.log("INSTALLING NFL DAILY ANALYTICS PERMANENT TRIGGERS");
+  Logger.log("==============================================");
+
+  const resetHandler =
+    "resetNFLDailyAnalyticsPipeline";
+
+  const runHandler =
+    "runNFLDailyAnalyticsPipeline";
+
+  const triggers =
+    ScriptApp.getProjectTriggers();
+
+  let deletedReset = 0;
+  let deletedRun = 0;
+
+  triggers.forEach(trigger => {
+
+    const handler =
+      trigger.getHandlerFunction();
+
+    if (handler === resetHandler) {
+
+      ScriptApp.deleteTrigger(trigger);
+      deletedReset++;
+
+    } else if (handler === runHandler) {
+
+      ScriptApp.deleteTrigger(trigger);
+      deletedRun++;
+
+    }
+
+  });
+
+  Logger.log(
+    `Removed existing permanent Reset triggers: ${deletedReset}`
+  );
+
+  Logger.log(
+    `Removed existing permanent Run triggers: ${deletedRun}`
+  );
+
+
+  // Permanent nightly RESET.
+  ScriptApp
+    .newTrigger(resetHandler)
+    .timeBased()
+    .everyDays(1)
+    .atHour(0)
+    .create();
+
+  Logger.log(
+    "Created permanent Reset trigger: 12 AM – 1 AM daily."
+  );
+
+
+  // Permanent nightly RUN.
+  ScriptApp
+    .newTrigger(runHandler)
+    .timeBased()
+    .everyDays(1)
+    .atHour(1)
+    .create();
+
+  Logger.log(
+    "Created permanent Run trigger: 1 AM – 2 AM daily."
+  );
+
+
+  const finalTriggers =
+    ScriptApp.getProjectTriggers();
+
+  const resetCount =
+    finalTriggers.filter(
+      trigger =>
+        trigger.getHandlerFunction() === resetHandler
+    ).length;
+
+  const runCount =
+    finalTriggers.filter(
+      trigger =>
+        trigger.getHandlerFunction() === runHandler
+    ).length;
+
+  const continuationCount =
+    finalTriggers.filter(
+      trigger =>
+        trigger.getHandlerFunction() ===
+        "continueNFLDailyAnalyticsPipeline"
+    ).length;
+
+
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset triggers now installed: ${resetCount}`
+  );
+
+  Logger.log(
+    `Permanent Run triggers now installed: ${runCount}`
+  );
+
+  Logger.log(
+    `Temporary continuation triggers currently installed: ${continuationCount}`
+  );
+
+
+  if (
+    resetCount !== 1 ||
+    runCount !== 1
+  ) {
+
+    throw new Error(
+      "NFL permanent trigger installation failed. Expected exactly 1 Reset and 1 Run trigger."
+    );
+
+  }
+
+
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    "PASS: NFL has exactly one permanent Reset trigger and one permanent Run trigger."
+  );
+
+  Logger.log("==============================================");
+  Logger.log("NFL PERMANENT TRIGGER INSTALLATION COMPLETE");
+  Logger.log("==============================================");
+}
+
+function testNFLPermanentTriggerSurvival() {
+
+  Logger.log("==============================================");
+  Logger.log("NFL PERMANENT TRIGGER SURVIVAL TEST");
+  Logger.log("==============================================");
+
+  const resetHandler =
+    "resetNFLDailyAnalyticsPipeline";
+
+  const runHandler =
+    "runNFLDailyAnalyticsPipeline";
+
+  const continuationHandler =
+    "continueNFLDailyAnalyticsPipeline";
+
+
+  function countHandler_(handler) {
+
+    return ScriptApp
+      .getProjectTriggers()
+      .filter(
+        trigger =>
+          trigger.getHandlerFunction() === handler
+      )
+      .length;
+
+  }
+
+
+  const resetBefore =
+    countHandler_(resetHandler);
+
+  const runBefore =
+    countHandler_(runHandler);
+
+  const continuationBefore =
+    countHandler_(continuationHandler);
+
+
+  Logger.log("----------------------------------------------");
+  Logger.log("BEFORE CONTINUATION CLEANUP");
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset triggers: ${resetBefore}`
+  );
+
+  Logger.log(
+    `Permanent Run triggers: ${runBefore}`
+  );
+
+  Logger.log(
+    `Temporary continuation triggers: ${continuationBefore}`
+  );
+
+
+  if (
+    resetBefore !== 1 ||
+    runBefore !== 1
+  ) {
+
+    throw new Error(
+      "Pre-test failure: expected exactly 1 permanent Reset and 1 permanent Run trigger."
+    );
+
+  }
+
+
+  Logger.log("----------------------------------------------");
+  Logger.log("RUNNING CONTINUATION CLEANUP");
+  Logger.log("----------------------------------------------");
+
+  /*
+   * Exercise the REAL NFL continuation cleanup.
+   *
+   * It should target ONLY:
+   *   continueNFLDailyAnalyticsPipeline
+   *
+   * It must preserve:
+   *   resetNFLDailyAnalyticsPipeline
+   *   runNFLDailyAnalyticsPipeline
+   */
+  clearNFLDailyAnalyticsContinuationTriggers_();
+
+
+  const resetAfter =
+    countHandler_(resetHandler);
+
+  const runAfter =
+    countHandler_(runHandler);
+
+  const continuationAfter =
+    countHandler_(continuationHandler);
+
+
+  Logger.log("----------------------------------------------");
+  Logger.log("AFTER CONTINUATION CLEANUP");
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset triggers: ${resetAfter}`
+  );
+
+  Logger.log(
+    `Permanent Run triggers: ${runAfter}`
+  );
+
+  Logger.log(
+    `Temporary continuation triggers: ${continuationAfter}`
+  );
+
+
+  const resetSurvived =
+    resetAfter === 1;
+
+  const runSurvived =
+    runAfter === 1;
+
+  const continuationsCleared =
+    continuationAfter === 0;
+
+
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset survived: ${resetSurvived}`
+  );
+
+  Logger.log(
+    `Permanent Run survived: ${runSurvived}`
+  );
+
+  Logger.log(
+    `Temporary continuations cleared: ${continuationsCleared}`
+  );
+
+
+  if (
+    !resetSurvived ||
+    !runSurvived ||
+    !continuationsCleared
+  ) {
+
+    throw new Error(
+      "FAIL: NFL trigger isolation is not working correctly."
+    );
+
+  }
+
+
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    "PASS: NFL continuation cleanup cannot delete either permanent nightly trigger."
+  );
+
+  Logger.log("==============================================");
+  Logger.log("NFL PERMANENT TRIGGER SURVIVAL TEST COMPLETE");
+  Logger.log("==============================================");
+}
+
+// ============================================================================
+// SPORTACULAR LAUNCH AUTOPILOT
+// P18 — PLAYER ANALYTICS CONTRACT FREEZE
+// NFL AUTOMATED AUDIT RUNNER v0.5
+//
+// Purpose:
+// - Run approved NFL P18 release gates automatically.
+// - Continue after an individual gate fails.
+// - Produce one consolidated PASS / FAIL / BLOCKER report.
+// - Preserve existing NFL production/model logic.
+// - Exclude obsolete pre-P15 production assertions.
+// - Does NOT refresh production Player Props.
+// ============================================================================
+
+function runSportacularP18NFLAudit() {
+
+  const suiteStartedAt =
+    new Date();
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P18 NFL AUTOMATED AUDIT"
+  );
+
+  Logger.log(
+    "PLAYER ANALYTICS CONTRACT FREEZE"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  /*
+   * P18 RELEASE-GATE REGISTRY
+   *
+   * IMPORTANT:
+   *
+   * testNFLFinalUniversalPlayerPropsRegression()
+   * is intentionally NOT registered here.
+   *
+   * That older P14 regression predates P15 production integration
+   * and still requires:
+   *
+   *   AE    Risk Score       = blank
+   *   AH    Sportacular Score = blank
+   *   AI    Sportacular Edge  = blank
+   *   AJ    Confidence Tier   = blank
+   *
+   * P15 now intentionally owns and populates those fields.
+   *
+   * Therefore that legacy assertion is not a valid current P18
+   * release gate.
+   */
+  const registry = [
+
+    {
+      id:
+        "NFL-P18-001",
+
+      area:
+        "Universal A:AJ Contract",
+
+      name:
+        "NFL Universal Full Prop Row",
+
+      functionName:
+        "testNFLUniversalFullPropRow",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NFL-P18-002",
+
+      area:
+        "P15 Sportacular Scoring",
+
+      name:
+        "Universal Sportacular Scoring Contract",
+
+      functionName:
+        "testUniversalSportacularScoringContract",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NFL-P18-003",
+
+      area:
+        "Historical + Projection Contract",
+
+      name:
+        "NFL Universal Historical Context",
+
+      functionName:
+        "testNFLUniversalPropHistoricalContext",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NFL-P18-004",
+
+      area:
+        "Probability + EV Contract",
+
+      name:
+        "NFL Universal Probability EV",
+
+      functionName:
+        "testNFLUniversalPropProbabilityEV",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NFL-P18-005",
+
+      area:
+        "Decision + Trend Contract",
+
+      name:
+        "NFL Universal Decision Trend Fields",
+
+      functionName:
+        "testNFLUniversalDecisionTrendFields",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NFL-P18-006",
+
+      area:
+        "Sample-Size Reliability",
+
+      name:
+        "NFL Player Prop Sample Size Reliability",
+
+      functionName:
+        "testNFLPlayerPropSampleSizeReliability_D10W",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NFL-P18-007",
+
+      area:
+        "Probability Calibration",
+
+      name:
+        "NFL Probability Calibration Parity",
+
+      functionName:
+        "testNFLPlayerPropProbabilityCalibrationParity_D10X",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NFL-P18-008",
+
+      area:
+        "Production-Style Calibration",
+
+      name:
+        "NFL Production Style Probability Calibration",
+
+      functionName:
+        "testNFLProductionStyleProbabilityCalibration_D10AB",
+
+      blocker:
+        true
+    }
+
+  ];
+
+
+  const results =
+    [];
+
+
+  registry.forEach(
+    testDefinition => {
+
+      const startedAt =
+        new Date();
+
+
+      Logger.log(
+        "------------------------------------------------------------"
+      );
+
+      Logger.log(
+        `RUNNING | ${testDefinition.id} | ` +
+        `${testDefinition.area} | ` +
+        `${testDefinition.name}`
+      );
+
+
+      let status =
+        "PASS";
+
+      let message =
+        "";
+
+
+      try {
+
+        const testFunction =
+          globalThis[
+            testDefinition.functionName
+          ];
+
+
+        if (
+          typeof testFunction !==
+          "function"
+        ) {
+
+          throw new Error(
+            `Test function not found: ` +
+            testDefinition.functionName
+          );
+        }
+
+
+        testFunction();
+
+
+        message =
+          "Completed without assertion failure.";
+
+      } catch (error) {
+
+        status =
+          "FAIL";
+
+
+        message =
+          error &&
+          error.message
+            ? String(error.message)
+            : String(error);
+      }
+
+
+      const finishedAt =
+        new Date();
+
+
+      const durationMs =
+        finishedAt.getTime() -
+        startedAt.getTime();
+
+
+      const result = {
+
+        id:
+          testDefinition.id,
+
+        league:
+          "NFL",
+
+        area:
+          testDefinition.area,
+
+        name:
+          testDefinition.name,
+
+        functionName:
+          testDefinition.functionName,
+
+        blocker:
+          Boolean(
+            testDefinition.blocker
+          ),
+
+        status:
+          status,
+
+        durationMs:
+          durationMs,
+
+        message:
+          message
+      };
+
+
+      results.push(
+        result
+      );
+
+
+      Logger.log(
+        `${status} | ` +
+        `${testDefinition.id} | ` +
+        `${testDefinition.name} | ` +
+        `${durationMs} ms`
+      );
+
+
+      if (
+        status !== "PASS"
+      ) {
+
+        Logger.log(
+          `ERROR | ${message}`
+        );
+      }
+
+    }
+  );
+
+
+  // ==========================================================================
+  // CONSOLIDATED REPORT
+  // ==========================================================================
+
+  const passed =
+    results.filter(
+      result =>
+        result.status === "PASS"
+    ).length;
+
+
+  const failed =
+    results.filter(
+      result =>
+        result.status === "FAIL"
+    ).length;
+
+
+  const warnings =
+    results.filter(
+      result =>
+        result.status === "WARN"
+    ).length;
+
+
+  const blockers =
+    results.filter(
+      result =>
+        result.status === "FAIL" &&
+        result.blocker === true
+    ).length;
+
+
+  const suiteFinishedAt =
+    new Date();
+
+
+  const totalDurationMs =
+    suiteFinishedAt.getTime() -
+    suiteStartedAt.getTime();
+
+
+  const releaseStatus =
+    blockers > 0
+      ? "BLOCKED"
+      : failed > 0
+        ? "FAIL"
+        : "PASS";
+
+
+  Logger.log(
+    ""
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR P18 — NFL CONSOLIDATED REPORT"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  results.forEach(
+    result => {
+
+      Logger.log(
+        `${result.status.padEnd(5)} | ` +
+        `${result.id} | ` +
+        `${result.area} | ` +
+        `${result.name}`
+      );
+
+
+      if (
+        result.status !== "PASS"
+      ) {
+
+        Logger.log(
+          `       ↳ ${result.message}`
+        );
+      }
+
+    }
+  );
+
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    `Tests registered: ${results.length}`
+  );
+
+  Logger.log(
+    `Passed: ${passed}`
+  );
+
+  Logger.log(
+    `Warnings: ${warnings}`
+  );
+
+  Logger.log(
+    `Failed: ${failed}`
+  );
+
+  Logger.log(
+    `Release blockers: ${blockers}`
+  );
+
+  Logger.log(
+    `Total runtime: ${totalDurationMs} ms`
+  );
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    `NFL P18 STATUS: ${releaseStatus}`
+  );
+
+
+  if (
+    releaseStatus === "PASS"
+  ) {
+
+    Logger.log(
+      "NFL P18 AUTOMATED GATES: PASS"
+    );
+
+  } else {
+
+    Logger.log(
+      "NFL P18 AUTOMATED GATES: NOT READY TO FREEZE"
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return {
+
+    deployment:
+      "P18",
+
+    league:
+      "NFL",
+
+    suite:
+      "Player Analytics Contract Freeze",
+
+    status:
+      releaseStatus,
+
+    testsRegistered:
+      results.length,
+
+    passed:
+      passed,
+
+    warnings:
+      warnings,
+
+    failed:
+      failed,
+
+    blockers:
+      blockers,
+
+    durationMs:
+      totalDurationMs,
+
+    results:
+      results
+  };
+}
+
+// ============================================================================
+// SPORTACULAR V1.0
+// P19 D3A — NFL LIVE PRODUCTION INTEGRITY
+//
+// PURPOSE:
+// Audit the CURRENT NFL Player Props production output against the frozen
+// P15/P18 A:AJ contract.
+//
+// READ-ONLY:
+// - Does NOT refresh Player Props
+// - Does NOT call the provider API
+// - Does NOT modify sheet values
+// - Does NOT modify formulas
+// - Does NOT modify scoring
+//
+// IMPORTANT:
+// This supersedes the stale PRE-P15 live assertions inside the historical
+// P14 D7 regression. It does NOT modify or delete that historical test.
+// ============================================================================
+
+function testNFLLiveProductionIntegrity_P19D3A() {
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P19 D3A NFL LIVE PRODUCTION INTEGRITY"
+  );
+
+  Logger.log(
+    "CURRENT P15/P18 PRODUCTION CONTRACT"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  const expectedHeaders =
+    NFL_UNIVERSAL_PLAYER_PROPS_HEADERS;
+
+
+  const columnCount =
+    expectedHeaders.length;
+
+
+  const results =
+    [];
+
+
+  function addResult_(
+    name,
+    pass,
+    details
+  ) {
+
+    const result = {
+      name:
+        name,
+
+      pass:
+        Boolean(pass),
+
+      details:
+        details === undefined
+          ? null
+          : details
+    };
+
+
+    results.push(
+      result
+    );
+
+
+    Logger.log(
+      JSON.stringify(
+        result
+      )
+    );
+
+
+    return result.pass;
+  }
+
+
+  function hasValue_(
+    value
+  ) {
+
+    return (
+      value !== "" &&
+      value !== null &&
+      value !== undefined
+    );
+  }
+
+
+  function finiteIfPopulated_(
+    value
+  ) {
+
+    if (
+      !hasValue_(value)
+    ) {
+      return true;
+    }
+
+
+    return Number.isFinite(
+      Number(value)
+    );
+  }
+
+
+  function nearlyEqual_(
+    a,
+    b,
+    tolerance
+  ) {
+
+    if (
+      !Number.isFinite(
+        Number(a)
+      ) ||
+      !Number.isFinite(
+        Number(b)
+      )
+    ) {
+      return false;
+    }
+
+
+    return (
+      Math.abs(
+        Number(a) -
+        Number(b)
+      ) <=
+      (
+        tolerance === undefined
+          ? 1e-8
+          : tolerance
+      )
+    );
+  }
+
+
+  // ==========================================================================
+  // 1 — FROZEN UNIVERSAL CONTRACT
+  // ==========================================================================
+
+  addResult_(
+    "NFL universal production contract remains exactly 36 columns",
+    columnCount === 36,
+    {
+      actual:
+        columnCount,
+
+      expected:
+        36
+    }
+  );
+
+
+  // ==========================================================================
+  // 2 — PRODUCTION SHEET
+  // ==========================================================================
+
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+
+  const sheet =
+    ss.getSheetByName(
+      "Player Props"
+    );
+
+
+  addResult_(
+    'NFL production sheet "Player Props" exists',
+    Boolean(sheet),
+    null
+  );
+
+
+  if (!sheet) {
+
+    throw new Error(
+      'P19 D3A FAIL — Sheet "Player Props" not found.'
+    );
+  }
+
+
+  const lastRow =
+    sheet.getLastRow();
+
+
+  const lastColumn =
+    sheet.getLastColumn();
+
+
+  addResult_(
+    "NFL Player Props sheet contains at least frozen A:AJ width",
+    lastColumn >= 36,
+    {
+      actualLastColumn:
+        lastColumn,
+
+      requiredColumns:
+        36
+    }
+  );
+
+
+  if (
+    lastColumn < 36
+  ) {
+
+    throw new Error(
+      `P19 D3A FAIL — Player Props has only ${lastColumn} columns; A:AJ requires 36.`
+    );
+  }
+
+
+  // ==========================================================================
+  // 3 — EXACT HEADERS
+  // ==========================================================================
+
+  const actualHeaders =
+    sheet
+      .getRange(
+        1,
+        1,
+        1,
+        columnCount
+      )
+      .getValues()[0];
+
+
+  const headerMismatches =
+    [];
+
+
+  expectedHeaders.forEach(
+    (expected, index) => {
+
+      const actual =
+        String(
+          actualHeaders[index] ?? ""
+        ).trim();
+
+
+      if (
+        actual !== expected
+      ) {
+
+        headerMismatches.push({
+          column:
+            index + 1,
+
+          expected:
+            expected,
+
+          actual:
+            actual
+        });
+      }
+    }
+  );
+
+
+  addResult_(
+    "NFL live A:AJ headers exactly match frozen universal contract",
+    headerMismatches.length === 0,
+    {
+      mismatchCount:
+        headerMismatches.length,
+
+      samples:
+        headerMismatches.slice(
+          0,
+          10
+        )
+    }
+  );
+
+
+  // ==========================================================================
+  // 4 — NO FORMULA-DRIVEN PRODUCTION OUTPUT
+  // ==========================================================================
+
+  let formulaCellCount =
+    0;
+
+
+  const formulaSamples =
+    [];
+
+
+  if (
+    lastRow >= 2
+  ) {
+
+    const formulas =
+      sheet
+        .getRange(
+          2,
+          1,
+          lastRow - 1,
+          columnCount
+        )
+        .getFormulas();
+
+
+    formulas.forEach(
+      (row, rowIndex) => {
+
+        row.forEach(
+          (formula, columnIndex) => {
+
+            if (
+              String(
+                formula ?? ""
+              ).trim()
+            ) {
+
+              formulaCellCount++;
+
+
+              if (
+                formulaSamples.length <
+                10
+              ) {
+
+                formulaSamples.push({
+                  row:
+                    rowIndex + 2,
+
+                  column:
+                    columnIndex + 1,
+
+                  formula:
+                    formula
+                });
+              }
+            }
+          }
+        );
+      }
+    );
+  }
+
+
+  addResult_(
+    "NFL live A:AJ production output contains no formulas",
+    formulaCellCount === 0,
+    {
+      formulaCellCount:
+        formulaCellCount,
+
+      samples:
+        formulaSamples
+    }
+  );
+
+
+  // ==========================================================================
+  // 5 — LIVE ROW STATE
+  // ==========================================================================
+
+  const rows =
+    lastRow >= 2
+      ? sheet
+          .getRange(
+            2,
+            1,
+            lastRow - 1,
+            columnCount
+          )
+          .getValues()
+      : [];
+
+
+  const populatedRows =
+    rows.filter(
+      row =>
+        row.some(
+          value =>
+            hasValue_(value)
+        )
+    );
+
+
+  addResult_(
+    "NFL Player Props currently contains production rows",
+    populatedRows.length > 0,
+    {
+      lastRow:
+        lastRow,
+
+      productionRows:
+        populatedRows.length
+    }
+  );
+
+
+  if (
+    populatedRows.length === 0
+  ) {
+
+    throw new Error(
+      "P19 D3A FAIL — No current NFL Player Props production rows found."
+    );
+  }
+
+
+  // ==========================================================================
+  // 6 — COMPLETE ROW / IDENTITY / DUPLICATE / NUMERIC SCAN
+  // ==========================================================================
+
+  let blankRows =
+    0;
+
+  let missingGameIdRows =
+    0;
+
+  let missingProviderIdRows =
+    0;
+
+  let missingPlayerIdRows =
+    0;
+
+  let missingVendorRows =
+    0;
+
+  let missingPropTypeRows =
+    0;
+
+  let numericViolations =
+    0;
+
+  let probabilityBoundViolations =
+    0;
+
+  let probabilityComplementViolations =
+    0;
+
+  let unsupportedProbabilityViolations =
+    0;
+
+  let bestSideVocabularyViolations =
+    0;
+
+  let confidenceTierVocabularyViolations =
+    0;
+
+  let riskTierVocabularyViolations =
+    0;
+
+  let riskScoreViolations =
+    0;
+
+  let scoringBoundViolations =
+    0;
+
+  let scoringPairViolations =
+    0;
+
+  let actionabilityViolations =
+    0;
+
+  let bestEVViolations =
+    0;
+
+  let bestModelProbabilityViolations =
+    0;
+
+  let scorerParityViolations =
+    0;
+
+
+  let probabilityRows =
+    0;
+
+  let candidateRows =
+    0;
+
+  let scoringRows =
+    0;
+
+  let actionableRows =
+    0;
+
+  let noPlayRows =
+    0;
+
+
+  const samples = {
+
+    numeric:
+      [],
+
+    probability:
+      [],
+
+    unsupportedProbability:
+      [],
+
+    vocabulary:
+      [],
+
+    risk:
+      [],
+
+    scoring:
+      [],
+
+    actionability:
+      [],
+
+    candidate:
+      [],
+
+    scorerParity:
+      []
+  };
+
+
+  const providerIds =
+    new Set();
+
+
+  let duplicateProviderIds =
+    0;
+
+
+  const universalRows =
+    new Set();
+
+
+  let exactUniversalDuplicates =
+    0;
+
+
+  const numericColumns = [
+    8,   // I  Line Value
+    10,  // K  Odds
+    12,  // M  Over Odds
+    13,  // N  Under Odds
+    16,  // Q  Player Baseline
+    17,  // R  Trend Adjustment
+    18,  // S  Projected Stat
+    19,  // T  Stat Std Dev
+    20,  // U  Model Prob Over
+    21,  // V  Model Prob Under
+    22,  // W  EV Over
+    23,  // X  EV Under
+    25,  // Z  Best EV
+    26,  // AA Best Model Probability
+    27,  // AB Best Price Edge
+    28,  // AC Trend Score
+    30,  // AE Risk Score
+    32,  // AG Model Confidence
+    33,  // AH Sportacular Score
+    34   // AI Sportacular Edge
+  ];
+
+
+  const validBestSides =
+    new Set([
+      "Over",
+      "Under",
+      "No Play"
+    ]);
+
+
+  const validConfidenceTiers =
+    new Set([
+      "Elite",
+      "Strong",
+      "Solid",
+      "Lean",
+      "No Play"
+    ]);
+
+
+  const validRiskTiers =
+    new Set([
+      "Low",
+      "Medium",
+      "High"
+    ]);
+
+
+  rows.forEach(
+    (row, rowIndex) => {
+
+      const sheetRow =
+        rowIndex + 2;
+
+
+      const hasData =
+        row.some(
+          value =>
+            hasValue_(value)
+        );
+
+
+      if (!hasData) {
+
+        blankRows++;
+
+        return;
+      }
+
+
+      // ----------------------------------------------------------------------
+      // Required production identity
+      // ----------------------------------------------------------------------
+
+      if (
+        !hasValue_(
+          row[0]
+        )
+      ) {
+        missingGameIdRows++;
+      }
+
+
+      if (
+        !hasValue_(
+          row[4]
+        )
+      ) {
+        missingProviderIdRows++;
+
+      } else {
+
+        const providerId =
+          String(
+            row[4]
+          );
+
+
+        if (
+          providerIds.has(
+            providerId
+          )
+        ) {
+
+          duplicateProviderIds++;
+
+        } else {
+
+          providerIds.add(
+            providerId
+          );
+        }
+      }
+
+
+      if (
+        !hasValue_(
+          row[5]
+        )
+      ) {
+        missingPlayerIdRows++;
+      }
+
+
+      if (
+        !hasValue_(
+          row[6]
+        )
+      ) {
+        missingVendorRows++;
+      }
+
+
+      if (
+        !hasValue_(
+          row[7]
+        )
+      ) {
+        missingPropTypeRows++;
+      }
+
+
+      // ----------------------------------------------------------------------
+      // Exact A:AJ duplicate protection
+      // ----------------------------------------------------------------------
+
+      const universalKey =
+        JSON.stringify(
+          row
+        );
+
+
+      if (
+        universalRows.has(
+          universalKey
+        )
+      ) {
+
+        exactUniversalDuplicates++;
+
+      } else {
+
+        universalRows.add(
+          universalKey
+        );
+      }
+
+
+      // ----------------------------------------------------------------------
+      // Numeric finiteness
+      // ----------------------------------------------------------------------
+
+      numericColumns.forEach(
+        columnIndex => {
+
+          const value =
+            row[
+              columnIndex
+            ];
+
+
+          if (
+            !finiteIfPopulated_(
+              value
+            )
+          ) {
+
+            numericViolations++;
+
+
+            if (
+              samples.numeric.length <
+              10
+            ) {
+
+              samples.numeric.push({
+                row:
+                  sheetRow,
+
+                column:
+                  columnIndex + 1,
+
+                value:
+                  value
+              });
+            }
+          }
+        }
+      );
+
+
+      // ----------------------------------------------------------------------
+      // Current universal fields
+      // ----------------------------------------------------------------------
+
+      const propType =
+        String(
+          row[7] ?? ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      const marketType =
+        String(
+          row[9] ?? ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      const lineValue =
+        row[8];
+
+
+      const overOdds =
+        row[12];
+
+
+      const underOdds =
+        row[13];
+
+
+      const projectedStat =
+        row[18];
+
+
+      const statStdDev =
+        row[19];
+
+
+      const modelProbOver =
+        row[20];
+
+
+      const modelProbUnder =
+        row[21];
+
+
+      const evOver =
+        row[22];
+
+
+      const evUnder =
+        row[23];
+
+
+      const bestSide =
+        String(
+          row[24] ?? ""
+        ).trim();
+
+
+      const bestEV =
+        row[25];
+
+
+      const bestModelProbability =
+        row[26];
+
+
+      const bestPriceEdge =
+        row[27];
+
+
+      const trendScore =
+        row[28];
+
+
+      const riskScore =
+        row[30];
+
+
+      const riskTier =
+        String(
+          row[31] ?? ""
+        ).trim();
+
+
+      const modelConfidence =
+        row[32];
+
+
+      const sportacularScore =
+        row[33];
+
+
+      const sportacularEdge =
+        row[34];
+
+
+      const confidenceTier =
+        String(
+          row[35] ?? ""
+        ).trim();
+
+
+      // ----------------------------------------------------------------------
+      // Probability contract
+      // ----------------------------------------------------------------------
+
+      const probabilitySupported =
+        marketType ===
+          "over_under" &&
+        NFL_UNIVERSAL_PROBABILITY_MARKETS.has(
+          propType
+        );
+
+
+      const hasOverProbability =
+        hasValue_(
+          modelProbOver
+        );
+
+
+      const hasUnderProbability =
+        hasValue_(
+          modelProbUnder
+        );
+
+
+      const hasAnyProbability =
+        hasOverProbability ||
+        hasUnderProbability;
+
+
+      const hasAnyEV =
+        hasValue_(
+          evOver
+        ) ||
+        hasValue_(
+          evUnder
+        );
+
+
+      if (
+        hasOverProbability &&
+        hasUnderProbability
+      ) {
+
+        probabilityRows++;
+
+
+        const over =
+          Number(
+            modelProbOver
+          );
+
+
+        const under =
+          Number(
+            modelProbUnder
+          );
+
+
+        const boundsPass =
+          Number.isFinite(over) &&
+          Number.isFinite(under) &&
+          over >=
+            0.025 -
+            1e-9 &&
+          over <=
+            0.975 +
+            1e-9 &&
+          under >=
+            0.025 -
+            1e-9 &&
+          under <=
+            0.975 +
+            1e-9;
+
+
+        if (!boundsPass) {
+
+          probabilityBoundViolations++;
+
+
+          if (
+            samples.probability.length <
+            10
+          ) {
+
+            samples.probability.push({
+              row:
+                sheetRow,
+
+              over:
+                modelProbOver,
+
+              under:
+                modelProbUnder,
+
+              issue:
+                "bounds"
+            });
+          }
+        }
+
+
+        if (
+          !nearlyEqual_(
+            over + under,
+            1,
+            1e-8
+          )
+        ) {
+
+          probabilityComplementViolations++;
+
+
+          if (
+            samples.probability.length <
+            10
+          ) {
+
+            samples.probability.push({
+              row:
+                sheetRow,
+
+              over:
+                over,
+
+              under:
+                under,
+
+              sum:
+                over + under,
+
+              issue:
+                "complement"
+            });
+          }
+        }
+      }
+
+
+      if (
+        !probabilitySupported &&
+        (
+          hasAnyProbability ||
+          hasAnyEV
+        )
+      ) {
+
+        unsupportedProbabilityViolations++;
+
+
+        if (
+          samples.unsupportedProbability.length <
+          10
+        ) {
+
+          samples.unsupportedProbability.push({
+            row:
+              sheetRow,
+
+            propType:
+              propType,
+
+            marketType:
+              marketType,
+
+            modelProbOver:
+              modelProbOver,
+
+            modelProbUnder:
+              modelProbUnder,
+
+            evOver:
+              evOver,
+
+            evUnder:
+              evUnder
+          });
+        }
+      }
+
+
+      // ----------------------------------------------------------------------
+      // Frozen vocabularies
+      // ----------------------------------------------------------------------
+
+      if (
+        bestSide &&
+        !validBestSides.has(
+          bestSide
+        )
+      ) {
+
+        bestSideVocabularyViolations++;
+
+
+        if (
+          samples.vocabulary.length <
+          10
+        ) {
+
+          samples.vocabulary.push({
+            row:
+              sheetRow,
+
+            field:
+              "Best Side",
+
+            value:
+              bestSide
+          });
+        }
+      }
+
+
+      if (
+        confidenceTier &&
+        !validConfidenceTiers.has(
+          confidenceTier
+        )
+      ) {
+
+        confidenceTierVocabularyViolations++;
+
+
+        if (
+          samples.vocabulary.length <
+          10
+        ) {
+
+          samples.vocabulary.push({
+            row:
+              sheetRow,
+
+            field:
+              "Confidence Tier",
+
+            value:
+              confidenceTier
+          });
+        }
+      }
+
+
+      if (
+        riskTier &&
+        !validRiskTiers.has(
+          riskTier
+        )
+      ) {
+
+        riskTierVocabularyViolations++;
+
+
+        if (
+          samples.vocabulary.length <
+          10
+        ) {
+
+          samples.vocabulary.push({
+            row:
+              sheetRow,
+
+            field:
+              "Risk Tier",
+
+            value:
+              riskTier
+          });
+        }
+      }
+
+
+      // ----------------------------------------------------------------------
+      // AE:AF risk semantics
+      // ----------------------------------------------------------------------
+
+      const hasRiskScore =
+        hasValue_(
+          riskScore
+        );
+
+
+      const hasRiskTier =
+        Boolean(
+          riskTier
+        );
+
+
+      if (
+        hasRiskScore
+      ) {
+
+        const numericRisk =
+          Number(
+            riskScore
+          );
+
+
+        if (
+          !Number.isFinite(
+            numericRisk
+          ) ||
+          numericRisk < 0 ||
+          numericRisk > 100
+        ) {
+
+          riskScoreViolations++;
+
+
+          if (
+            samples.risk.length <
+            10
+          ) {
+
+            samples.risk.push({
+              row:
+                sheetRow,
+
+              riskScore:
+                riskScore,
+
+              riskTier:
+                riskTier,
+
+              issue:
+                "bounds"
+            });
+          }
+        }
+      }
+
+
+      if (
+        hasRiskScore !==
+        hasRiskTier
+      ) {
+
+        riskScoreViolations++;
+
+
+        if (
+          samples.risk.length <
+          10
+        ) {
+
+          samples.risk.push({
+            row:
+              sheetRow,
+
+            riskScore:
+              riskScore,
+
+            riskTier:
+              riskTier,
+
+            issue:
+              "pair"
+          });
+        }
+      }
+
+
+      // ----------------------------------------------------------------------
+      // AH:AI scoring semantics
+      // ----------------------------------------------------------------------
+
+      const hasSportacularScore =
+        hasValue_(
+          sportacularScore
+        );
+
+
+      const hasSportacularEdge =
+        hasValue_(
+          sportacularEdge
+        );
+
+
+      if (
+        hasSportacularScore ||
+        hasSportacularEdge
+      ) {
+
+        scoringRows++;
+      }
+
+
+      if (
+        hasSportacularScore
+      ) {
+
+        const score =
+          Number(
+            sportacularScore
+          );
+
+
+        if (
+          !Number.isFinite(score) ||
+          score < 0 ||
+          score > 100
+        ) {
+
+          scoringBoundViolations++;
+
+
+          if (
+            samples.scoring.length <
+            10
+          ) {
+
+            samples.scoring.push({
+              row:
+                sheetRow,
+
+              sportacularScore:
+                sportacularScore,
+
+              sportacularEdge:
+                sportacularEdge,
+
+              issue:
+                "score bounds"
+            });
+          }
+        }
+      }
+
+
+      if (
+        hasSportacularEdge
+      ) {
+
+        const edge =
+          Number(
+            sportacularEdge
+          );
+
+
+        if (
+          !Number.isFinite(edge) ||
+          edge < 0 ||
+          edge > 100
+        ) {
+
+          scoringBoundViolations++;
+
+
+          if (
+            samples.scoring.length <
+            10
+          ) {
+
+            samples.scoring.push({
+              row:
+                sheetRow,
+
+              sportacularScore:
+                sportacularScore,
+
+              sportacularEdge:
+                sportacularEdge,
+
+              issue:
+                "edge bounds"
+            });
+          }
+        }
+      }
+
+
+      if (
+        hasSportacularScore !==
+        hasSportacularEdge
+      ) {
+
+        scoringPairViolations++;
+
+
+        if (
+          samples.scoring.length <
+          10
+        ) {
+
+          samples.scoring.push({
+            row:
+              sheetRow,
+
+            sportacularScore:
+              sportacularScore,
+
+            sportacularEdge:
+              sportacularEdge,
+
+            issue:
+              "pair"
+          });
+        }
+      }
+
+
+      // ----------------------------------------------------------------------
+      // Candidate selection parity
+      // ----------------------------------------------------------------------
+
+      const candidateSide =
+        selectUniversalCandidateSide_({
+          evOver:
+            evOver,
+
+          evUnder:
+            evUnder
+        });
+
+
+      if (
+        candidateSide === "Over" ||
+        candidateSide === "Under"
+      ) {
+
+        candidateRows++;
+
+
+        const expectedBestEV =
+          candidateSide === "Over"
+            ? Number(evOver)
+            : Number(evUnder);
+
+
+        const expectedProbability =
+          candidateSide === "Over"
+            ? Number(modelProbOver)
+            : Number(modelProbUnder);
+
+
+        if (
+          !hasValue_(bestEV) ||
+          !nearlyEqual_(
+            bestEV,
+            expectedBestEV,
+            1e-8
+          )
+        ) {
+
+          bestEVViolations++;
+
+
+          if (
+            samples.candidate.length <
+            10
+          ) {
+
+            samples.candidate.push({
+              row:
+                sheetRow,
+
+              candidateSide:
+                candidateSide,
+
+              actualBestEV:
+                bestEV,
+
+              expectedBestEV:
+                expectedBestEV
+            });
+          }
+        }
+
+
+        if (
+          !hasValue_(
+            bestModelProbability
+          ) ||
+          !nearlyEqual_(
+            bestModelProbability,
+            expectedProbability,
+            1e-8
+          )
+        ) {
+
+          bestModelProbabilityViolations++;
+
+
+          if (
+            samples.candidate.length <
+            10
+          ) {
+
+            samples.candidate.push({
+              row:
+                sheetRow,
+
+              candidateSide:
+                candidateSide,
+
+              actualBestModelProbability:
+                bestModelProbability,
+
+              expectedBestModelProbability:
+                expectedProbability
+            });
+          }
+        }
+      }
+
+
+      // ----------------------------------------------------------------------
+      // Master P15 scorer parity
+      //
+      // Rebuild the fields P15 owns:
+      // Y / AE / AF / AH / AI / AJ
+      // ----------------------------------------------------------------------
+
+      const rebuilt =
+        buildUniversalSportacularScoring_({
+          lineValue:
+            lineValue,
+
+          projectedStat:
+            projectedStat,
+
+          statStdDev:
+            statStdDev,
+
+          evOver:
+            evOver,
+
+          evUnder:
+            evUnder,
+
+          bestModelProbability:
+            bestModelProbability,
+
+          bestPriceEdge:
+            bestPriceEdge,
+
+          trendScore:
+            trendScore,
+
+          modelConfidence:
+            modelConfidence
+        });
+
+
+      const riskMatches =
+        (
+          rebuilt.riskScore === null &&
+          !hasValue_(riskScore)
+        ) ||
+        (
+          rebuilt.riskScore !== null &&
+          hasValue_(riskScore) &&
+          nearlyEqual_(
+            rebuilt.riskScore,
+            riskScore,
+            1e-8
+          )
+        );
+
+
+      const riskTierMatches =
+        (
+          rebuilt.riskTier === null &&
+          !riskTier
+        ) ||
+        rebuilt.riskTier ===
+          riskTier;
+
+
+      const scoreMatches =
+        (
+          rebuilt.sportacularScore === null &&
+          !hasValue_(
+            sportacularScore
+          )
+        ) ||
+        (
+          rebuilt.sportacularScore !== null &&
+          hasValue_(
+            sportacularScore
+          ) &&
+          nearlyEqual_(
+            rebuilt.sportacularScore,
+            sportacularScore,
+            1e-8
+          )
+        );
+
+
+      const edgeMatches =
+        (
+          rebuilt.sportacularEdge === null &&
+          !hasValue_(
+            sportacularEdge
+          )
+        ) ||
+        (
+          rebuilt.sportacularEdge !== null &&
+          hasValue_(
+            sportacularEdge
+          ) &&
+          nearlyEqual_(
+            rebuilt.sportacularEdge,
+            sportacularEdge,
+            1e-8
+          )
+        );
+
+
+      const confidenceMatches =
+        (
+          rebuilt.confidenceTier === null &&
+          !confidenceTier
+        ) ||
+        rebuilt.confidenceTier ===
+          confidenceTier;
+
+
+      const sideMatches =
+        rebuilt.finalBestSide ===
+          bestSide;
+
+
+      if (
+        !riskMatches ||
+        !riskTierMatches ||
+        !scoreMatches ||
+        !edgeMatches ||
+        !confidenceMatches ||
+        !sideMatches
+      ) {
+
+        scorerParityViolations++;
+
+
+        if (
+          samples.scorerParity.length <
+          10
+        ) {
+
+          samples.scorerParity.push({
+            row:
+              sheetRow,
+
+            production: {
+              bestSide:
+                bestSide,
+
+              riskScore:
+                riskScore,
+
+              riskTier:
+                riskTier,
+
+              sportacularScore:
+                sportacularScore,
+
+              sportacularEdge:
+                sportacularEdge,
+
+              confidenceTier:
+                confidenceTier
+            },
+
+            rebuilt:
+              rebuilt
+          });
+        }
+      }
+
+
+      // ----------------------------------------------------------------------
+      // Final actionability semantics
+      // ----------------------------------------------------------------------
+
+      if (
+        bestSide === "Over" ||
+        bestSide === "Under"
+      ) {
+
+        actionableRows++;
+
+
+        if (
+          !confidenceTier ||
+          confidenceTier ===
+            "No Play" ||
+          rebuilt.actionable !==
+            true
+        ) {
+
+          actionabilityViolations++;
+
+
+          if (
+            samples.actionability.length <
+            10
+          ) {
+
+            samples.actionability.push({
+              row:
+                sheetRow,
+
+              bestSide:
+                bestSide,
+
+              confidenceTier:
+                confidenceTier,
+
+              rebuilt:
+                rebuilt
+            });
+          }
+        }
+
+      } else if (
+        bestSide === "No Play"
+      ) {
+
+        noPlayRows++;
+
+
+        if (
+          rebuilt.finalBestSide !==
+          "No Play"
+        ) {
+
+          actionabilityViolations++;
+
+
+          if (
+            samples.actionability.length <
+            10
+          ) {
+
+            samples.actionability.push({
+              row:
+                sheetRow,
+
+              bestSide:
+                bestSide,
+
+              confidenceTier:
+                confidenceTier,
+
+              rebuilt:
+                rebuilt
+            });
+          }
+        }
+      }
+    }
+  );
+
+
+  // ==========================================================================
+  // 7 — STALE-BOUNDARY PROTECTION
+  // ==========================================================================
+
+  const rowsBelowToInspect =
+    25;
+
+
+  const startBelow =
+    lastRow + 1;
+
+
+  const availableRowsBelow =
+    Math.max(
+      0,
+      sheet.getMaxRows() -
+      lastRow
+    );
+
+
+  const inspectCount =
+    Math.min(
+      rowsBelowToInspect,
+      availableRowsBelow
+    );
+
+
+  let staleBoundaryCells =
+    0;
+
+
+  const staleBoundarySamples =
+    [];
+
+
+  if (
+    inspectCount > 0
+  ) {
+
+    const belowValues =
+      sheet
+        .getRange(
+          startBelow,
+          1,
+          inspectCount,
+          columnCount
+        )
+        .getValues();
+
+
+    belowValues.forEach(
+      (row, rowIndex) => {
+
+        row.forEach(
+          (value, columnIndex) => {
+
+            if (
+              hasValue_(value)
+            ) {
+
+              staleBoundaryCells++;
+
+
+              if (
+                staleBoundarySamples.length <
+                10
+              ) {
+
+                staleBoundarySamples.push({
+                  row:
+                    startBelow +
+                    rowIndex,
+
+                  column:
+                    columnIndex + 1,
+
+                  value:
+                    value
+                });
+              }
+            }
+          }
+        );
+      }
+    );
+  }
+
+
+  // ==========================================================================
+  // ASSERTIONS
+  // ==========================================================================
+
+  addResult_(
+    "NFL live production range contains no blank rows",
+    blankRows === 0,
+    {
+      violations:
+        blankRows
+    }
+  );
+
+
+  addResult_(
+    "Every live NFL production row has a Game Id",
+    missingGameIdRows === 0,
+    {
+      violations:
+        missingGameIdRows
+    }
+  );
+
+
+  addResult_(
+    "Every live NFL production row has a provider Id",
+    missingProviderIdRows === 0,
+    {
+      violations:
+        missingProviderIdRows
+    }
+  );
+
+
+  addResult_(
+    "Every live NFL production row has a Player Id",
+    missingPlayerIdRows === 0,
+    {
+      violations:
+        missingPlayerIdRows
+    }
+  );
+
+
+  addResult_(
+    "Every live NFL production row has a Vendor",
+    missingVendorRows === 0,
+    {
+      violations:
+        missingVendorRows
+    }
+  );
+
+
+  addResult_(
+    "Every live NFL production row has a Prop Type",
+    missingPropTypeRows === 0,
+    {
+      violations:
+        missingPropTypeRows
+    }
+  );
+
+
+  addResult_(
+    "Live NFL provider IDs are unique",
+    duplicateProviderIds === 0,
+    {
+      uniqueProviderIds:
+        providerIds.size,
+
+      duplicateOccurrences:
+        duplicateProviderIds
+    }
+  );
+
+
+  addResult_(
+    "Live NFL output contains no exact duplicate A:AJ rows",
+    exactUniversalDuplicates === 0,
+    {
+      violations:
+        exactUniversalDuplicates
+    }
+  );
+
+
+  addResult_(
+    "All populated NFL production numeric values are finite",
+    numericViolations === 0,
+    {
+      violations:
+        numericViolations,
+
+      samples:
+        samples.numeric
+    }
+  );
+
+
+  addResult_(
+    "All evaluable NFL probabilities remain inside frozen bounds",
+    probabilityBoundViolations === 0,
+    {
+      probabilityRows:
+        probabilityRows,
+
+      violations:
+        probabilityBoundViolations,
+
+      samples:
+        samples.probability
+    }
+  );
+
+
+  addResult_(
+    "All evaluable NFL Over/Under probability pairs sum to one",
+    probabilityComplementViolations === 0,
+    {
+      probabilityRows:
+        probabilityRows,
+
+      violations:
+        probabilityComplementViolations,
+
+      samples:
+        samples.probability
+    }
+  );
+
+
+  addResult_(
+    "Unsupported NFL markets do not fabricate probability or EV",
+    unsupportedProbabilityViolations === 0,
+    {
+      violations:
+        unsupportedProbabilityViolations,
+
+      samples:
+        samples.unsupportedProbability
+    }
+  );
+
+
+  addResult_(
+    "All live NFL Best Side values use frozen vocabulary",
+    bestSideVocabularyViolations === 0,
+    {
+      violations:
+        bestSideVocabularyViolations,
+
+      samples:
+        samples.vocabulary
+    }
+  );
+
+
+  addResult_(
+    "All populated NFL Confidence Tier values use frozen P15 vocabulary",
+    confidenceTierVocabularyViolations === 0,
+    {
+      violations:
+        confidenceTierVocabularyViolations,
+
+      samples:
+        samples.vocabulary
+    }
+  );
+
+
+  addResult_(
+    "All populated NFL Risk Tier values use frozen universal vocabulary",
+    riskTierVocabularyViolations === 0,
+    {
+      violations:
+        riskTierVocabularyViolations,
+
+      samples:
+        samples.vocabulary
+    }
+  );
+
+
+  addResult_(
+    "All populated NFL universal Risk Scores preserve AE:AF semantics",
+    riskScoreViolations === 0,
+    {
+      violations:
+        riskScoreViolations,
+
+      samples:
+        samples.risk
+    }
+  );
+
+
+  addResult_(
+    "All populated NFL Sportacular scoring values remain inside frozen bounds",
+    scoringBoundViolations === 0,
+    {
+      scoringRows:
+        scoringRows,
+
+      violations:
+        scoringBoundViolations,
+
+      samples:
+        samples.scoring
+    }
+  );
+
+
+  addResult_(
+    "NFL Sportacular Score and Sportacular Edge populate together",
+    scoringPairViolations === 0,
+    {
+      scoringRows:
+        scoringRows,
+
+      violations:
+        scoringPairViolations,
+
+      samples:
+        samples.scoring
+    }
+  );
+
+
+  addResult_(
+    "All live NFL Best EV values agree with internal EV candidate",
+    bestEVViolations === 0,
+    {
+      candidateRows:
+        candidateRows,
+
+      violations:
+        bestEVViolations,
+
+      samples:
+        samples.candidate
+    }
+  );
+
+
+  addResult_(
+    "All live NFL Best Model Probability values agree with internal EV candidate",
+    bestModelProbabilityViolations === 0,
+    {
+      candidateRows:
+        candidateRows,
+
+      violations:
+        bestModelProbabilityViolations,
+
+      samples:
+        samples.candidate
+    }
+  );
+
+
+  addResult_(
+    "Every NFL production row agrees with frozen P15 master scorer ownership",
+    scorerParityViolations === 0,
+    {
+      violations:
+        scorerParityViolations,
+
+      samples:
+        samples.scorerParity
+    }
+  );
+
+
+  addResult_(
+    "NFL final Best Side and Confidence Tier preserve frozen actionability semantics",
+    actionabilityViolations === 0,
+    {
+      actionableRows:
+        actionableRows,
+
+      noPlayRows:
+        noPlayRows,
+
+      violations:
+        actionabilityViolations,
+
+      samples:
+        samples.actionability
+    }
+  );
+
+
+  addResult_(
+    "No stale NFL A:AJ values survive immediately below production output",
+    staleBoundaryCells === 0,
+    {
+      inspectedRowsBelowOutput:
+        inspectCount,
+
+      violations:
+        staleBoundaryCells,
+
+      samples:
+        staleBoundarySamples
+    }
+  );
+
+
+  // ==========================================================================
+  // FINAL REPORT
+  // ==========================================================================
+
+  const passed =
+    results.filter(
+      result =>
+        result.pass
+    ).length;
+
+
+  const failed =
+    results.length -
+    passed;
+
+
+  const summary = {
+
+    test:
+      "P19 D3A NFL LIVE PRODUCTION INTEGRITY",
+
+    tests:
+      results.length,
+
+    passed:
+      passed,
+
+    failed:
+      failed,
+
+    pass:
+      failed === 0,
+
+    productionRows:
+      populatedRows.length,
+
+    probabilityRows:
+      probabilityRows,
+
+    candidateRows:
+      candidateRows,
+
+    scoringRows:
+      scoringRows,
+
+    actionableRows:
+      actionableRows,
+
+    noPlayRows:
+      noPlayRows,
+
+    uniqueProviderIds:
+      providerIds.size,
+
+    duplicateProviderIdOccurrences:
+      duplicateProviderIds,
+
+    exactUniversalRowDuplicates:
+      exactUniversalDuplicates,
+
+    staleBoundaryCells:
+      staleBoundaryCells,
+
+    results:
+      results
+  };
+
+
+  Logger.log(
+    JSON.stringify(
+      summary,
+      null,
+      2
+    )
+  );
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  if (
+    !summary.pass
+  ) {
+
+    Logger.log(
+      "P19 D3A STATUS: BLOCKED"
+    );
+
+    Logger.log(
+      "NFL LIVE PRODUCTION INTEGRITY: FAIL"
+    );
+
+    Logger.log(
+      "============================================================"
+    );
+
+
+    throw new Error(
+      `P19 D3A NFL live production audit failed: ${failed} assertion(s) failed.`
+    );
+  }
+
+
+  Logger.log(
+    "P19 D3A STATUS: PASS"
+  );
+
+  Logger.log(
+    "NFL LIVE PRODUCTION INTEGRITY: PASS"
+  );
+
+  Logger.log(
+    "READY FOR P19 D3B — NFL STANDARDIZED PRODUCTION EVIDENCE"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return summary;
+}
+
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("Sports Data")
@@ -12913,6 +16990,307 @@ function diagnoseNFLGameParticipation423946() {
   console.log(
     "===== END DIAGNOSTIC ====="
   );
+}
+
+/**
+ * ============================================================================
+ * D10AB — NFL PRODUCTION-STYLE PROBABILITY CALIBRATION
+ * ============================================================================
+ *
+ * Regression test for an extreme but realistic NFL player-prop scenario.
+ *
+ * Goal:
+ *   - raw probability may become extremely confident
+ *   - early-sample reliability must pull that probability toward 50%
+ *   - calibrated probabilities must remain complementary
+ *   - EV must use the calibrated probabilities
+ *
+ * This test does NOT change production behavior.
+ * ============================================================================
+ */
+function testNFLProductionStyleProbabilityCalibration_D10AB() {
+
+  const input = {
+    propType: "receiving_yards",
+    marketType: "over_under",
+
+    // Intentionally extreme production-style example.
+    projectedStat: 32,
+    statStdDev: 12,
+    lineValue: 59.5,
+
+    // Early-season NFL sample.
+    currentGames: 2,
+
+    overOdds: -110,
+    underOdds: -110
+  };
+
+
+  const result =
+    buildNFLUniversalPropProbabilityEV_(input);
+
+
+  const tests = [];
+
+
+  function addTest(
+    name,
+    pass,
+    diagnostics
+  ) {
+    const test = {
+      name,
+      pass: pass === true
+    };
+
+    if (
+      diagnostics &&
+      typeof diagnostics === "object"
+    ) {
+      Object.assign(
+        test,
+        diagnostics
+      );
+    }
+
+    tests.push(test);
+
+    Logger.log(
+      JSON.stringify(test)
+    );
+  }
+
+
+  // --------------------------------------------------------------------------
+  // 1. Production builder returned calibrated probabilities.
+  // --------------------------------------------------------------------------
+
+  addTest(
+    "Calibrated probabilities exist",
+    result.modelProbOver !== null &&
+    result.modelProbUnder !== null,
+    {
+      modelProbOver:
+        result.modelProbOver,
+      modelProbUnder:
+        result.modelProbUnder
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // 2. Reliability exists and remains bounded.
+  // --------------------------------------------------------------------------
+
+  addTest(
+    "Probability reliability exists and is bounded",
+    result.reliability !== null &&
+    Number.isFinite(
+      Number(result.reliability)
+    ) &&
+    result.reliability >= 0 &&
+    result.reliability <= 1,
+    {
+      reliability:
+        result.reliability
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // 3. Raw probability is intentionally extreme.
+  // --------------------------------------------------------------------------
+
+  const rawUnder =
+    result.rawProbOver === null
+      ? null
+      : 1 -
+        result.rawProbOver;
+
+
+  addTest(
+    "Raw Under probability is extreme",
+    rawUnder !== null &&
+    rawUnder > 0.95,
+    {
+      rawProbOver:
+        result.rawProbOver,
+      rawProbUnder:
+        rawUnder
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // 4. Calibration must reduce that extreme certainty.
+  // --------------------------------------------------------------------------
+
+  addTest(
+    "Calibration reduces extreme Under probability",
+    rawUnder !== null &&
+    result.modelProbUnder !== null &&
+    result.modelProbUnder <
+      rawUnder &&
+    result.modelProbUnder >
+      0.5,
+    {
+      rawUnder,
+      calibratedUnder:
+        result.modelProbUnder
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // 5. Probabilities remain complementary.
+  // --------------------------------------------------------------------------
+
+  const probabilityTotal =
+    (
+      result.modelProbOver !== null &&
+      result.modelProbUnder !== null
+    )
+      ? result.modelProbOver +
+        result.modelProbUnder
+      : null;
+
+
+  addTest(
+    "Calibrated probabilities still sum to 1",
+    probabilityTotal !== null &&
+    Math.abs(
+      probabilityTotal - 1
+    ) <= 1e-10,
+    {
+      modelProbOver:
+        result.modelProbOver,
+      modelProbUnder:
+        result.modelProbUnder,
+      total:
+        probabilityTotal
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // 6. EV exists and therefore uses the calibrated probability path.
+  // --------------------------------------------------------------------------
+
+  addTest(
+    "Calibrated EV values exist",
+    result.evOver !== null &&
+    result.evUnder !== null &&
+    Number.isFinite(
+      Number(result.evOver)
+    ) &&
+    Number.isFinite(
+      Number(result.evUnder)
+    ),
+    {
+      evOver:
+        result.evOver,
+      evUnder:
+        result.evUnder
+    }
+  );
+
+
+  // --------------------------------------------------------------------------
+  // 7. Verify the expected two-game reliability contract.
+  //
+  // reliability =
+  //   MIN(1, 0.60 + 0.05 * 2)
+  //   = 0.70
+  // --------------------------------------------------------------------------
+
+  addTest(
+    "Two-game reliability remains 0.70",
+    result.reliability !== null &&
+    Math.abs(
+      result.reliability -
+      0.70
+    ) <= 1e-10,
+    {
+      expectedReliability:
+        0.70,
+      actualReliability:
+        result.reliability
+    }
+  );
+
+
+  const pass =
+    tests.every(
+      test =>
+        test.pass === true
+    );
+
+
+  const output = {
+    test:
+      "D10AB NFL PRODUCTION-STYLE PROBABILITY CALIBRATION",
+
+    input,
+
+    raw: {
+      overProbability:
+        result.rawProbOver,
+
+      underProbability:
+        rawUnder
+    },
+
+    calibrated: {
+      modelProbOver:
+        result.modelProbOver,
+
+      modelProbUnder:
+        result.modelProbUnder,
+
+      evOver:
+        result.evOver,
+
+      evUnder:
+        result.evUnder,
+
+      reliability:
+        result.reliability
+    },
+
+    tests:
+      tests.length,
+
+    passed:
+      tests.filter(
+        test =>
+          test.pass === true
+      ).length,
+
+    pass,
+
+    results:
+      tests
+  };
+
+
+  Logger.log(
+    JSON.stringify(
+      output,
+      null,
+      2
+    )
+  );
+
+
+  if (!pass) {
+    throw new Error(
+      "D10AB NFL production-style probability calibration regression failed."
+    );
+  }
+
+
+  return true;
 }
 
 // ============================================================================

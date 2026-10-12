@@ -1,0 +1,1658 @@
+// ============================================================================
+// SPORTACULAR V1.0 RELEASE CONTROLLER
+// P18 — MASTER FOUR-LEAGUE PLAYER ANALYTICS CONTRACT FREEZE
+// Version 0.1
+//
+// IMPORTANT:
+// The four league Apps Script projects are independent.
+// This controller does NOT pretend it can execute functions inside those
+// projects directly.
+//
+// Instead, it validates standardized audit evidence produced by the approved
+// league-local P18 runners.
+//
+// League-local source runners:
+//
+// NBA: runSportacularP18NBAAudit()
+// NHL: runSportacularP18NHLAudit()
+// MLB: runSportacularP18MLBAudit()
+// NFL: runSportacularP18NFLAudit()
+//
+// Once P18 is frozen, this project becomes the permanent home for the
+// Sportacular V1 release-gate controller.
+// ============================================================================
+
+
+// ============================================================================
+// P18 VERIFIED LEAGUE AUDIT EVIDENCE
+//
+// These values come from the completed league-local P18 audit runs.
+//
+// Do not change PASS to PASS manually to bypass a failed future audit.
+// When a league audit is rerun in the future, update its evidence here from
+// that actual runner result.
+// ============================================================================
+
+const SPORTACULAR_P18_LEAGUE_EVIDENCE = {
+
+  NBA: {
+    runner:
+      "runSportacularP18NBAAudit",
+
+    status:
+      "PASS",
+
+    testsRegistered:
+      4,
+
+    testsPassed:
+      4,
+
+    warnings:
+      0,
+
+    failures:
+      0,
+
+    blockers:
+      0,
+
+    underlyingAssertions:
+      81,
+
+    underlyingAssertionsPassed:
+      81,
+
+    evidenceType:
+      "league-local automated audit"
+  },
+
+
+  NHL: {
+    runner:
+      "runSportacularP18NHLAudit",
+
+    status:
+      "PASS",
+
+    testsRegistered:
+      5,
+
+    testsPassed:
+      5,
+
+    warnings:
+      0,
+
+    failures:
+      0,
+
+    blockers:
+      0,
+
+    productionRowsAudited:
+      5073,
+
+    evidenceType:
+      "league-local automated audit"
+  },
+
+
+  MLB: {
+    runner:
+      "runSportacularP18MLBAudit",
+
+    status:
+      "PASS",
+
+    testsRegistered:
+      7,
+
+    testsPassed:
+      7,
+
+    warnings:
+      0,
+
+    failures:
+      0,
+
+    blockers:
+      0,
+
+    productionRowsAudited:
+      44,
+
+    evidenceType:
+      "league-local automated audit"
+  },
+
+
+  NFL: {
+    runner:
+      "runSportacularP18NFLAudit",
+
+    status:
+      "PASS",
+
+    testsRegistered:
+      8,
+
+    testsPassed:
+      8,
+
+    warnings:
+      0,
+
+    failures:
+      0,
+
+    blockers:
+      0,
+
+    evidenceType:
+      "league-local automated audit"
+  }
+
+};
+
+
+// ============================================================================
+// FROZEN UNIVERSAL PLAYER PROPS CONTRACT
+// ============================================================================
+
+const SPORTACULAR_P18_UNIVERSAL_HEADERS = [
+  "Game Id",
+  "Game Date",
+  "Away Team",
+  "Home Team",
+  "Id",
+  "Player Id",
+  "Vendor",
+  "Prop Type",
+  "Line Value",
+  "Type",
+  "Odds",
+  "Updated At",
+  "Over Odds",
+  "Under Odds",
+  "Player Name",
+  "Team",
+  "Player Baseline",
+  "Trend Adjustment",
+  "Projected Stat",
+  "Stat Std Dev",
+  "Model Prob Over",
+  "Model Prob Under",
+  "EV Over",
+  "EV Under",
+  "Best Side",
+  "Best EV",
+  "Best Model Probability",
+  "Best Price Edge",
+  "Trend Score",
+  "Trend Strength",
+  "Risk Score",
+  "Risk Tier",
+  "Model Confidence",
+  "Sportacular Score",
+  "Sportacular Edge",
+  "Confidence Tier"
+];
+
+
+// ============================================================================
+// FROZEN P15 CONFIDENCE-TIER VOCABULARY
+// ============================================================================
+
+const SPORTACULAR_P18_CONFIDENCE_TIERS = [
+  "Elite",
+  "Strong",
+  "Solid",
+  "Lean",
+  "No Play"
+];
+
+
+// ============================================================================
+// MASTER P18 FOUR-LEAGUE FREEZE AUDIT
+// ============================================================================
+
+function runSportacularP18MasterFreezeAudit() {
+
+  const startedAt =
+    new Date();
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P18 MASTER FOUR-LEAGUE FREEZE AUDIT"
+  );
+
+  Logger.log(
+    "PLAYER ANALYTICS CONTRACT FREEZE"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  const assertions =
+    [];
+
+
+  function assertMaster(
+    name,
+    condition,
+    details
+  ) {
+
+    const pass =
+      Boolean(condition);
+
+
+    const result = {
+      name:
+        name,
+
+      pass:
+        pass,
+
+      details:
+        details || null
+    };
+
+
+    assertions.push(
+      result
+    );
+
+
+    Logger.log(
+      JSON.stringify(result)
+    );
+
+
+    return pass;
+  }
+
+
+  // ==========================================================================
+  // GATE 1 — UNIVERSAL CONTRACT DEFINITION
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "MASTER GATE 1 — UNIVERSAL A:AJ CONTRACT"
+  );
+
+
+  assertMaster(
+    "Universal Player Props contract contains exactly 36 columns",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS.length === 36,
+    {
+      actual:
+        SPORTACULAR_P18_UNIVERSAL_HEADERS.length,
+
+      expected:
+        36
+    }
+  );
+
+
+  assertMaster(
+    "Universal contract begins with Game Id",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[0] ===
+      "Game Id"
+  );
+
+
+  assertMaster(
+    "Universal contract ends with Confidence Tier",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[35] ===
+      "Confidence Tier"
+  );
+
+
+  assertMaster(
+    "P15 owns AE Risk Score",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[30] ===
+      "Risk Score"
+  );
+
+
+  assertMaster(
+    "P15 owns AF Risk Tier",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[31] ===
+      "Risk Tier"
+  );
+
+
+  assertMaster(
+    "AG preserves Model Confidence",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[32] ===
+      "Model Confidence"
+  );
+
+
+  assertMaster(
+    "P15 owns AH Sportacular Score",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[33] ===
+      "Sportacular Score"
+  );
+
+
+  assertMaster(
+    "P15 owns AI Sportacular Edge",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[34] ===
+      "Sportacular Edge"
+  );
+
+
+  assertMaster(
+    "P15 owns AJ Confidence Tier",
+    SPORTACULAR_P18_UNIVERSAL_HEADERS[35] ===
+      "Confidence Tier"
+  );
+
+
+  // ==========================================================================
+  // GATE 2 — CONFIDENCE-TIER CONTRACT
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "MASTER GATE 2 — P15 CONFIDENCE-TIER CONTRACT"
+  );
+
+
+  const expectedConfidenceTiers = [
+    "Elite",
+    "Strong",
+    "Solid",
+    "Lean",
+    "No Play"
+  ];
+
+
+  assertMaster(
+    "Frozen confidence-tier vocabulary contains exactly five tiers",
+    SPORTACULAR_P18_CONFIDENCE_TIERS.length === 5,
+    {
+      tiers:
+        SPORTACULAR_P18_CONFIDENCE_TIERS
+    }
+  );
+
+
+  assertMaster(
+    "Frozen confidence-tier vocabulary exactly matches P15",
+    JSON.stringify(
+      SPORTACULAR_P18_CONFIDENCE_TIERS
+    ) ===
+    JSON.stringify(
+      expectedConfidenceTiers
+    ),
+    {
+      actual:
+        SPORTACULAR_P18_CONFIDENCE_TIERS,
+
+      expected:
+        expectedConfidenceTiers
+    }
+  );
+
+
+  // ==========================================================================
+  // GATE 3 — LEAGUE AUDIT EVIDENCE
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "MASTER GATE 3 — FOUR-LEAGUE AUTOMATED AUDIT EVIDENCE"
+  );
+
+
+  const requiredLeagues = [
+    "NBA",
+    "NHL",
+    "MLB",
+    "NFL"
+  ];
+
+
+  requiredLeagues.forEach(
+    league => {
+
+      const evidence =
+        SPORTACULAR_P18_LEAGUE_EVIDENCE[
+          league
+        ];
+
+
+      assertMaster(
+        `${league} P18 audit evidence exists`,
+        Boolean(evidence),
+        evidence || null
+      );
+
+
+      if (
+        !evidence
+      ) {
+        return;
+      }
+
+
+      assertMaster(
+        `${league} P18 audit status is PASS`,
+        evidence.status === "PASS",
+        {
+          status:
+            evidence.status
+        }
+      );
+
+
+      assertMaster(
+        `${league} registered at least one automated gate`,
+        Number(
+          evidence.testsRegistered
+        ) > 0,
+        {
+          testsRegistered:
+            evidence.testsRegistered
+        }
+      );
+
+
+      assertMaster(
+        `${league} passed every registered automated gate`,
+        evidence.testsPassed ===
+          evidence.testsRegistered,
+        {
+          passed:
+            evidence.testsPassed,
+
+          registered:
+            evidence.testsRegistered
+        }
+      );
+
+
+      assertMaster(
+        `${league} has zero failed gates`,
+        evidence.failures === 0,
+        {
+          failures:
+            evidence.failures
+        }
+      );
+
+
+      assertMaster(
+        `${league} has zero release blockers`,
+        evidence.blockers === 0,
+        {
+          blockers:
+            evidence.blockers
+        }
+      );
+
+    }
+  );
+
+
+  // ==========================================================================
+  // GATE 4 — FOUR-LEAGUE COMPLETENESS
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "MASTER GATE 4 — FOUR-LEAGUE COMPLETENESS"
+  );
+
+
+  const passingLeagues =
+    requiredLeagues.filter(
+      league => {
+
+        const evidence =
+          SPORTACULAR_P18_LEAGUE_EVIDENCE[
+            league
+          ];
+
+
+        return (
+          evidence &&
+          evidence.status === "PASS" &&
+          evidence.testsRegistered > 0 &&
+          evidence.testsPassed ===
+            evidence.testsRegistered &&
+          evidence.failures === 0 &&
+          evidence.blockers === 0
+        );
+      }
+    );
+
+
+  assertMaster(
+    "All four required leagues have passing P18 evidence",
+    passingLeagues.length === 4,
+    {
+      passingLeagues:
+        passingLeagues,
+
+      requiredLeagues:
+        requiredLeagues
+    }
+  );
+
+
+  const totalRegisteredLeagueGates =
+    requiredLeagues.reduce(
+      (
+        total,
+        league
+      ) =>
+        total +
+        Number(
+          SPORTACULAR_P18_LEAGUE_EVIDENCE[
+            league
+          ].testsRegistered ||
+          0
+        ),
+      0
+    );
+
+
+  const totalPassedLeagueGates =
+    requiredLeagues.reduce(
+      (
+        total,
+        league
+      ) =>
+        total +
+        Number(
+          SPORTACULAR_P18_LEAGUE_EVIDENCE[
+            league
+          ].testsPassed ||
+          0
+        ),
+      0
+    );
+
+
+  assertMaster(
+    "Every registered league-level P18 gate passed",
+    totalRegisteredLeagueGates ===
+      totalPassedLeagueGates,
+    {
+      registered:
+        totalRegisteredLeagueGates,
+
+      passed:
+        totalPassedLeagueGates
+    }
+  );
+
+
+  // ==========================================================================
+  // CONSOLIDATED MASTER REPORT
+  // ==========================================================================
+
+  const failedAssertions =
+    assertions.filter(
+      assertion =>
+        assertion.pass !== true
+    );
+
+
+  const passedAssertions =
+    assertions.length -
+    failedAssertions.length;
+
+
+  const releaseBlockers =
+    failedAssertions.length;
+
+
+  const finishedAt =
+    new Date();
+
+
+  const durationMs =
+    finishedAt.getTime() -
+    startedAt.getTime();
+
+
+  const status =
+    releaseBlockers === 0
+      ? "PASS"
+      : "BLOCKED";
+
+
+  Logger.log(
+    ""
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P18 MASTER FREEZE REPORT"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  requiredLeagues.forEach(
+    league => {
+
+      const evidence =
+        SPORTACULAR_P18_LEAGUE_EVIDENCE[
+          league
+        ];
+
+
+      Logger.log(
+        `${league.padEnd(4)} | ` +
+        `${evidence.status.padEnd(4)} | ` +
+        `${evidence.testsPassed}/` +
+        `${evidence.testsRegistered} ` +
+        `league gates | ` +
+        `${evidence.blockers} blockers`
+      );
+
+    }
+  );
+
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    `League gates registered: ${totalRegisteredLeagueGates}`
+  );
+
+  Logger.log(
+    `League gates passed: ${totalPassedLeagueGates}`
+  );
+
+  Logger.log(
+    `Master assertions: ${assertions.length}`
+  );
+
+  Logger.log(
+    `Master assertions passed: ${passedAssertions}`
+  );
+
+  Logger.log(
+    `Master assertions failed: ${failedAssertions.length}`
+  );
+
+  Logger.log(
+    `Release blockers: ${releaseBlockers}`
+  );
+
+  Logger.log(
+    `Runtime: ${durationMs} ms`
+  );
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    `P18 MASTER STATUS: ${status}`
+  );
+
+
+  if (
+    status === "PASS"
+  ) {
+
+    Logger.log(
+      "P18 PLAYER ANALYTICS CONTRACT: FROZEN"
+    );
+
+    Logger.log(
+      "READY FOR P19 — FOUR-LEAGUE PRODUCTION QA"
+    );
+
+  } else {
+
+    Logger.log(
+      "P18 PLAYER ANALYTICS CONTRACT: NOT READY TO FREEZE"
+    );
+
+    Logger.log(
+      "DO NOT ADVANCE TO P19"
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return {
+
+    deployment:
+      "P18",
+
+    suite:
+      "Master Four-League Player Analytics Contract Freeze",
+
+    status:
+      status,
+
+    leaguesRequired:
+      requiredLeagues.length,
+
+    leaguesPassed:
+      passingLeagues.length,
+
+    leagueGatesRegistered:
+      totalRegisteredLeagueGates,
+
+    leagueGatesPassed:
+      totalPassedLeagueGates,
+
+    masterAssertions:
+      assertions.length,
+
+    masterAssertionsPassed:
+      passedAssertions,
+
+    masterAssertionsFailed:
+      failedAssertions.length,
+
+    blockers:
+      releaseBlockers,
+
+    durationMs:
+      durationMs,
+
+    leagueEvidence:
+      SPORTACULAR_P18_LEAGUE_EVIDENCE,
+
+    failedAssertions:
+      failedAssertions
+  };
+}
+
+// ============================================================================
+// SPORTACULAR V1.0 RELEASE CONTROLLER
+// P19 D1 — FOUR-LEAGUE PRODUCTION QA FRAMEWORK
+// Version 0.1
+//
+// PURPOSE:
+// Define and automatically validate the production-QA contract that every
+// league must satisfy before P19 can freeze.
+//
+// IMPORTANT:
+// - Read-only.
+// - Does NOT call league APIs.
+// - Does NOT refresh spreadsheets.
+// - Does NOT modify production data.
+// - Does NOT replace the frozen P18 contract.
+// - Establishes the reusable P19 release-gate framework.
+// ============================================================================
+
+
+// ============================================================================
+// P19 REQUIRED LEAGUES
+// ============================================================================
+
+const SPORTACULAR_P19_REQUIRED_LEAGUES = [
+  "NBA",
+  "NHL",
+  "MLB",
+  "NFL"
+];
+
+
+// ============================================================================
+// P19 PRODUCTION QA DOMAINS
+//
+// Every league must eventually produce evidence for all domains below.
+//
+// "allowOffseasonNoRows" means zero production rows can be acceptable when
+// there are legitimately no games / props available, provided the structural
+// contract still passes.
+// ============================================================================
+
+const SPORTACULAR_P19_QA_DOMAINS = [
+
+  {
+    id: "STRUCTURE",
+    name: "Universal A:AJ Production Structure",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "ROW_INTEGRITY",
+    name: "Production Row Integrity",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "NULL_INTEGRITY",
+    name: "Null / Missing-Data Integrity",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "IDENTITY",
+    name: "Player + Game Identity Integrity",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "DUPLICATES",
+    name: "Duplicate Production Row Integrity",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "PROBABILITY_EV",
+    name: "Probability + EV Production Integrity",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "SCORING",
+    name: "P15 Scoring Production Integrity",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "ACTIONABILITY",
+    name: "Best Side + Confidence Tier Actionability",
+    blocker: true,
+    allowOffseasonNoRows: true
+  },
+
+  {
+    id: "NO_DATA_STATE",
+    name: "Offseason / No-Data Production State",
+    blocker: true,
+    allowOffseasonNoRows: true
+  }
+
+];
+
+
+// ============================================================================
+// P19 FROZEN UNIVERSAL HEADERS
+//
+// Deliberately repeated in P19 instead of referencing a mutable spreadsheet.
+// This lets the release controller independently validate the expected
+// production contract.
+// ============================================================================
+
+const SPORTACULAR_P19_UNIVERSAL_HEADERS = [
+  "Game Id",
+  "Game Date",
+  "Away Team",
+  "Home Team",
+  "Id",
+  "Player Id",
+  "Vendor",
+  "Prop Type",
+  "Line Value",
+  "Type",
+  "Odds",
+  "Updated At",
+  "Over Odds",
+  "Under Odds",
+  "Player Name",
+  "Team",
+  "Player Baseline",
+  "Trend Adjustment",
+  "Projected Stat",
+  "Stat Std Dev",
+  "Model Prob Over",
+  "Model Prob Under",
+  "EV Over",
+  "EV Under",
+  "Best Side",
+  "Best EV",
+  "Best Model Probability",
+  "Best Price Edge",
+  "Trend Score",
+  "Trend Strength",
+  "Risk Score",
+  "Risk Tier",
+  "Model Confidence",
+  "Sportacular Score",
+  "Sportacular Edge",
+  "Confidence Tier"
+];
+
+
+// ============================================================================
+// P19 FROZEN VOCABULARIES
+// ============================================================================
+
+const SPORTACULAR_P19_BEST_SIDE_VALUES = [
+  "Over",
+  "Under",
+  "No Play"
+];
+
+
+const SPORTACULAR_P19_CONFIDENCE_TIER_VALUES = [
+  "Elite",
+  "Strong",
+  "Solid",
+  "Lean",
+  "No Play"
+];
+
+
+const SPORTACULAR_P19_RISK_TIER_VALUES = [
+  "Low",
+  "Medium",
+  "High"
+];
+
+
+// ============================================================================
+// P19 LEAGUE EVIDENCE TEMPLATE
+//
+// D1 intentionally starts every production domain as PENDING.
+//
+// Later P19 deployments will replace PENDING only with evidence produced by
+// actual league-local production audits.
+//
+// DO NOT manually change PENDING to PASS just to advance the release.
+// ============================================================================
+
+function buildSportacularP19LeagueEvidenceTemplate_(
+  league
+) {
+
+  const domains = {};
+
+
+  SPORTACULAR_P19_QA_DOMAINS.forEach(
+    domain => {
+
+      domains[
+        domain.id
+      ] = {
+
+        status:
+          "PENDING",
+
+        sourceTest:
+          null,
+
+        productionRowsAudited:
+          null,
+
+        notes:
+          null
+      };
+
+    }
+  );
+
+
+  return {
+
+    league:
+      league,
+
+    overallStatus:
+      "PENDING",
+
+    productionRowsAudited:
+      null,
+
+    domains:
+      domains
+  };
+}
+
+
+// ============================================================================
+// P19 D1 FRAMEWORK AUDIT
+// ============================================================================
+
+function runSportacularP19D1FrameworkAudit() {
+
+  const startedAt =
+    new Date();
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P19 D1 AUTOMATED AUDIT"
+  );
+
+  Logger.log(
+    "FOUR-LEAGUE PRODUCTION QA FRAMEWORK"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  const assertions =
+    [];
+
+
+  function assertP19D1(
+    name,
+    condition,
+    details
+  ) {
+
+    const pass =
+      Boolean(condition);
+
+
+    const result = {
+
+      name:
+        name,
+
+      pass:
+        pass,
+
+      details:
+        details || null
+    };
+
+
+    assertions.push(
+      result
+    );
+
+
+    Logger.log(
+      JSON.stringify(result)
+    );
+
+
+    return pass;
+  }
+
+
+  // ==========================================================================
+  // D1.1 — LEAGUE CONTRACT
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "P19 D1.1 — REQUIRED LEAGUES"
+  );
+
+
+  assertP19D1(
+    "P19 contains exactly four required leagues",
+    SPORTACULAR_P19_REQUIRED_LEAGUES.length === 4,
+    {
+      leagues:
+        SPORTACULAR_P19_REQUIRED_LEAGUES
+    }
+  );
+
+
+  assertP19D1(
+    "NBA is required",
+    SPORTACULAR_P19_REQUIRED_LEAGUES.includes(
+      "NBA"
+    )
+  );
+
+
+  assertP19D1(
+    "NHL is required",
+    SPORTACULAR_P19_REQUIRED_LEAGUES.includes(
+      "NHL"
+    )
+  );
+
+
+  assertP19D1(
+    "MLB is required",
+    SPORTACULAR_P19_REQUIRED_LEAGUES.includes(
+      "MLB"
+    )
+  );
+
+
+  assertP19D1(
+    "NFL is required",
+    SPORTACULAR_P19_REQUIRED_LEAGUES.includes(
+      "NFL"
+    )
+  );
+
+
+  // ==========================================================================
+  // D1.2 — UNIVERSAL A:AJ CONTRACT
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "P19 D1.2 — UNIVERSAL A:AJ PRODUCTION CONTRACT"
+  );
+
+
+  assertP19D1(
+    "P19 universal production contract contains exactly 36 columns",
+    SPORTACULAR_P19_UNIVERSAL_HEADERS.length === 36,
+    {
+      actual:
+        SPORTACULAR_P19_UNIVERSAL_HEADERS.length,
+
+      expected:
+        36
+    }
+  );
+
+
+  assertP19D1(
+    "P19 production contract starts with Game Id",
+    SPORTACULAR_P19_UNIVERSAL_HEADERS[0] ===
+      "Game Id"
+  );
+
+
+  assertP19D1(
+    "P19 production contract ends with Confidence Tier",
+    SPORTACULAR_P19_UNIVERSAL_HEADERS[35] ===
+      "Confidence Tier"
+  );
+
+
+  const uniqueHeaders =
+    new Set(
+      SPORTACULAR_P19_UNIVERSAL_HEADERS
+    );
+
+
+  assertP19D1(
+    "P19 universal contract contains no duplicate headers",
+    uniqueHeaders.size ===
+      SPORTACULAR_P19_UNIVERSAL_HEADERS.length,
+    {
+      unique:
+        uniqueHeaders.size,
+
+      total:
+        SPORTACULAR_P19_UNIVERSAL_HEADERS.length
+    }
+  );
+
+
+  // ==========================================================================
+  // D1.3 — QA DOMAIN CONTRACT
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "P19 D1.3 — PRODUCTION QA DOMAINS"
+  );
+
+
+  const expectedDomainIds = [
+    "STRUCTURE",
+    "ROW_INTEGRITY",
+    "NULL_INTEGRITY",
+    "IDENTITY",
+    "DUPLICATES",
+    "PROBABILITY_EV",
+    "SCORING",
+    "ACTIONABILITY",
+    "NO_DATA_STATE"
+  ];
+
+
+  assertP19D1(
+    "P19 defines exactly nine production QA domains",
+    SPORTACULAR_P19_QA_DOMAINS.length === 9,
+    {
+      actual:
+        SPORTACULAR_P19_QA_DOMAINS.length,
+
+      expected:
+        9
+    }
+  );
+
+
+  const actualDomainIds =
+    SPORTACULAR_P19_QA_DOMAINS.map(
+      domain =>
+        domain.id
+    );
+
+
+  assertP19D1(
+    "P19 production QA domain IDs exactly match release contract",
+    JSON.stringify(
+      actualDomainIds
+    ) ===
+    JSON.stringify(
+      expectedDomainIds
+    ),
+    {
+      actual:
+        actualDomainIds,
+
+      expected:
+        expectedDomainIds
+    }
+  );
+
+
+  assertP19D1(
+    "Every P19 production QA domain is a release blocker",
+    SPORTACULAR_P19_QA_DOMAINS.every(
+      domain =>
+        domain.blocker === true
+    )
+  );
+
+
+  // ==========================================================================
+  // D1.4 — FROZEN VOCABULARIES
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "P19 D1.4 — FROZEN PRODUCTION VOCABULARIES"
+  );
+
+
+  assertP19D1(
+    "Best Side vocabulary is frozen",
+    JSON.stringify(
+      SPORTACULAR_P19_BEST_SIDE_VALUES
+    ) ===
+    JSON.stringify(
+      [
+        "Over",
+        "Under",
+        "No Play"
+      ]
+    )
+  );
+
+
+  assertP19D1(
+    "Confidence Tier vocabulary includes Solid",
+    SPORTACULAR_P19_CONFIDENCE_TIER_VALUES.includes(
+      "Solid"
+    ),
+    {
+      tiers:
+        SPORTACULAR_P19_CONFIDENCE_TIER_VALUES
+    }
+  );
+
+
+  assertP19D1(
+    "Confidence Tier vocabulary exactly matches P15",
+    JSON.stringify(
+      SPORTACULAR_P19_CONFIDENCE_TIER_VALUES
+    ) ===
+    JSON.stringify(
+      [
+        "Elite",
+        "Strong",
+        "Solid",
+        "Lean",
+        "No Play"
+      ]
+    )
+  );
+
+
+  assertP19D1(
+    "Risk Tier vocabulary is frozen",
+    JSON.stringify(
+      SPORTACULAR_P19_RISK_TIER_VALUES
+    ) ===
+    JSON.stringify(
+      [
+        "Low",
+        "Medium",
+        "High"
+      ]
+    )
+  );
+
+
+  // ==========================================================================
+  // D1.5 — EVIDENCE TEMPLATE
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "P19 D1.5 — STANDARDIZED LEAGUE EVIDENCE TEMPLATE"
+  );
+
+
+  SPORTACULAR_P19_REQUIRED_LEAGUES.forEach(
+    league => {
+
+      const evidence =
+        buildSportacularP19LeagueEvidenceTemplate_(
+          league
+        );
+
+
+      assertP19D1(
+        `${league} evidence template identifies correct league`,
+        evidence.league ===
+          league
+      );
+
+
+      assertP19D1(
+        `${league} evidence starts PENDING`,
+        evidence.overallStatus ===
+          "PENDING"
+      );
+
+
+      const evidenceDomainIds =
+        Object.keys(
+          evidence.domains
+        );
+
+
+      assertP19D1(
+        `${league} evidence contains all nine QA domains`,
+        JSON.stringify(
+          evidenceDomainIds
+        ) ===
+        JSON.stringify(
+          expectedDomainIds
+        ),
+        {
+          domains:
+            evidenceDomainIds
+        }
+      );
+
+
+      assertP19D1(
+        `${league} cannot accidentally start with a passing domain`,
+        evidenceDomainIds.every(
+          domainId =>
+            evidence.domains[
+              domainId
+            ].status ===
+              "PENDING"
+        )
+      );
+
+    }
+  );
+
+
+  // ==========================================================================
+  // D1.6 — FAIL-CLOSED RELEASE BEHAVIOR
+  // ==========================================================================
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    "P19 D1.6 — FAIL-CLOSED RELEASE BEHAVIOR"
+  );
+
+
+  const templateEvidence =
+    SPORTACULAR_P19_REQUIRED_LEAGUES.map(
+      league =>
+        buildSportacularP19LeagueEvidenceTemplate_(
+          league
+        )
+    );
+
+
+  const templateCanRelease =
+    templateEvidence.every(
+      evidence =>
+        evidence.overallStatus ===
+          "PASS" &&
+        Object.values(
+          evidence.domains
+        ).every(
+          domain =>
+            domain.status ===
+              "PASS"
+        )
+    );
+
+
+  assertP19D1(
+    "P19 cannot release while production evidence is still pending",
+    templateCanRelease === false,
+    {
+      releaseAllowed:
+        templateCanRelease
+    }
+  );
+
+
+  // ==========================================================================
+  // D1 CONSOLIDATED REPORT
+  // ==========================================================================
+
+  const failedAssertions =
+    assertions.filter(
+      assertion =>
+        assertion.pass !== true
+    );
+
+
+  const passedAssertions =
+    assertions.length -
+    failedAssertions.length;
+
+
+  const blockers =
+    failedAssertions.length;
+
+
+  const status =
+    blockers === 0
+      ? "PASS"
+      : "BLOCKED";
+
+
+  const finishedAt =
+    new Date();
+
+
+  const durationMs =
+    finishedAt.getTime() -
+    startedAt.getTime();
+
+
+  Logger.log(
+    ""
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P19 D1 CONSOLIDATED REPORT"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  Logger.log(
+    `Required leagues: ${SPORTACULAR_P19_REQUIRED_LEAGUES.length}`
+  );
+
+  Logger.log(
+    `Production QA domains: ${SPORTACULAR_P19_QA_DOMAINS.length}`
+  );
+
+  Logger.log(
+    `Universal columns: ${SPORTACULAR_P19_UNIVERSAL_HEADERS.length}`
+  );
+
+  Logger.log(
+    `Assertions: ${assertions.length}`
+  );
+
+  Logger.log(
+    `Assertions passed: ${passedAssertions}`
+  );
+
+  Logger.log(
+    `Assertions failed: ${failedAssertions.length}`
+  );
+
+  Logger.log(
+    `Release blockers: ${blockers}`
+  );
+
+  Logger.log(
+    `Runtime: ${durationMs} ms`
+  );
+
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+
+  Logger.log(
+    `P19 D1 STATUS: ${status}`
+  );
+
+
+  if (
+    status === "PASS"
+  ) {
+
+    Logger.log(
+      "P19 PRODUCTION QA FRAMEWORK: FROZEN"
+    );
+
+    Logger.log(
+      "READY FOR P19 D2 — LEAGUE PRODUCTION EVIDENCE"
+    );
+
+  } else {
+
+    Logger.log(
+      "P19 PRODUCTION QA FRAMEWORK: NOT READY TO FREEZE"
+    );
+
+    Logger.log(
+      "DO NOT ADVANCE TO P19 D2"
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return {
+
+    deployment:
+      "P19-D1",
+
+    suite:
+      "Four-League Production QA Framework",
+
+    status:
+      status,
+
+    requiredLeagues:
+      SPORTACULAR_P19_REQUIRED_LEAGUES.length,
+
+    productionQADomains:
+      SPORTACULAR_P19_QA_DOMAINS.length,
+
+    universalColumns:
+      SPORTACULAR_P19_UNIVERSAL_HEADERS.length,
+
+    assertions:
+      assertions.length,
+
+    assertionsPassed:
+      passedAssertions,
+
+    assertionsFailed:
+      failedAssertions.length,
+
+    blockers:
+      blockers,
+
+    durationMs:
+      durationMs,
+
+    failedAssertions:
+      failedAssertions
+  };
+}

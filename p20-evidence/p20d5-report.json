@@ -1,0 +1,246 @@
+{
+  "deployment": "P20-D5",
+  "evidenceType": "REAL_BROWSER_EXECUTION",
+  "browser": "PLAYWRIGHT_CHROMIUM",
+  "status": "PASS",
+  "freezeStatus": "PENDING",
+  "testedRoutes": 2,
+  "passedRoutes": 2,
+  "failedRoutes": 0,
+  "notExercisedRoutes": 6,
+  "coverage": [
+    {
+      "league": "NBA",
+      "profileType": "PLAYER",
+      "status": "NOT_EXERCISED"
+    },
+    {
+      "league": "NBA",
+      "profileType": "TEAM",
+      "status": "NOT_EXERCISED"
+    },
+    {
+      "league": "NHL",
+      "profileType": "PLAYER",
+      "status": "NOT_EXERCISED"
+    },
+    {
+      "league": "NHL",
+      "profileType": "TEAM",
+      "status": "PASS"
+    },
+    {
+      "league": "MLB",
+      "profileType": "PLAYER",
+      "status": "NOT_EXERCISED"
+    },
+    {
+      "league": "MLB",
+      "profileType": "TEAM",
+      "status": "NOT_EXERCISED"
+    },
+    {
+      "league": "NFL",
+      "profileType": "PLAYER",
+      "status": "PASS"
+    },
+    {
+      "league": "NFL",
+      "profileType": "TEAM",
+      "status": "NOT_EXERCISED"
+    }
+  ],
+  "results": [
+    {
+      "deployment": "P20-D5",
+      "evidenceType": "REAL_BROWSER_EXECUTION",
+      "league": "NFL",
+      "profileType": "PLAYER",
+      "label": "NFL Caleb Williams",
+      "url": "https://sportacularanalytics.com/player.html?league=nfl&id=277867",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 3377
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Player identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Caleb Williams",
+            "actual": "Caleb Williams"
+          }
+        },
+        {
+          "name": "Player name element is visible",
+          "status": "PASS",
+          "details": {
+            "playerNameVisible": true
+          }
+        },
+        {
+          "name": "Player Profile required DOM containers exist",
+          "status": "PASS",
+          "details": {
+            "playerNameExists": true,
+            "trendGridExists": true,
+            "gameLogSectionExists": true,
+            "analyticsSectionExists": true,
+            "seasonSectionExists": true
+          }
+        },
+        {
+          "name": "Production Player API returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "playerApiResponses": [
+              {
+                "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nfl&id=277867",
+                "status": 200
+              }
+            ]
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalNetworkFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [
+        {
+          "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nfl&id=277867",
+          "status": 200
+        }
+      ],
+      "snapshot": {
+        "title": "Player Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/player.html?league=nfl&id=277867",
+        "bodyLength": 3377,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n← Back to NFL Player Props\nNFL PLAYER PROFILE\nCaleb Williams\n\nChicago Bears\n\nQuarterback\n\nSeason Snapshot\nPassing Yards\n203.5\nPassing TDs\n1\nInterceptions\n0.5\nCompletions\n18\nAttempts\n27.5\n\nPLAYER MOMENTUM\n\nCurrent Player Trends\n➡️ STABLE\nPassing Yards\n\nCaleb Williams is stable in Passing Yards, averaging 203.5 over the last 5 games compared to a season average of 203.5 with a 100% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n➡️ STABLE\nPassing TDs\n\nCaleb Williams is stable in Passing TDs, averaging 1.0 over the last 5 games compared to a season average of 1.0 with a 50% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n➡️ STABLE\nInterceptions\n\nCaleb Williams is stable in Interceptions, averaging 0.5 over the last 5 games compared to a season average of 0.5 with a 50% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n➡️ STABLE\nCompletions\n\nCaleb Williams is stable in Completions, averaging 18.0 over the last 5 games compared to a season average of 18.0 with a 100% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n➡️ STABLE\nPass Attempts\n\nCaleb Williams is stable in Pass Attempts, averaging 27.5 over the last 5 games compared to a season average of 27.5 with a 100% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n➡️ STABLE\nRushing Yards\n\nCaleb Williams is stable in Rushing Yards, averaging 53.5 over the last 5 games compared to a season average of 53.5 with a 100% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n➡️ STABLE\nRushing Attempts\n\nCaleb Williams is stable in Rushing Attempts, averaging 7.5 over the last 5 games compared to a season average of 7.5 with a 100% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n➡️ STABLE\nRushing TDs\n\nCaleb Williams is stable in Rushing TDs, averaging 1.0 over the last 5 games compared to a season average of 1.0 with a 50% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 2 GAMES\n\nSEASON OVERVIEW\n\nSeason Statistics\nPassing\nGames\n2\nPassing Yards\n203.5\nPassing TDs\n1\nCompletions\n18\nAttempts\n27.5\nRushing\nRush Yards\n53.5\nRush Attempts\n7.5\nRush TDs\n1\nTrend Metrics\nConsistency\n67.8\nTrend Strength\nEarly\nRisk Tier\nEarly\n\nRECENT PERFORMANCE\n\nRecent Performance\nDate\tOpponent\tPassing Yards\tPassing TDs\tInterceptions\tCompletions\tPass Attempts\tRushing Yards\tRushing Attempts\tRushing TDs\nSep 20\tMinnesota Vikings\t138\t0\t1\t15\t26\t42\t5\t0\nSep 13\tCarolina Panthers\t269\t2\t0\t21\t29\t65\t10\t2\nContinue Exploring NFL Player Props\n\nView every available NFL player prop, sportsbook, expected value, and trend from today's slate.\n\n← Back to NFL Player Props\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "Caleb Williams",
+        "teamName": "",
+        "playerPosition": "Quarterback",
+        "playerTeam": "Chicago Bears",
+        "profileTitle": "NFL PLAYER PROFILE",
+        "playerNameExists": true,
+        "teamNameExists": false,
+        "trendGridExists": true,
+        "gameLogSectionExists": true,
+        "analyticsSectionExists": true,
+        "seasonSectionExists": true,
+        "playerNameVisible": true,
+        "teamNameVisible": false,
+        "readyState": "complete"
+      }
+    },
+    {
+      "deployment": "P20-D5",
+      "evidenceType": "REAL_BROWSER_EXECUTION",
+      "league": "NHL",
+      "profileType": "TEAM",
+      "label": "NHL Montréal Canadiens",
+      "url": "https://sportacularanalytics.com/nhl-team?league=nhl&team=Montr%C3%A9al%20Canadiens",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 2773
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Team identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Montréal Canadiens",
+            "actual": "Montréal Canadiens"
+          }
+        },
+        {
+          "name": "Team name element is visible",
+          "status": "PASS",
+          "details": {
+            "teamNameVisible": true
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalNetworkFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [],
+      "snapshot": {
+        "title": "NHL Team Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/nhl-team?league=nhl&team=Montr%C3%A9al%20Canadiens",
+        "bodyLength": 2773,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n🏒\nMontréal Canadiens\n\nNHL\n\nLeague Rank\n#21\nRank Score\n35.5\nOverall Rating\n41\nOffensive Rating\n43.5\nDefensive Rating\n37.1\nRating Tier\nBelow Average\nRating Notes\nBalanced team profile.\nLast Updated\n10/11/2026\nSeason Snapshot\nGames Played\n\n5\nGoals / Game\n\n2.8\nGoals Allowed / Game\n\n3.8\nShots On Goal / Game\n\n26.4\nAssists / Game\n\n4.4\nPoints / Game\n\n7.2\nSaves / Game\n\n24.4\nCurrent Team Trends\nAssists\nLast 5 Avg\n\n4.4\nSeason Avg\n\n4.4\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nHigh\nHit Rate\n\n80%\nThe Montréal Canadiens are holding steady in Assists, averaging 4.40 over the last 5 games compared to 4.40 on the season, with a 1+ hit rate of 80%.\nGoals Allowed\nLast 5 Avg\n\n3.8\nSeason Avg\n\n3.8\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nHigh\nHit Rate\n\n80%\nThe Montréal Canadiens are holding steady in Goals Allowed, averaging 3.80 over the last 5 games compared to 3.80 on the season, with a 1+ hit rate of 80%.\nGoals For\nLast 5 Avg\n\n2.8\nSeason Avg\n\n2.8\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nHigh\nHit Rate\n\n80%\nThe Montréal Canadiens are holding steady in Goals For, averaging 2.80 over the last 5 games compared to 2.80 on the season, with a 1+ hit rate of 80%.\nPoints\nLast 5 Avg\n\n7.2\nSeason Avg\n\n7.2\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nHigh\nHit Rate\n\n80%\nThe Montréal Canadiens are holding steady in Points, averaging 7.20 over the last 5 games compared to 7.20 on the season, with a 1+ hit rate of 80%.\nSaves\nLast 5 Avg\n\n24.4\nSeason Avg\n\n24.4\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nLow\nHit Rate\n\n100%\nThe Montréal Canadiens are holding steady in Saves, averaging 24.40 over the last 5 games compared to 24.40 on the season, with a 1+ hit rate of 100%.\nShots On Goal\nLast 5 Avg\n\n26.4\nSeason Avg\n\n26.4\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nLow\nHit Rate\n\n100%\nThe Montréal Canadiens are holding steady in Shots On Goal, averaging 26.40 over the last 5 games compared to 26.40 on the season, with a 1+ hit rate of 100%.\nRecent Performance\nDate\tOpponent\tResult\tGF\tGA\tSOG\tAST\tPTS\tSV\n2026-10-10\tDetroit Red Wings\tT 0-0\t0\t0\t30\t0\t0\t30\n2026-10-08\tNashville Predators\tL 2-5\t2\t5\t33\t1\t3\t15\n2026-10-06\tCarolina Hurricanes\tL 4-6\t4\t6\t20\t8\t12\t27\n2026-10-03\tPittsburgh Penguins\tL 5-6\t5\t6\t25\t9\t14\t24\n2026-09-29\tToronto Maple Leafs\tW 3-2\t3\t2\t24\t4\t7\t26\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "",
+        "teamName": "Montréal Canadiens",
+        "playerPosition": "",
+        "playerTeam": "",
+        "profileTitle": "",
+        "playerNameExists": false,
+        "teamNameExists": true,
+        "trendGridExists": false,
+        "gameLogSectionExists": false,
+        "analyticsSectionExists": false,
+        "seasonSectionExists": false,
+        "playerNameVisible": false,
+        "teamNameVisible": true,
+        "readyState": "complete"
+      }
+    }
+  ],
+  "generatedAt": "2026-10-12T01:28:35.585Z"
+}

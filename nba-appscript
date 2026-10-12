@@ -1638,76 +1638,98 @@ function clearNBATeamGameLogsSheetOnly() {
   writeNBAOutputSheet_(sheet, headers, []);
 }
 
+// ============================================================================
+// NBA 2026-27 MONTHLY GAME LOG REFRESH FUNCTIONS
+// ============================================================================
+//
+// These wrappers intentionally use the existing date-range refresh engines:
+//
+//   refreshNBAPlayerGameLogsForDateRange_()
+//   refreshNBATeamGameLogsForDateRange_()
+//
+// They are also consumed by the NBA Daily Analytics Mother Pipeline.
+// ============================================================================
+
+
+// -----------------------------------------------------------------------------
+// PLAYER GAME LOGS
+// -----------------------------------------------------------------------------
+
 function refreshNBAPlayerGameLogsOctober() {
-  refreshNBAPlayerGameLogsForDateRange_("2025-10-21", "2025-10-31");
+  refreshNBAPlayerGameLogsForDateRange_("2026-10-01", "2026-10-31");
 }
 
 function refreshNBAPlayerGameLogsNovember() {
-  refreshNBAPlayerGameLogsForDateRange_("2025-11-01", "2025-11-30");
+  refreshNBAPlayerGameLogsForDateRange_("2026-11-01", "2026-11-30");
 }
 
 function refreshNBAPlayerGameLogsDecember() {
-  refreshNBAPlayerGameLogsForDateRange_("2025-12-01", "2025-12-31");
+  refreshNBAPlayerGameLogsForDateRange_("2026-12-01", "2026-12-31");
 }
 
 function refreshNBAPlayerGameLogsJanuary() {
-  refreshNBAPlayerGameLogsForDateRange_("2026-01-01", "2026-01-31");
+  refreshNBAPlayerGameLogsForDateRange_("2027-01-01", "2027-01-31");
 }
 
 function refreshNBAPlayerGameLogsFebruary() {
-  refreshNBAPlayerGameLogsForDateRange_("2026-02-01", "2026-02-28");
+  refreshNBAPlayerGameLogsForDateRange_("2027-02-01", "2027-02-28");
 }
 
 function refreshNBAPlayerGameLogsMarch() {
-  refreshNBAPlayerGameLogsForDateRange_("2026-03-01", "2026-03-31");
+  refreshNBAPlayerGameLogsForDateRange_("2027-03-01", "2027-03-31");
 }
 
 function refreshNBAPlayerGameLogsApril() {
-  refreshNBAPlayerGameLogsForDateRange_("2026-04-01", "2026-04-30");
+  refreshNBAPlayerGameLogsForDateRange_("2027-04-01", "2027-04-30");
 }
 
 function refreshNBAPlayerGameLogsMay() {
-  refreshNBAPlayerGameLogsForDateRange_("2026-05-01", "2026-05-31");
+  refreshNBAPlayerGameLogsForDateRange_("2027-05-01", "2027-05-31");
 }
 
 function refreshNBAPlayerGameLogsJune() {
-  refreshNBAPlayerGameLogsForDateRange_("2026-06-01", "2026-06-13");
+  refreshNBAPlayerGameLogsForDateRange_("2027-06-01", "2027-06-30");
 }
 
+
+// -----------------------------------------------------------------------------
+// TEAM GAME LOGS
+// -----------------------------------------------------------------------------
+
 function refreshNBATeamGameLogsOctober() {
-  refreshNBATeamGameLogsForDateRange_("2025-10-21", "2025-10-31");
+  refreshNBATeamGameLogsForDateRange_("2026-10-01", "2026-10-31");
 }
 
 function refreshNBATeamGameLogsNovember() {
-  refreshNBATeamGameLogsForDateRange_("2025-11-01", "2025-11-30");
+  refreshNBATeamGameLogsForDateRange_("2026-11-01", "2026-11-30");
 }
 
 function refreshNBATeamGameLogsDecember() {
-  refreshNBATeamGameLogsForDateRange_("2025-12-01", "2025-12-31");
+  refreshNBATeamGameLogsForDateRange_("2026-12-01", "2026-12-31");
 }
 
 function refreshNBATeamGameLogsJanuary() {
-  refreshNBATeamGameLogsForDateRange_("2026-01-01", "2026-01-31");
+  refreshNBATeamGameLogsForDateRange_("2027-01-01", "2027-01-31");
 }
 
 function refreshNBATeamGameLogsFebruary() {
-  refreshNBATeamGameLogsForDateRange_("2026-02-01", "2026-02-28");
+  refreshNBATeamGameLogsForDateRange_("2027-02-01", "2027-02-28");
 }
 
 function refreshNBATeamGameLogsMarch() {
-  refreshNBATeamGameLogsForDateRange_("2026-03-01", "2026-03-31");
+  refreshNBATeamGameLogsForDateRange_("2027-03-01", "2027-03-31");
 }
 
 function refreshNBATeamGameLogsApril() {
-  refreshNBATeamGameLogsForDateRange_("2026-04-01", "2026-04-30");
+  refreshNBATeamGameLogsForDateRange_("2027-04-01", "2027-04-30");
 }
 
 function refreshNBATeamGameLogsMay() {
-  refreshNBATeamGameLogsForDateRange_("2026-05-01", "2026-05-31");
+  refreshNBATeamGameLogsForDateRange_("2027-05-01", "2027-05-31");
 }
 
 function refreshNBATeamGameLogsJune() {
-  refreshNBATeamGameLogsForDateRange_("2026-06-01", "2026-06-13");
+  refreshNBATeamGameLogsForDateRange_("2027-06-01", "2027-06-30");
 }
 
 function addNBATeamGameLogRow_(rows, game, gameId, team, opponent, statMap) {
@@ -12011,6 +12033,2328 @@ function testUniversalSportacularScoringContract() {
 
 
   return true;
+}
+
+// ============================================================================
+// NBA DAILY ANALYTICS MOTHER PIPELINE
+// ============================================================================
+//
+// Purpose:
+//   Runs the NBA historical/trend analytics pipeline in strict dependency order.
+//
+// Order:
+//   1. Player Game Logs — completed/current months only
+//   2. Team Game Logs   — completed/current months only
+//   3. Player Season Stats
+//   4. Team Season Stats
+//   5. Player Trends
+//   6. Team Trends
+//   7. Top Player Trends
+//   8. Top Team Trends
+//
+// The pipeline stores its current step in Script Properties so that a later
+// execution can resume exactly where the previous execution stopped.
+//
+// IMPORTANT:
+//   Game Odds and Player Props are intentionally NOT part of this pipeline.
+//   They keep their existing 15-minute refresh cadence.
+// ============================================================================
+
+const NBA_DAILY_ANALYTICS_PIPELINE = {
+  stateKey: "NBA_DAILY_ANALYTICS_PIPELINE_STATE",
+  retryFunction: "continueNBADailyAnalyticsPipeline",
+  retryDelayMs: 60 * 1000,
+
+  playerMonths: [
+    {
+      key: "2026-10",
+      start: "2026-10-01",
+      fn: refreshNBAPlayerGameLogsOctober
+    },
+    {
+      key: "2026-11",
+      start: "2026-11-01",
+      fn: refreshNBAPlayerGameLogsNovember
+    },
+    {
+      key: "2026-12",
+      start: "2026-12-01",
+      fn: refreshNBAPlayerGameLogsDecember
+    },
+    {
+      key: "2027-01",
+      start: "2027-01-01",
+      fn: refreshNBAPlayerGameLogsJanuary
+    },
+    {
+      key: "2027-02",
+      start: "2027-02-01",
+      fn: refreshNBAPlayerGameLogsFebruary
+    },
+    {
+      key: "2027-03",
+      start: "2027-03-01",
+      fn: refreshNBAPlayerGameLogsMarch
+    },
+    {
+      key: "2027-04",
+      start: "2027-04-01",
+      fn: refreshNBAPlayerGameLogsApril
+    },
+    {
+      key: "2027-05",
+      start: "2027-05-01",
+      fn: refreshNBAPlayerGameLogsMay
+    },
+    {
+      key: "2027-06",
+      start: "2027-06-01",
+      fn: refreshNBAPlayerGameLogsJune
+    }
+  ],
+
+  teamMonths: [
+    {
+      key: "2026-10",
+      start: "2026-10-01",
+      fn: refreshNBATeamGameLogsOctober
+    },
+    {
+      key: "2026-11",
+      start: "2026-11-01",
+      fn: refreshNBATeamGameLogsNovember
+    },
+    {
+      key: "2026-12",
+      start: "2026-12-01",
+      fn: refreshNBATeamGameLogsDecember
+    },
+    {
+      key: "2027-01",
+      start: "2027-01-01",
+      fn: refreshNBATeamGameLogsJanuary
+    },
+    {
+      key: "2027-02",
+      start: "2027-02-01",
+      fn: refreshNBATeamGameLogsFebruary
+    },
+    {
+      key: "2027-03",
+      start: "2027-03-01",
+      fn: refreshNBATeamGameLogsMarch
+    },
+    {
+      key: "2027-04",
+      start: "2027-04-01",
+      fn: refreshNBATeamGameLogsApril
+    },
+    {
+      key: "2027-05",
+      start: "2027-05-01",
+      fn: refreshNBATeamGameLogsMay
+    },
+    {
+      key: "2027-06",
+      start: "2027-06-01",
+      fn: refreshNBATeamGameLogsJune
+    }
+  ]
+};
+
+
+function getNBADailyAnalyticsDateKey_() {
+
+  const timeZone =
+    SpreadsheetApp
+      .getActiveSpreadsheet()
+      .getSpreadsheetTimeZone();
+
+  return Utilities.formatDate(
+    new Date(),
+    timeZone,
+    "yyyy-MM-dd"
+  );
+}
+
+
+function getNBADailyAnalyticsState_() {
+
+  const properties =
+    PropertiesService.getScriptProperties();
+
+  const raw =
+    properties.getProperty(
+      NBA_DAILY_ANALYTICS_PIPELINE.stateKey
+    );
+
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    return null;
+  }
+}
+
+
+function saveNBADailyAnalyticsState_(state) {
+
+  PropertiesService
+    .getScriptProperties()
+    .setProperty(
+      NBA_DAILY_ANALYTICS_PIPELINE.stateKey,
+      JSON.stringify(state)
+    );
+}
+
+
+function clearNBADailyAnalyticsState_() {
+
+  PropertiesService
+    .getScriptProperties()
+    .deleteProperty(
+      NBA_DAILY_ANALYTICS_PIPELINE.stateKey
+    );
+}
+
+
+function getNBAEligiblePipelineMonths_(months) {
+
+  const today =
+    getNBADailyAnalyticsDateKey_();
+
+  return months.filter(
+    month =>
+      month.start <= today
+  );
+}
+
+
+function createNBADailyAnalyticsState_() {
+
+  return {
+    runDate:
+      getNBADailyAnalyticsDateKey_(),
+
+    stage:
+      "PLAYER_GAME_LOGS",
+
+    playerMonthIndex:
+      0,
+
+    teamMonthIndex:
+      0,
+
+    completed:
+      false,
+
+    lastSuccessfulStep:
+      null,
+
+    lastError:
+      null,
+
+    updatedAt:
+      new Date().toISOString()
+  };
+}
+
+
+function scheduleNBADailyAnalyticsRetry_() {
+
+  const handler =
+    NBA_DAILY_ANALYTICS_PIPELINE.retryFunction;
+
+  // Prevent duplicate continuation triggers.
+  ScriptApp
+    .getProjectTriggers()
+    .filter(
+      trigger =>
+        trigger.getHandlerFunction() === handler
+    )
+    .forEach(
+      trigger =>
+        ScriptApp.deleteTrigger(trigger)
+    );
+
+  ScriptApp
+    .newTrigger(handler)
+    .timeBased()
+    .after(
+      NBA_DAILY_ANALYTICS_PIPELINE.retryDelayMs
+    )
+    .create();
+
+  Logger.log(
+    "NBA mother pipeline continuation scheduled."
+  );
+}
+
+
+function clearNBADailyAnalyticsContinuationTriggers_() {
+
+  const handler =
+    NBA_DAILY_ANALYTICS_PIPELINE.retryFunction;
+
+  ScriptApp
+    .getProjectTriggers()
+    .filter(
+      trigger =>
+        trigger.getHandlerFunction() === handler
+    )
+    .forEach(
+      trigger =>
+        ScriptApp.deleteTrigger(trigger)
+    );
+}
+
+/**
+ * Temporary continuation-trigger entry point.
+ *
+ * IMPORTANT:
+ * Permanent nightly triggers should call:
+ *   runNBADailyAnalyticsPipeline
+ *
+ * Temporary pipeline continuation triggers call:
+ *   continueNBADailyAnalyticsPipeline
+ *
+ * Keeping these handler names separate prevents continuation cleanup
+ * from deleting the permanent nightly Run trigger.
+ */
+function continueNBADailyAnalyticsPipeline() {
+
+  Logger.log(
+    "NBA temporary continuation trigger fired."
+  );
+
+  runNBADailyAnalyticsPipeline();
+}
+
+function runNBADailyAnalyticsPipeline() {
+
+  const lock =
+    LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+
+    Logger.log(
+      "NBA mother pipeline is already running. Exiting duplicate execution."
+    );
+
+    return;
+  }
+
+  try {
+
+    clearNBADailyAnalyticsContinuationTriggers_();
+
+    const today =
+      getNBADailyAnalyticsDateKey_();
+
+    let state =
+      getNBADailyAnalyticsState_();
+
+    /*
+      Start a fresh pipeline when:
+      - no state exists,
+      - yesterday's pipeline completed,
+      - or the stored state belongs to another date.
+    */
+    if (
+      !state ||
+      state.completed ||
+      state.runDate !== today
+    ) {
+
+      state =
+        createNBADailyAnalyticsState_();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+    Logger.log(
+      `NBA mother pipeline starting/resuming. Stage: ${state.stage}`
+    );
+
+    const playerMonths =
+      getNBAEligiblePipelineMonths_(
+        NBA_DAILY_ANALYTICS_PIPELINE.playerMonths
+      );
+
+    const teamMonths =
+      getNBAEligiblePipelineMonths_(
+        NBA_DAILY_ANALYTICS_PIPELINE.teamMonths
+      );
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 1 — PLAYER GAME LOG MONTHS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "PLAYER_GAME_LOGS") {
+
+      if (
+        state.playerMonthIndex <
+        playerMonths.length
+      ) {
+
+        const month =
+          playerMonths[
+            state.playerMonthIndex
+          ];
+
+        Logger.log(
+          `NBA mother pipeline: refreshing Player Game Logs ${month.key}`
+        );
+
+        month.fn();
+
+        state.playerMonthIndex += 1;
+
+        state.lastSuccessfulStep =
+          `PLAYER_GAME_LOGS:${month.key}`;
+
+        state.lastError = null;
+        state.updatedAt =
+          new Date().toISOString();
+
+        saveNBADailyAnalyticsState_(state);
+
+        scheduleNBADailyAnalyticsRetry_();
+
+        return;
+      }
+
+      state.stage =
+        "TEAM_GAME_LOGS";
+
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 2 — TEAM GAME LOG MONTHS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TEAM_GAME_LOGS") {
+
+      if (
+        state.teamMonthIndex <
+        teamMonths.length
+      ) {
+
+        const month =
+          teamMonths[
+            state.teamMonthIndex
+          ];
+
+        Logger.log(
+          `NBA mother pipeline: refreshing Team Game Logs ${month.key}`
+        );
+
+        month.fn();
+
+        state.teamMonthIndex += 1;
+
+        state.lastSuccessfulStep =
+          `TEAM_GAME_LOGS:${month.key}`;
+
+        state.lastError = null;
+        state.updatedAt =
+          new Date().toISOString();
+
+        saveNBADailyAnalyticsState_(state);
+
+        scheduleNBADailyAnalyticsRetry_();
+
+        return;
+      }
+
+      state.stage =
+        "PLAYER_SEASON_STATS";
+
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 3 — PLAYER SEASON STATS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "PLAYER_SEASON_STATS") {
+
+      Logger.log(
+        "NBA mother pipeline: refreshing Player Season Stats"
+      );
+
+      refreshNBAPlayerSeasonStatsSheet();
+
+      state.stage =
+        "TEAM_SEASON_STATS";
+
+      state.lastSuccessfulStep =
+        "PLAYER_SEASON_STATS";
+
+      state.lastError = null;
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 4 — TEAM SEASON STATS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TEAM_SEASON_STATS") {
+
+      Logger.log(
+        "NBA mother pipeline: refreshing Team Season Stats"
+      );
+
+      refreshNBATeamSeasonStatsSheet();
+
+      state.stage =
+        "PLAYER_TRENDS";
+
+      state.lastSuccessfulStep =
+        "TEAM_SEASON_STATS";
+
+      state.lastError = null;
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 5 — PLAYER TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "PLAYER_TRENDS") {
+
+      Logger.log(
+        "NBA mother pipeline: refreshing Player Trends"
+      );
+
+      refreshNBAPlayerTrendsSheet();
+
+      state.stage =
+        "TEAM_TRENDS";
+
+      state.lastSuccessfulStep =
+        "PLAYER_TRENDS";
+
+      state.lastError = null;
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 6 — TEAM TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TEAM_TRENDS") {
+
+      Logger.log(
+        "NBA mother pipeline: refreshing Team Trends"
+      );
+
+      refreshNBATeamTrendsOutputSheet();
+
+      state.stage =
+        "TOP_PLAYER_TRENDS";
+
+      state.lastSuccessfulStep =
+        "TEAM_TRENDS";
+
+      state.lastError = null;
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 7 — TOP PLAYER TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TOP_PLAYER_TRENDS") {
+
+      Logger.log(
+        "NBA mother pipeline: refreshing Top Player Trends"
+      );
+
+      refreshNBATopPlayerTrendsSheet();
+
+      state.stage =
+        "TOP_TEAM_TRENDS";
+
+      state.lastSuccessfulStep =
+        "TOP_PLAYER_TRENDS";
+
+      state.lastError = null;
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // STAGE 8 — TOP TEAM TRENDS
+    // ------------------------------------------------------------------------
+
+    if (state.stage === "TOP_TEAM_TRENDS") {
+
+      Logger.log(
+        "NBA mother pipeline: refreshing Top Team Trends"
+      );
+
+      refreshNBATopTeamTrendsSheet();
+
+      state.stage =
+        "COMPLETE";
+
+      state.completed =
+        true;
+
+      state.lastSuccessfulStep =
+        "TOP_TEAM_TRENDS";
+
+      state.lastError = null;
+      state.updatedAt =
+        new Date().toISOString();
+
+      saveNBADailyAnalyticsState_(state);
+
+      clearNBADailyAnalyticsContinuationTriggers_();
+
+      Logger.log(
+        "NBA DAILY ANALYTICS MOTHER PIPELINE COMPLETE."
+      );
+
+      return;
+    }
+
+  } catch (error) {
+
+    const state =
+      getNBADailyAnalyticsState_() ||
+      createNBADailyAnalyticsState_();
+
+    state.lastError =
+      String(
+        error &&
+        error.stack
+          ? error.stack
+          : error
+      );
+
+    state.updatedAt =
+      new Date().toISOString();
+
+    saveNBADailyAnalyticsState_(state);
+
+    Logger.log(
+      `NBA mother pipeline failed at ${state.stage}.`
+    );
+
+    Logger.log(
+      state.lastError
+    );
+
+    /*
+      The state has NOT advanced, so the next execution retries
+      the exact failed step.
+    */
+    scheduleNBADailyAnalyticsRetry_();
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+}
+
+function resetNBADailyAnalyticsPipeline() {
+
+  Logger.log(
+    "NBA mother pipeline reset starting..."
+  );
+
+  // Reset the stored pipeline state first.
+  clearNBADailyAnalyticsState_();
+
+  Logger.log(
+    "NBA mother pipeline stored state cleared."
+  );
+
+  // Trigger cleanup is deliberately isolated so that a temporary
+  // Apps Script trigger-service problem cannot prevent the state reset.
+  try {
+
+    clearNBADailyAnalyticsContinuationTriggers_();
+
+    Logger.log(
+      "NBA mother pipeline continuation triggers cleared."
+    );
+
+  } catch (error) {
+
+    Logger.log(
+      "NBA mother pipeline trigger cleanup could not complete."
+    );
+
+    Logger.log(
+      String(
+        error && error.stack
+          ? error.stack
+          : error
+      )
+    );
+
+  }
+
+  Logger.log(
+    "NBA daily analytics mother pipeline state reset."
+  );
+}
+
+function logNBADailyAnalyticsPipelineState() {
+
+  const state =
+    getNBADailyAnalyticsState_();
+
+  Logger.log(
+    JSON.stringify(
+      state,
+      null,
+      2
+    )
+  );
+}
+
+function testNBADailyAnalyticsTriggerSeparation() {
+
+  Logger.log("==============================================");
+  Logger.log("NBA DAILY ANALYTICS TRIGGER SEPARATION TEST");
+  Logger.log("==============================================");
+
+  const permanentRunHandler =
+    "runNBADailyAnalyticsPipeline";
+
+  const temporaryHandler =
+    NBA_DAILY_ANALYTICS_PIPELINE.retryFunction;
+
+  const resetHandler =
+    "resetNBADailyAnalyticsPipeline";
+
+  Logger.log(
+    `Permanent Run handler: ${permanentRunHandler}`
+  );
+
+  Logger.log(
+    `Temporary continuation handler: ${temporaryHandler}`
+  );
+
+  Logger.log(
+    `Reset handler: ${resetHandler}`
+  );
+
+  const handlersAreSeparated =
+    permanentRunHandler !== temporaryHandler;
+
+  Logger.log(
+    `Permanent Run and temporary continuation are separated: ${handlersAreSeparated}`
+  );
+
+  const temporaryHandlerCorrect =
+    temporaryHandler ===
+    "continueNBADailyAnalyticsPipeline";
+
+  Logger.log(
+    `Temporary handler is correct: ${temporaryHandlerCorrect}`
+  );
+
+  const triggers =
+    ScriptApp.getProjectTriggers();
+
+  Logger.log(
+    `Current project trigger count: ${triggers.length}`
+  );
+
+  triggers.forEach(
+    (trigger, index) => {
+
+      Logger.log(
+        `Trigger ${index + 1}: ` +
+        `${trigger.getHandlerFunction()} | ` +
+        `${trigger.getEventType()}`
+      );
+
+    }
+  );
+
+  if (
+    handlersAreSeparated &&
+    temporaryHandlerCorrect
+  ) {
+
+    Logger.log(
+      "PASS: NBA permanent Run trigger is now isolated from temporary continuation cleanup."
+    );
+
+  } else {
+
+    throw new Error(
+      "FAIL: NBA permanent and temporary trigger handlers are not safely separated."
+    );
+  }
+
+  Logger.log("==============================================");
+  Logger.log("NBA TRIGGER SEPARATION TEST COMPLETE");
+  Logger.log("==============================================");
+}
+
+/**
+ * Installs the two PERMANENT NBA Daily Analytics triggers.
+ *
+ * Permanent schedule:
+ *   Reset: 12 AM – 1 AM
+ *   Run:   1 AM – 2 AM
+ *
+ * This function ONLY replaces triggers belonging to these two
+ * permanent handlers. It does not touch Schedule, Rosters,
+ * Game Odds, Player Props, or temporary continuation triggers.
+ */
+function installNBADailyAnalyticsPermanentTriggers() {
+
+  Logger.log("==============================================");
+  Logger.log("INSTALLING NBA DAILY ANALYTICS PERMANENT TRIGGERS");
+  Logger.log("==============================================");
+
+  const resetHandler =
+    "resetNBADailyAnalyticsPipeline";
+
+  const runHandler =
+    "runNBADailyAnalyticsPipeline";
+
+  const triggers =
+    ScriptApp.getProjectTriggers();
+
+  let deletedReset = 0;
+  let deletedRun = 0;
+
+  triggers.forEach(trigger => {
+
+    const handler =
+      trigger.getHandlerFunction();
+
+    if (handler === resetHandler) {
+
+      ScriptApp.deleteTrigger(trigger);
+      deletedReset++;
+
+    } else if (handler === runHandler) {
+
+      ScriptApp.deleteTrigger(trigger);
+      deletedRun++;
+
+    }
+
+  });
+
+  Logger.log(
+    `Removed existing permanent Reset triggers: ${deletedReset}`
+  );
+
+  Logger.log(
+    `Removed existing permanent Run triggers: ${deletedRun}`
+  );
+
+  // Permanent daily RESET:
+  // Apps Script executes this sometime during the midnight–1 AM window.
+  ScriptApp
+    .newTrigger(resetHandler)
+    .timeBased()
+    .everyDays(1)
+    .atHour(0)
+    .create();
+
+  Logger.log(
+    "Created permanent Reset trigger: 12 AM – 1 AM daily."
+  );
+
+  // Permanent daily RUN:
+  // Apps Script executes this sometime during the 1–2 AM window.
+  ScriptApp
+    .newTrigger(runHandler)
+    .timeBased()
+    .everyDays(1)
+    .atHour(1)
+    .create();
+
+  Logger.log(
+    "Created permanent Run trigger: 1 AM – 2 AM daily."
+  );
+
+  const finalTriggers =
+    ScriptApp.getProjectTriggers();
+
+  const resetCount =
+    finalTriggers.filter(
+      trigger =>
+        trigger.getHandlerFunction() === resetHandler
+    ).length;
+
+  const runCount =
+    finalTriggers.filter(
+      trigger =>
+        trigger.getHandlerFunction() === runHandler
+    ).length;
+
+  const continuationCount =
+    finalTriggers.filter(
+      trigger =>
+        trigger.getHandlerFunction() ===
+        "continueNBADailyAnalyticsPipeline"
+    ).length;
+
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset triggers now installed: ${resetCount}`
+  );
+
+  Logger.log(
+    `Permanent Run triggers now installed: ${runCount}`
+  );
+
+  Logger.log(
+    `Temporary continuation triggers currently installed: ${continuationCount}`
+  );
+
+  if (
+    resetCount !== 1 ||
+    runCount !== 1
+  ) {
+
+    throw new Error(
+      "NBA permanent trigger installation failed. Expected exactly 1 Reset and 1 Run trigger."
+    );
+
+  }
+
+  Logger.log("----------------------------------------------");
+  Logger.log(
+    "PASS: NBA has exactly one permanent Reset trigger and one permanent Run trigger."
+  );
+
+  Logger.log("==============================================");
+  Logger.log("NBA PERMANENT TRIGGER INSTALLATION COMPLETE");
+  Logger.log("==============================================");
+}
+
+function testNBAPermanentTriggerSurvival() {
+
+  Logger.log("==============================================");
+  Logger.log("NBA PERMANENT TRIGGER SURVIVAL TEST");
+  Logger.log("==============================================");
+
+  const resetHandler =
+    "resetNBADailyAnalyticsPipeline";
+
+  const runHandler =
+    "runNBADailyAnalyticsPipeline";
+
+  const continuationHandler =
+    "continueNBADailyAnalyticsPipeline";
+
+
+  function countHandler_(handler) {
+
+    return ScriptApp
+      .getProjectTriggers()
+      .filter(
+        trigger =>
+          trigger.getHandlerFunction() === handler
+      )
+      .length;
+
+  }
+
+
+  const resetBefore =
+    countHandler_(resetHandler);
+
+  const runBefore =
+    countHandler_(runHandler);
+
+  const continuationBefore =
+    countHandler_(continuationHandler);
+
+
+  Logger.log("----------------------------------------------");
+  Logger.log("BEFORE CONTINUATION CLEANUP");
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset triggers: ${resetBefore}`
+  );
+
+  Logger.log(
+    `Permanent Run triggers: ${runBefore}`
+  );
+
+  Logger.log(
+    `Temporary continuation triggers: ${continuationBefore}`
+  );
+
+
+  if (
+    resetBefore !== 1 ||
+    runBefore !== 1
+  ) {
+
+    throw new Error(
+      "Pre-test failure: expected exactly 1 permanent Reset and 1 permanent Run trigger."
+    );
+
+  }
+
+
+  Logger.log("----------------------------------------------");
+  Logger.log("RUNNING CONTINUATION CLEANUP");
+  Logger.log("----------------------------------------------");
+
+  /*
+   * This is the exact cleanup operation that previously
+   * could delete the permanent Run trigger.
+   */
+  clearNBADailyAnalyticsContinuationTriggers_();
+
+
+  const resetAfter =
+    countHandler_(resetHandler);
+
+  const runAfter =
+    countHandler_(runHandler);
+
+  const continuationAfter =
+    countHandler_(continuationHandler);
+
+
+  Logger.log("----------------------------------------------");
+  Logger.log("AFTER CONTINUATION CLEANUP");
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset triggers: ${resetAfter}`
+  );
+
+  Logger.log(
+    `Permanent Run triggers: ${runAfter}`
+  );
+
+  Logger.log(
+    `Temporary continuation triggers: ${continuationAfter}`
+  );
+
+
+  const resetSurvived =
+    resetAfter === 1;
+
+  const runSurvived =
+    runAfter === 1;
+
+  const continuationsCleared =
+    continuationAfter === 0;
+
+
+  Logger.log("----------------------------------------------");
+
+  Logger.log(
+    `Permanent Reset survived: ${resetSurvived}`
+  );
+
+  Logger.log(
+    `Permanent Run survived: ${runSurvived}`
+  );
+
+  Logger.log(
+    `Temporary continuations cleared: ${continuationsCleared}`
+  );
+
+
+  if (
+    !resetSurvived ||
+    !runSurvived ||
+    !continuationsCleared
+  ) {
+
+    throw new Error(
+      "FAIL: NBA trigger isolation is not working correctly."
+    );
+
+  }
+
+
+  Logger.log("----------------------------------------------");
+  Logger.log(
+    "PASS: NBA continuation cleanup cannot delete either permanent nightly trigger."
+  );
+
+  Logger.log("==============================================");
+  Logger.log("NBA PERMANENT TRIGGER SURVIVAL TEST COMPLETE");
+  Logger.log("==============================================");
+}
+
+// ============================================================================
+// SPORTACULAR LAUNCH AUTOPILOT
+// P18 — PLAYER ANALYTICS CONTRACT FREEZE
+// NBA AUTOMATED AUDIT RUNNER v0.1
+//
+// Purpose:
+// - Run approved NBA P18 release tests automatically.
+// - Continue after an individual test fails.
+// - Produce one consolidated PASS / FAIL / BLOCKER report.
+// - Does NOT refresh production sheets.
+// - Does NOT modify analytics/model logic.
+// ============================================================================
+
+function runSportacularP18NBAAudit() {
+
+  const suiteStartedAt =
+    new Date();
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P18 NBA AUTOMATED AUDIT"
+  );
+
+  Logger.log(
+    "PLAYER ANALYTICS CONTRACT FREEZE"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  /*
+   * Only true automated release gates belong here.
+   *
+   * Do NOT add a test merely because its name begins with "test".
+   * A P18 gate must:
+   *
+   * 1. Be safe to run automatically.
+   * 2. Verify the Player Analytics contract.
+   * 3. Throw when its assertions fail.
+   * 4. Avoid production refresh/mutation behavior.
+   */
+  const registry = [
+
+    {
+      id:
+        "NBA-P18-001",
+
+      area:
+        "Universal A:AJ Contract",
+
+      name:
+        "NBA Universal Prop Row Contract",
+
+      functionName:
+        "testNBAUniversalPropRowContract",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NBA-P18-002",
+
+      area:
+        "P15 Sportacular Scoring",
+
+      name:
+        "Universal Sportacular Scoring Contract",
+
+      functionName:
+        "testUniversalSportacularScoringContract",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NBA-P18-003",
+
+      area:
+        "Projection Model",
+
+      name:
+        "NBA Projection Model Integrity",
+
+      functionName:
+        "testSportacularP18NBAProjectionIntegrity",
+
+      blocker:
+        true
+    },
+
+
+    {
+      id:
+        "NBA-P18-004",
+
+      area:
+        "Probability + EV",
+
+      name:
+        "NBA Probability + EV Integrity",
+
+      functionName:
+        "testSportacularP18NBAProbabilityEVIntegrity",
+
+      blocker:
+        true
+    }
+
+  ];
+
+
+  const results =
+    [];
+
+
+  registry.forEach(
+    testDefinition => {
+
+      const startedAt =
+        new Date();
+
+
+      Logger.log(
+        "------------------------------------------------------------"
+      );
+
+      Logger.log(
+        `RUNNING | ${testDefinition.id} | ` +
+        `${testDefinition.area} | ` +
+        `${testDefinition.name}`
+      );
+
+
+      let status =
+        "PASS";
+
+      let message =
+        "";
+
+
+      try {
+
+        const testFunction =
+          globalThis[
+            testDefinition.functionName
+          ];
+
+
+        if (
+          typeof testFunction !==
+          "function"
+        ) {
+
+          throw new Error(
+            `Test function not found: ` +
+            testDefinition.functionName
+          );
+        }
+
+
+        testFunction();
+
+
+        message =
+          "Completed without assertion failure.";
+
+      } catch (error) {
+
+        status =
+          "FAIL";
+
+
+        message =
+          error &&
+          error.message
+            ? String(error.message)
+            : String(error);
+      }
+
+
+      const finishedAt =
+        new Date();
+
+
+      const durationMs =
+        finishedAt.getTime() -
+        startedAt.getTime();
+
+
+      const result = {
+
+        id:
+          testDefinition.id,
+
+        league:
+          "NBA",
+
+        area:
+          testDefinition.area,
+
+        name:
+          testDefinition.name,
+
+        functionName:
+          testDefinition.functionName,
+
+        blocker:
+          Boolean(
+            testDefinition.blocker
+          ),
+
+        status:
+          status,
+
+        durationMs:
+          durationMs,
+
+        message:
+          message
+      };
+
+
+      results.push(
+        result
+      );
+
+
+      Logger.log(
+        `${status} | ` +
+        `${testDefinition.id} | ` +
+        `${testDefinition.name} | ` +
+        `${durationMs} ms`
+      );
+
+
+      if (
+        status !== "PASS"
+      ) {
+
+        Logger.log(
+          `ERROR | ${message}`
+        );
+      }
+
+    }
+  );
+
+
+  // ==========================================================================
+  // SUMMARY
+  // ==========================================================================
+
+  const passed =
+    results.filter(
+      result =>
+        result.status === "PASS"
+    ).length;
+
+
+  const failed =
+    results.filter(
+      result =>
+        result.status === "FAIL"
+    ).length;
+
+
+  const blockers =
+    results.filter(
+      result =>
+        result.status === "FAIL" &&
+        result.blocker === true
+    ).length;
+
+
+  const warnings =
+    results.filter(
+      result =>
+        result.status === "WARN"
+    ).length;
+
+
+  const suiteFinishedAt =
+    new Date();
+
+
+  const totalDurationMs =
+    suiteFinishedAt.getTime() -
+    suiteStartedAt.getTime();
+
+
+  const releaseStatus =
+    blockers > 0
+      ? "BLOCKED"
+      : failed > 0
+        ? "FAIL"
+        : "PASS";
+
+
+  Logger.log(
+    ""
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR P18 — NBA CONSOLIDATED REPORT"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  results.forEach(
+    result => {
+
+      Logger.log(
+        `${result.status.padEnd(5)} | ` +
+        `${result.id} | ` +
+        `${result.area} | ` +
+        `${result.name}`
+      );
+
+
+      if (
+        result.status !== "PASS"
+      ) {
+
+        Logger.log(
+          `       ↳ ${result.message}`
+        );
+      }
+
+    }
+  );
+
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    `Tests registered: ${results.length}`
+  );
+
+  Logger.log(
+    `Passed: ${passed}`
+  );
+
+  Logger.log(
+    `Warnings: ${warnings}`
+  );
+
+  Logger.log(
+    `Failed: ${failed}`
+  );
+
+  Logger.log(
+    `Release blockers: ${blockers}`
+  );
+
+  Logger.log(
+    `Total runtime: ${totalDurationMs} ms`
+  );
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    `NBA P18 STATUS: ${releaseStatus}`
+  );
+
+
+  if (
+    releaseStatus === "PASS"
+  ) {
+
+    Logger.log(
+      "NBA P18 AUTOMATED GATES: PASS"
+    );
+
+  } else {
+
+    Logger.log(
+      "NBA P18 AUTOMATED GATES: NOT READY TO FREEZE"
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  /*
+   * Return structured data too.
+   *
+   * Later the four-league master controller can consume
+   * this same structure instead of parsing Logger output.
+   */
+  return {
+
+    deployment:
+      "P18",
+
+    league:
+      "NBA",
+
+    suite:
+      "Player Analytics Contract Freeze",
+
+    status:
+      releaseStatus,
+
+    testsRegistered:
+      results.length,
+
+    passed:
+      passed,
+
+    warnings:
+      warnings,
+
+    failed:
+      failed,
+
+    blockers:
+      blockers,
+
+    durationMs:
+      totalDurationMs,
+
+    results:
+      results
+  };
+}
+
+// ============================================================================
+// SPORTACULAR LAUNCH AUTOPILOT
+// P18 — NBA ASSERTION-BASED MODEL GATES
+// v0.2
+//
+// These tests are:
+// - Read-only
+// - Assertion-based
+// - Safe for automated release auditing
+// - Independent of diagnostic/output sheets
+// ============================================================================
+
+
+// ============================================================================
+// NBA-P18-003
+// PROJECTION MODEL INTEGRITY
+// ============================================================================
+
+function testSportacularP18NBAProjectionIntegrity() {
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P18 NBA — PROJECTION MODEL INTEGRITY"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  const tolerance =
+    0.000001;
+
+
+  const tests = [
+
+    {
+      market:
+        "points",
+
+      season:
+        25,
+
+      recent:
+        30,
+
+      expectedBaseline:
+        25,
+
+      expectedTrendAdjustment:
+        2,
+
+      expectedProjection:
+        27
+    },
+
+
+    {
+      market:
+        "rebounds",
+
+      season:
+        10,
+
+      recent:
+        12,
+
+      expectedBaseline:
+        10,
+
+      expectedTrendAdjustment:
+        0.6,
+
+      expectedProjection:
+        10.6
+    },
+
+
+    {
+      market:
+        "assists",
+
+      season:
+        8,
+
+      recent:
+        10,
+
+      expectedBaseline:
+        8,
+
+      expectedTrendAdjustment:
+        0.7,
+
+      expectedProjection:
+        8.7
+    },
+
+
+    {
+      market:
+        "points_rebounds_assists",
+
+      season:
+        40,
+
+      recent:
+        46,
+
+      expectedBaseline:
+        40,
+
+      expectedTrendAdjustment:
+        3,
+
+      expectedProjection:
+        43
+    },
+
+
+    {
+      market:
+        "blocks_steals",
+
+      season:
+        2,
+
+      recent:
+        4,
+
+      expectedBaseline:
+        2,
+
+      expectedTrendAdjustment:
+        0.3,
+
+      expectedProjection:
+        2.3
+    }
+
+  ];
+
+
+  let totalTests =
+    0;
+
+  let passedTests =
+    0;
+
+  let failedTests =
+    0;
+
+
+  function assertP18NBAProjection_(
+    name,
+    pass,
+    details
+  ) {
+
+    totalTests++;
+
+
+    if (pass) {
+
+      passedTests++;
+
+    } else {
+
+      failedTests++;
+    }
+
+
+    Logger.log(
+      JSON.stringify({
+        name:
+          name,
+
+        pass:
+          Boolean(pass),
+
+        details:
+          details || {}
+      })
+    );
+  }
+
+
+  tests.forEach(
+    test => {
+
+      const result =
+        calculateNBAPropProjection_(
+          test.market,
+          test.season,
+          test.recent
+        );
+
+
+      assertP18NBAProjection_(
+        `${test.market} baseline`,
+        Math.abs(
+          result.baseline -
+          test.expectedBaseline
+        ) < tolerance,
+        {
+          actual:
+            result.baseline,
+
+          expected:
+            test.expectedBaseline
+        }
+      );
+
+
+      assertP18NBAProjection_(
+        `${test.market} trend adjustment`,
+        Math.abs(
+          result.trendAdjustment -
+          test.expectedTrendAdjustment
+        ) < tolerance,
+        {
+          actual:
+            result.trendAdjustment,
+
+          expected:
+            test.expectedTrendAdjustment
+        }
+      );
+
+
+      assertP18NBAProjection_(
+        `${test.market} projected stat`,
+        Math.abs(
+          result.projection -
+          test.expectedProjection
+        ) < tolerance,
+        {
+          actual:
+            result.projection,
+
+          expected:
+            test.expectedProjection
+        }
+      );
+
+
+      assertP18NBAProjection_(
+        `${test.market} obeys baseline + trend = projection`,
+        Math.abs(
+          (
+            result.baseline +
+            result.trendAdjustment
+          ) -
+          result.projection
+        ) < tolerance,
+        {
+          baseline:
+            result.baseline,
+
+          trendAdjustment:
+            result.trendAdjustment,
+
+          projection:
+            result.projection
+        }
+      );
+
+    }
+  );
+
+
+  const normalizationTests = [
+
+    {
+      input:
+        "points",
+
+      expected:
+        "points"
+    },
+
+    {
+      input:
+        "player_points",
+
+      expected:
+        "points"
+    },
+
+    {
+      input:
+        "points_rebounds",
+
+      expected:
+        "points_rebounds"
+    },
+
+    {
+      input:
+        "PRA",
+
+      expected:
+        "points_rebounds_assists"
+    },
+
+    {
+      input:
+        "blocks_steals",
+
+      expected:
+        "blocks_steals"
+    },
+
+    {
+      input:
+        "fantasy_points",
+
+      expected:
+        null
+    },
+
+    {
+      input:
+        "first_basket",
+
+      expected:
+        null
+    }
+
+  ];
+
+
+  normalizationTests.forEach(
+    test => {
+
+      const actual =
+        normalizeNBAPropMarket_(
+          test.input
+        );
+
+
+      assertP18NBAProjection_(
+        `market normalization: ${test.input}`,
+        actual === test.expected,
+        {
+          actual:
+            actual,
+
+          expected:
+            test.expected
+        }
+      );
+
+    }
+  );
+
+
+  const unsupported =
+    calculateNBAPropProjection_(
+      "unsupported_market",
+      20,
+      25
+    );
+
+
+  assertP18NBAProjection_(
+    "unsupported market preserves null projection contract",
+    unsupported.baseline === null &&
+    unsupported.trendAdjustment === null &&
+    unsupported.projection === null,
+    unsupported
+  );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "P18 NBA PROJECTION MODEL INTEGRITY",
+
+      totalTests:
+        totalTests,
+
+      passedTests:
+        passedTests,
+
+      failedTests:
+        failedTests,
+
+      passed:
+        failedTests === 0
+    })
+  );
+
+
+  if (
+    failedTests > 0
+  ) {
+
+    throw new Error(
+      `P18 NBA projection integrity failed: ` +
+      `${failedTests} test(s) failed.`
+    );
+  }
+
+
+  Logger.log(
+    "P18 NBA PROJECTION MODEL INTEGRITY: PASS"
+  );
+}
+
+
+// ============================================================================
+// NBA-P18-004
+// PROBABILITY + EV MATH INTEGRITY
+// ============================================================================
+
+function testSportacularP18NBAProbabilityEVIntegrity() {
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P18 NBA — PROBABILITY + EV INTEGRITY"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  const tolerance =
+    0.000001;
+
+
+  let totalTests =
+    0;
+
+  let passedTests =
+    0;
+
+  let failedTests =
+    0;
+
+
+  function assertP18NBAProbabilityEV_(
+    name,
+    pass,
+    details
+  ) {
+
+    totalTests++;
+
+
+    if (pass) {
+
+      passedTests++;
+
+    } else {
+
+      failedTests++;
+    }
+
+
+    Logger.log(
+      JSON.stringify({
+        name:
+          name,
+
+        pass:
+          Boolean(pass),
+
+        details:
+          details || {}
+      })
+    );
+  }
+
+
+  const oddsTests = [
+
+    {
+      odds:
+        -110,
+
+      expectedImplied:
+        110 / 210
+    },
+
+    {
+      odds:
+        120,
+
+      expectedImplied:
+        100 / 220
+    },
+
+    {
+      odds:
+        150,
+
+      expectedImplied:
+        100 / 250
+    },
+
+    {
+      odds:
+        -200,
+
+      expectedImplied:
+        200 / 300
+    }
+
+  ];
+
+
+  oddsTests.forEach(
+    test => {
+
+      const actual =
+        americanOddsToNBAImpliedProbability_(
+          test.odds
+        );
+
+
+      assertP18NBAProbabilityEV_(
+        `American odds ${test.odds} implied probability`,
+        Math.abs(
+          actual -
+          test.expectedImplied
+        ) < tolerance,
+        {
+          actual:
+            actual,
+
+          expected:
+            test.expectedImplied
+        }
+      );
+
+    }
+  );
+
+
+  const evTests = [
+
+    {
+      name:
+        "55% at -110",
+
+      probability:
+        0.55,
+
+      odds:
+        -110
+    },
+
+    {
+      name:
+        "60% at +120",
+
+      probability:
+        0.60,
+
+      odds:
+        120
+    },
+
+    {
+      name:
+        "45% at +150",
+
+      probability:
+        0.45,
+
+      odds:
+        150
+    },
+
+    {
+      name:
+        "70% at -200",
+
+      probability:
+        0.70,
+
+      odds:
+        -200
+    }
+
+  ];
+
+
+  evTests.forEach(
+    test => {
+
+      const impliedProbability =
+        americanOddsToNBAImpliedProbability_(
+          test.odds
+        );
+
+
+      const profitPerDollar =
+        test.odds > 0
+          ? test.odds / 100
+          : 100 / Math.abs(test.odds);
+
+
+      const expectedEV =
+        (
+          test.probability *
+          profitPerDollar
+        ) -
+        (
+          1 -
+          test.probability
+        );
+
+
+      const actualEV =
+        calculateNBAExpectedValue_(
+          test.probability,
+          test.odds
+        );
+
+
+      const expectedPriceEdge =
+        test.probability -
+        impliedProbability;
+
+
+      const actualPriceEdge =
+        calculateNBAPriceEdge_(
+          test.probability,
+          test.odds
+        );
+
+
+      assertP18NBAProbabilityEV_(
+        `${test.name} EV`,
+        Math.abs(
+          actualEV -
+          expectedEV
+        ) < tolerance,
+        {
+          actual:
+            actualEV,
+
+          expected:
+            expectedEV
+        }
+      );
+
+
+      assertP18NBAProbabilityEV_(
+        `${test.name} price edge`,
+        Math.abs(
+          actualPriceEdge -
+          expectedPriceEdge
+        ) < tolerance,
+        {
+          actual:
+            actualPriceEdge,
+
+          expected:
+            expectedPriceEdge
+        }
+      );
+
+    }
+  );
+
+
+  assertP18NBAProbabilityEV_(
+    "zero American odds returns null implied probability",
+    americanOddsToNBAImpliedProbability_(0) === null,
+    {
+      actual:
+        americanOddsToNBAImpliedProbability_(0)
+    }
+  );
+
+
+  assertP18NBAProbabilityEV_(
+    "missing American odds returns null implied probability",
+    americanOddsToNBAImpliedProbability_(null) === null,
+    {
+      actual:
+        americanOddsToNBAImpliedProbability_(null)
+    }
+  );
+
+
+  assertP18NBAProbabilityEV_(
+    "missing odds preserves null EV",
+    calculateNBAExpectedValue_(
+      0.55,
+      null
+    ) === null,
+    {
+      actual:
+        calculateNBAExpectedValue_(
+          0.55,
+          null
+        )
+    }
+  );
+
+
+  assertP18NBAProbabilityEV_(
+    "invalid probability above 1 preserves null EV",
+    calculateNBAExpectedValue_(
+      1.01,
+      -110
+    ) === null,
+    {
+      actual:
+        calculateNBAExpectedValue_(
+          1.01,
+          -110
+        )
+    }
+  );
+
+
+  assertP18NBAProbabilityEV_(
+    "invalid negative probability preserves null EV",
+    calculateNBAExpectedValue_(
+      -0.01,
+      -110
+    ) === null,
+    {
+      actual:
+        calculateNBAExpectedValue_(
+          -0.01,
+          -110
+        )
+    }
+  );
+
+
+  Logger.log(
+    JSON.stringify({
+      test:
+        "P18 NBA PROBABILITY + EV INTEGRITY",
+
+      totalTests:
+        totalTests,
+
+      passedTests:
+        passedTests,
+
+      failedTests:
+        failedTests,
+
+      passed:
+        failedTests === 0
+    })
+  );
+
+
+  if (
+    failedTests > 0
+  ) {
+
+    throw new Error(
+      `P18 NBA probability/EV integrity failed: ` +
+      `${failedTests} test(s) failed.`
+    );
+  }
+
+
+  Logger.log(
+    "P18 NBA PROBABILITY + EV INTEGRITY: PASS"
+  );
 }
 
 function onOpen() {

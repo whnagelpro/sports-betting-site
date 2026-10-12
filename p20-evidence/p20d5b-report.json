@@ -1,0 +1,870 @@
+{
+  "deployment": "P20-D5B",
+  "evidenceType": "FOUR_LEAGUE_REAL_BROWSER_COVERAGE",
+  "architecture": {
+    "player": "LOCAL_PRODUCTION_ROSTER_TO_DEPLOYED_PLAYER_API_TO_DEPLOYED_PLAYER_PAGE",
+    "team": "SCRIPT_JS_TEAM_PROFILE_CONFIG_TO_PRODUCTION_CSV_TO_DEPLOYED_TEAM_PAGE",
+    "browser": "PLAYWRIGHT_CHROMIUM"
+  },
+  "baseURL": "https://sportacularanalytics.com",
+  "status": "PASS",
+  "freezeStatus": "READY_TO_FREEZE",
+  "coverage": [
+    {
+      "league": "NBA",
+      "profileType": "PLAYER",
+      "status": "PASS"
+    },
+    {
+      "league": "NBA",
+      "profileType": "TEAM",
+      "status": "NO_DATA_STATE"
+    },
+    {
+      "league": "NHL",
+      "profileType": "PLAYER",
+      "status": "PASS"
+    },
+    {
+      "league": "NHL",
+      "profileType": "TEAM",
+      "status": "PASS"
+    },
+    {
+      "league": "MLB",
+      "profileType": "PLAYER",
+      "status": "PASS"
+    },
+    {
+      "league": "MLB",
+      "profileType": "TEAM",
+      "status": "PASS"
+    },
+    {
+      "league": "NFL",
+      "profileType": "PLAYER",
+      "status": "PASS"
+    },
+    {
+      "league": "NFL",
+      "profileType": "TEAM",
+      "status": "PASS"
+    }
+  ],
+  "counts": {
+    "requiredProfileBoundaries": 8,
+    "passed": 7,
+    "acceptedNoData": 1,
+    "notExercised": 0,
+    "failed": 0,
+    "javascriptExceptions": 0,
+    "consoleErrors": 0,
+    "failedRequests": 0,
+    "httpFailures": 0,
+    "blockers": 0
+  },
+  "discoveryEvidence": [
+    {
+      "league": "NBA",
+      "type": "PLAYER",
+      "status": "PASS",
+      "id": "3",
+      "rosterName": "Steven Adams",
+      "resolvedName": "Steven Adams",
+      "apiURL": "https://sportacularanalytics.com/.netlify/functions/player?league=nba&id=3",
+      "runtimeMs": 3653
+    },
+    {
+      "league": "NBA",
+      "type": "TEAM",
+      "status": "NO_DATA_STATE",
+      "reason": "Configured production Team Profile sources are reachable but contain no team data rows.",
+      "sources": [
+        {
+          "propertyName": "teamTrends",
+          "status": 200,
+          "rows": 0
+        },
+        {
+          "propertyName": "seasonStats",
+          "status": 200,
+          "rows": 0
+        },
+        {
+          "propertyName": "teamGameLogs",
+          "status": 200,
+          "rows": 0
+        },
+        {
+          "propertyName": "schedule",
+          "status": 200,
+          "rows": 0
+        }
+      ]
+    },
+    {
+      "league": "NHL",
+      "type": "PLAYER",
+      "status": "PASS",
+      "id": "4",
+      "rosterName": "Corey Perry",
+      "resolvedName": "Corey Perry",
+      "apiURL": "https://sportacularanalytics.com/.netlify/functions/player?league=nhl&id=4",
+      "runtimeMs": 7310
+    },
+    {
+      "league": "NHL",
+      "type": "TEAM",
+      "status": "PASS",
+      "team": "Anaheim Ducks",
+      "source": "teamTrends",
+      "sourceURL": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=482198043&single=true&output=csv"
+    },
+    {
+      "league": "MLB",
+      "type": "PLAYER",
+      "status": "PASS",
+      "id": "533",
+      "rosterName": "Andrew Abbott",
+      "resolvedName": "Andrew Abbott",
+      "apiURL": "https://sportacularanalytics.com/.netlify/functions/player?league=mlb&id=533",
+      "runtimeMs": 5926
+    },
+    {
+      "league": "MLB",
+      "type": "TEAM",
+      "status": "PASS",
+      "team": "Arizona Diamondbacks",
+      "source": "teamTrends",
+      "sourceURL": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=2103952049&single=true&output=csv"
+    },
+    {
+      "league": "NFL",
+      "type": "PLAYER",
+      "status": "PASS",
+      "id": "811",
+      "rosterName": "A.J. Brown",
+      "resolvedName": "A.J. Brown",
+      "apiURL": "https://sportacularanalytics.com/.netlify/functions/player?league=nfl&id=811",
+      "runtimeMs": 4021
+    },
+    {
+      "league": "NFL",
+      "type": "TEAM",
+      "status": "PASS",
+      "team": "Tampa Bay Buccaneers",
+      "source": "teamTrends",
+      "sourceURL": "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=40257281&single=true&output=csv"
+    }
+  ],
+  "evidence": [
+    {
+      "league": "NBA",
+      "profileType": "PLAYER",
+      "expectedName": "Steven Adams",
+      "url": "https://sportacularanalytics.com/player.html?league=nba&id=3",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 1168
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Player identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Steven Adams",
+            "actual": "Steven Adams"
+          }
+        },
+        {
+          "name": "Player identity is visible",
+          "status": "PASS",
+          "details": {
+            "playerNameVisible": true
+          }
+        },
+        {
+          "name": "Required Player Profile DOM containers exist",
+          "status": "PASS",
+          "details": {
+            "playerNameExists": true,
+            "trendGridExists": true,
+            "gameLogSectionExists": true,
+            "analyticsSectionExists": true,
+            "seasonSectionExists": true
+          }
+        },
+        {
+          "name": "Production Player API returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "playerApiResponses": [
+              {
+                "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nba&id=3",
+                "status": 200
+              }
+            ]
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [
+        {
+          "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nba&id=3",
+          "status": 200
+        }
+      ],
+      "snapshot": {
+        "title": "Player Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/player.html?league=nba&id=3",
+        "readyState": "complete",
+        "bodyLength": 1168,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n← Back to NBA Player Props\nNBA PLAYER PROFILE\nSteven Adams\n\nHouston Rockets\n\nC\n\nSeason Snapshot\nPoints\n—\nRebounds\n—\nAssists\n—\nThrees\n—\nPRA\n—\n\nPLAYER MOMENTUM\n\nCurrent Player Trends\n📊\nNo Trends Available\n\nSportacular has not generated any qualifying trends for this player yet. Check back after additional games have been played.\n\nSEASON OVERVIEW\n\nSeason Statistics\nSeason Production\nGames\n—\nPoints\n—\nRebounds\n—\nAssists\n—\nThrees\n—\nPRA\n—\nPer Game\nPoints / Game\n—\nRebounds / Game\n—\nAssists / Game\n—\nThrees / Game\n—\nPRA / Game\n—\nTrend Metrics\nConsistency\n—\nTrend Strength\nEarly\nRisk Tier\nEarly\nContinue Exploring NBA Player Props\n\nView every available NBA player prop, sportsbook, expected value, and trend from today's slate.\n\n← Back to NBA Player Props\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "Steven Adams",
+        "playerTeam": "Houston Rockets",
+        "playerPosition": "C",
+        "teamName": "",
+        "playerNameExists": true,
+        "teamNameExists": false,
+        "playerNameVisible": true,
+        "teamNameVisible": false,
+        "trendGridExists": true,
+        "gameLogSectionExists": true,
+        "analyticsSectionExists": true,
+        "seasonSectionExists": true,
+        "teamSeasonStatsExists": false,
+        "teamTrendsExists": false
+      }
+    },
+    {
+      "league": "NBA",
+      "profileType": "TEAM",
+      "status": "NO_DATA_STATE",
+      "url": null,
+      "expectedName": null,
+      "reason": "No real production team identity is currently available. Production sources are reachable and empty.",
+      "sourceResults": [
+        {
+          "propertyName": "teamTrends",
+          "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=133740316&single=true&output=csv",
+          "status": 200,
+          "rows": 0
+        },
+        {
+          "propertyName": "seasonStats",
+          "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1732528649&single=true&output=csv",
+          "status": 200,
+          "rows": 0
+        },
+        {
+          "propertyName": "teamGameLogs",
+          "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=572928850&single=true&output=csv",
+          "status": 200,
+          "rows": 0
+        },
+        {
+          "propertyName": "schedule",
+          "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1724367340&single=true&output=csv",
+          "status": 200,
+          "rows": 0
+        }
+      ]
+    },
+    {
+      "league": "NHL",
+      "profileType": "PLAYER",
+      "expectedName": "Corey Perry",
+      "url": "https://sportacularanalytics.com/player.html?league=nhl&id=4",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 3273
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Player identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Corey Perry",
+            "actual": "Corey Perry"
+          }
+        },
+        {
+          "name": "Player identity is visible",
+          "status": "PASS",
+          "details": {
+            "playerNameVisible": true
+          }
+        },
+        {
+          "name": "Required Player Profile DOM containers exist",
+          "status": "PASS",
+          "details": {
+            "playerNameExists": true,
+            "trendGridExists": true,
+            "gameLogSectionExists": true,
+            "analyticsSectionExists": true,
+            "seasonSectionExists": true
+          }
+        },
+        {
+          "name": "Production Player API returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "playerApiResponses": [
+              {
+                "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nhl&id=4",
+                "status": 200
+              }
+            ]
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [
+        {
+          "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nhl&id=4",
+          "status": 200
+        }
+      ],
+      "snapshot": {
+        "title": "Player Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/player.html?league=nhl&id=4",
+        "readyState": "complete",
+        "bodyLength": 3273,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n← Back to NHL Player Props\nNHL PLAYER PROFILE\nCorey Perry\n\nLos Angeles Kings\n\nR\n\nSeason Snapshot\nGoals\n0\nAssists\n0\nPoints\n0\nShots on Goal\n1.3\nSaves\n0\n\nPLAYER MOMENTUM\n\nCurrent Player Trends\n➡️ STABLE\nAssists\n\nCorey Perry is holding steady in Assists, averaging 0.00 over the last 5 compared to 0.00 on the season, with a 1+ hit rate of 0%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nWeak Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n➡️ STABLE\nBlocked Shots\n\nCorey Perry is holding steady in Blocked Shots, averaging 0.33 over the last 5 compared to 0.33 on the season, with a 1+ hit rate of 33%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nWeak Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n➡️ STABLE\nGoals\n\nCorey Perry is holding steady in Goals, averaging 0.00 over the last 5 compared to 0.00 on the season, with a 1+ hit rate of 0%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nWeak Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n➡️ STABLE\nHits\n\nCorey Perry is holding steady in Hits, averaging 0.00 over the last 5 compared to 0.00 on the season, with a 1+ hit rate of 0%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nWeak Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n➡️ STABLE\nPoints\n\nCorey Perry is holding steady in Points, averaging 0.00 over the last 5 compared to 0.00 on the season, with a 1+ hit rate of 0%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nWeak Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n➡️ STABLE\nPower Play Points\n\nCorey Perry is holding steady in Power Play Points, averaging 0.00 over the last 5 compared to 0.00 on the season, with a 1+ hit rate of 0%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nWeak Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n➡️ STABLE\nSaves\n\nCorey Perry is holding steady in Saves, averaging 0.00 over the last 5 compared to 0.00 on the season, with a 1+ hit rate of 0%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nWeak Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n➡️ STABLE\nShots On Goal\n\nCorey Perry is holding steady in Shots On Goal, averaging 1.33 over the last 5 compared to 1.33 on the season, with a 1+ hit rate of 67%.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nModerate Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 3 GAMES\n\nSEASON OVERVIEW\n\nSeason Statistics\nSeason Production\nGames\n3\nGoals\n0\nAssists\n0\nPoints\n0\nShots on Goal\n4\nSaves\n0\nPer Game\nGoals / Game\n0.0\nAssists / Game\n0.0\nPoints / Game\n0.0\nShots on Goal / Game\n1.3\nSaves / Game\n0.0\nTrend Metrics\nConsistency\n0\nTrend Strength\nWeak Trend\nRisk Tier\nHigh\n\nRECENT PERFORMANCE\n\nRecent Performance\nDate\tOpponent\tG\tA\tPTS\tSOG\tPPP\tHIT\tBLK\nOct 10\tVegas Golden Knights\t0\t0\t0\t1\t0\t0\t1\nOct 6\tFlorida Panthers\t0\t0\t0\t0\t0\t0\t0\nOct 3\tSan Jose Sharks\t0\t0\t0\t3\t0\t0\t0\nContinue Exploring NHL Player Props\n\nView every available NHL player prop, sportsbook, expected value, and trend from today's slate.\n\n← Back to NHL Player Props\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "Corey Perry",
+        "playerTeam": "Los Angeles Kings",
+        "playerPosition": "R",
+        "teamName": "",
+        "playerNameExists": true,
+        "teamNameExists": false,
+        "playerNameVisible": true,
+        "teamNameVisible": false,
+        "trendGridExists": true,
+        "gameLogSectionExists": true,
+        "analyticsSectionExists": true,
+        "seasonSectionExists": true,
+        "teamSeasonStatsExists": false,
+        "teamTrendsExists": false
+      }
+    },
+    {
+      "league": "NHL",
+      "profileType": "TEAM",
+      "expectedName": "Anaheim Ducks",
+      "url": "https://sportacularanalytics.com/nhl-team?league=nhl&team=Anaheim%20Ducks",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 2742
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Team identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Anaheim Ducks",
+            "actual": "Anaheim Ducks"
+          }
+        },
+        {
+          "name": "Team identity is visible",
+          "status": "PASS",
+          "details": {
+            "teamNameVisible": true
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [],
+      "snapshot": {
+        "title": "NHL Team Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/nhl-team?league=nhl&team=Anaheim%20Ducks",
+        "readyState": "complete",
+        "bodyLength": 2742,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n🏒\nAnaheim Ducks\n\nNHL\n\nLeague Rank\n#13\nRank Score\n61.3\nOverall Rating\n57.9\nOffensive Rating\n65.3\nDefensive Rating\n46.8\nRating Tier\nAverage\nRating Notes\nBalanced team profile.\nLast Updated\n10/11/2026\nSeason Snapshot\nGames Played\n\n5\nGoals / Game\n\n3.6\nGoals Allowed / Game\n\n2.6\nShots On Goal / Game\n\n23.2\nAssists / Game\n\n6.8\nPoints / Game\n\n10.4\nSaves / Game\n\n22.4\nCurrent Team Trends\nAssists\nLast 5 Avg\n\n6.8\nSeason Avg\n\n6.8\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nMedium\nHit Rate\n\n100%\nThe Anaheim Ducks are holding steady in Assists, averaging 6.80 over the last 5 games compared to 6.80 on the season, with a 1+ hit rate of 100%.\nGoals Allowed\nLast 5 Avg\n\n2.6\nSeason Avg\n\n2.6\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Anaheim Ducks are holding steady in Goals Allowed, averaging 2.60 over the last 5 games compared to 2.60 on the season, with a 1+ hit rate of 100%.\nGoals For\nLast 5 Avg\n\n3.6\nSeason Avg\n\n3.6\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nMedium\nHit Rate\n\n100%\nThe Anaheim Ducks are holding steady in Goals For, averaging 3.60 over the last 5 games compared to 3.60 on the season, with a 1+ hit rate of 100%.\nPoints\nLast 5 Avg\n\n10.4\nSeason Avg\n\n10.4\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nMedium\nHit Rate\n\n100%\nThe Anaheim Ducks are holding steady in Points, averaging 10.40 over the last 5 games compared to 10.40 on the season, with a 1+ hit rate of 100%.\nSaves\nLast 5 Avg\n\n22.4\nSeason Avg\n\n22.4\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nMedium\nHit Rate\n\n100%\nThe Anaheim Ducks are holding steady in Saves, averaging 22.40 over the last 5 games compared to 22.40 on the season, with a 1+ hit rate of 100%.\nShots On Goal\nLast 5 Avg\n\n23.2\nSeason Avg\n\n23.2\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nLow\nHit Rate\n\n100%\nThe Anaheim Ducks are holding steady in Shots On Goal, averaging 23.20 over the last 5 games compared to 23.20 on the season, with a 1+ hit rate of 100%.\nRecent Performance\nDate\tOpponent\tResult\tGF\tGA\tSOG\tAST\tPTS\tSV\n2026-10-10\tCalgary Flames\tW 4-2\t4\t2\t28\t7\t11\t27\n2026-10-09\tWinnipeg Jets\tW 5-1\t5\t1\t17\t9\t14\t15\n2026-10-07\tEdmonton Oilers\tL 2-5\t2\t5\t31\t4\t6\t14\n2026-10-04\tFlorida Panthers\tW 3-2\t3\t2\t20\t6\t9\t29\n2026-10-02\tVegas Golden Knights\tW 4-3\t4\t3\t20\t8\t12\t27\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "",
+        "playerTeam": "",
+        "playerPosition": "",
+        "teamName": "Anaheim Ducks",
+        "playerNameExists": false,
+        "teamNameExists": true,
+        "playerNameVisible": false,
+        "teamNameVisible": true,
+        "trendGridExists": false,
+        "gameLogSectionExists": false,
+        "analyticsSectionExists": false,
+        "seasonSectionExists": false,
+        "teamSeasonStatsExists": true,
+        "teamTrendsExists": true
+      }
+    },
+    {
+      "league": "MLB",
+      "profileType": "PLAYER",
+      "expectedName": "Andrew Abbott",
+      "url": "https://sportacularanalytics.com/player.html?league=mlb&id=533",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 2944
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Player identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Andrew Abbott",
+            "actual": "Andrew Abbott"
+          }
+        },
+        {
+          "name": "Player identity is visible",
+          "status": "PASS",
+          "details": {
+            "playerNameVisible": true
+          }
+        },
+        {
+          "name": "Required Player Profile DOM containers exist",
+          "status": "PASS",
+          "details": {
+            "playerNameExists": true,
+            "trendGridExists": true,
+            "gameLogSectionExists": true,
+            "analyticsSectionExists": true,
+            "seasonSectionExists": true
+          }
+        },
+        {
+          "name": "Production Player API returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "playerApiResponses": [
+              {
+                "url": "https://sportacularanalytics.com/.netlify/functions/player?league=mlb&id=533",
+                "status": 200
+              }
+            ]
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [
+        {
+          "url": "https://sportacularanalytics.com/.netlify/functions/player?league=mlb&id=533",
+          "status": 200
+        }
+      ],
+      "snapshot": {
+        "title": "Player Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/player.html?league=mlb&id=533",
+        "readyState": "complete",
+        "bodyLength": 2944,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n← Back to MLB Player Props\nMLB PLAYER PROFILE\nAndrew Abbott\n\nCincinnati Reds\n\nSP\n\nSeason Snapshot\nIP / Game\n5.2\nSO / Game\n4.1\nER / Game\n2.7\nH / Game\n5.2\nBB / Game\n2.4\n\nPLAYER MOMENTUM\n\nCurrent Player Trends\n↗ RISING\nPitcher Earned Runs\n\nAndrew Abbott is trending up in pitcher_earned_runs, averaging 3.60 over the last 5 compared to 2.66 on the season (+35.5%), with a 1+ hit rate of 100%.\n\nTREND SCORE\n+35.5\nTREND STRENGTH\nElite Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 32 GAMES\n↗ RISING\nPitcher Hits Allowed\n\nAndrew Abbott is holding steady in pitcher_hits_allowed, averaging 5.80 over the last 5 compared to 5.16 on the season, with a 1+ hit rate of 100%.\n\nTREND SCORE\n+12.5\nTREND STRENGTH\nStrong Trend\nRISK TIER\nMedium\nMOMENTUM CONFIDENCE\nModerate\nBASED ON 32 GAMES\n↘ FALLING\nPitcher Strikeouts\n\nAndrew Abbott is trending down in pitcher_strikeouts, averaging 3.40 over the last 5 compared to 4.09 on the season (-16.9%), with a 1+ hit rate of 80%.\n\nTREND SCORE\n-16.9\nTREND STRENGTH\nCold Trend\nRISK TIER\nMedium\nMOMENTUM CONFIDENCE\nModerate\nBASED ON 32 GAMES\n↘ FALLING\nPitcher Outs\n\nAndrew Abbott is trending down in pitcher_outs, averaging 12.40 over the last 5 compared to 15.56 on the season (-20.3%), with a 1+ hit rate of 100%.\n\nTREND SCORE\n-20.3\nTREND STRENGTH\nCold Trend\nRISK TIER\nMedium\nMOMENTUM CONFIDENCE\nModerate\nBASED ON 32 GAMES\n↘ FALLING\nPitcher Walks\n\nAndrew Abbott is trending down in pitcher_walks, averaging 1.60 over the last 5 compared to 2.38 on the season (-32.6%), with a 1+ hit rate of 60%.\n\nTREND SCORE\n-32.6\nTREND STRENGTH\nCold Trend\nRISK TIER\nHigh\nMOMENTUM CONFIDENCE\nLow\nBASED ON 32 GAMES\n\nSEASON OVERVIEW\n\nSeason Statistics\nSeason Production\nGames\n32\nInnings Pitched\n166\nStrikeouts\n131\nEarned Runs\n85\nHits Allowed\n165\nWalks\n76\nPer Game\nStrikeouts / Game\n4.1\nOuts / Game\n15.6\nER / Game\n2.7\nHits Allowed / Game\n5.2\nWalks / Game\n2.4\nTrend Metrics\nConsistency\n-\nTrend Strength\n-\nRisk Tier\n-\n\nRECENT PERFORMANCE\n\nRecent Performance\nDate\tOpponent\tIP\tSO\tER\tH\tBB\nSep 23\tAtlanta Braves\t7.0\t6\t2\t6\t1\nSep 16\tLos Angeles Dodgers\t4.2\t5\t1\t3\t5\nSep 11\tMilwaukee Brewers\t2.0\t0\t7\t9\t0\nSep 5\tMilwaukee Brewers\t4.0\t5\t1\t3\t0\nAug 29\tChicago Cubs\t3.0\t1\t7\t8\t2\nAug 23\tArizona Diamondbacks\t6.0\t6\t4\t7\t2\nAug 18\tSt. Louis Cardinals\t6.1\t6\t2\t4\t2\nAug 13\tChicago White Sox\t4.1\t3\t5\t7\t3\nAug 6\tOakland Athletics\t6.2\t4\t3\t7\t2\nAug 1\tPittsburgh Pirates\t5.0\t1\t3\t3\t5\nContinue Exploring MLB Player Props\n\nView every available MLB player prop, sportsbook, expected value, and trend from today's slate.\n\n← Back to MLB Player Props\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "Andrew Abbott",
+        "playerTeam": "Cincinnati Reds",
+        "playerPosition": "SP",
+        "teamName": "",
+        "playerNameExists": true,
+        "teamNameExists": false,
+        "playerNameVisible": true,
+        "teamNameVisible": false,
+        "trendGridExists": true,
+        "gameLogSectionExists": true,
+        "analyticsSectionExists": true,
+        "seasonSectionExists": true,
+        "teamSeasonStatsExists": false,
+        "teamTrendsExists": false
+      }
+    },
+    {
+      "league": "MLB",
+      "profileType": "TEAM",
+      "expectedName": "Arizona Diamondbacks",
+      "url": "https://sportacularanalytics.com/mlb-team?league=mlb&team=Arizona%20Diamondbacks",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 3092
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Team identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Arizona Diamondbacks",
+            "actual": "Arizona Diamondbacks"
+          }
+        },
+        {
+          "name": "Team identity is visible",
+          "status": "PASS",
+          "details": {
+            "teamNameVisible": true
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [],
+      "snapshot": {
+        "title": "Team Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/mlb-team?league=mlb&team=Arizona%20Diamondbacks",
+        "readyState": "complete",
+        "bodyLength": 3092,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n⚾\nArizona Diamondbacks\n\nMLB\n\nLeague Rank\n#20\nRank Score\n34.5\nOverall Rating\n41.3\nOffensive Rating\n51.7\nPitching Rating\n25.8\nRating Tier\nBelow Average\nRating Notes\nOffense carrying the team.\nLast Updated\n10/3/2026\nSeason Snapshot\nGames Played\n\n162\nRuns / Game\n\n4.6\nRuns Allowed / Game\n\n4.5\nHits / Game\n\n8.3\nHome Runs / Game\n\n1.0\nTotal Bases / Game\n\n13.5\nStrikeouts / Game\n\n7.4\nCurrent Team Trends\nHits\nLast 5 Avg\n\n10.4\nSeason Avg\n\n8.277777778\nAbove Season\n\n25.6%\nTrend Strength\n\nElite Trend\nRisk Tier\n\nMedium\nHit Rate\n\n100%\nThe Arizona Diamondbacks are trending up in Hits, averaging 10.40 over the last 5 games compared to 8.28 on the season (+25.6%), with a 1+ hit rate of 100%.\nHome Runs\nLast 5 Avg\n\n1.6\nSeason Avg\n\n1.024691358\nAbove Season\n\n56.1%\nTrend Strength\n\nElite Trend\nRisk Tier\n\nHigh\nHit Rate\n\n80%\nThe Arizona Diamondbacks are trending up in Home Runs, averaging 1.60 over the last 5 games compared to 1.02 on the season (+56.1%), with a 1+ hit rate of 80%.\nRuns Allowed\nLast 5 Avg\n\n6.8\nSeason Avg\n\n4.50617284\nAbove Season\n\n50.9%\nTrend Strength\n\nElite Trend\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Arizona Diamondbacks are trending up in Runs Allowed, averaging 6.80 over the last 5 games compared to 4.51 on the season (+50.9%), with a 1+ hit rate of 100%.\nRuns For\nLast 5 Avg\n\n7.8\nSeason Avg\n\n4.561728395\nAbove Season\n\n71.0%\nTrend Strength\n\nElite Trend\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Arizona Diamondbacks are trending up in Runs For, averaging 7.80 over the last 5 games compared to 4.56 on the season (+71.0%), with a 1+ hit rate of 100%.\nStrikeouts\nLast 5 Avg\n\n7.4\nSeason Avg\n\n7.37654321\nAbove Season\n\n0.3%\nTrend Strength\n\nModerate Trend\nRisk Tier\n\nMedium\nHit Rate\n\n100%\nThe Arizona Diamondbacks are holding steady in Strikeouts, averaging 7.40 over the last 5 games compared to 7.38 on the season, with a 1+ hit rate of 100%.\nTotal Bases\nLast 5 Avg\n\n18\nSeason Avg\n\n13.54320988\nAbove Season\n\n32.9%\nTrend Strength\n\nElite Trend\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Arizona Diamondbacks are trending up in Total Bases, averaging 18.00 over the last 5 games compared to 13.54 on the season (+32.9%), with a 1+ hit rate of 100%.\nRecent Performance\nDate\tOpponent\tResult\tR\tRA\tHits\tHR\tTB\tSO\n2026-09-27\tSan Diego Padres\tL 4-9\t4\t9\t8\t0\t10\t4\n2026-09-26\tSan Diego Padres\tL 7-10\t7\t10\t10\t1\t14\t12\n2026-09-25\tSan Diego Padres\tW 11-4\t11\t4\t8\t3\t20\t4\n2026-09-24\tColorado Rockies\tW 12-8\t12\t8\t18\t3\t33\t7\n2026-09-23\tColorado Rockies\tW 5-3\t5\t3\t8\t1\t13\t10\n2026-09-22\tColorado Rockies\tW 7-2\t7\t2\t13\t1\t21\t3\n2026-09-20\tNew York Yankees\tW 8-4\t8\t4\t11\t1\t17\t6\n2026-09-19\tNew York Yankees\tW 5-3\t5\t3\t7\t1\t12\t10\n2026-09-18\tNew York Yankees\tL 2-9\t2\t9\t7\t1\t11\t11\n2026-09-16\tMiami Marlins\tL 3-4\t3\t4\t10\t3\t20\t9\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "",
+        "playerTeam": "",
+        "playerPosition": "",
+        "teamName": "Arizona Diamondbacks",
+        "playerNameExists": false,
+        "teamNameExists": true,
+        "playerNameVisible": false,
+        "teamNameVisible": true,
+        "trendGridExists": false,
+        "gameLogSectionExists": false,
+        "analyticsSectionExists": false,
+        "seasonSectionExists": false,
+        "teamSeasonStatsExists": true,
+        "teamTrendsExists": true
+      }
+    },
+    {
+      "league": "NFL",
+      "profileType": "PLAYER",
+      "expectedName": "A.J. Brown",
+      "url": "https://sportacularanalytics.com/player.html?league=nfl&id=811",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 1903
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Player identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "A.J. Brown",
+            "actual": "A.J. Brown"
+          }
+        },
+        {
+          "name": "Player identity is visible",
+          "status": "PASS",
+          "details": {
+            "playerNameVisible": true
+          }
+        },
+        {
+          "name": "Required Player Profile DOM containers exist",
+          "status": "PASS",
+          "details": {
+            "playerNameExists": true,
+            "trendGridExists": true,
+            "gameLogSectionExists": true,
+            "analyticsSectionExists": true,
+            "seasonSectionExists": true
+          }
+        },
+        {
+          "name": "Production Player API returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "playerApiResponses": [
+              {
+                "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nfl&id=811",
+                "status": 200
+              }
+            ]
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [
+        {
+          "url": "https://sportacularanalytics.com/.netlify/functions/player?league=nfl&id=811",
+          "status": 200
+        }
+      ],
+      "snapshot": {
+        "title": "Player Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/player.html?league=nfl&id=811",
+        "readyState": "complete",
+        "bodyLength": 1903,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n← Back to NFL Player Props\nNFL PLAYER PROFILE\nA.J. Brown\n\nNew England Patriots\n\nWide Receiver\n\nSeason Snapshot\nReceptions\n3\nReceiving Yards\n26\nReceiving TDs\n0\nRush Yards\n0\nRush TDs\n0\n\nPLAYER MOMENTUM\n\nCurrent Player Trends\n➡️ STABLE\nReceptions\n\nA.J. Brown is stable in Receptions, averaging 3.0 over the last 5 games compared to a season average of 3.0 with a 100% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 1 GAME\n➡️ STABLE\nReceiving Yards\n\nA.J. Brown is stable in Receiving Yards, averaging 26.0 over the last 5 games compared to a season average of 26.0 with a 100% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 1 GAME\n➡️ STABLE\nReceiving TDs\n\nA.J. Brown is stable in Receiving TDs, averaging 0.0 over the last 5 games compared to a season average of 0.0 with a 0% 1+ hit rate.\n\nTREND SCORE\n0.0\nTREND STRENGTH\nEarly\nRISK TIER\nEarly\nMOMENTUM CONFIDENCE\nLow\nBASED ON 1 GAME\n\nSEASON OVERVIEW\n\nSeason Statistics\nReceiving\nGames\n1\nReceptions\n3\nReceiving Yards\n26\nReceiving TDs\n0\nRushing\nRush Attempts\n0\nRush Yards\n0\nRush TDs\n0\nTrend Metrics\nConsistency\n0\nTrend Strength\nEarly\nRisk Tier\nEarly\n\nRECENT PERFORMANCE\n\nRecent Performance\nDate\tOpponent\tReceptions\tReceiving Yards\tReceiving TDs\nSep 9\tSeattle Seahawks\t3\t26\t0\nContinue Exploring NFL Player Props\n\nView every available NFL player prop, sportsbook, expected value, and trend from today's slate.\n\n← Back to NFL Player Props\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "A.J. Brown",
+        "playerTeam": "New England Patriots",
+        "playerPosition": "Wide Receiver",
+        "teamName": "",
+        "playerNameExists": true,
+        "teamNameExists": false,
+        "playerNameVisible": true,
+        "teamNameVisible": false,
+        "trendGridExists": true,
+        "gameLogSectionExists": true,
+        "analyticsSectionExists": true,
+        "seasonSectionExists": true,
+        "teamSeasonStatsExists": false,
+        "teamTrendsExists": false
+      }
+    },
+    {
+      "league": "NFL",
+      "profileType": "TEAM",
+      "expectedName": "Tampa Bay Buccaneers",
+      "url": "https://sportacularanalytics.com/nfl-team?league=nfl&team=Tampa%20Bay%20Buccaneers",
+      "status": "PASS",
+      "navigationStatus": 200,
+      "navigationError": null,
+      "checks": [
+        {
+          "name": "Production navigation returned HTTP 200",
+          "status": "PASS",
+          "details": {
+            "navigationStatus": 200
+          }
+        },
+        {
+          "name": "Page rendered nonempty body",
+          "status": "PASS",
+          "details": {
+            "bodyLength": 2743
+          }
+        },
+        {
+          "name": "No uncaught JavaScript exceptions",
+          "status": "PASS",
+          "details": {
+            "javascriptErrors": []
+          }
+        },
+        {
+          "name": "Team identity rendered correctly",
+          "status": "PASS",
+          "details": {
+            "expected": "Tampa Bay Buccaneers",
+            "actual": "Tampa Bay Buccaneers"
+          }
+        },
+        {
+          "name": "Team identity is visible",
+          "status": "PASS",
+          "details": {
+            "teamNameVisible": true
+          }
+        },
+        {
+          "name": "No critical production network failures",
+          "status": "PASS",
+          "details": {
+            "criticalFailures": []
+          }
+        }
+      ],
+      "javascriptErrors": [],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "httpFailures": [],
+      "playerApiResponses": [],
+      "snapshot": {
+        "title": "NFL Team Profile | Sportacular Analytics",
+        "url": "https://sportacularanalytics.com/nfl-team?league=nfl&team=Tampa%20Bay%20Buccaneers",
+        "readyState": "complete",
+        "bodyLength": 2743,
+        "bodyText": "Home\nNBA\nNHL\nMLB\nNFL\nPricing\nAbout\nLegal\nLogin\n🏈\nTampa Bay Buccaneers\n\nNFL\n\nLeague Rank\n#19\nRank Score\n41.9\nOverall Rating\n45.8\nOffensive Rating\n35.5\nDefensive Rating\n61.3\nRating Tier\nBelow Average\nRating Notes\nDefense carrying the team.\nLast Updated\n10/11/2026\nSeason Snapshot\nGames Played\n\n5\nPoints For\n\n20\nPoints Allowed\n\n22.4\nPassing Yards\n\n190.4\nRushing Yards\n\n133\nTurnovers\n\n0.8\nSacks\n\n4.6\nCurrent Team Trends\nPoints For\nLast 5 Avg\n\n20\nSeason Avg\n\n20\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Tampa Bay Buccaneers are stable in Points For, averaging 20.0 over the last 5 games compared to a season average of 20.0 with a 100% 1+ hit rate.\nPoints Allowed\nLast 5 Avg\n\n22.4\nSeason Avg\n\n22.4\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Tampa Bay Buccaneers are stable in Points Allowed, averaging 22.4 over the last 5 games compared to a season average of 22.4 with a 100% 1+ hit rate.\nPassing Yards\nLast 5 Avg\n\n190.4\nSeason Avg\n\n190.4\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Tampa Bay Buccaneers are stable in Passing Yards, averaging 190.4 over the last 5 games compared to a season average of 190.4 with a 100% 1+ hit rate.\nRushing Yards\nLast 5 Avg\n\n133\nSeason Avg\n\n133\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Tampa Bay Buccaneers are stable in Rushing Yards, averaging 133.0 over the last 5 games compared to a season average of 133.0 with a 100% 1+ hit rate.\nTurnovers\nLast 5 Avg\n\n0.8\nSeason Avg\n\n0.8\nAbove Season\n\n0.0%\nTrend Strength\n\nWeak\nRisk Tier\n\nHigh\nHit Rate\n\n20%\nThe Tampa Bay Buccaneers are stable in Turnovers, averaging 0.8 over the last 5 games compared to a season average of 0.8 with a 20% 1+ hit rate.\nSacks\nLast 5 Avg\n\n4.6\nSeason Avg\n\n4.6\nAbove Season\n\n0.0%\nTrend Strength\n\nModerate\nRisk Tier\n\nHigh\nHit Rate\n\n100%\nThe Tampa Bay Buccaneers are stable in Sacks, averaging 4.6 over the last 5 games compared to a season average of 4.6 with a 100% 1+ hit rate.\nRecent Performance\nDate\tOpponent\tResult\tPF\tPA\tPass Yds\tRush Yds\tTO\tSacks\n2026-10-08\tDallas Cowboys\tW 24-16\t24\t16\t189\t241\t0\t1\n2026-10-04\tGreen Bay Packers\tL 14-17\t14\t17\t148\t141\t0\t3\n2026-09-27\tMinnesota Vikings\tL 16-23\t16\t23\t217\t57\t0\t9\n2026-09-20\tCleveland Browns\tL 19-23\t19\t23\t182\t137\t0\t5\n2026-09-13\tCincinnati Bengals\tL 27-33\t27\t33\t216\t89\t4\t5\n\nDisclaimer: Data provided by BallDontLie API. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.\n\nWe would love to hear from you! Contact us at support@sportacularanalytics.com.\n\n© 2026 Sportacular Analytics. All rights reserved.",
+        "playerName": "",
+        "playerTeam": "",
+        "playerPosition": "",
+        "teamName": "Tampa Bay Buccaneers",
+        "playerNameExists": false,
+        "teamNameExists": true,
+        "playerNameVisible": false,
+        "teamNameVisible": true,
+        "trendGridExists": false,
+        "gameLogSectionExists": false,
+        "analyticsSectionExists": false,
+        "seasonSectionExists": false,
+        "teamSeasonStatsExists": true,
+        "teamTrendsExists": true
+      }
+    }
+  ],
+  "failures": [],
+  "generatedAt": "2026-10-12T01:37:53.749Z"
+}

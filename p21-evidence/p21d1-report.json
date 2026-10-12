@@ -1,0 +1,737 @@
+{
+  "phase": "P21",
+  "deployment": "D1",
+  "test": "Authentication & Tier Contract QA",
+  "timestamp": "2026-10-12T02:15:29.850Z",
+  "evidenceType": "SOURCE_AND_MOCKED_BACKEND",
+  "productionModified": false,
+  "summary": {
+    "total": 76,
+    "passed": 76,
+    "failed": 0,
+    "blockers": 0
+  },
+  "assertions": [
+    {
+      "name": "Exactly five membership tiers",
+      "status": "PASS",
+      "details": {
+        "actualNames": [
+          "Rookie",
+          "Veteran",
+          "All-Star",
+          "Hall-of-Famer",
+          "Legend"
+        ]
+      }
+    },
+    {
+      "name": "Rookie membership contract",
+      "status": "PASS",
+      "details": {
+        "actual": {
+          "maxRankingsPerGame": 5,
+          "showPlayerProps": false,
+          "showGameOdds": true,
+          "maxPropsToShow": 0,
+          "showTopBet": false,
+          "showLeaderboardCount": 3
+        },
+        "expected": {
+          "maxRankingsPerGame": 5,
+          "showPlayerProps": false,
+          "showGameOdds": true,
+          "maxPropsToShow": 0,
+          "showTopBet": false,
+          "showLeaderboardCount": 3
+        }
+      }
+    },
+    {
+      "name": "Veteran membership contract",
+      "status": "PASS",
+      "details": {
+        "actual": {
+          "maxRankingsPerGame": 5,
+          "showPlayerProps": false,
+          "showGameOdds": true,
+          "maxPropsToShow": 0,
+          "showTopBet": false,
+          "showLeaderboardCount": 5
+        },
+        "expected": {
+          "maxRankingsPerGame": 5,
+          "showPlayerProps": false,
+          "showGameOdds": true,
+          "maxPropsToShow": 0,
+          "showTopBet": false,
+          "showLeaderboardCount": 5
+        }
+      }
+    },
+    {
+      "name": "All-Star membership contract",
+      "status": "PASS",
+      "details": {
+        "actual": {
+          "maxRankingsPerGame": 99,
+          "showPlayerProps": true,
+          "showGameOdds": true,
+          "maxPropsToShow": 10,
+          "showTopBet": false,
+          "showLeaderboardCount": 7
+        },
+        "expected": {
+          "maxRankingsPerGame": 99,
+          "showPlayerProps": true,
+          "showGameOdds": true,
+          "maxPropsToShow": 10,
+          "showTopBet": false,
+          "showLeaderboardCount": 7
+        }
+      }
+    },
+    {
+      "name": "Hall-of-Famer membership contract",
+      "status": "PASS",
+      "details": {
+        "actual": {
+          "maxRankingsPerGame": 99,
+          "showPlayerProps": true,
+          "showGameOdds": true,
+          "maxPropsToShow": 25,
+          "showTopBet": true,
+          "showLeaderboardCount": 12
+        },
+        "expected": {
+          "maxRankingsPerGame": 99,
+          "showPlayerProps": true,
+          "showGameOdds": true,
+          "maxPropsToShow": 25,
+          "showTopBet": true,
+          "showLeaderboardCount": 12
+        }
+      }
+    },
+    {
+      "name": "Legend membership contract",
+      "status": "PASS",
+      "details": {
+        "actual": {
+          "maxRankingsPerGame": 99,
+          "showPlayerProps": true,
+          "showGameOdds": true,
+          "maxPropsToShow": 99999,
+          "showTopBet": true,
+          "showLeaderboardCount": 20
+        },
+        "expected": {
+          "maxRankingsPerGame": 99,
+          "showPlayerProps": true,
+          "showGameOdds": true,
+          "maxPropsToShow": 99999,
+          "showTopBet": true,
+          "showLeaderboardCount": 20
+        }
+      }
+    },
+    {
+      "name": "Frontend initializes Supabase",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend supports session retrieval",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend supports login",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend supports signup",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend supports logout",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend supports password reset request",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend supports password update",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend retrieves membership profile",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Frontend has Rookie fallback",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Password reset uses production domain",
+      "status": "PASS",
+      "details": {
+        "actual": "https://sportacularanalytics.com/auth.html?view=update-password",
+        "expected": "https://sportacularanalytics.com/auth.html?view=update-password"
+      }
+    },
+    {
+      "name": "nba backend allowlist matches contract",
+      "status": "PASS",
+      "details": {
+        "actual": [
+          "All-Star",
+          "Hall-of-Famer",
+          "Legend"
+        ]
+      }
+    },
+    {
+      "name": "nba validates user with getUser",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nba reads profiles table",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nba enforces tier allowlist",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nba: Missing Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nba: Malformed Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nba: Empty Bearer token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nba: Invalid token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nba: Missing profile",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nba: Rookie access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nba: Veteran access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nba: All-Star access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nba: Hall-of-Famer access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nba: Legend access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nba: Unknown tier denied",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl backend allowlist matches contract",
+      "status": "PASS",
+      "details": {
+        "actual": [
+          "All-Star",
+          "Hall-of-Famer",
+          "Legend"
+        ]
+      }
+    },
+    {
+      "name": "nhl validates user with getUser",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nhl reads profiles table",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nhl enforces tier allowlist",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nhl: Missing Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl: Malformed Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl: Empty Bearer token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl: Invalid token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl: Missing profile",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl: Rookie access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl: Veteran access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nhl: All-Star access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nhl: Hall-of-Famer access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nhl: Legend access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nhl: Unknown tier denied",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb backend allowlist matches contract",
+      "status": "PASS",
+      "details": {
+        "actual": [
+          "All-Star",
+          "Hall-of-Famer",
+          "Legend"
+        ]
+      }
+    },
+    {
+      "name": "mlb validates user with getUser",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "mlb reads profiles table",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "mlb enforces tier allowlist",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "mlb: Missing Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb: Malformed Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb: Empty Bearer token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb: Invalid token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb: Missing profile",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb: Rookie access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb: Veteran access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "mlb: All-Star access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "mlb: Hall-of-Famer access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "mlb: Legend access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "mlb: Unknown tier denied",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl backend allowlist matches contract",
+      "status": "PASS",
+      "details": {
+        "actual": [
+          "All-Star",
+          "Hall-of-Famer",
+          "Legend"
+        ]
+      }
+    },
+    {
+      "name": "nfl validates user with getUser",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nfl reads profiles table",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nfl enforces tier allowlist",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "nfl: Missing Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl: Malformed Authorization",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl: Empty Bearer token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl: Invalid token",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 401,
+        "expectedStatus": 401,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl: Missing profile",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl: Rookie access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl: Veteran access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    },
+    {
+      "name": "nfl: All-Star access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nfl: Hall-of-Famer access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nfl: Legend access",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 200,
+        "expectedStatus": 200,
+        "sourceFetches": 1,
+        "expectedFetches": 1
+      }
+    },
+    {
+      "name": "nfl: Unknown tier denied",
+      "status": "PASS",
+      "details": {
+        "actualStatus": 403,
+        "expectedStatus": 403,
+        "sourceFetches": 0,
+        "expectedFetches": 0
+      }
+    }
+  ],
+  "fatalError": null
+}
