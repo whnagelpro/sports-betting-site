@@ -4174,6 +4174,26 @@ async function renderNHLTrends() {
 
   updateTierDisplay("nhl-tier-display");
 
+  const currentTier = CURRENT_USER_TIER || "Rookie";
+  const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+  const filterIds = [
+    "nhl-trends-stat-filter",
+    "nhl-trends-sort-filter",
+    "nhl-trends-player-filter"
+  ];
+
+  if (!currentRules.showPlayerProps) {
+    setTrendsFiltersDisabled(filterIds, true);
+    renderTrendsLockedState(
+      container,
+      "nhl-trends-filter-summary",
+      currentTier,
+      "NHL Player"
+    );
+    return;
+  }
+
   container.innerHTML = `
     <div class="empty-state">
       <h3>Loading NHL trends...</h3>
@@ -5092,6 +5112,35 @@ async function renderNFLTrends() {
     document.getElementById("nfl-trends-container");
 
   if (!container) return;
+
+  const currentTier =
+    CURRENT_USER_TIER || "Rookie";
+
+  const currentRules =
+    TIER_RULES[currentTier] ||
+    TIER_RULES.Rookie;
+
+  const filterIds = [
+    "nfl-trends-player-filter",
+    "nfl-trends-stat-filter",
+    "nfl-trends-sort-filter"
+  ];
+
+  if (!currentRules.showPlayerProps) {
+    setTrendsFiltersDisabled(
+      filterIds,
+      true
+    );
+
+    renderTrendsLockedState(
+      container,
+      "nfl-trends-filter-summary",
+      currentTier,
+      "NFL Player"
+    );
+
+    return;
+  }
 
   try {
     const rows =

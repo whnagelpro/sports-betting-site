@@ -1,0 +1,2006 @@
+{
+  "phase": "P21 D6",
+  "description": "Five-tier production frontend gating QA",
+  "baseUrl": "https://sportacularanalytics.com",
+  "generatedAt": "2026-10-13T03:14:33.497Z",
+  "assertions": [
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Profile",
+      "message": "Persistent browser profile directory exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Identity",
+      "message": "Auth page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Identity",
+      "message": "Persistent authenticated session exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Identity",
+      "message": "Profile tier exactly Rookie"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Identity",
+      "message": "Authenticated profile has email identity"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 5",
+      "maxObserved": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 3",
+      "leaderboardCount": 3
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Player Trends",
+      "message": "Unauthorized tier receives Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Rookie",
+      "area": "NHL Player Trends",
+      "message": "Unauthorized tier did not receive expected Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Player Trends",
+      "message": "Unauthorized tier receives Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Rookie",
+      "area": "NFL Player Trends",
+      "message": "Unauthorized tier did not receive expected Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Homepage Top Bet",
+      "message": "Homepage returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NBA Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "MLB Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NFL Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Browser Health",
+      "message": "No uncaught JavaScript exceptions"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Rookie",
+      "area": "Browser Health",
+      "message": "Unexpected console errors observed",
+      "consoleErrors": [
+        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)",
+        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5615:3)",
+        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5620:3)",
+        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5625:3)"
+      ]
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Browser Health",
+      "message": "No failed browser network requests"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Browser Health",
+      "message": "No unexpected HTTP failures"
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "Browser Health",
+      "message": "Expected protected Player Props 403 responses observed",
+      "count": 4
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Profile",
+      "message": "Persistent browser profile directory exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Identity",
+      "message": "Auth page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Identity",
+      "message": "Persistent authenticated session exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Identity",
+      "message": "Profile tier exactly Veteran"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Identity",
+      "message": "Authenticated profile has email identity"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 5",
+      "maxObserved": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 5",
+      "leaderboardCount": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 5",
+      "maxObserved": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 5",
+      "leaderboardCount": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 5",
+      "maxObserved": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 5",
+      "leaderboardCount": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Player Props",
+      "message": "Unauthorized tier receives Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Player Props",
+      "message": "No protected Player Props cards rendered"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Player Trends",
+      "message": "Unauthorized tier receives Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Veteran",
+      "area": "NHL Player Trends",
+      "message": "Unauthorized tier did not receive expected Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Player Trends",
+      "message": "Unauthorized tier receives Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Veteran",
+      "area": "NFL Player Trends",
+      "message": "Unauthorized tier did not receive expected Player Trends locked state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Homepage Top Bet",
+      "message": "Homepage returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NBA Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NHL Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "MLB Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "NFL Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Browser Health",
+      "message": "No uncaught JavaScript exceptions"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Veteran",
+      "area": "Browser Health",
+      "message": "Unexpected console errors observed",
+      "consoleErrors": [
+        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)",
+        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5615:3)",
+        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5620:3)",
+        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5625:3)"
+      ]
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Browser Health",
+      "message": "No failed browser network requests"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Browser Health",
+      "message": "No unexpected HTTP failures"
+    },
+    {
+      "status": "PASS",
+      "tier": "Veteran",
+      "area": "Browser Health",
+      "message": "Expected protected Player Props 403 responses observed",
+      "count": 4
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Profile",
+      "message": "Persistent browser profile directory exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Identity",
+      "message": "Auth page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Identity",
+      "message": "Persistent authenticated session exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Identity",
+      "message": "Profile tier exactly All-Star"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Identity",
+      "message": "Authenticated profile has email identity"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 7",
+      "leaderboardCount": 7
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 7",
+      "leaderboardCount": 7
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 7",
+      "leaderboardCount": 7
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Player Props",
+      "message": "Visible props do not exceed tier cap 10",
+      "propCards": 10
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Player Props",
+      "message": "Props leaderboard does not exceed cap 7",
+      "leaderboardCount": 7
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Player Props",
+      "message": "Visible props do not exceed tier cap 10",
+      "propCards": 4
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Player Props",
+      "message": "Props leaderboard does not exceed cap 7",
+      "leaderboardCount": 4
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Player Props",
+      "message": "Visible props do not exceed tier cap 10",
+      "propCards": 10
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Player Props",
+      "message": "Props leaderboard does not exceed cap 7",
+      "leaderboardCount": 7
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Homepage Top Bet",
+      "message": "Homepage returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NBA Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NHL Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "MLB Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "NFL Homepage Top Bet",
+      "message": "Restricted tier does not expose Top Bet content"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Browser Health",
+      "message": "No uncaught JavaScript exceptions"
+    },
+    {
+      "status": "FAIL",
+      "tier": "All-Star",
+      "area": "Browser Health",
+      "message": "Unexpected console errors observed",
+      "consoleErrors": [
+        "NBA props render error: TypeError: Cannot convert undefined or null to object\n    at Object.keys (<anonymous>)\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2328:38)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)"
+      ]
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Browser Health",
+      "message": "No failed browser network requests"
+    },
+    {
+      "status": "PASS",
+      "tier": "All-Star",
+      "area": "Browser Health",
+      "message": "No unexpected HTTP failures"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Profile",
+      "message": "Persistent browser profile directory exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Identity",
+      "message": "Auth page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Identity",
+      "message": "Persistent authenticated session exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Identity",
+      "message": "Profile tier exactly Hall-of-Famer"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Identity",
+      "message": "Authenticated profile has email identity"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 12",
+      "leaderboardCount": 12
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Player Props",
+      "message": "Visible props do not exceed tier cap 25",
+      "propCards": 25
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Player Props",
+      "message": "Props leaderboard does not exceed cap 10",
+      "leaderboardCount": 10
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Homepage Top Bet",
+      "message": "Homepage returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Browser Health",
+      "message": "No uncaught JavaScript exceptions"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Hall-of-Famer",
+      "area": "Browser Health",
+      "message": "Unexpected console errors observed",
+      "consoleErrors": [
+        "NBA props render error: TypeError: Cannot convert undefined or null to object\n    at Object.keys (<anonymous>)\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2328:38)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)"
+      ]
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Browser Health",
+      "message": "No failed browser network requests"
+    },
+    {
+      "status": "PASS",
+      "tier": "Hall-of-Famer",
+      "area": "Browser Health",
+      "message": "No unexpected HTTP failures"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Profile",
+      "message": "Persistent browser profile directory exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Identity",
+      "message": "Auth page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Identity",
+      "message": "Persistent authenticated session exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Identity",
+      "message": "Profile tier exactly Legend"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Identity",
+      "message": "Authenticated profile has email identity"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 20",
+      "leaderboardCount": 20
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 20",
+      "leaderboardCount": 20
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Game Odds",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Game Odds",
+      "message": "Game Odds container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Game Odds",
+      "message": "Game Odds not tier-locked"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 20",
+      "leaderboardCount": 20
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Player Props",
+      "message": "Visible props do not exceed tier cap 99999",
+      "propCards": 4
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Player Props",
+      "message": "Props leaderboard does not exceed cap 10",
+      "leaderboardCount": 4
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Props",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Props",
+      "message": "Player Props container exists"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Props",
+      "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Props",
+      "message": "Visible props do not exceed tier cap 99999",
+      "propCards": 60
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Props",
+      "message": "Props leaderboard does not exceed cap 10",
+      "leaderboardCount": 10
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NBA Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NHL Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Trends",
+      "message": "Page returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Trends",
+      "message": "Authorized tier not blocked by Player Trends gating"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Homepage Top Bet",
+      "message": "Homepage returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Browser Health",
+      "message": "No uncaught JavaScript exceptions"
+    },
+    {
+      "status": "FAIL",
+      "tier": "Legend",
+      "area": "Browser Health",
+      "message": "Unexpected console errors observed",
+      "consoleErrors": [
+        "NBA props render error: TypeError: Cannot convert undefined or null to object\n    at Object.keys (<anonymous>)\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2328:38)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)"
+      ]
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Browser Health",
+      "message": "No failed browser network requests"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "Browser Health",
+      "message": "No unexpected HTTP failures"
+    }
+  ],
+  "notExercised": [
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Rookie",
+      "area": "NBA Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Rookie",
+      "area": "NBA Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Rookie",
+      "area": "NHL Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Rookie",
+      "area": "NHL Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Rookie",
+      "area": "MLB Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Rookie",
+      "area": "MLB Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Veteran",
+      "area": "NBA Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Veteran",
+      "area": "NBA Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "NBA Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "NBA Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "NBA Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "NBA Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NBA Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top NBA game odds opportunity."
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NHL Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top NHL game odds opportunity."
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top MLB game odds opportunity."
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "NFL Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top NFL game odds opportunity."
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NBA Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NBA Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NBA Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NBA Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NHL Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NHL Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NBA Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top NBA game odds opportunity."
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NHL Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top NHL game odds opportunity."
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "MLB Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top MLB game odds opportunity."
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Legend",
+      "area": "NFL Homepage Top Bet",
+      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
+      "text": "Loading...\n\nFetching top NFL game odds opportunity."
+    }
+  ],
+  "browserHealth": [
+    {
+      "tier": "Rookie",
+      "jsExceptions": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)",
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5615:3)",
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5620:3)",
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5625:3)"
+      ],
+      "failedRequests": [],
+      "unexpectedHttpFailures": [],
+      "expectedProtectedFailures": [
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium"
+        },
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium"
+        },
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium"
+        },
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium"
+        }
+      ]
+    },
+    {
+      "tier": "Veteran",
+      "jsExceptions": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)",
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5615:3)",
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5620:3)",
+        "Failed to load resource: the server responded with a status of 403 ()",
+        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5625:3)"
+      ],
+      "failedRequests": [],
+      "unexpectedHttpFailures": [],
+      "expectedProtectedFailures": [
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium"
+        },
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium"
+        },
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium"
+        },
+        {
+          "status": 403,
+          "url": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium"
+        }
+      ]
+    },
+    {
+      "tier": "All-Star",
+      "jsExceptions": [],
+      "consoleErrors": [
+        "NBA props render error: TypeError: Cannot convert undefined or null to object\n    at Object.keys (<anonymous>)\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2328:38)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)"
+      ],
+      "failedRequests": [],
+      "unexpectedHttpFailures": [],
+      "expectedProtectedFailures": []
+    },
+    {
+      "tier": "Hall-of-Famer",
+      "jsExceptions": [],
+      "consoleErrors": [
+        "NBA props render error: TypeError: Cannot convert undefined or null to object\n    at Object.keys (<anonymous>)\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2328:38)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)"
+      ],
+      "failedRequests": [],
+      "unexpectedHttpFailures": [],
+      "expectedProtectedFailures": []
+    },
+    {
+      "tier": "Legend",
+      "jsExceptions": [],
+      "consoleErrors": [
+        "NBA props render error: TypeError: Cannot convert undefined or null to object\n    at Object.keys (<anonymous>)\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2328:38)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2611:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5610:3)"
+      ],
+      "failedRequests": [],
+      "unexpectedHttpFailures": [],
+      "expectedProtectedFailures": []
+    }
+  ],
+  "summary": {
+    "pass": 257,
+    "fail": 9,
+    "notExercised": 38,
+    "blockers": 9,
+    "status": "FAIL"
+  }
+}
