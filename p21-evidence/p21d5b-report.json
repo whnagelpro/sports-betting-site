@@ -1,0 +1,303 @@
+{
+  "phase": "P21",
+  "deployment": "D5B",
+  "test": "Authenticated Veteran Production QA",
+  "timestamp": "2026-10-12T03:24:26.713Z",
+  "productionUrl": "https://sportacularanalytics.com",
+  "evidenceType": "LIVE_AUTHENTICATED_PLAYWRIGHT_VETERAN",
+  "productionModified": false,
+  "accountEvidence": {
+    "sessionPresent": true,
+    "userPresent": true,
+    "emailIdentityPresent": true,
+    "profileFound": true,
+    "tier": "Veteran"
+  },
+  "premiumAuthorization": [
+    {
+      "league": "nba",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "NBA premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    },
+    {
+      "league": "nhl",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "NHL premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    },
+    {
+      "league": "mlb",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "MLB premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    },
+    {
+      "league": "nfl",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "NFL premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    }
+  ],
+  "browserHealth": {
+    "javascriptExceptions": [],
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 403 ()",
+      "Failed to load resource: the server responded with a status of 403 ()",
+      "Failed to load resource: the server responded with a status of 403 ()",
+      "Failed to load resource: the server responded with a status of 403 ()"
+    ],
+    "failedRequests": [],
+    "expected403s": [
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium",
+        "status": 403
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium",
+        "status": 403
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium",
+        "status": 403
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium",
+        "status": 403
+      }
+    ],
+    "unexpectedHttpFailures": []
+  },
+  "notExercised": [
+    "All-Star authenticated production account",
+    "Hall-of-Famer authenticated production account",
+    "Veteran visual Player Props locked-state page",
+    "Veteran Game Odds visual access"
+  ],
+  "summary": {
+    "assertions": 30,
+    "passed": 30,
+    "failed": 0,
+    "blockers": 0
+  },
+  "assertions": [
+    {
+      "name": "Persistent Veteran QA browser profile exists",
+      "status": "PASS",
+      "details": {
+        "profilePath": "/Users/billynagel/Desktop/props-site/p21-evidence/p21-veteran-auth-profile"
+      }
+    },
+    {
+      "name": "Production auth page navigation HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Production Supabase client available",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Veteran authenticated session persists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Veteran authenticated user exists",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Veteran session contains access token",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Veteran profile exists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Authenticated profile tier is Veteran",
+      "status": "PASS",
+      "details": {
+        "tier": "Veteran"
+      }
+    },
+    {
+      "name": "Veteran account has email identity",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Production UI visibly recognizes Veteran",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NBA: Veteran authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "NBA: Veteran receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "NBA: Veteran receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "NBA: Veteran receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NHL: Veteran authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "NHL: Veteran receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "NHL: Veteran receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "NHL: Veteran receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "MLB: Veteran authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "MLB: Veteran receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "MLB: Veteran receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "MLB: Veteran receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NFL: Veteran authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "NFL: Veteran receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "NFL: Veteran receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "NFL: Veteran receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "No uncaught JavaScript exceptions",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "No failed browser network requests",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "failures": []
+      }
+    },
+    {
+      "name": "Four expected premium HTTP 403 responses observed",
+      "status": "PASS",
+      "details": {
+        "count": 4
+      }
+    },
+    {
+      "name": "No unexpected HTTP failures",
+      "status": "PASS",
+      "details": {
+        "unexpected": []
+      }
+    }
+  ]
+}

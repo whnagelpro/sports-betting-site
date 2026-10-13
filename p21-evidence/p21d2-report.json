@@ -1,0 +1,291 @@
+{
+  "phase": "P21",
+  "deployment": "D2",
+  "test": "Live Production Authentication & Security QA",
+  "timestamp": "2026-10-12T02:22:30.476Z",
+  "productionUrl": "https://sportacularanalytics.com",
+  "evidenceType": "LIVE_DEPLOYED_HTTP",
+  "productionModified": false,
+  "scope": {
+    "authenticatedUserFlows": "NOT_EXERCISED",
+    "realMembershipTiers": "NOT_EXERCISED",
+    "supabaseRedirectAllowlist": "NOT_EXERCISED",
+    "passwordRecoveryEmailFlow": "NOT_EXERCISED"
+  },
+  "summary": {
+    "total": 22,
+    "passed": 22,
+    "failed": 0,
+    "blockers": 0
+  },
+  "assertions": [
+    {
+      "name": "Production homepage accessible",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "finalUrl": "https://sportacularanalytics.com/",
+        "contentType": "text/html; charset=UTF-8",
+        "error": null
+      }
+    },
+    {
+      "name": "Production authentication page accessible",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "finalUrl": "https://sportacularanalytics.com/auth.html",
+        "contentType": "text/html; charset=UTF-8",
+        "error": null
+      }
+    },
+    {
+      "name": "Production signup route accessible",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "finalUrl": "https://sportacularanalytics.com/auth.html?view=signup",
+        "contentType": "text/html; charset=UTF-8",
+        "error": null
+      }
+    },
+    {
+      "name": "Production password-reset route accessible",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "finalUrl": "https://sportacularanalytics.com/auth.html?view=reset",
+        "contentType": "text/html; charset=UTF-8",
+        "error": null
+      }
+    },
+    {
+      "name": "Production password-update route accessible",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "finalUrl": "https://sportacularanalytics.com/auth.html?view=update-password",
+        "contentType": "text/html; charset=UTF-8",
+        "error": null
+      }
+    },
+    {
+      "name": "Deployed script uses production password-reset domain",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "finalUrl": "https://sportacularanalytics.com/script.js",
+        "contentType": "application/javascript; charset=UTF-8",
+        "error": null
+      }
+    },
+    {
+      "name": "NBA: Missing Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NBA: Malformed Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NBA: Empty Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NBA: Invalid Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Unauthorized user",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NHL: Missing Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NHL: Malformed Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NHL: Empty Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NHL: Invalid Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Unauthorized user",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "MLB: Missing Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "MLB: Malformed Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "MLB: Empty Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "MLB: Invalid Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Unauthorized user",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NFL: Missing Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NFL: Malformed Authorization rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NFL: Empty Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Missing or invalid Authorization header",
+          "message": null
+        }
+      }
+    },
+    {
+      "name": "NFL: Invalid Bearer token rejected safely",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "finalUrl": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium",
+        "contentType": "application/json",
+        "error": {
+          "error": "Unauthorized user",
+          "message": null
+        }
+      }
+    }
+  ]
+}

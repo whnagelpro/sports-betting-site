@@ -1,0 +1,304 @@
+{
+  "phase": "P21",
+  "deployment": "D5A",
+  "test": "Authenticated Rookie Production QA",
+  "timestamp": "2026-10-12T03:14:51.372Z",
+  "productionUrl": "https://sportacularanalytics.com",
+  "evidenceType": "LIVE_AUTHENTICATED_PLAYWRIGHT_ROOKIE",
+  "productionModified": false,
+  "accountEvidence": {
+    "sessionPresent": true,
+    "userPresent": true,
+    "emailIdentityPresent": true,
+    "profileFound": true,
+    "tier": "Rookie"
+  },
+  "premiumAuthorization": [
+    {
+      "league": "nba",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "NBA premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    },
+    {
+      "league": "nhl",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "NHL premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    },
+    {
+      "league": "mlb",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "MLB premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    },
+    {
+      "league": "nfl",
+      "status": 403,
+      "contentType": "application/json",
+      "error": null,
+      "apiError": "Upgrade required",
+      "message": "NFL premium props require All-Star or higher",
+      "returnedProtectedCsv": false
+    }
+  ],
+  "browserHealth": {
+    "javascriptExceptions": [],
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 403 ()",
+      "Failed to load resource: the server responded with a status of 403 ()",
+      "Failed to load resource: the server responded with a status of 403 ()",
+      "Failed to load resource: the server responded with a status of 403 ()"
+    ],
+    "failedRequests": [],
+    "expected403s": [
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium",
+        "status": 403
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium",
+        "status": 403
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium",
+        "status": 403
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium",
+        "status": 403
+      }
+    ],
+    "unexpectedHttpFailures": []
+  },
+  "notExercised": [
+    "Veteran authenticated production account",
+    "All-Star authenticated production account",
+    "Hall-of-Famer authenticated production account",
+    "Rookie visual Player Props locked-state page",
+    "Rookie Game Odds visual access"
+  ],
+  "summary": {
+    "assertions": 30,
+    "passed": 30,
+    "failed": 0,
+    "blockers": 0
+  },
+  "assertions": [
+    {
+      "name": "Persistent Rookie QA browser profile exists",
+      "status": "PASS",
+      "details": {
+        "profilePath": "/Users/billynagel/Desktop/props-site/p21-evidence/p21-rookie-auth-profile"
+      }
+    },
+    {
+      "name": "Production auth page navigation HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Production Supabase client available",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Rookie authenticated session persists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Rookie authenticated user exists",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Rookie session contains access token",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Rookie profile exists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Authenticated profile tier is Rookie",
+      "status": "PASS",
+      "details": {
+        "tier": "Rookie"
+      }
+    },
+    {
+      "name": "Rookie account has email identity",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Production UI visibly recognizes Rookie",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NBA: Rookie authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "NBA: Rookie receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "NBA: Rookie receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "NBA: Rookie receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NHL: Rookie authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "NHL: Rookie receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "NHL: Rookie receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "NHL: Rookie receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "MLB: Rookie authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "MLB: Rookie receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "MLB: Rookie receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "MLB: Rookie receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NFL: Rookie authenticated request returns HTTP 403",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required",
+        "error": null
+      }
+    },
+    {
+      "name": "NFL: Rookie receives upgrade-required response",
+      "status": "PASS",
+      "details": {
+        "status": 403,
+        "apiError": "Upgrade required"
+      }
+    },
+    {
+      "name": "NFL: Rookie receives JSON denial response",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json"
+      }
+    },
+    {
+      "name": "NFL: Rookie receives no protected CSV",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "No uncaught JavaScript exceptions",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "No failed browser network requests",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "failures": []
+      }
+    },
+    {
+      "name": "Four expected premium HTTP 403 responses observed",
+      "status": "PASS",
+      "details": {
+        "count": 4
+      }
+    },
+    {
+      "name": "No unexpected HTTP failures",
+      "status": "PASS",
+      "details": {
+        "unexpected": []
+      }
+    }
+  ]
+}

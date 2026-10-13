@@ -1,0 +1,256 @@
+{
+  "phase": "P21",
+  "deployment": "D4",
+  "test": "Logout + Post-Logout Security QA",
+  "timestamp": "2026-10-12T02:55:56.565Z",
+  "productionUrl": "https://sportacularanalytics.com",
+  "evidenceType": "LIVE_AUTHENTICATED_PLAYWRIGHT_LOGOUT",
+  "productionModified": false,
+  "preLogout": {
+    "sessionPresent": true,
+    "userPresent": true,
+    "profileFound": true,
+    "tier": "Legend"
+  },
+  "postLogout": {
+    "sessionPresent": false,
+    "userPresent": false
+  },
+  "postReload": {
+    "sessionPresent": false,
+    "userPresent": false
+  },
+  "premiumAuthorization": [
+    {
+      "league": "nba",
+      "status": 401,
+      "contentType": "application/json",
+      "hasError": true,
+      "error": "Missing or invalid Authorization header"
+    },
+    {
+      "league": "nhl",
+      "status": 401,
+      "contentType": "application/json",
+      "hasError": true,
+      "error": "Missing or invalid Authorization header"
+    },
+    {
+      "league": "mlb",
+      "status": 401,
+      "contentType": "application/json",
+      "hasError": true,
+      "error": "Missing or invalid Authorization header"
+    },
+    {
+      "league": "nfl",
+      "status": 401,
+      "contentType": "application/json",
+      "hasError": true,
+      "error": "Missing or invalid Authorization header"
+    }
+  ],
+  "browserHealth": {
+    "javascriptExceptions": [],
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 ()",
+      "Failed to load resource: the server responded with a status of 401 ()",
+      "Failed to load resource: the server responded with a status of 401 ()",
+      "Failed to load resource: the server responded with a status of 401 ()"
+    ],
+    "failedRequests": [],
+    "expected401s": [
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nba-props-premium",
+        "status": 401
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nhl-props-premium",
+        "status": 401
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/mlb-props-premium",
+        "status": 401
+      },
+      {
+        "url": "https://sportacularanalytics.com/.netlify/functions/nfl-props-premium",
+        "status": 401
+      }
+    ],
+    "unexpectedHttpFailures": []
+  },
+  "note": "This test intentionally signed the persistent P21 QA browser profile out.",
+  "summary": {
+    "assertions": 24,
+    "passed": 24,
+    "failed": 0,
+    "blockers": 0
+  },
+  "assertions": [
+    {
+      "name": "Persistent QA browser profile exists",
+      "status": "PASS",
+      "details": {
+        "profilePath": "/Users/billynagel/Desktop/props-site/p21-evidence/p21-auth-profile"
+      }
+    },
+    {
+      "name": "Production auth page navigation HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Pre-logout session exists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Pre-logout authenticated user exists",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Pre-logout profile exists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Pre-logout tier is Legend",
+      "status": "PASS",
+      "details": {
+        "tier": "Legend"
+      }
+    },
+    {
+      "name": "Production logout button exists",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Production logout button is visible",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Session removed after logout",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Authenticated user removed after logout",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Production UI shows logged-out state",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Logout persists after page reload",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "User remains logged out after reload",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NBA: premium endpoint rejects logged-out browser",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "NBA: logged-out response is JSON auth error",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json",
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "NHL: premium endpoint rejects logged-out browser",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "NHL: logged-out response is JSON auth error",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json",
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "MLB: premium endpoint rejects logged-out browser",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "MLB: logged-out response is JSON auth error",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json",
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "NFL: premium endpoint rejects logged-out browser",
+      "status": "PASS",
+      "details": {
+        "status": 401,
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "NFL: logged-out response is JSON auth error",
+      "status": "PASS",
+      "details": {
+        "contentType": "application/json",
+        "error": "Missing or invalid Authorization header"
+      }
+    },
+    {
+      "name": "No uncaught JavaScript exceptions",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "No failed browser network requests",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "failures": []
+      }
+    },
+    {
+      "name": "No unexpected HTTP failures",
+      "status": "PASS",
+      "details": {
+        "unexpected": [],
+        "expected401Count": 4
+      }
+    }
+  ]
+}

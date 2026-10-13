@@ -2804,6 +2804,24 @@ function getRiskClass(riskTier) {
 
 async function renderHomeSpotlights() {
   try {
+    /*
+     * Resolve the current authenticated tier before applying
+     * homepage Top Bet visibility rules.
+     *
+     * index.html calls renderHomeSpotlights() immediately after
+     * script.js loads, so CURRENT_USER_TIER may still contain its
+     * default value until the Supabase session/profile has finished
+     * loading.
+     */
+    await updateSessionStatus();
+
+    const currentTier =
+      CURRENT_USER_TIER || "Rookie";
+
+    const currentRules =
+      TIER_RULES[currentTier] ||
+      TIER_RULES.Rookie;
+
     const [
       nbaGames,
       nhlGames,
@@ -2885,7 +2903,7 @@ async function renderHomeSpotlights() {
     const topNFLProp = [...nflProps]
       .sort((a, b) => b.ev - a.ev)[0];
 
-    if (topNBAGame) {
+    if (currentRules.showTopBet && topNBAGame) {
       const bestRank = [...topNBAGame.rankings]
         .sort((a, b) => b.ev - a.ev)[0];
 
@@ -2939,7 +2957,7 @@ async function renderHomeSpotlights() {
       );
     }
 
-    if (topNHLGame) {
+    if (currentRules.showTopBet && topNHLGame) {
       const bestRank = [...topNHLGame.rankings]
         .sort((a, b) => b.ev - a.ev)[0];
 
@@ -2993,7 +3011,7 @@ async function renderHomeSpotlights() {
       );
     }
 
-    if (topMLBGame) {
+    if (currentRules.showTopBet && topMLBGame) {
       const bestRank = [...topMLBGame.rankings]
         .sort((a, b) => b.ev - a.ev)[0];
 
@@ -3047,7 +3065,7 @@ async function renderHomeSpotlights() {
       );
     }
 
-    if (topNFLGame) {
+    if (currentRules.showTopBet && topNFLGame) {
       const bestRank = [...topNFLGame.rankings]
         .sort((a, b) => b.ev - a.ev)[0];
 
@@ -4865,70 +4883,6 @@ async function renderMLBTeamTrends() {
         <p>Please check your published MLB Team Trends CSV.</p>
       </div>
     `;
-  }
-}
-
-async function renderMLBTopPlayerTrends() {
-  const container = document.getElementById("mlb-top-player-trends-container");
-  if (!container) return;
-
-  try {
-    const rows = await fetchLeagueTrends(MLB_TOP_PLAYER_TRENDS_CSV_URL);
-    const topRows = rows.filter(row => row["Player Name"]).slice(0, 5);
-
-    if (!topRows.length) {
-      container.innerHTML = "";
-      return;
-    }
-
-    container.innerHTML = topRows.map(row => `
-      <div class="trend-card">
-        <div class="trend-card-header">
-          <div class="trend-title">
-            <h3>#${row["Rank"] || ""} ${row["Player Name"] || "Unknown Player"}</h3>
-            <div class="trend-subtitle">${row["Team"] || "N/A"} • ${row["Stat Type"] || "Trend"}</div>
-          </div>
-          <div class="trend-strength-badge">${row["Trend Strength"] || "N/A"}</div>
-        </div>
-
-        <div class="trend-note">${row["Trend Note"] || ""}</div>
-      </div>
-    `).join("");
-  } catch (error) {
-    console.error("Top MLB player trends error:", error);
-    container.innerHTML = "";
-  }
-}
-
-async function renderMLBTopTeamTrends() {
-  const container = document.getElementById("mlb-top-team-trends-container");
-  if (!container) return;
-
-  try {
-    const rows = await fetchLeagueTrends(MLB_TOP_TEAM_TRENDS_CSV_URL);
-    const topRows = rows.filter(row => row["Team"]).slice(0, 5);
-
-    if (!topRows.length) {
-      container.innerHTML = "";
-      return;
-    }
-
-    container.innerHTML = topRows.map(row => `
-      <div class="trend-card">
-        <div class="trend-card-header">
-          <div class="trend-title">
-            <h3>#${row["Rank"] || ""} ${row["Team"] || "Unknown Team"}</h3>
-            <div class="trend-subtitle">${row["Metric"] || "Trend"}</div>
-          </div>
-          <div class="trend-strength-badge">${row["Trend Strength"] || "N/A"}</div>
-        </div>
-
-        <div class="trend-note">${row["Trend Note"] || ""}</div>
-      </div>
-    `).join("");
-  } catch (error) {
-    console.error("Top MLB team trends error:", error);
-    container.innerHTML = "";
   }
 }
 

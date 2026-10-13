@@ -1,0 +1,290 @@
+{
+  "phase": "P21",
+  "deployment": "D5C",
+  "test": "Authenticated All-Star Production QA",
+  "timestamp": "2026-10-12T03:33:57.107Z",
+  "productionUrl": "https://sportacularanalytics.com",
+  "evidenceType": "LIVE_AUTHENTICATED_PLAYWRIGHT_ALL_STAR",
+  "productionModified": false,
+  "accountEvidence": {
+    "sessionPresent": true,
+    "userPresent": true,
+    "emailIdentityPresent": true,
+    "profileFound": true,
+    "tier": "All-Star"
+  },
+  "premiumAuthorization": [
+    {
+      "league": "nba",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null,
+      "apiError": null,
+      "bodyLength": 421,
+      "looksLikeCsv": true
+    },
+    {
+      "league": "nhl",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null,
+      "apiError": null,
+      "bodyLength": 242855,
+      "looksLikeCsv": true
+    },
+    {
+      "league": "mlb",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null,
+      "apiError": null,
+      "bodyLength": 32684,
+      "looksLikeCsv": true
+    },
+    {
+      "league": "nfl",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null,
+      "apiError": null,
+      "bodyLength": 856636,
+      "looksLikeCsv": true
+    }
+  ],
+  "browserHealth": {
+    "javascriptExceptions": [],
+    "consoleErrors": [],
+    "failedRequests": [],
+    "httpFailures": []
+  },
+  "notExercised": [
+    "Hall-of-Famer authenticated production account",
+    "All-Star visual Player Props maxPropsToShow=10 behavior",
+    "All-Star Top Bet hidden-state behavior",
+    "All-Star Game Odds visual access"
+  ],
+  "summary": {
+    "assertions": 30,
+    "passed": 30,
+    "failed": 0,
+    "blockers": 0
+  },
+  "assertions": [
+    {
+      "name": "Persistent All-Star QA browser profile exists",
+      "status": "PASS",
+      "details": {
+        "profilePath": "/Users/billynagel/Desktop/props-site/p21-evidence/p21-allstar-auth-profile"
+      }
+    },
+    {
+      "name": "Production auth page navigation HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "Production Supabase client available",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "All-Star authenticated session persists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "All-Star authenticated user exists",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "All-Star session contains access token",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "All-Star profile exists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Authenticated profile tier is All-Star",
+      "status": "PASS",
+      "details": {
+        "tier": "All-Star"
+      }
+    },
+    {
+      "name": "All-Star account has email identity",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Production UI visibly recognizes All-Star",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NBA: All-Star authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null,
+        "apiError": null
+      }
+    },
+    {
+      "name": "NBA: All-Star premium response is not authorization-error JSON",
+      "status": "PASS",
+      "details": {
+        "apiError": null
+      }
+    },
+    {
+      "name": "NBA: All-Star premium response contains body",
+      "status": "PASS",
+      "details": {
+        "bodyLength": 421
+      }
+    },
+    {
+      "name": "NBA: All-Star premium response has Player Props CSV structure",
+      "status": "PASS",
+      "details": {
+        "contentType": "text/plain; charset=utf-8",
+        "bodyLength": 421
+      }
+    },
+    {
+      "name": "NHL: All-Star authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null,
+        "apiError": null
+      }
+    },
+    {
+      "name": "NHL: All-Star premium response is not authorization-error JSON",
+      "status": "PASS",
+      "details": {
+        "apiError": null
+      }
+    },
+    {
+      "name": "NHL: All-Star premium response contains body",
+      "status": "PASS",
+      "details": {
+        "bodyLength": 242855
+      }
+    },
+    {
+      "name": "NHL: All-Star premium response has Player Props CSV structure",
+      "status": "PASS",
+      "details": {
+        "contentType": "text/plain; charset=utf-8",
+        "bodyLength": 242855
+      }
+    },
+    {
+      "name": "MLB: All-Star authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null,
+        "apiError": null
+      }
+    },
+    {
+      "name": "MLB: All-Star premium response is not authorization-error JSON",
+      "status": "PASS",
+      "details": {
+        "apiError": null
+      }
+    },
+    {
+      "name": "MLB: All-Star premium response contains body",
+      "status": "PASS",
+      "details": {
+        "bodyLength": 32684
+      }
+    },
+    {
+      "name": "MLB: All-Star premium response has Player Props CSV structure",
+      "status": "PASS",
+      "details": {
+        "contentType": "text/plain; charset=utf-8",
+        "bodyLength": 32684
+      }
+    },
+    {
+      "name": "NFL: All-Star authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null,
+        "apiError": null
+      }
+    },
+    {
+      "name": "NFL: All-Star premium response is not authorization-error JSON",
+      "status": "PASS",
+      "details": {
+        "apiError": null
+      }
+    },
+    {
+      "name": "NFL: All-Star premium response contains body",
+      "status": "PASS",
+      "details": {
+        "bodyLength": 856636
+      }
+    },
+    {
+      "name": "NFL: All-Star premium response has Player Props CSV structure",
+      "status": "PASS",
+      "details": {
+        "contentType": "text/plain; charset=utf-8",
+        "bodyLength": 856636
+      }
+    },
+    {
+      "name": "No uncaught JavaScript exceptions",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "No console errors",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "No failed browser network requests",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "failures": []
+      }
+    },
+    {
+      "name": "No HTTP failures",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "failures": []
+      }
+    }
+  ]
+}

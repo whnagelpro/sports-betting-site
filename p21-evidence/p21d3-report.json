@@ -1,0 +1,214 @@
+{
+  "phase": "P21",
+  "deployment": "D3",
+  "test": "Authenticated Legend Production QA",
+  "timestamp": "2026-10-12T02:49:56.839Z",
+  "productionUrl": "https://sportacularanalytics.com",
+  "evidenceType": "LIVE_AUTHENTICATED_PLAYWRIGHT",
+  "productionModified": false,
+  "accountEvidence": {
+    "sessionPresent": true,
+    "userPresent": true,
+    "emailIdentityPresent": true,
+    "profileFound": true,
+    "tier": "Legend"
+  },
+  "premiumAuthorization": [
+    {
+      "league": "nba",
+      "status": 200,
+      "ok": true,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null
+    },
+    {
+      "league": "nhl",
+      "status": 200,
+      "ok": true,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null
+    },
+    {
+      "league": "mlb",
+      "status": 200,
+      "ok": true,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null
+    },
+    {
+      "league": "nfl",
+      "status": 200,
+      "ok": true,
+      "contentType": "text/plain; charset=utf-8",
+      "error": null
+    }
+  ],
+  "browserHealth": {
+    "javascriptExceptions": [],
+    "consoleErrors": [],
+    "failedRequests": [],
+    "httpFailures": []
+  },
+  "notExercised": [
+    "Rookie authenticated production account",
+    "Veteran authenticated production account",
+    "All-Star authenticated production account",
+    "Hall-of-Famer authenticated production account",
+    "Real password recovery email delivery",
+    "Supabase redirect allowlist",
+    "Logout/post-logout regression"
+  ],
+  "summary": {
+    "assertions": 20,
+    "passed": 20,
+    "failed": 0,
+    "blockers": 0
+  },
+  "assertions": [
+    {
+      "name": "Persistent QA browser profile exists",
+      "status": "PASS",
+      "details": {
+        "profilePath": "/Users/billynagel/Desktop/props-site/p21-evidence/p21-auth-profile"
+      }
+    },
+    {
+      "name": "Production auth page navigation HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "finalUrl": "https://sportacularanalytics.com/auth.html"
+      }
+    },
+    {
+      "name": "Production Supabase client available",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Authenticated session persists in QA browser",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Authenticated Supabase user exists",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Authenticated session contains access token",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Authenticated profile exists",
+      "status": "PASS",
+      "details": {
+        "error": null
+      }
+    },
+    {
+      "name": "Authenticated profile tier is Legend",
+      "status": "PASS",
+      "details": {
+        "tier": "Legend"
+      }
+    },
+    {
+      "name": "Authenticated account has email identity",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "Production UI visibly recognizes Legend",
+      "status": "PASS",
+      "details": {}
+    },
+    {
+      "name": "NBA: Legend authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "contentType": "text/plain; charset=utf-8",
+        "error": null
+      }
+    },
+    {
+      "name": "NBA: Legend request accepted by premium authorization",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "NHL: Legend authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "contentType": "text/plain; charset=utf-8",
+        "error": null
+      }
+    },
+    {
+      "name": "NHL: Legend request accepted by premium authorization",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "MLB: Legend authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "contentType": "text/plain; charset=utf-8",
+        "error": null
+      }
+    },
+    {
+      "name": "MLB: Legend request accepted by premium authorization",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "NFL: Legend authenticated request returns HTTP 200",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "contentType": "text/plain; charset=utf-8",
+        "error": null
+      }
+    },
+    {
+      "name": "NFL: Legend request accepted by premium authorization",
+      "status": "PASS",
+      "details": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "No uncaught JavaScript exceptions",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "No failed browser network requests",
+      "status": "PASS",
+      "details": {
+        "count": 0,
+        "failures": []
+      }
+    }
+  ]
+}
