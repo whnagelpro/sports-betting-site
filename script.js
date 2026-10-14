@@ -4927,6 +4927,26 @@ async function renderMLBTrends() {
 
   updateTierDisplay("mlb-tier-display");
 
+  const currentTier = CURRENT_USER_TIER || "Rookie";
+  const currentRules = TIER_RULES[currentTier] || TIER_RULES.Rookie;
+
+  const filterIds = [
+    "mlb-trends-stat-filter",
+    "mlb-trends-sort-filter",
+    "mlb-trends-player-filter"
+  ];
+
+  if (!currentRules.showPlayerProps) {
+    setTrendsFiltersDisabled(filterIds, true);
+    renderTrendsLockedState(
+      container,
+      "mlb-trends-filter-summary",
+      currentTier,
+      "MLB Player"
+    );
+    return;
+  }
+
   container.innerHTML = `
     <div class="empty-state">
       <h3>Loading MLB trends...</h3>

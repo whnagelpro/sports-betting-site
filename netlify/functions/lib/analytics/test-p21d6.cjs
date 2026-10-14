@@ -827,15 +827,26 @@ async function runTier(tier) {
     );
   }
 
-  const filteredConsoleErrors = consoleErrors.filter(message => {
-    if (
-      !tier.propsAllowed &&
-      /403|failed to load resource/i.test(message)
-    ) {
-      return false;
+    const filteredConsoleErrors = consoleErrors.filter(message => {
+    if (!tier.propsAllowed) {
+        const isExpectedProtected403Console =
+        /403|failed to load resource/i.test(message);
+
+        const isExpectedPremiumPropsDenial =
+        /^(NBA|NHL|MLB|NFL) props render error:\s*Error:\s*(NBA|NHL|MLB|NFL) premium props require All-Star or higher$/i.test(
+            message.trim()
+        );
+
+        if (
+        isExpectedProtected403Console ||
+        isExpectedPremiumPropsDenial
+        ) {
+        return false;
+        }
     }
+
     return true;
-  });
+    });
 
   if (filteredConsoleErrors.length === 0) {
     pass(
