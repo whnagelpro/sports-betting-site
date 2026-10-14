@@ -2325,8 +2325,14 @@ if (
   const text = await response.text();
   const rows = parseCSV(text);
 
-  console.log("CSV Headers:", Object.keys(rows[0]));
-  console.log("First CSV Row:", rows[0]);
+  console.log(
+    "CSV Headers:",
+    rows[0] ? Object.keys(rows[0]) : []
+  );
+  console.log(
+    "First CSV Row:",
+    rows[0] || null
+  );
 
   const props =
     league === "nfl"
