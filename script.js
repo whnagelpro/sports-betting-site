@@ -3341,6 +3341,8 @@ async function fetchTeaserPropsJson(endpointUrl) {
 async function updateSessionStatus() {
   const statusEl = document.getElementById("session-status");
   const tierEl = document.getElementById("tier-status");
+  const manageSubscriptionBtn =
+    document.getElementById("manage-subscription-btn");
 
   if (!supabaseClient) return;
 
@@ -3358,6 +3360,9 @@ async function updateSessionStatus() {
 
     if (statusEl) statusEl.textContent = "Unable to check session.";
     if (tierEl) tierEl.textContent = "Tier: --";
+    if (manageSubscriptionBtn) {
+      manageSubscriptionBtn.style.display = "none";
+    }
     return;
   }
 
@@ -3382,6 +3387,18 @@ async function updateSessionStatus() {
     if (tierEl) {
       tierEl.textContent = `Tier: ${CURRENT_USER_TIER}`;
     }
+
+    const paidTiers = [
+      "Veteran",
+      "All-Star",
+      "Hall-of-Famer",
+      "Legend"
+    ];
+
+    if (manageSubscriptionBtn) {
+      manageSubscriptionBtn.style.display =
+        paidTiers.includes(CURRENT_USER_TIER) ? "" : "none";
+    }
   } else {
     CURRENT_USER = null;
     CURRENT_USER_PROFILE = null;
@@ -3394,6 +3411,9 @@ async function updateSessionStatus() {
 
     if (statusEl) statusEl.textContent = "Not currently logged in.";
     if (tierEl) tierEl.textContent = "Tier: --";
+    if (manageSubscriptionBtn) {
+      manageSubscriptionBtn.style.display = "none";
+    }
   }
 }
 
@@ -3442,11 +3462,15 @@ function initAuthPage() {
   const signupForm = document.getElementById("signup-form");
   const loginForm = document.getElementById("login-form");
   const logoutBtn = document.getElementById("logout-btn");
+  const manageSubscriptionBtn =
+    document.getElementById("manage-subscription-btn");
   const resetRequestForm = document.getElementById("reset-request-form");
   const resetUpdateForm = document.getElementById("reset-update-form");
 
   const signupMessage = document.getElementById("signup-message");
   const loginMessage = document.getElementById("login-message");
+  const manageSubscriptionMessage =
+    document.getElementById("manage-subscription-message");
   const resetRequestMessage = document.getElementById("reset-request-message");
   const resetUpdateMessage = document.getElementById("reset-update-message");
 
@@ -3605,6 +3629,101 @@ function initAuthPage() {
         resetUpdateMessage.textContent = "Password updated successfully. You can now log in.";
         window.history.replaceState({}, document.title, "auth.html?view=login");
         showAuthView("login");
+      }
+    });
+  }
+
+  if (manageSubscriptionBtn) {
+    manageSubscriptionBtn.addEventListener("click", async () => {
+      manageSubscriptionBtn.disabled = true;
+
+      if (manageSubscriptionMessage) {
+        manageSubscriptionMessage.textContent =
+          "Opening billing portal...";
+      }
+
+      try {
+        let {
+          data: sessionData,
+          error: sessionError
+        } = await supabaseClient.auth.getSession();
+
+        if (sessionError || !sessionData?.session?.access_token) {
+          throw new Error(
+            "Please log in again before managing your subscription."
+          );
+        }
+
+        let accessToken =
+          sessionData.session.access_token;
+
+        let response = await fetch(
+          "/.netlify/functions/stripe-customer-portal",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
+
+        if (response.status === 401) {
+          const {
+            data: refreshedData,
+            error: refreshError
+          } = await supabaseClient.auth.refreshSession();
+
+          const refreshedToken =
+            refreshedData?.session?.access_token || "";
+
+          if (!refreshError && refreshedToken) {
+            accessToken = refreshedToken;
+
+            response = await fetch(
+              "/.netlify/functions/stripe-customer-portal",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${accessToken}`
+                }
+              }
+            );
+          }
+        }
+
+        let payload = null;
+
+        try {
+          payload = await response.json();
+        } catch (jsonError) {
+          payload = null;
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            payload?.error ||
+            "Unable to open billing portal."
+          );
+        }
+
+        if (
+          !payload?.url ||
+          !payload.url.startsWith("https://billing.stripe.com/")
+        ) {
+          throw new Error(
+            "Billing portal returned an invalid redirect."
+          );
+        }
+
+        window.location.href = payload.url;
+      } catch (error) {
+        if (manageSubscriptionMessage) {
+          manageSubscriptionMessage.textContent =
+            error?.message ||
+            "Unable to open billing portal.";
+        }
+
+        manageSubscriptionBtn.disabled = false;
       }
     });
   }
