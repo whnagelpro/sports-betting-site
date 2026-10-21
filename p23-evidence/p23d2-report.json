@@ -1,0 +1,1834 @@
+{
+  "milestone": "P23",
+  "phase": "D2",
+  "title": "Mobile Navigation Production QA",
+  "productionUrl": "https://sportacularanalytics.com",
+  "generatedAt": "2026-10-21T02:41:33.606Z",
+  "matrix": {
+    "engines": [
+      "Chromium",
+      "Firefox",
+      "WebKit"
+    ],
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "routes": [
+      {
+        "name": "Homepage",
+        "route": "/index.html"
+      },
+      {
+        "name": "Authentication",
+        "route": "/auth.html"
+      },
+      {
+        "name": "Pricing",
+        "route": "/pricing.html"
+      },
+      {
+        "name": "NBA Game Odds",
+        "route": "/nba-odds.html"
+      },
+      {
+        "name": "NBA Player Props",
+        "route": "/nba-props.html"
+      }
+    ]
+  },
+  "summary": {
+    "cases": 15,
+    "assertions": 255,
+    "pass": 255,
+    "fail": 0,
+    "status": "PASS"
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Homepage",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Authentication",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "Pricing",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Game Odds",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "page": "NBA Player Props",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Homepage",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Authentication",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "Pricing",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Game Odds",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "page": "NBA Player Props",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Homepage",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Authentication",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "Pricing",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Game Odds",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Production page returns HTTP 200",
+      "detail": "HTTP=200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu toggle exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu toggle is visible at 390px",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Mobile menu initially reports aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation is initially hidden",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Opening menu sets aria-expanded=true",
+      "detail": "aria-expanded=true"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation becomes visible after toggle",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Opening menu applies mobile-open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "First navigation dropdown exists",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu is initially closed",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown click applies open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu becomes visible",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Second dropdown click removes open state",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Dropdown menu becomes hidden again",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Closing menu restores aria-expanded=false",
+      "detail": "aria-expanded=false"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Site navigation becomes hidden after closing",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "page": "NBA Player Props",
+      "assertion": "Closing menu removes mobile-open state",
+      "detail": ""
+    }
+  ]
+}
