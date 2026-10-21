@@ -1,0 +1,5091 @@
+{
+  "milestone": "P23",
+  "phase": "D1",
+  "title": "Responsive Production Baseline",
+  "productionUrl": "https://sportacularanalytics.com",
+  "generatedAt": "2026-10-21T02:18:32.127Z",
+  "matrix": {
+    "engines": [
+      "Chromium",
+      "Firefox",
+      "WebKit"
+    ],
+    "viewports": [
+      {
+        "name": "Phone 390",
+        "width": 390,
+        "height": 844
+      },
+      {
+        "name": "Shared 768",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "name": "Shared 900",
+        "width": 900,
+        "height": 1100
+      },
+      {
+        "name": "Desktop 1280",
+        "width": 1280,
+        "height": 900
+      }
+    ],
+    "routes": [
+      {
+        "name": "Homepage",
+        "route": "/index.html"
+      },
+      {
+        "name": "Authentication",
+        "route": "/auth.html"
+      },
+      {
+        "name": "Pricing",
+        "route": "/pricing.html"
+      },
+      {
+        "name": "NBA Game Odds",
+        "route": "/nba-odds.html"
+      },
+      {
+        "name": "NBA Player Props",
+        "route": "/nba-props.html"
+      },
+      {
+        "name": "NBA Player Trends",
+        "route": "/nba-trends.html"
+      },
+      {
+        "name": "NBA Team Trends",
+        "route": "/nba-team-trends.html"
+      },
+      {
+        "name": "NBA Player Profiles",
+        "route": "/nba-player-profiles.html"
+      },
+      {
+        "name": "NBA Team Profiles",
+        "route": "/nba-team-profiles.html"
+      },
+      {
+        "name": "NBA Team Profile",
+        "route": "/nba-team.html?league=nba&team=Boston%20Celtics"
+      },
+      {
+        "name": "Player Profile Shell",
+        "route": "/player.html"
+      },
+      {
+        "name": "Checkout Success",
+        "route": "/success.html"
+      },
+      {
+        "name": "Terms",
+        "route": "/terms.html"
+      }
+    ]
+  },
+  "summary": {
+    "cases": 156,
+    "assertions": 624,
+    "pass": 624,
+    "fail": 0,
+    "status": "PASS"
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Chromium",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "Firefox",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Phone 390",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=390, document=390, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 768",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=768, document=768, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Shared 900",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=900, document=900, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=6799"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Homepage",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1764"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Authentication",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=4520"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Pricing",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3547"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Game Odds",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3357"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Props",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3191"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3270"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Trends",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1888"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Player Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2898"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profiles",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=2552"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "NBA Team Profile",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1272"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Player Profile Shell",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=1930"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Checkout Success",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Production navigation returns HTTP 200",
+      "detail": "HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Viewport meta is present",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "Document renders meaningful body content",
+      "detail": "bodyLength=3275"
+    },
+    {
+      "status": "PASS",
+      "engine": "WebKit",
+      "viewport": "Desktop 1280",
+      "page": "Terms",
+      "check": "No page-level horizontal overflow",
+      "detail": "viewport=1280, document=1280, overflow=0"
+    }
+  ]
+}
