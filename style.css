@@ -1819,6 +1819,14 @@ select:disabled {
     left: 0;
     width: min(280px, 82vw);
   }
+
+  .guide-panel .hover-guide-item:hover .hover-guide-tooltip {
+    display: none;
+  }
+
+  .guide-panel .hover-guide-item.tooltip-open .hover-guide-tooltip {
+    display: block;
+  }
 }
 
 .trends-promo-section {
