@@ -1,0 +1,451 @@
+{
+  "milestone": "P22 D3",
+  "description": "Executable Stripe Webhook Lifecycle QA with isolated dependency mocks",
+  "generatedAt": "2026-10-15T02:36:41.553Z",
+  "productionNetworkCallsPerformed": false,
+  "stripeTransactionsPerformed": false,
+  "productionSupabaseMutationsPerformed": false,
+  "realSecretsUsed": false,
+  "summary": {
+    "pass": 87,
+    "fail": 0,
+    "notExercised": 0
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "area": "Files",
+      "check": "Stripe webhook source exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Configuration",
+      "check": "Webhook initializes Stripe from STRIPE_SECRET_KEY"
+    },
+    {
+      "status": "PASS",
+      "area": "Configuration",
+      "check": "Webhook initializes Supabase from SUPABASE_URL"
+    },
+    {
+      "status": "PASS",
+      "area": "Configuration",
+      "check": "Webhook initializes Supabase from service-role environment variable"
+    },
+    {
+      "status": "PASS",
+      "area": "Configuration",
+      "check": "Webhook verification receives STRIPE_WEBHOOK_SECRET"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-1 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-1 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-1 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-1 writes Veteran"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-1 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-1 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-2 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-2 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-2 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-2 writes Veteran"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-2 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran price-slot-2 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-1 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-1 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-1 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-1 writes All-Star"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-1 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-1 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-2 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-2 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-2 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-2 writes All-Star"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-2 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star price-slot-2 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-1 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-1 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-1 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-1 writes Hall-of-Famer"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-1 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-1 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-2 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-2 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-2 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-2 writes Hall-of-Famer"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-2 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer price-slot-2 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-1 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-1 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-1 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-1 writes Legend"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-1 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-1 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-2 returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-2 retrieves completed Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-2 performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-2 writes Legend"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-2 targets profile by checkout email"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend price-slot-2 acknowledges successful processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Email Resolution",
+      "check": "customer_details.email returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Email Resolution",
+      "check": "customer_details.email selects expected email"
+    },
+    {
+      "status": "PASS",
+      "area": "Email Resolution",
+      "check": "customer_email fallback returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Email Resolution",
+      "check": "customer_email fallback selects expected email"
+    },
+    {
+      "status": "PASS",
+      "area": "Email Resolution",
+      "check": "expanded customer.email fallback returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Email Resolution",
+      "check": "expanded customer.email fallback selects expected email"
+    },
+    {
+      "status": "PASS",
+      "area": "Safe Skip",
+      "check": "Unknown Price ID returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Safe Skip",
+      "check": "Unknown Price ID is explicitly marked skipped"
+    },
+    {
+      "status": "PASS",
+      "area": "Safe Skip",
+      "check": "Unknown Price ID performs no profile mutation"
+    },
+    {
+      "status": "PASS",
+      "area": "Safe Skip",
+      "check": "Missing checkout email returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Safe Skip",
+      "check": "Missing checkout email is explicitly marked skipped"
+    },
+    {
+      "status": "PASS",
+      "area": "Safe Skip",
+      "check": "Missing checkout email performs no profile mutation"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Subscription deletion returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Cancellation retrieves the Stripe customer"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Cancellation performs exactly one profile update"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Cancellation writes Rookie tier"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Cancellation targets profile by Stripe customer email"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Cancellation is acknowledged"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Cancellation without customer email returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Cancellation without customer email performs no profile mutation"
+    },
+    {
+      "status": "PASS",
+      "area": "Event Isolation",
+      "check": "Unhandled Stripe event returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Event Isolation",
+      "check": "Unhandled event does not retrieve Checkout Session"
+    },
+    {
+      "status": "PASS",
+      "area": "Event Isolation",
+      "check": "Unhandled event does not retrieve customer"
+    },
+    {
+      "status": "PASS",
+      "area": "Event Isolation",
+      "check": "Unhandled event performs no profile mutation"
+    },
+    {
+      "status": "PASS",
+      "area": "Event Isolation",
+      "check": "Unhandled event is safely acknowledged"
+    },
+    {
+      "status": "PASS",
+      "area": "Failure Handling",
+      "check": "Checkout Supabase failure returns HTTP 500"
+    },
+    {
+      "status": "PASS",
+      "area": "Failure Handling",
+      "check": "Checkout Supabase failure returns controlled error body"
+    },
+    {
+      "status": "PASS",
+      "area": "Failure Handling",
+      "check": "Checkout Supabase failure preserves diagnostic detail"
+    },
+    {
+      "status": "PASS",
+      "area": "Failure Handling",
+      "check": "Stripe Checkout retrieval failure returns HTTP 500"
+    },
+    {
+      "status": "PASS",
+      "area": "Failure Handling",
+      "check": "Stripe retrieval failure performs no profile mutation"
+    },
+    {
+      "status": "PASS",
+      "area": "Failure Handling",
+      "check": "Stripe retrieval failure preserves diagnostic detail"
+    },
+    {
+      "status": "PASS",
+      "area": "Signature",
+      "check": "Signature verification failure returns HTTP 400"
+    },
+    {
+      "status": "PASS",
+      "area": "Signature",
+      "check": "Signature failure returns controlled webhook error"
+    },
+    {
+      "status": "PASS",
+      "area": "Signature",
+      "check": "Signature failure stops all lifecycle processing"
+    }
+  ]
+}

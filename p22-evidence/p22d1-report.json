@@ -1,0 +1,274 @@
+{
+  "milestone": "P22 D1",
+  "description": "Static Stripe + Subscription Contract QA",
+  "generatedAt": "2026-10-15T01:39:02.035Z",
+  "destructiveActionsPerformed": false,
+  "summary": {
+    "pass": 51,
+    "fail": 0,
+    "notExercised": 1
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "area": "Files",
+      "check": "Stripe webhook source exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Files",
+      "check": "Pricing page source exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Secret Handling",
+      "check": "STRIPE_SECRET_KEY is read from environment"
+    },
+    {
+      "status": "PASS",
+      "area": "Secret Handling",
+      "check": "STRIPE_WEBHOOK_SECRET is read from environment"
+    },
+    {
+      "status": "PASS",
+      "area": "Secret Handling",
+      "check": "SUPABASE_URL is read from environment"
+    },
+    {
+      "status": "PASS",
+      "area": "Secret Handling",
+      "check": "SUPABASE_SERVICE_ROLE_KEY is read from environment"
+    },
+    {
+      "status": "PASS",
+      "area": "Secret Handling",
+      "check": "No obvious Stripe/Supabase secret values hard-coded"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Security",
+      "check": "Stripe-Signature header is read"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Security",
+      "check": "Stripe constructEvent signature verification is used"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Security",
+      "check": "Webhook verification uses configured webhook secret"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Security",
+      "check": "Invalid webhook signatures return HTTP 400"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Exactly 8 Stripe Price IDs are mapped"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Veteran has exactly 2 mapped Price IDs"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All-Star has exactly 2 mapped Price IDs"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Hall-of-Famer has exactly 2 mapped Price IDs"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Legend has exactly 2 mapped Price IDs"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "All mapped Stripe Price IDs are unique"
+    },
+    {
+      "status": "PASS",
+      "area": "Price Mapping",
+      "check": "Price map contains only supported paid tiers"
+    },
+    {
+      "status": "PASS",
+      "area": "Checkout",
+      "check": "checkout.session.completed is handled"
+    },
+    {
+      "status": "PASS",
+      "area": "Checkout",
+      "check": "Completed Checkout Session is retrieved from Stripe"
+    },
+    {
+      "status": "PASS",
+      "area": "Checkout",
+      "check": "Checkout retrieval expands line items and customer"
+    },
+    {
+      "status": "PASS",
+      "area": "Checkout",
+      "check": "Checkout Price ID is resolved through PRICE_TO_TIER"
+    },
+    {
+      "status": "PASS",
+      "area": "Checkout",
+      "check": "Checkout updates matching Supabase profile tier by email"
+    },
+    {
+      "status": "PASS",
+      "area": "Checkout",
+      "check": "Missing email or unmapped Price ID is safely skipped"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "customer.subscription.deleted is handled"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Canceled subscription customer is retrieved"
+    },
+    {
+      "status": "PASS",
+      "area": "Cancellation",
+      "check": "Deleted subscription reverts matching profile to Rookie"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Exactly 4 paid-tier pricing buttons have Stripe links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Veteran pricing button exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Veteran monthly link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Veteran annual link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Veteran monthly and annual links are distinct"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "All-Star pricing button exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "All-Star monthly link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "All-Star annual link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "All-Star monthly and annual links are distinct"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Hall-of-Famer pricing button exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Hall-of-Famer monthly link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Hall-of-Famer annual link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Hall-of-Famer monthly and annual links are distinct"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Legend pricing button exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Legend monthly link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Legend annual link uses Stripe Payment Links"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Legend monthly and annual links are distinct"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "All 8 paid Payment Links are unique"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Selected paid plan is stored before checkout redirect"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Billing toggle selects monthly versus annual checkout URL"
+    },
+    {
+      "status": "PASS",
+      "area": "Pricing",
+      "check": "Pricing button redirects browser to selected Stripe URL"
+    },
+    {
+      "status": "PASS",
+      "area": "Lifecycle",
+      "check": "Initial checkout event coverage present"
+    },
+    {
+      "status": "PASS",
+      "area": "Lifecycle",
+      "check": "Subscription deletion event coverage present"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "area": "Lifecycle",
+      "check": "Subscription update/change event is not currently implemented",
+      "note": "Inventory finding only; no production mutation performed"
+    },
+    {
+      "status": "PASS",
+      "area": "Lifecycle",
+      "check": "No unexpected Stripe lifecycle event handlers detected"
+    }
+  ]
+}

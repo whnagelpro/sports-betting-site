@@ -1,0 +1,560 @@
+{
+  "milestone": "P22 D4",
+  "description": "Live Stripe Payment Links + Customer Portal Production QA",
+  "generatedAt": "2026-10-20T23:32:25.381031Z",
+  "productionNetworkCallsPerformed": true,
+  "stripeTransactionsPerformed": false,
+  "liveSubscriptionMutationsPerformed": false,
+  "productionSupabaseMutationsPerformedByD4Validation": false,
+  "realSecretsExposed": false,
+  "summary": {
+    "pass": 105,
+    "fail": 0,
+    "notExercised": 3
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran monthly Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran monthly Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran monthly Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran monthly Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran monthly Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran monthly public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran annual Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran annual Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran annual Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran annual Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran annual Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Veteran annual public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star monthly Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star monthly Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star monthly Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star monthly Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star monthly Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star monthly public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star annual Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star annual Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star annual Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star annual Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star annual Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "All-Star annual public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer monthly Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer monthly Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer monthly Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer monthly Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer monthly Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer monthly public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer annual Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer annual Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer annual Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer annual Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer annual Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Hall-of-Famer annual public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend monthly Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend monthly Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend monthly Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend monthly Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend monthly Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend monthly public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend annual Payment Link resolves to exactly one live Stripe Payment Link"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend annual Payment Link is active and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend annual Payment Link uses the expected Stripe Price ID"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend annual Payment Link has the expected USD amount and recurring interval"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend annual Payment Link redirects completed checkout to https://sportacularanalytics.com/success.html"
+    },
+    {
+      "status": "PASS",
+      "area": "Payment Links",
+      "check": "Legend annual public Payment Link URL returns HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Production",
+      "check": "Exactly one live Stripe webhook endpoint targets the production stripe-webhook function"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Production",
+      "check": "Production Stripe webhook endpoint is enabled"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Production",
+      "check": "Production Stripe webhook endpoint is livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Production",
+      "check": "Production Stripe webhook subscribes to checkout.session.completed"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Production",
+      "check": "Production Stripe webhook subscribes to customer.subscription.deleted"
+    },
+    {
+      "status": "PASS",
+      "area": "Webhook Production",
+      "check": "Production webhook event configuration matches the currently implemented lifecycle handlers"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "area": "Webhook Production",
+      "check": "Historical live checkout/cancellation delivery was not available in the latest audited Stripe event window",
+      "note": "Read-only event audit found no relevant checkout.session.completed or customer.subscription.deleted events; no transaction or cancellation was manufactured"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Stripe Customer Portal configuration exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Stripe Customer Portal configuration is active, default, and livemode"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal allows payment-method updates"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal allows invoice-history access"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal allows customer contact-information updates"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal subscription cancellation is enabled"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal cancellation mode is at period end"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal cancellation proration behavior is none"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal cancellation-reason collection is enabled"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Portal",
+      "check": "Customer Portal subscription plan switching is disabled"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Lookup",
+      "check": "Live Stripe customer audit found three customers with subscriptions"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Lookup",
+      "check": "All audited Stripe customers have email addresses"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Lookup",
+      "check": "Stripe customer email audit found no duplicate email groups"
+    },
+    {
+      "status": "PASS",
+      "area": "Customer Lookup",
+      "check": "Current Stripe customer data is safe for unique exact-email portal lookup"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Non-POST portal request returns HTTP 405"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Missing Authorization header returns HTTP 401"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Invalid authenticated user returns HTTP 401"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Missing Supabase profile returns HTTP 403"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Missing Stripe customer returns HTTP 404"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Duplicate Stripe customers return HTTP 409"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Customer without a manageable subscription returns HTTP 404"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Authenticated customer with an active subscription receives a Stripe portal URL"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend uses STRIPE_SECRET_KEY from the server environment"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend uses SUPABASE_URL from the server environment"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend uses SUPABASE_SERVICE_ROLE_KEY from the server environment"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend validates the Supabase access token before Stripe lookup"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend resolves the authenticated account email without exposing Stripe credentials"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend fails closed when multiple Stripe customers match"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend requires a manageable subscription before creating a portal session"
+    },
+    {
+      "status": "PASS",
+      "area": "Portal Backend",
+      "check": "Portal backend creates a Stripe-hosted portal session with the Sportacular Account return URL"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Deployment",
+      "check": "stripe-customer-portal.cjs is bundled as a production Netlify function"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Deployment",
+      "check": "Customer Portal backend deployed successfully to sportacularanalytics.com"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Security",
+      "check": "Unauthenticated production Customer Portal POST returns HTTP 401"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Security",
+      "check": "Unauthenticated production Customer Portal response uses Cache-Control no-store"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Production auth.html contains the Manage Subscription button"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Production auth.html contains the Manage Subscription status-message element"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Production script.js contains paid-tier Manage Subscription visibility logic"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Production script.js calls the stripe-customer-portal endpoint"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Production script.js sends Bearer authorization to the portal endpoint"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Production script.js validates the returned billing.stripe.com portal URL"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Manage Subscription is shown for the authenticated Legend account"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Account page continues to display Tier: Legend after portal integration"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Frontend",
+      "check": "Existing Logout control remains available after portal integration"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Manage Subscription displays an opening-billing-portal status before redirect"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Authenticated Legend account successfully opens the live Stripe Customer Portal"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Live Stripe Customer Portal displays the Legend Plan"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Live Stripe Customer Portal displays the Legend monthly price as $79.00 per month"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Stripe Customer Portal provides subscription-management controls"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Stripe Customer Portal return control routes back to Sportacular Analytics"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Sportacular authenticated session remains active after returning from Stripe"
+    },
+    {
+      "status": "PASS",
+      "area": "Live Portal Round Trip",
+      "check": "Legend tier remains unchanged after the non-mutating portal round trip"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "area": "Live Cancellation",
+      "check": "Live Cancel subscription action was not exercised",
+      "note": "Intentionally skipped to avoid modifying the real Legend subscription; cancellation handler behavior passed separately in frozen P22 D3"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "area": "Live Cancellation",
+      "check": "Live end-of-period customer.subscription.deleted delivery and Rookie downgrade were not exercised",
+      "note": "No production subscription cancellation was performed; mocked deletion-to-Rookie lifecycle behavior passed in frozen P22 D3"
+    }
+  ]
+}

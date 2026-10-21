@@ -1,0 +1,89 @@
+{
+  "milestone": "P22 D5",
+  "description": "Post-Checkout Activation UX Production QA",
+  "generatedAt": "2026-10-21T01:07:14.417577Z",
+  "productionNetworkCallsPerformed": true,
+  "stripeTransactionsPerformed": false,
+  "liveSubscriptionMutationsPerformed": false,
+  "productionSupabaseMutationsPerformedByD5Validation": false,
+  "realSecretsExposed": false,
+  "productionDeployId": "6ad80f1269c9db61494c3f6f",
+  "sourceCommit": "02e753c",
+  "summary": {
+    "pass": 14,
+    "fail": 0,
+    "notExercised": 0
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "Default success message confirms payment rather than immediate subscription activation"
+    },
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "Success page explains that Sportacular Analytics access is being activated"
+    },
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "Success page explains that the upgraded plan may take a moment to appear"
+    },
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "Selected-plan message confirms payment for the selected plan"
+    },
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "selectedPlan localStorage cleanup remains present"
+    },
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "Old immediate subscription-activation claim is removed"
+    },
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "Old immediate premium-access claim is removed"
+    },
+    {
+      "status": "PASS",
+      "area": "Local Source Contract",
+      "check": "Old selected-plan immediate activation claim is removed"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Browser",
+      "check": "Generic production success message is payment-based"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Browser",
+      "check": "Production success page explains asynchronous account activation"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Browser",
+      "check": "selectedPlan produces the plan-specific payment confirmation in production"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Browser",
+      "check": "selectedPlan is cleared after production success-page processing"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Browser",
+      "check": "Old immediate subscription-activation claim is absent from rendered production page"
+    },
+    {
+      "status": "PASS",
+      "area": "Production Browser",
+      "check": "Old immediate premium-access claim is absent from rendered production page"
+    }
+  ]
+}
