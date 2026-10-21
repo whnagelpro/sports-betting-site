@@ -2892,3 +2892,19 @@ transition:.2s;
   }
 
 }
+
+/* =====================================================
+   P23 MOBILE TEAM PROFILE RESPONSIVE FIX
+===================================================== */
+
+@media (max-width: 640px) {
+    .mlb-team-right {
+        width: 100%;
+        min-width: 0;
+        grid-template-columns: 1fr;
+    }
+
+    .hero-stat-wide {
+        grid-column: span 1;
+    }
+}
