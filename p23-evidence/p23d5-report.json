@@ -1,0 +1,2619 @@
+{
+  "milestone": "P23 D5",
+  "title": "Tablet + Orientation / Responsive Transition QA",
+  "environment": "production",
+  "baseUrl": "https://sportacularanalytics.com",
+  "browsers": [
+    "Chromium",
+    "Firefox",
+    "WebKit"
+  ],
+  "viewports": [
+    {
+      "name": "Tablet Portrait",
+      "width": 768,
+      "height": 1024,
+      "expectedNavigation": "mobile"
+    },
+    {
+      "name": "Tablet Landscape",
+      "width": 1024,
+      "height": 768,
+      "expectedNavigation": "desktop"
+    }
+  ],
+  "breakpointCoverage": [
+    {
+      "breakpoint": "768px",
+      "source": "style.css",
+      "diagnosticWidths": [
+        768,
+        769
+      ],
+      "result": "PASS"
+    },
+    {
+      "breakpoint": "900px",
+      "source": "style.css",
+      "diagnosticWidths": [
+        899,
+        901
+      ],
+      "result": "PASS"
+    },
+    {
+      "breakpoint": "992px",
+      "source": "player.css",
+      "diagnosticWidths": [
+        991,
+        992,
+        993
+      ],
+      "result": "PASS"
+    }
+  ],
+  "pages": [
+    {
+      "name": "Home",
+      "path": "/index.html"
+    },
+    {
+      "name": "Auth",
+      "path": "/auth.html"
+    },
+    {
+      "name": "Pricing",
+      "path": "/pricing.html"
+    },
+    {
+      "name": "NBA Game Odds",
+      "path": "/nba-odds.html"
+    },
+    {
+      "name": "NBA Player Props",
+      "path": "/nba-props.html"
+    },
+    {
+      "name": "NBA Player Trends",
+      "path": "/nba-trends.html"
+    },
+    {
+      "name": "NBA Team Trends",
+      "path": "/nba-team-trends.html"
+    },
+    {
+      "name": "NBA Player Profiles",
+      "path": "/nba-player-profiles.html"
+    },
+    {
+      "name": "NBA Team Profiles",
+      "path": "/nba-team-profiles.html"
+    },
+    {
+      "name": "Real NBA Player Profile",
+      "path": "/player.html?league=nba&id=17896078"
+    },
+    {
+      "name": "Real NBA Team Profile",
+      "path": "/nba-team?league=nba&team=Atlanta%20Hawks"
+    }
+  ],
+  "cases": 66,
+  "casePass": 66,
+  "caseFail": 0,
+  "assertions": 264,
+  "passedAssertions": 264,
+  "failedAssertions": 0,
+  "notExercised": 0,
+  "status": "PASS",
+  "results": [
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Home",
+      "path": "/index.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5430,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Auth",
+      "path": "/auth.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 600,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Pricing",
+      "path": "/pricing.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 2286,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Game Odds",
+      "path": "/nba-odds.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 88209,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Props",
+      "path": "/nba-props.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1042,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Trends",
+      "path": "/nba-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1047,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Team Trends",
+      "path": "/nba-team-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1089,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Profiles",
+      "path": "/nba-player-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 788,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Team Profiles",
+      "path": "/nba-team-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1134,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Real NBA Player Profile",
+      "path": "/player.html?league=nba&id=17896078",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1119,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Real NBA Team Profile",
+      "path": "/nba-team?league=nba&team=Atlanta%20Hawks",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 654,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Home",
+      "path": "/index.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5436,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Auth",
+      "path": "/auth.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 645,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Pricing",
+      "path": "/pricing.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 2331,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Game Odds",
+      "path": "/nba-odds.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 88254,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Props",
+      "path": "/nba-props.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1087,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Trends",
+      "path": "/nba-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1092,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Team Trends",
+      "path": "/nba-team-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1134,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Profiles",
+      "path": "/nba-player-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1334,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Team Profiles",
+      "path": "/nba-team-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1179,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Real NBA Player Profile",
+      "path": "/player.html?league=nba&id=17896078",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1164,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Real NBA Team Profile",
+      "path": "/nba-team?league=nba&team=Atlanta%20Hawks",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 699,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Home",
+      "path": "/index.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5388,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Auth",
+      "path": "/auth.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 600,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Pricing",
+      "path": "/pricing.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 2286,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Game Odds",
+      "path": "/nba-odds.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 87687,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Props",
+      "path": "/nba-props.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 923,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Trends",
+      "path": "/nba-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 973,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Team Trends",
+      "path": "/nba-team-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 992,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Profiles",
+      "path": "/nba-player-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 747,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Team Profiles",
+      "path": "/nba-team-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1134,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Real NBA Player Profile",
+      "path": "/player.html?league=nba&id=17896078",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1119,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Real NBA Team Profile",
+      "path": "/nba-team?league=nba&team=Atlanta%20Hawks",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 654,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Home",
+      "path": "/index.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5394,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Auth",
+      "path": "/auth.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 645,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Pricing",
+      "path": "/pricing.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 2331,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Game Odds",
+      "path": "/nba-odds.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 87732,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Props",
+      "path": "/nba-props.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 968,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Trends",
+      "path": "/nba-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1018,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Team Trends",
+      "path": "/nba-team-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1037,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Profiles",
+      "path": "/nba-player-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 792,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Team Profiles",
+      "path": "/nba-team-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1179,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Real NBA Player Profile",
+      "path": "/player.html?league=nba&id=17896078",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1164,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Real NBA Team Profile",
+      "path": "/nba-team?league=nba&team=Atlanta%20Hawks",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 699,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Home",
+      "path": "/index.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5349,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Auth",
+      "path": "/auth.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 600,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Pricing",
+      "path": "/pricing.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 2286,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Game Odds",
+      "path": "/nba-odds.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 88209,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Props",
+      "path": "/nba-props.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1042,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Trends",
+      "path": "/nba-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1047,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Team Trends",
+      "path": "/nba-team-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1089,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Player Profiles",
+      "path": "/nba-player-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 747,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "NBA Team Profiles",
+      "path": "/nba-team-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1134,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Real NBA Player Profile",
+      "path": "/player.html?league=nba&id=17896078",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1119,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "768x1024",
+      "orientation": "Tablet Portrait",
+      "page": "Real NBA Team Profile",
+      "path": "/nba-team?league=nba&team=Atlanta%20Hawks",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "mobile",
+          "actual": "mobile",
+          "mobileToggleVisible": true,
+          "navVisible": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 654,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Home",
+      "path": "/index.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5394,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Auth",
+      "path": "/auth.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 645,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Pricing",
+      "path": "/pricing.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 2331,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Game Odds",
+      "path": "/nba-odds.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 88254,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Props",
+      "path": "/nba-props.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1087,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Trends",
+      "path": "/nba-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1092,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Team Trends",
+      "path": "/nba-team-trends.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1134,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Player Profiles",
+      "path": "/nba-player-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 792,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "NBA Team Profiles",
+      "path": "/nba-team-profiles.html",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1179,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Real NBA Player Profile",
+      "path": "/player.html?league=nba&id=17896078",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 660,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "1024x768",
+      "orientation": "Tablet Landscape",
+      "page": "Real NBA Team Profile",
+      "path": "/nba-team?league=nba&team=Atlanta%20Hawks",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "clipped-controls",
+          "expected": 0,
+          "actual": 0,
+          "details": [],
+          "passed": true
+        },
+        {
+          "type": "navigation-mode",
+          "expected": "desktop",
+          "actual": "desktop",
+          "mobileToggleVisible": false,
+          "navVisible": true,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 699,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    }
+  ]
+}
