@@ -1,0 +1,5353 @@
+{
+  "milestone": "P23 D3",
+  "title": "Responsive Interactive Controls / Touch UI",
+  "target": "https://sportacularanalytics.com",
+  "generatedAt": "2026-10-22T02:28:46.670Z",
+  "browsers": [
+    "Chromium",
+    "Firefox",
+    "WebKit"
+  ],
+  "viewports": [
+    {
+      "name": "Mobile 390x844",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "name": "Tablet 768x1024",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "name": "Desktop 1280x900",
+      "width": 1280,
+      "height": 900
+    }
+  ],
+  "cases": 90,
+  "casePass": 90,
+  "caseFail": 0,
+  "assertions": 765,
+  "passedAssertions": 765,
+  "failedAssertions": 0,
+  "status": "PASS",
+  "notes": [
+    "Read-only production QA; no checkout, subscription, logout, password-reset submission, or account mutation performed.",
+    "Logged-out Player Props and Player Trends are expected to remain gated according to the frozen P21 tier contract.",
+    "Team Profile route contract uses extensionless /nba-team?league=nba&team=<team> production URLs.",
+    "P23 D3 production fixes validated separately: mobile tooltip close behavior and Auth form-control cross-browser styling."
+  ],
+  "results": [
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Mobile 390x844",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Tablet 768x1024",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Chromium",
+      "viewport": "Desktop 1280x900",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Mobile 390x844",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Tablet 768x1024",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "Firefox",
+      "viewport": "Desktop 1280x900",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Mobile 390x844",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Tablet 768x1024",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "Pricing Toggle",
+      "assertions": [
+        {
+          "name": "Pricing page HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Visible billing slider exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Pricing defaults to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        },
+        {
+          "name": "Five monthly prices visible initially",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "No annual prices visible initially",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Pricing page has no horizontal overflow initially",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle switches to annual",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Monthly prices hidden in annual mode",
+          "expected": 0,
+          "actual": 0,
+          "pass": true
+        },
+        {
+          "name": "Five annual prices visible",
+          "expected": 5,
+          "actual": 5,
+          "pass": true
+        },
+        {
+          "name": "Billing toggle returns to monthly",
+          "expected": false,
+          "actual": false,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Game Odds Controls",
+      "assertions": [
+        {
+          "name": "NBA Game Odds HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Reset control exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real game filter value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real sportsbook value exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real game selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Real sportsbook selection applies",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Game filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Sportsbook filter resets to All",
+          "expected": "All",
+          "actual": "All",
+          "pass": true
+        },
+        {
+          "name": "Logged-out/default Game Odds remains Rookie tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Game Odds has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Player Props Logged Out",
+      "assertions": [
+        {
+          "name": "NBA Player Props HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props shows Login Required",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props reports Not Logged In tier",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-game-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-prop-type-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-player-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sort-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter exists",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#nba-props-sportsbook-filter disabled while logged out",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Props reset control remains visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props exposes login CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Props has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Player Trends Logged Out",
+      "assertions": [
+        {
+          "name": "/nba-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "NBA Team Trends Rookie",
+      "assertions": [
+        {
+          "name": "/nba-team-trends.html HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html shows expected tier requirement",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html exposes View Plans CTA",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "/nba-team-trends.html has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "Real NBA Player Profile",
+      "assertions": [
+        {
+          "name": "NBA Player Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player selector initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile initially disabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA team available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "At least one real NBA player available",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "View Player Profile becomes enabled",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Player Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real Player Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Login",
+      "assertions": [
+        {
+          "name": "Login Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#login-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Signup",
+      "assertions": [
+        {
+          "name": "Signup Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-password exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#signup-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "Auth Reset Request",
+      "assertions": [
+        {
+          "name": "Reset Request Auth HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Correct Auth view visible",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Other Auth views hidden",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-email exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "#reset-request-form button[type='submit'] exists and is usable",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Auth page has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "browser": "WebKit",
+      "viewport": "Desktop 1280x900",
+      "surface": "Real NBA Team Profile",
+      "assertions": [
+        {
+          "name": "NBA Team Profiles directory HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "All 30 NBA team links discovered",
+          "expected": 30,
+          "actual": 30,
+          "pass": true
+        },
+        {
+          "name": "Team directory has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Discovered real NBA team",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile navigation HTTP OK",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile URL contract correct",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Real team state rendered",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile renders substantive content",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        },
+        {
+          "name": "Team Profile has no horizontal overflow",
+          "expected": true,
+          "actual": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    }
+  ]
+}
