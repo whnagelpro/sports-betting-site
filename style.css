@@ -2936,3 +2936,44 @@ transition:.2s;
   font: inherit;
 }
 
+/* =====================================================
+   P23 D4 MOBILE TOUCH TARGET FIX
+===================================================== */
+
+@media (max-width: 640px) {
+  /* Shared league filters and reset controls */
+  .league-controls select,
+  .league-hero select {
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .filter-reset-btn,
+  .reset-filters-btn {
+    min-height: 44px;
+  }
+
+  /* Authentication submit controls */
+  .auth-container button {
+    min-height: 44px;
+  }
+
+  /* Pricing billing switch */
+  .billing-switch {
+    min-height: 44px;
+  }
+
+  .billing-slider {
+    top: 7px;
+    bottom: 7px;
+  }
+
+  /* Team profile directory links */
+  .team-directory a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
