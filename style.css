@@ -2920,3 +2920,19 @@ transition:.2s;
         grid-column: span 1;
     }
 }
+/* =====================================================
+   P23 AUTH FORM CONTROL RESPONSIVE FIX
+===================================================== */
+
+.auth-container input.sportsbook-select {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  min-height: 40px;
+  background: #0f1727;
+  color: #f5f7fb;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  font: inherit;
+}
+
