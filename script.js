@@ -2735,6 +2735,16 @@ async function renderPropsPage(pageKey) {
 
 setPropsFiltersDisabled(config, !currentRules.showPlayerProps);
 
+if (props.length === 0) {
+  container.innerHTML = `
+    <div class="empty-state">
+      <h3>No ${config.emptyLabel} props available today.</h3>
+      <p>Please check back once today’s player props are live.</p>
+    </div>
+  `;
+  return;
+}
+
 if (visibleProps.length === 0) {
   container.innerHTML = `
     <div class="empty-state">
