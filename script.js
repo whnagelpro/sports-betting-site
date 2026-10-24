@@ -4032,6 +4032,16 @@ async function renderNBATrends() {
 
       setTrendsFiltersDisabled(filterIds, false);
 
+      if (rows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NBA player trends available right now.</h3>
+            <p>Please check back once NBA trend data is available.</p>
+          </div>
+        `;
+        return;
+      }
+
       const selectedStat =
         document.getElementById("nba-trends-stat-filter")?.value || "Points";
 
