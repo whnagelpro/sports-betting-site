@@ -2569,6 +2569,16 @@ async function renderOddsPage(pageKey) {
 
       setOddsFiltersDisabled(config, false);
 
+      if (games.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No ${config.emptyLabel} games available today.</h3>
+            <p>Check back later for upcoming game odds.</p>
+          </div>
+        `;
+        return;
+      }
+
       if (filteredGames.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
