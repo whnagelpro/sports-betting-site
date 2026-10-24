@@ -4423,6 +4423,16 @@ async function renderNHLTrends() {
 
       setTrendsFiltersDisabled(filterIds, false);
 
+      if (rows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NHL player trends available right now.</h3>
+            <p>Please check back once NHL trend data is available.</p>
+          </div>
+        `;
+        return;
+      }
+
       const selectedStat =
         document.getElementById("nhl-trends-stat-filter")?.value || "Shots On Goal";
 
