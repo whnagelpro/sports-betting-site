@@ -5509,10 +5509,9 @@ async function renderNFLTrends() {
 
     container.innerHTML = `
       <div class="empty-state">
-        <h3>No NFL trends available right now.</h3>
+        <h3>Unable to load NFL player trends right now.</h3>
         <p>
-          Please check back when NFL games and trend
-          data are live.
+          Please try again in a moment or check your data source.
         </p>
       </div>
     `;
