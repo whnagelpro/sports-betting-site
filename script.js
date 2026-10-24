@@ -2180,14 +2180,20 @@ async function fetchLeagueGames(csvUrl) {
   const text = await response.text();
   const rows = parseCSV(text);
   console.log("=== RAW CSV TEST ===");
-  console.log(rows[0]["Game Date"]);
-  console.log(rows[1]["Game Date"]);
-  console.log(rows[2]["Game Date"]);
+  rows
+    .slice(0, 3)
+    .forEach((row) => {
+      console.log(row["Game Date"]);
+    });
 
   console.log("=== NORMALIZED ===");
-  console.log(normalizeDate(rows[0]["Game Date"]));
-  console.log(normalizeDate(rows[1]["Game Date"]));
-  console.log(normalizeDate(rows[2]["Game Date"]));
+  rows
+    .slice(0, 3)
+    .forEach((row) => {
+      console.log(
+        normalizeDate(row["Game Date"])
+      );
+    });
   const games = transformRowsToGames(rows);
   const today = getTodayDateString();
   console.log("CSV rows:", rows.length);
