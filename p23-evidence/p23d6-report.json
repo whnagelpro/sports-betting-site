@@ -1,0 +1,391 @@
+{
+  "milestone": "P23 D6",
+  "title": "Mobile Authentication + Session Persistence QA",
+  "environment": "production",
+  "baseUrl": "https://sportacularanalytics.com",
+  "browser": "Chromium",
+  "authenticatedTier": "Legend",
+  "profileSource": "Disposable local authenticated browser profile; credentials and session tokens are not stored in this report.",
+  "scope": [
+    "Authenticated mobile navigation persistence",
+    "Portrait-to-landscape session persistence",
+    "Landscape-to-portrait session persistence",
+    "Explicit page reload persistence",
+    "Browser close/reopen persistence",
+    "Authenticated responsive overflow regression"
+  ],
+  "productionFix": {
+    "commit": "82d695d",
+    "deploy": "6adba36e5c60c9ab59d639b2",
+    "description": "Authenticated tablet navigation overflow fix for 769px through 850px."
+  },
+  "cases": 9,
+  "casePass": 9,
+  "caseFail": 0,
+  "assertions": 41,
+  "passedAssertions": 41,
+  "failedAssertions": 0,
+  "notExercised": 0,
+  "status": "PASS",
+  "results": [
+    {
+      "case": "Auth — Portrait",
+      "path": "/auth.html",
+      "viewport": "390x844",
+      "authenticated": true,
+      "tier": "Legend",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-session",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        },
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 633,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "Home — Portrait",
+      "path": "/index.html",
+      "viewport": "390x844",
+      "authenticated": true,
+      "tier": "Legend",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-session",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        },
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5391,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "NBA Props — Portrait",
+      "path": "/nba-props.html",
+      "viewport": "390x844",
+      "authenticated": true,
+      "tier": "Legend",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-session",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        },
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1009,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "NBA Trends — Portrait",
+      "path": "/nba-trends.html",
+      "viewport": "390x844",
+      "authenticated": true,
+      "tier": "Legend",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-session",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        },
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 980,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "NBA Props — Landscape",
+      "path": "/nba-props.html",
+      "viewport": "844x390",
+      "authenticated": true,
+      "tier": "Legend",
+      "clientWidth": 844,
+      "scrollWidth": 844,
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-session",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        },
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 1009,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "NBA Trends — Landscape",
+      "path": "/nba-trends.html",
+      "viewport": "844x390",
+      "authenticated": true,
+      "tier": "Legend",
+      "clientWidth": 844,
+      "scrollWidth": 844,
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-session",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        },
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 980,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "Home — Portrait Return",
+      "path": "/index.html",
+      "viewport": "390x844",
+      "authenticated": true,
+      "tier": "Legend",
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-session",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        },
+        {
+          "type": "horizontal-overflow",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "type": "meaningful-page-content",
+          "expected": "bodyLength > 100",
+          "actual": 5391,
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "Explicit Reload Persistence",
+      "path": "/index.html",
+      "viewport": "390x844",
+      "authenticated": true,
+      "tier": "Legend",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client-after-reload",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-after-reload",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier-after-reload",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    },
+    {
+      "case": "Browser Close/Reopen Persistence",
+      "path": "/auth.html",
+      "viewport": "390x844",
+      "authenticated": true,
+      "tier": "Legend",
+      "status": "PASS",
+      "assertions": [
+        {
+          "type": "supabase-client-after-reopen",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "authenticated-after-reopen",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "type": "profile-tier-after-reopen",
+          "expected": "Legend",
+          "actual": "Legend",
+          "passed": true
+        }
+      ],
+      "notExercised": []
+    }
+  ]
+}
