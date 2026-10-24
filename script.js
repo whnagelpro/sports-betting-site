@@ -2605,6 +2605,38 @@ async function renderPropsPage(pageKey) {
   const container = document.getElementById(config.containerId);
   if (!container) return;
 
+  /*
+   * Resolve authentication and tier gating before attempting the
+   * protected Player Props fetch.
+   *
+   * Logged-out users should see the Login Required state.
+   * Authenticated Rookie/Veteran users should see the locked state.
+   * All-Star+ users may continue to the protected fetch.
+   */
+  const initialTier =
+    CURRENT_USER_TIER || "Rookie";
+
+  const initialRules =
+    TIER_RULES[initialTier] ||
+    TIER_RULES.Rookie;
+
+  if (!CURRENT_USER) {
+    renderPropsLoginRequiredState(
+      config,
+      container
+    );
+    return;
+  }
+
+  if (!initialRules.showPlayerProps) {
+    renderPropsLockedState(
+      config,
+      container,
+      initialTier
+    );
+    return;
+  }
+
   container.innerHTML = `
   <div class="empty-state">
     <h3>Loading ${config.emptyLabel} props...</h3>
