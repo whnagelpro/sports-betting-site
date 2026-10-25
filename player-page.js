@@ -1228,13 +1228,49 @@ function renderProps() {
 
     if (!player.props?.length) {
 
-        section.hidden = true;
+        section.hidden = false;
+
+        const featuredProp =
+            section.querySelector(
+                ".featured-prop-card"
+            );
+
+        if (featuredProp) {
+            featuredProp.hidden = true;
+        }
+
+        const grid =
+            document.getElementById(
+                "props-grid"
+            );
+
+        if (grid) {
+
+            grid.innerHTML = `
+                <article class="trend-card empty-state">
+                    <h3>No Player Props Available</h3>
+                    <p>
+                        Check back once props are available for this player.
+                    </p>
+                </article>
+            `;
+
+        }
 
         return;
 
     }
 
     section.hidden = false;
+
+    const featuredProp =
+        section.querySelector(
+            ".featured-prop-card"
+        );
+
+    if (featuredProp) {
+        featuredProp.hidden = false;
+    }
 
     const isActionableProp = prop => {
 
