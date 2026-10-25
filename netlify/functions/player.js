@@ -287,6 +287,17 @@ export async function handler(event) {
 
         }
 
+        dataAvailability.seasonStats =
+            Boolean(
+                context.seasonStats &&
+                Object.keys(context.seasonStats).length > 0
+            );
+
+        console.log(
+            "Player-specific season stats available:",
+            dataAvailability.seasonStats
+        );
+
 
         // ----------------------------
         // Build player object
