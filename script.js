@@ -3263,9 +3263,15 @@ async function renderHomeTopProps() {
   const container = document.getElementById("home-top-props");
   if (!container) return;
 
-  const currentTier = CURRENT_USER_TIER || "Rookie";
-
   try {
+    /*
+     * Resolve the authenticated tier before rendering homepage
+     * prop-preview messaging. The homepage invokes this function
+     * before the Supabase session/profile may have finished loading.
+     */
+    await updateSessionStatus();
+
+    const currentTier = CURRENT_USER_TIER || "Rookie";
     const [
   nbaProps,
   nhlProps,
@@ -3298,6 +3304,11 @@ const allProps = [
 
     const visibleProps = allProps.slice(0, 5);
 
+    const hasFullPropsAccess =
+      currentTier === "All-Star" ||
+      currentTier === "Hall-of-Famer" ||
+      currentTier === "Legend";
+
     if (visibleProps.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -3319,7 +3330,8 @@ const allProps = [
               : prop.poissonProbExact;
 
           const probabilityText = formatProbability(probabilityValue);
-          const isLockedPreview = index >= 3;
+          const isLockedPreview =
+            index >= 3 && !hasFullPropsAccess;
 
           return `
             <div class="leaderboard-item ${isLockedPreview ? "blurred" : ""}">
@@ -3327,16 +3339,30 @@ const allProps = [
               <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
               <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
               <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
-              <div class="prop-upgrade-hint">🔒 Unlock full prop board with All-Star</div>
+              ${
+                isLockedPreview && !hasFullPropsAccess
+                  ? `<div class="prop-upgrade-hint">🔒 Unlock full prop board with All-Star</div>`
+                  : ""
+              }
             </div>
           `;
         })
         .join("") +
       `
         <div class="upgrade-cta-box">
-          <h3>${currentTier === "Rookie" ? "Upgrade to Unlock More Props" : "You're Seeing Limited Results"}</h3>
-          <p>Unlock the full board, advanced filters, and top EV plays.</p>
-          <a href="pricing.html" class="btn btn-primary">Upgrade to All-Star</a>
+          ${
+            hasFullPropsAccess
+              ? `
+                <h3>Your Full Prop Board Is Unlocked</h3>
+                <p>View the complete player prop board with your current plan.</p>
+                <a href="nba-props.html" class="btn btn-primary">View Full Prop Board</a>
+              `
+              : `
+                <h3>Unlock the Full Prop Board</h3>
+                <p>Upgrade to All-Star or higher for the full board, advanced filters, and deeper prop analytics.</p>
+                <a href="pricing.html" class="btn btn-primary">Compare Plans</a>
+              `
+          }
         </div>
       `;
 
