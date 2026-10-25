@@ -5741,6 +5741,16 @@ async function renderNFLTeamTrends() {
         false
       );
 
+      if (rows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NFL team trends available right now.</h3>
+            <p>Please check back once NFL team trend data is available.</p>
+          </div>
+        `;
+        return;
+      }
+
       const selectedStat =
         document.getElementById(
           "nfl-team-trends-stat-filter"
