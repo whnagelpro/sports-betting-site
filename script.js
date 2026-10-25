@@ -3660,7 +3660,7 @@ function initAuthPage() {
       if (error) {
         signupMessage.textContent = error.message;
       } else {
-        signupMessage.textContent = "Account created successfully. Check your email if confirmation is required, then log in.";
+        signupMessage.textContent = "Account created successfully. Check your email if confirmation is required, then log in to start with your Rookie access.";
       }
 
       await updateSessionStatus();
