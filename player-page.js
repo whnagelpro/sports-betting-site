@@ -572,14 +572,6 @@ function renderGameLogs() {
 
 if (!section) return;
 
-if (!player.gameLogs?.length) {
-
-    section.hidden = true;
-
-    return;
-
-}
-
 section.hidden = false;
 
     const body = document.getElementById("game-log-body");
