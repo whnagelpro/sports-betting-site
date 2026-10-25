@@ -5058,6 +5058,16 @@ async function renderMLBTeamTrends() {
 
       setTrendsFiltersDisabled(filterIds, false);
 
+      if (rows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No MLB team trends available right now.</h3>
+            <p>Please check back once MLB team trend data is available.</p>
+          </div>
+        `;
+        return;
+      }
+
       const selectedStat =
         document.getElementById("mlb-team-trends-stat-filter")?.value || "Runs For";
 
