@@ -298,6 +298,12 @@ async function fetchTeamTrends(league) {
 
   const response = await fetch(config.teamTrends);
 
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch ${league.toUpperCase()} team trends: ${response.status}`
+    );
+  }
+
   const csv = await response.text();
 
   return parseCSV(csv);
@@ -6251,7 +6257,24 @@ async function initTeamProfilePage() {
 
   }
 
-  const trends = await fetchTeamTrends(league);
+  let trends = [];
+  let teamTrendsLoadError = false;
+
+  try {
+
+    trends =
+      await fetchTeamTrends(league);
+
+  } catch (error) {
+
+    teamTrendsLoadError = true;
+
+    console.error(
+      "Team trends load error:",
+      error
+    );
+
+  }
 
   let teamGameLogs = [];
   let teamGameLogsLoadError = false;
@@ -7172,7 +7195,12 @@ if (seasonStatsLoadError) {
 const trendsContainer =
   document.getElementById("team-trends-content");
 
-if (!teamTrends.length) {
+if (teamTrendsLoadError) {
+
+  trendsContainer.innerHTML =
+    "<p>Unable to load team trends right now.</p>";
+
+} else if (!teamTrends.length) {
 
   trendsContainer.innerHTML =
     "<p>No current team trends found.</p>";
