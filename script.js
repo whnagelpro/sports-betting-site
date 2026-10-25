@@ -6253,8 +6253,24 @@ async function initTeamProfilePage() {
 
   const trends = await fetchTeamTrends(league);
 
-  const teamGameLogs =
-    await fetchTeamGameLogs(league);
+  let teamGameLogs = [];
+  let teamGameLogsLoadError = false;
+
+  try {
+
+    teamGameLogs =
+      await fetchTeamGameLogs(league);
+
+  } catch (error) {
+
+    teamGameLogsLoadError = true;
+
+    console.error(
+      "Team game logs load error:",
+      error
+    );
+
+  }
 
   console.log(
     "Team Game Logs:",
@@ -7203,10 +7219,29 @@ if (!teamTrends.length) {
 console.log(teamGames);
 console.log(teamGames[0]);
 
-renderTeamGameLog(
-  teamGames,
-  league
-);
+if (teamGameLogsLoadError) {
+
+  const gameLogContainer =
+    document.getElementById(
+      "team-game-log-content"
+    );
+
+  if (gameLogContainer) {
+    gameLogContainer.innerHTML = `
+      <div class="team-performance-empty">
+        Unable to load recent games right now.
+      </div>
+    `;
+  }
+
+} else {
+
+  renderTeamGameLog(
+    teamGames,
+    league
+  );
+
+}
 
 }
 
