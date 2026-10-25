@@ -4621,6 +4621,16 @@ async function renderNHLTeamTrends() {
 
       setTrendsFiltersDisabled(filterIds, false);
 
+      if (rows.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No NHL team trends available right now.</h3>
+            <p>Please check back once NHL team trend data is available.</p>
+          </div>
+        `;
+        return;
+      }
+
       const selectedStat =
         document.getElementById("nhl-team-trends-stat-filter")?.value || "Goals For";
 
