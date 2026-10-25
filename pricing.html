@@ -335,8 +335,27 @@
   }
 
   document.querySelectorAll(".pricing-btn").forEach((button) => {
-    button.addEventListener("click", (event) => {
+    button.addEventListener("click", async (event) => {
       event.preventDefault();
+
+      try {
+        if (typeof fetchCurrentUserProfile === "function") {
+          const profile = await fetchCurrentUserProfile();
+          const paidTiers = [
+            "Veteran",
+            "All-Star",
+            "Hall-of-Famer",
+            "Legend"
+          ];
+
+          if (profile && paidTiers.includes(profile.tier)) {
+            window.location.href = "auth.html";
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Unable to check current pricing tier:", error);
+      }
 
       const plan = button.getAttribute("data-plan");
       if (plan) {
