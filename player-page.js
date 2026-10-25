@@ -1237,6 +1237,7 @@ function renderProps() {
 
         if (featuredProp) {
             featuredProp.hidden = true;
+            featuredProp.style.display = "none";
         }
 
         const grid =
@@ -1270,6 +1271,7 @@ function renderProps() {
 
     if (featuredProp) {
         featuredProp.hidden = false;
+        featuredProp.style.display = "";
     }
 
     const isActionableProp = prop => {
