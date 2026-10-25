@@ -78,6 +78,25 @@ async function initPlayerPage() {
 
         console.error(error);
 
+        const playerName =
+            document.getElementById("player-name");
+
+        if (playerName) {
+
+            if (error?.status === 404) {
+
+                playerName.textContent =
+                    "Player not found.";
+
+            } else {
+
+                playerName.textContent =
+                    "Unable to load player right now.";
+
+            }
+
+        }
+
     }
 
 }
@@ -225,13 +244,25 @@ async function fetchPlayer() {
 
     );
 
+    if (response.status === 404) {
+
+        const error =
+            new Error("Player not found.");
+
+        error.status = 404;
+
+        throw error;
+
+    }
+
     if (!response.ok) {
 
-        throw new Error(
+        const error =
+            new Error("Unable to load player.");
 
-            "Unable to load player."
+        error.status = response.status;
 
-        );
+        throw error;
 
     }
 
