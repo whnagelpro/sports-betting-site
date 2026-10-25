@@ -278,6 +278,12 @@ async function fetchTeamSeasonStats(league) {
 
   const response = await fetch(config.seasonStats);
 
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch ${league.toUpperCase()} team season stats: ${response.status}`
+    );
+  }
+
   const csv = await response.text();
 
   return parseCSV(csv);
@@ -6226,7 +6232,24 @@ async function initTeamProfilePage() {
   // NEW CODE STARTS HERE
   //-------------------------------------------------------
 
-  const stats = await fetchTeamSeasonStats(league);
+  let stats = [];
+  let seasonStatsLoadError = false;
+
+  try {
+
+    stats =
+      await fetchTeamSeasonStats(league);
+
+  } catch (error) {
+
+    seasonStatsLoadError = true;
+
+    console.error(
+      "Team season stats load error:",
+      error
+    );
+
+  }
 
   const trends = await fetchTeamTrends(league);
 
@@ -6835,7 +6858,12 @@ async function initTeamProfilePage() {
   const statsContainer =
     document.getElementById("team-season-stats-content");
 
-if (!teamStats) {
+if (seasonStatsLoadError) {
+
+  statsContainer.innerHTML =
+    "<p>Unable to load season statistics right now.</p>";
+
+} else if (!teamStats) {
 
   statsContainer.innerHTML =
     "<p>No season statistics found.</p>";
