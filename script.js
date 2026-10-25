@@ -2847,6 +2847,21 @@ function renderHomeSpotlightCard(containerId, data) {
   `;
 }
 
+function renderHomeTopBetLockedState(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="props-locked-box">
+      <h3>🔒 Premium Top Bet</h3>
+      <p>Unlock with <strong>Hall-of-Famer</strong> or <strong>Legend</strong>.</p>
+      <div style="margin-top: 12px;">
+        <a href="pricing.html" class="btn btn-primary">Compare Plans</a>
+      </div>
+    </div>
+  `;
+}
+
 function setPropsFiltersDisabled(config, isDisabled) {
   [
     config.gameFilterId,
@@ -3002,9 +3017,8 @@ async function renderHomeSpotlights() {
         }
       );
     } else {
-      renderHomeSpotlightCard(
-        "home-top-nba-bet",
-        null
+      renderHomeTopBetLockedState(
+        "home-top-nba-bet"
       );
     }
 
@@ -3056,9 +3070,8 @@ async function renderHomeSpotlights() {
         }
       );
     } else {
-      renderHomeSpotlightCard(
-        "home-top-nhl-bet",
-        null
+      renderHomeTopBetLockedState(
+        "home-top-nhl-bet"
       );
     }
 
@@ -3110,9 +3123,8 @@ async function renderHomeSpotlights() {
         }
       );
     } else {
-      renderHomeSpotlightCard(
-        "home-top-mlb-bet",
-        null
+      renderHomeTopBetLockedState(
+        "home-top-mlb-bet"
       );
     }
 
@@ -3164,9 +3176,8 @@ async function renderHomeSpotlights() {
         }
       );
     } else {
-      renderHomeSpotlightCard(
-        "home-top-nfl-bet",
-        null
+      renderHomeTopBetLockedState(
+        "home-top-nfl-bet"
       );
     }
 
