@@ -3696,6 +3696,10 @@ function initAuthPage() {
         loginMessage.textContent = error.message;
       } else {
         loginMessage.textContent = "Login successful.";
+        if (loginView) loginView.style.display = "none";
+        if (signupView) signupView.style.display = "none";
+        if (resetRequestView) resetRequestView.style.display = "none";
+        if (resetUpdateView) resetUpdateView.style.display = "none";
       }
 
       await updateSessionStatus();
