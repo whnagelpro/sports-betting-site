@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Methodology | Sportacular Analytics</title>
+  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <div class="logo">
+      <a href="/">
+        <img src="/logo.png" alt="Sportacular Analytics Logo" />
+      </a>
+    </div>
+
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open menu" aria-expanded="false">
+      ☰
+    </button>
+
+    <nav id="site-nav">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+
+        <li class="dropdown">
+          <a href="#">NBA</a>
+          <ul class="dropdown-menu">
+            <li><a href="nba-odds.html">Game Odds</a></li>
+            <li><a href="nba-props.html">Player Props</a></li>
+            <li><a href="nba-trends.html">Player Trends</a></li>
+            <li><a href="nba-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">NHL</a>
+          <ul class="dropdown-menu">
+            <li><a href="nhl-odds.html">Game Odds</a></li>
+            <li><a href="nhl-props.html">Player Props</a></li>
+            <li><a href="nhl-trends.html">Player Trends</a></li>
+            <li><a href="nhl-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">MLB</a>
+          <ul class="dropdown-menu">
+            <li><a href="mlb-odds.html">Game Odds</a></li>
+            <li><a href="mlb-props.html">Player Props</a></li>
+            <li><a href="mlb-trends.html">Player Trends</a></li>
+            <li><a href="mlb-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#">NFL</a>
+          <ul class="dropdown-menu">
+            <li><a href="nfl-odds.html">Game Odds</a></li>
+            <li><a href="nfl-props.html">Player Props</a></li>
+            <li><a href="nfl-trends.html">Player Trends</a></li>
+            <li><a href="nfl-team-trends.html">Team Trends</a></li>
+          </ul>
+        </li>
+
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="index.html#about">About</a></li>
+
+        <li class="dropdown">
+          <a href="#">Legal</a>
+          <ul class="dropdown-menu">
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="disclaimer.html">Disclaimer</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </li>
+
+        <li id="nav-login-item"><a href="auth.html">Login</a></li>
+        <li id="nav-account-item" style="display: none;"><a href="auth.html">Account</a></li>
+        <li id="nav-logout-item" style="display: none;"><a href="#" id="nav-logout-link">Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="league-page">
+  <section class="league-hero">
+    <div class="container">
+      <h1>Sportacular Analytics Methodology</h1>
+      <p class="league-description">
+        Learn how to interpret the analytics, rankings, probabilities, edges, confidence indicators,
+        and risk information shown across Sportacular Analytics.
+      </p>
+
+      <div class="page-switcher">
+        <a href="index.html" class="page-switch-btn">Back Home</a>
+        <a href="pricing.html" class="page-switch-btn">View Plans</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bets-section">
+    <div class="container">
+
+      <div class="bet-card">
+        <h2>Our Approach</h2>
+        <p>
+          Sportacular Analytics organizes sports data, sportsbook markets, model estimates,
+          expected value, trends, and other analytical signals to make today's markets easier
+          to compare and evaluate.
+        </p>
+        <p style="margin-top: 14px;">
+          The platform is designed to help users analyze information from multiple angles rather
+          than rely on a single number. Model outputs should be considered alongside the underlying
+          market, player and team context, recent trends, and available data.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Expected Value (EV)</h2>
+        <p>
+          Expected Value is a way of evaluating the potential value identified at a listed
+          sportsbook price. Positive EV means the model identifies a price that may be more
+          favorable than its estimated probability would suggest.
+        </p>
+        <p style="margin-top: 14px;">
+          A larger positive EV can indicate a stronger potential statistical value, but positive
+          EV does not mean an outcome is guaranteed to occur.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Model Probability</h2>
+        <p>
+          Model Probability is Sportacular's estimated probability for an analyzed outcome.
+          For player props, it represents the estimated probability that the recommended Over
+          or Under outcome will occur.
+        </p>
+        <p style="margin-top: 14px;">
+          Model probabilities are estimates based on available data and should not be interpreted
+          as guarantees of future results.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Price Edge</h2>
+        <p>
+          Price Edge helps describe the difference between a model-based view of an outcome and
+          the price available in the market. It is another way to evaluate whether the listed
+          sportsbook price may offer statistical value.
+        </p>
+        <p style="margin-top: 14px;">
+          Price Edge and Expected Value are related analytical concepts, but they are displayed
+          as distinct metrics within Sportacular Analytics.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Sportacular Score</h2>
+        <p>
+          Sportacular Score is a summary ranking metric used to help compare analytical
+          opportunities within the platform. It provides a consistent way to surface stronger
+          model-rated opportunities without requiring users to evaluate every underlying signal
+          independently.
+        </p>
+        <p style="margin-top: 14px;">
+          The score should be used as a comparison tool, not as a prediction that an outcome
+          will win.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Sportacular Edge</h2>
+        <p>
+          Sportacular Edge is an analytical edge metric used by the platform when evaluating
+          and comparing opportunities. It is maintained separately from Expected Value and
+          Price Edge so users can evaluate multiple dimensions of the model output.
+        </p>
+        <p style="margin-top: 14px;">
+          A stronger edge represents a stronger model-identified analytical advantage, not a
+          guaranteed outcome.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Model Confidence &amp; Confidence Tier</h2>
+        <p>
+          Model Confidence communicates the strength of the model's confidence in an analytical
+          output. Confidence Tier provides a simplified categorical view of confidence so users
+          can compare opportunities more quickly.
+        </p>
+        <p style="margin-top: 14px;">
+          Confidence is not the same as probability, expected value, or risk. A high-confidence
+          model output can still be wrong, and all sports outcomes contain uncertainty.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Risk Tier</h2>
+        <p>
+          Risk Tier provides a separate view of the uncertainty or risk associated with an
+          analytical opportunity. It is intentionally distinct from Model Confidence and
+          Confidence Tier.
+        </p>
+        <p style="margin-top: 14px;">
+          Users should consider risk together with the available probability, edge, expected
+          value, trend, and market information rather than treating any single metric as decisive.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Player &amp; Team Trends</h2>
+        <p>
+          Trend information provides recent statistical context for players and teams. Recent
+          form can help explain what has been happening, but past performance does not guarantee
+          that the same pattern will continue.
+        </p>
+        <p style="margin-top: 14px;">
+          Sample size matters. Early or limited samples may provide less context than established
+          statistical samples, which is why trends should be interpreted alongside broader data.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Sportsbook Markets &amp; Data</h2>
+        <p>
+          Sportacular Analytics compares available sportsbook markets and sports data to help
+          users evaluate opportunities across multiple sources. Sportsbook prices, lines, player
+          information, statistics, and other third-party data can change over time.
+        </p>
+        <p style="margin-top: 14px;">
+          Because the platform relies on external sports data and odds sources, data may
+          occasionally contain errors, delays, missing information, or differences between
+          providers.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>How to Use the Analytics</h2>
+        <p>
+          No single Sportacular metric should be treated as a guaranteed prediction. A stronger
+          analytical process considers multiple signals together: model probability, expected
+          value, available price, analytical edge, confidence, risk, and relevant player or
+          team context.
+        </p>
+        <p style="margin-top: 14px;">
+          Sportacular Analytics is intended to make those signals easier to compare and understand
+          so users can perform their own analysis.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>No Guarantee of Results</h2>
+        <p>
+          Sportacular Analytics is provided for informational and educational purposes only.
+          Model outputs, rankings, probabilities, expected value calculations, trends, scores,
+          and edges do not guarantee future performance or profitability.
+        </p>
+        <p style="margin-top: 14px;">
+          Sports betting involves risk. Always make your own decisions, comply with applicable
+          laws, and never bet more than you can afford to lose.
+        </p>
+      </div>
+
+      <div class="bet-card">
+        <h2>Questions About the Analytics?</h2>
+        <p>
+          If you have a question about how to interpret information shown on Sportacular Analytics,
+          contact us at <strong>support@sportacularanalytics.com</strong>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>
+      <strong>Disclaimer:</strong> Sportacular Analytics is for informational and educational
+      purposes only. Nothing on this site guarantees results or should be considered financial
+      advice. If you sports bet, always bet responsibly.
+    </p>
+    <p class="support-email">
+      We would love to hear from you! Contact us at support@sportacularanalytics.com.
+    </p>
+    <p>&copy; 2026 Sportacular Analytics. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("mobile-menu-toggle");
+  const nav = document.getElementById("site-nav");
+
+  if (toggle && nav) {
+    toggle.addEventListener("click", () => {
+      nav.classList.toggle("mobile-open");
+      const isOpen = nav.classList.contains("mobile-open");
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      toggle.textContent = isOpen ? "✕" : "☰";
+    });
+  }
+
+  if (window.innerWidth <= 768) {
+    document.querySelectorAll(".dropdown > a").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const parent = link.parentElement;
+        parent.classList.toggle("open");
+      });
+    });
+  }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
