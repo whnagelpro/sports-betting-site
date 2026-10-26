@@ -3450,6 +3450,7 @@ async function fetchTeaserPropsJson(endpointUrl) {
 async function updateSessionStatus() {
   const statusEl = document.getElementById("session-status");
   const tierEl = document.getElementById("tier-status");
+  const tierGuidanceEl = document.getElementById("tier-guidance");
   const manageSubscriptionBtn =
     document.getElementById("manage-subscription-btn");
 
@@ -3469,6 +3470,7 @@ async function updateSessionStatus() {
 
     if (statusEl) statusEl.textContent = "Unable to check session.";
     if (tierEl) tierEl.textContent = "Tier: --";
+    if (tierGuidanceEl) tierGuidanceEl.textContent = "";
     if (manageSubscriptionBtn) {
       manageSubscriptionBtn.style.display = "none";
     }
@@ -3497,6 +3499,13 @@ async function updateSessionStatus() {
       tierEl.textContent = `Tier: ${CURRENT_USER_TIER}`;
     }
 
+    if (tierGuidanceEl) {
+      tierGuidanceEl.textContent =
+        CURRENT_USER_TIER === "Rookie"
+          ? "Your Rookie access includes daily Game Odds. Upgrade when you’re ready for deeper analytics."
+          : "";
+    }
+
     const paidTiers = [
       "Veteran",
       "All-Star",
@@ -3520,6 +3529,7 @@ async function updateSessionStatus() {
 
     if (statusEl) statusEl.textContent = "Not currently logged in.";
     if (tierEl) tierEl.textContent = "Tier: --";
+    if (tierGuidanceEl) tierGuidanceEl.textContent = "";
     if (manageSubscriptionBtn) {
       manageSubscriptionBtn.style.display = "none";
     }
