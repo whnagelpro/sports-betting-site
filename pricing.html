@@ -336,8 +336,23 @@
   }
 
   if (billingToggle) {
-    billingToggle.addEventListener("change", updateBillingView);
+    billingToggle.addEventListener("change", () => {
+      updateBillingView();
+
+      if (typeof plausible === "function") {
+        plausible("Billing Interval Changed", {
+          props: {
+            billing_interval: billingToggle.checked ? "annual" : "monthly"
+          }
+        });
+      }
+    });
+
     updateBillingView();
+  }
+
+  if (typeof plausible === "function") {
+    plausible("Pricing Viewed");
   }
 
   document.querySelectorAll(".pricing-btn").forEach((button) => {
@@ -374,6 +389,15 @@
         : button.getAttribute("data-monthly-url");
 
       if (targetUrl) {
+        if (typeof plausible === "function") {
+          plausible("Checkout Started", {
+            props: {
+              plan,
+              billing_interval: isAnnual ? "annual" : "monthly"
+            }
+          });
+        }
+
         window.location.href = targetUrl;
       }
     });
