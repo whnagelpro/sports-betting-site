@@ -2177,7 +2177,14 @@ function renderOddsLockedState(config, container, currentTier) {
       <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
       <p>Upgrade to <strong>Veteran</strong> or higher to unlock ${config.emptyLabel} game odds.</p>
       <div style="margin-top: 16px;">
-        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+        <a
+          href="pricing.html"
+          class="btn btn-primary"
+          data-upgrade-analytics="true"
+          data-upgrade-feature="game_odds"
+          data-upgrade-league="${config.emptyLabel}"
+          data-upgrade-required-tier="Veteran"
+        >View Plans</a>
       </div>
     </div>
   `;
@@ -2851,12 +2858,22 @@ function renderHomeTopBetLockedState(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
+  const league =
+    containerId.match(/^home-top-(nba|nhl|mlb|nfl)-bet$/i)?.[1]?.toUpperCase() || "";
+
   container.innerHTML = `
     <div class="props-locked-box">
       <h3>🔒 Premium Top Bet</h3>
       <p>Unlock with <strong>Hall-of-Famer</strong> or <strong>Legend</strong>.</p>
       <div style="margin-top: 12px;">
-        <a href="pricing.html" class="btn btn-primary">Compare Plans</a>
+        <a
+          href="pricing.html"
+          class="btn btn-primary"
+          data-upgrade-analytics="true"
+          data-upgrade-feature="top_bet"
+          data-upgrade-league="${league}"
+          data-upgrade-required-tier="Hall-of-Famer"
+        >Compare Plans</a>
       </div>
     </div>
   `;
@@ -3360,7 +3377,13 @@ const allProps = [
               : `
                 <h3>Unlock the Full Prop Board</h3>
                 <p>Upgrade to All-Star or higher for the full board, advanced filters, and deeper prop analytics.</p>
-                <a href="pricing.html" class="btn btn-primary">Compare Plans</a>
+                <a
+                  href="pricing.html"
+                  class="btn btn-primary"
+                  data-upgrade-analytics="true"
+                  data-upgrade-feature="full_prop_board"
+                  data-upgrade-required-tier="All-Star"
+                >Compare Plans</a>
               `
           }
         </div>
@@ -3901,7 +3924,14 @@ function renderPropsLockedState(config, container, currentTier) {
       <p>Your current plan is <strong>${currentTier}</strong>.</p>
       <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${config.emptyLabel} player props.</p>
       <div style="margin-top: 16px;">
-        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+        <a
+          href="pricing.html"
+          class="btn btn-primary"
+          data-upgrade-analytics="true"
+          data-upgrade-feature="player_props"
+          data-upgrade-league="${config.emptyLabel}"
+          data-upgrade-required-tier="All-Star"
+        >View Plans</a>
       </div>
     </div>
   `;
@@ -3940,7 +3970,14 @@ function renderPropsUpgradeRequiredState(config, container, currentTier) {
       <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
       <p>Upgrade to <strong>All-Star</strong> or higher to unlock ${config.emptyLabel} player props.</p>
       <div style="margin-top: 16px;">
-        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+        <a
+          href="pricing.html"
+          class="btn btn-primary"
+          data-upgrade-analytics="true"
+          data-upgrade-feature="player_props"
+          data-upgrade-league="${config.emptyLabel}"
+          data-upgrade-required-tier="All-Star"
+        >View Plans</a>
       </div>
     </div>
   `;
@@ -4901,7 +4938,14 @@ function renderTrendsLockedState(container, summaryId, currentTier, leagueLabel,
       <p>Your current plan is <strong>${currentTier || "Rookie"}</strong>.</p>
       <p>Upgrade to <strong>${requiredTier}</strong> or higher to unlock ${leagueLabel} trends.</p>
       <div style="margin-top: 16px;">
-        <a href="pricing.html" class="btn btn-primary">View Plans</a>
+        <a
+          href="pricing.html"
+          class="btn btn-primary"
+          data-upgrade-analytics="true"
+          data-upgrade-feature="${leagueLabel.includes("Team") ? "team_trends" : "player_trends"}"
+          data-upgrade-league="${leagueLabel.split(" ")[0]}"
+          data-upgrade-required-tier="${requiredTier}"
+        >View Plans</a>
       </div>
     </div>
   `;
@@ -6041,6 +6085,35 @@ async function initNFLPropsPage() {
 document.addEventListener("DOMContentLoaded", () => {
   updateNavAuthState();
   initAuthPage();
+
+  document.addEventListener("click", (event) => {
+    const upgradeLink = event.target.closest(
+      '[data-upgrade-analytics="true"]'
+    );
+
+    if (!upgradeLink) return;
+
+    const feature = upgradeLink.dataset.upgradeFeature;
+    const league = upgradeLink.dataset.upgradeLeague;
+    const requiredTier = upgradeLink.dataset.upgradeRequiredTier;
+
+    if (!feature || !requiredTier) return;
+
+    const props = {
+      feature,
+      required_tier: requiredTier
+    };
+
+    if (league) {
+      props.league = league;
+    }
+
+    if (typeof plausible === "function") {
+      plausible("Upgrade CTA Clicked", {
+        props
+      });
+    }
+  });
 });
 
 function createTeamTrendCard(trend) {
