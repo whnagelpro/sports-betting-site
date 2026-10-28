@@ -3671,6 +3671,14 @@ function initAuthPage() {
         signupMessage.textContent = error.message;
       } else {
         signupMessage.textContent = "Account created successfully. Check your email if confirmation is required, then log in to start with your Rookie access.";
+
+        if (typeof plausible === "function") {
+          plausible("Signup Completed", {
+            props: {
+              method: "email"
+            }
+          });
+        }
       }
 
       await updateSessionStatus();
@@ -3696,6 +3704,15 @@ function initAuthPage() {
         loginMessage.textContent = error.message;
       } else {
         loginMessage.textContent = "Login successful.";
+
+        if (typeof plausible === "function") {
+          plausible("Login Completed", {
+            props: {
+              method: "email"
+            }
+          });
+        }
+
         if (loginView) loginView.style.display = "none";
         if (signupView) signupView.style.display = "none";
         if (resetRequestView) resetRequestView.style.display = "none";
