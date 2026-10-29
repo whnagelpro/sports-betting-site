@@ -3878,6 +3878,10 @@ function initAuthPage() {
           );
         }
 
+        if (typeof plausible === "function") {
+          plausible("Billing Portal Opened");
+        }
+
         window.location.href = payload.url;
       } catch (error) {
         if (manageSubscriptionMessage) {
