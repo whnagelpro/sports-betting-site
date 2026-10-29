@@ -248,6 +248,14 @@
 </footer>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  const contactForm = document.querySelector('form[name="contact"]');
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", () => {
+      sessionStorage.setItem("contactSubmissionPending", "true");
+    });
+  }
+
   const toggle = document.getElementById("mobile-menu-toggle");
   const nav = document.getElementById("site-nav");
 

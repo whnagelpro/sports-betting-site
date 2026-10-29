@@ -129,6 +129,17 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("selectedPlan");
+
+      const contactSubmissionPending =
+        sessionStorage.getItem("contactSubmissionPending") === "true";
+
+      if (contactSubmissionPending) {
+        sessionStorage.removeItem("contactSubmissionPending");
+
+        if (typeof plausible === "function") {
+          plausible("Contact Submitted");
+        }
+      }
     });
   </script>
 <script>
