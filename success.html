@@ -142,6 +142,14 @@
       }
 
       localStorage.removeItem("selectedPlan");
+
+      if (savedPlan && typeof plausible === "function") {
+        plausible("Checkout Returned", {
+          props: {
+            plan: savedPlan
+          }
+        });
+      }
     });
   </script>
 <script>
