@@ -442,7 +442,17 @@ export async function handler(event) {
 
         console.log("Returning player response...");
 
-        return success(player);
+        const response =
+            success(player);
+
+        response.headers = {
+            ...response.headers,
+
+            "Netlify-CDN-Cache-Control":
+                "public, durable, max-age=300, stale-while-revalidate=600"
+        };
+
+        return response;
 
     }
 
