@@ -44,6 +44,8 @@ async function initPlayerPage() {
 
         console.log(player);
 
+        updatePlayerProfileSEO();
+
         renderHero();
 
         renderInsights();
@@ -267,6 +269,97 @@ async function fetchPlayer() {
     }
 
     return await response.json();
+
+}
+
+// ------------------------------------------------------
+// SEO
+// ------------------------------------------------------
+
+function updatePlayerProfileSEO() {
+
+    const playerName = player?.hero?.name;
+
+    if (!playerName || !currentPlayerId) {
+        return;
+    }
+
+    const league =
+        (currentLeague || "").toLowerCase();
+
+    const leagueLabel =
+        league.toUpperCase();
+
+    const canonicalUrl =
+        new URL(
+            "/player.html",
+            window.location.origin
+        );
+
+    canonicalUrl.searchParams.set(
+        "league",
+        league
+    );
+
+    canonicalUrl.searchParams.set(
+        "id",
+        currentPlayerId
+    );
+
+    document.title =
+        `${playerName} ${leagueLabel} Player Profile | Sportacular Analytics`;
+
+    let description =
+        document.querySelector(
+            'meta[name="description"]'
+        );
+
+    if (!description) {
+
+        description =
+            document.createElement("meta");
+
+        description.setAttribute(
+            "name",
+            "description"
+        );
+
+        document.head.appendChild(
+            description
+        );
+
+    }
+
+    description.setAttribute(
+        "content",
+        `Explore ${playerName}'s ${leagueLabel} player profile with statistics, trends, game logs, props, and Sportacular analytics.`
+    );
+
+    let canonical =
+        document.querySelector(
+            'link[rel="canonical"]'
+        );
+
+    if (!canonical) {
+
+        canonical =
+            document.createElement("link");
+
+        canonical.setAttribute(
+            "rel",
+            "canonical"
+        );
+
+        document.head.appendChild(
+            canonical
+        );
+
+    }
+
+    canonical.setAttribute(
+        "href",
+        canonicalUrl.href
+    );
 
 }
 
