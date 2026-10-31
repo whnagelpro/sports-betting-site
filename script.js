@@ -6454,6 +6454,148 @@ function updateTeamProfileSEO(
     canonicalUrl.href
   );
 
+  const pageTitle =
+    document.title;
+
+  const pageDescription =
+    description.getAttribute("content");
+
+  const socialImage =
+    `${window.location.origin}/social-share.png`;
+
+  const setMeta = (
+    selector,
+    attributeName,
+    attributeValue,
+    content
+  ) => {
+
+    let meta =
+      document.querySelector(
+        selector
+      );
+
+    if (!meta) {
+
+      meta =
+        document.createElement("meta");
+
+      meta.setAttribute(
+        attributeName,
+        attributeValue
+      );
+
+      document.head.appendChild(
+        meta
+      );
+
+    }
+
+    meta.setAttribute(
+      "content",
+      content
+    );
+
+  };
+
+  setMeta(
+    'meta[property="og:type"]',
+    "property",
+    "og:type",
+    "website"
+  );
+
+  setMeta(
+    'meta[property="og:site_name"]',
+    "property",
+    "og:site_name",
+    "Sportacular Analytics"
+  );
+
+  setMeta(
+    'meta[property="og:title"]',
+    "property",
+    "og:title",
+    pageTitle
+  );
+
+  setMeta(
+    'meta[property="og:description"]',
+    "property",
+    "og:description",
+    pageDescription
+  );
+
+  setMeta(
+    'meta[property="og:url"]',
+    "property",
+    "og:url",
+    canonicalUrl.href
+  );
+
+  setMeta(
+    'meta[property="og:image"]',
+    "property",
+    "og:image",
+    socialImage
+  );
+
+  setMeta(
+    'meta[property="og:image:width"]',
+    "property",
+    "og:image:width",
+    "1200"
+  );
+
+  setMeta(
+    'meta[property="og:image:height"]',
+    "property",
+    "og:image:height",
+    "630"
+  );
+
+  setMeta(
+    'meta[property="og:image:alt"]',
+    "property",
+    "og:image:alt",
+    "Sportacular Analytics sports analytics platform"
+  );
+
+  setMeta(
+    'meta[name="twitter:card"]',
+    "name",
+    "twitter:card",
+    "summary_large_image"
+  );
+
+  setMeta(
+    'meta[name="twitter:title"]',
+    "name",
+    "twitter:title",
+    pageTitle
+  );
+
+  setMeta(
+    'meta[name="twitter:description"]',
+    "name",
+    "twitter:description",
+    pageDescription
+  );
+
+  setMeta(
+    'meta[name="twitter:image"]',
+    "name",
+    "twitter:image",
+    socialImage
+  );
+
+  setMeta(
+    'meta[name="twitter:image:alt"]',
+    "name",
+    "twitter:image:alt",
+    "Sportacular Analytics sports analytics platform"
+  );
+
 }
 
 async function initTeamProfilePage() {
