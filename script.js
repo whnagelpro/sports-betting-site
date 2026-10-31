@@ -6352,6 +6352,110 @@ function highlightTrendCard(activeCard) {
 
 }
 
+function updateTeamProfileSEO(
+  league,
+  team
+) {
+
+  const normalizedLeague =
+    (league || "").toLowerCase();
+
+  const teamName =
+    decodeURIComponent(team || "");
+
+  const routeByLeague = {
+    nba: "/nba-team.html",
+    nhl: "/nhl-team.html",
+    mlb: "/mlb-team.html",
+    nfl: "/nfl-team.html"
+  };
+
+  const route =
+    routeByLeague[normalizedLeague];
+
+  if (
+    !route ||
+    !teamName
+  ) {
+    return;
+  }
+
+  const leagueLabel =
+    normalizedLeague.toUpperCase();
+
+  const canonicalUrl =
+    new URL(
+      route,
+      window.location.origin
+    );
+
+  canonicalUrl.searchParams.set(
+    "league",
+    normalizedLeague
+  );
+
+  canonicalUrl.searchParams.set(
+    "team",
+    teamName
+  );
+
+  document.title =
+    `${teamName} ${leagueLabel} Team Profile | Sportacular Analytics`;
+
+  let description =
+    document.querySelector(
+      'meta[name="description"]'
+    );
+
+  if (!description) {
+
+    description =
+      document.createElement("meta");
+
+    description.setAttribute(
+      "name",
+      "description"
+    );
+
+    document.head.appendChild(
+      description
+    );
+
+  }
+
+  description.setAttribute(
+    "content",
+    `Explore the ${teamName} ${leagueLabel} team profile with team statistics, trends, game logs, and Sportacular analytics.`
+  );
+
+  let canonical =
+    document.querySelector(
+      'link[rel="canonical"]'
+    );
+
+  if (!canonical) {
+
+    canonical =
+      document.createElement("link");
+
+    canonical.setAttribute(
+      "rel",
+      "canonical"
+    );
+
+    document.head.appendChild(
+      canonical
+    );
+
+  }
+
+  canonical.setAttribute(
+    "href",
+    canonicalUrl.href
+  );
+
+}
+
 async function initTeamProfilePage() {
 
   console.log("Initializing Team Profile Page...");
@@ -6372,6 +6476,11 @@ async function initTeamProfilePage() {
     return;
 
   }
+
+  updateTeamProfileSEO(
+    league,
+    team
+  );
 
   document.getElementById("team-name").textContent =
     decodeURIComponent(team);
