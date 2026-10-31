@@ -102,7 +102,22 @@ exports.handler = async function () {
   }
 
   try {
-    const response = await fetch(sourceUrl);
+      const controller = new AbortController();
+
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        10000
+      );
+
+      let response;
+
+      try {
+        response = await fetch(sourceUrl, {
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
     if (!response.ok) {
       return {
