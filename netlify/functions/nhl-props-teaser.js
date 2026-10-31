@@ -162,7 +162,9 @@ exports.handler = async function () {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "no-store"
+        "Cache-Control": "no-cache",
+        "Netlify-CDN-Cache-Control":
+          "public, durable, max-age=60, stale-while-revalidate=120"
       },
       body: JSON.stringify({
         access: "public_teaser",
