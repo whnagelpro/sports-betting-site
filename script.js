@@ -3476,6 +3476,7 @@ async function updateSessionStatus() {
   const tierGuidanceEl = document.getElementById("tier-guidance");
   const manageSubscriptionBtn =
     document.getElementById("manage-subscription-btn");
+  const logoutBtn = document.getElementById("logout-btn");
 
   if (!supabaseClient) return;
 
@@ -3496,6 +3497,9 @@ async function updateSessionStatus() {
     if (tierGuidanceEl) tierGuidanceEl.textContent = "";
     if (manageSubscriptionBtn) {
       manageSubscriptionBtn.style.display = "none";
+    }
+    if (logoutBtn) {
+      logoutBtn.style.display = "none";
     }
     return;
   }
@@ -3540,6 +3544,10 @@ async function updateSessionStatus() {
       manageSubscriptionBtn.style.display =
         paidTiers.includes(CURRENT_USER_TIER) ? "" : "none";
     }
+
+    if (logoutBtn) {
+      logoutBtn.style.display = "";
+    }
   } else {
     CURRENT_USER = null;
     CURRENT_USER_PROFILE = null;
@@ -3555,6 +3563,10 @@ async function updateSessionStatus() {
     if (tierGuidanceEl) tierGuidanceEl.textContent = "";
     if (manageSubscriptionBtn) {
       manageSubscriptionBtn.style.display = "none";
+    }
+
+    if (logoutBtn) {
+      logoutBtn.style.display = "none";
     }
   }
 }
