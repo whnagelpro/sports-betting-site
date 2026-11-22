@@ -2766,6 +2766,25 @@ container.innerHTML = `
 }
 }
 
+function bestScoredRank(game) {
+  const rankings = Array.isArray(game?.rankings) ? game.rankings : [];
+  const plays = rankings.filter((item) => item.side && item.side !== "No Play" && Number.isFinite(item.sportacularScore));
+  const pool = plays.length ? plays : rankings;
+  return [...pool].sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))[0] || null;
+}
+
+function topGameByScore(games) {
+  return [...games].sort((a, b) => (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1))[0];
+}
+
+function topPropByScore(props) {
+  return [...props].sort((a, b) => {
+    const scoreDiff = (Number.isFinite(b.sportacularScore) ? b.sportacularScore : -1) - (Number.isFinite(a.sportacularScore) ? a.sportacularScore : -1);
+    if (scoreDiff !== 0) return scoreDiff;
+    return (Number(b.ev) || 0) - (Number(a.ev) || 0);
+  })[0];
+}
+
 function renderHomeSpotlightCard(containerId, data) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -2779,6 +2798,7 @@ function renderHomeSpotlightCard(containerId, data) {
     <div class="home-spotlight-item">
       <div class="home-spotlight-title">${data.title}</div>
       <div class="home-spotlight-meta">${data.meta}</div>
+      <div class="home-spotlight-meta">Score: ${formatSportacularScore(data.score)}</div>
       <div class="home-spotlight-ev ${getEVClass(data.ev)}">EV: ${formatEV(data.ev)}</div>
       <div class="home-spotlight-meta">${data.subtext}</div>
     </div>
@@ -2884,69 +2904,19 @@ async function renderHomeSpotlights() {
       fetchTeaserPropsJson(NFL_PROPS_TEASER_URL).catch(() => [])
     ]);
 
-    const topNBAGame = [...nbaGames].sort((a, b) => {
-      const aTopEV = Math.max(
-        ...a.rankings.map((item) => item.ev)
-      );
+    const topNBAGame = topGameByScore(nbaGames);
+    const topNHLGame = topGameByScore(nhlGames);
+    const topMLBGame = topGameByScore(mlbGames);
+    const topNFLGame = topGameByScore(nflGames);
 
-      const bTopEV = Math.max(
-        ...b.rankings.map((item) => item.ev)
-      );
-
-      return bTopEV - aTopEV;
-    })[0];
-
-    const topNHLGame = [...nhlGames].sort((a, b) => {
-      const aTopEV = Math.max(
-        ...a.rankings.map((item) => item.ev)
-      );
-
-      const bTopEV = Math.max(
-        ...b.rankings.map((item) => item.ev)
-      );
-
-      return bTopEV - aTopEV;
-    })[0];
-
-    const topMLBGame = [...mlbGames].sort((a, b) => {
-      const aTopEV = Math.max(
-        ...a.rankings.map((item) => item.ev)
-      );
-
-      const bTopEV = Math.max(
-        ...b.rankings.map((item) => item.ev)
-      );
-
-      return bTopEV - aTopEV;
-    })[0];
-
-    const topNFLGame = [...nflGames].sort((a, b) => {
-      const aTopEV = Math.max(
-        ...a.rankings.map((item) => item.ev)
-      );
-
-      const bTopEV = Math.max(
-        ...b.rankings.map((item) => item.ev)
-      );
-
-      return bTopEV - aTopEV;
-    })[0];
-
-    const topNBAProp = [...nbaProps]
-      .sort((a, b) => b.ev - a.ev)[0];
-
-    const topNHLProp = [...nhlProps]
-      .sort((a, b) => b.ev - a.ev)[0];
-
-    const topMLBProp = [...mlbProps]
-      .sort((a, b) => b.ev - a.ev)[0];
-
-    const topNFLProp = [...nflProps]
-      .sort((a, b) => b.ev - a.ev)[0];
+    const topNBAProp = topPropByScore(nbaProps);
+    const topNHLProp = topPropByScore(nhlProps);
+    const topMLBProp = topPropByScore(mlbProps);
+    const topNFLProp = topPropByScore(nflProps);
 
     if (currentRules.showTopBet && topNBAGame) {
       const bestRank = [...topNBAGame.rankings]
-        .sort((a, b) => b.ev - a.ev)[0];
+        .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))[0];
 
       renderHomeSpotlightCard(
         "home-top-nba-bet",
@@ -2956,11 +2926,12 @@ async function renderHomeSpotlights() {
             `${topNBAGame.homeTeam}`,
 
           meta:
-            `Featured High-EV Play | ` +
+            `Featured Sportacular Score | ` +
             `${topNBAGame.vendor} | ` +
             `${topNBAGame.gameDate}`,
 
           ev: bestRank.ev,
+          score: bestRank.sportacularScore,
           subtext: `Top Bet: ${bestRank.bet}`
         }
       );
@@ -2984,6 +2955,7 @@ async function renderHomeSpotlights() {
             `${topNBAProp.gameDate || "Today"}`,
 
           ev: topNBAProp.ev,
+          score: topNBAProp.sportacularScore,
 
           subtext:
             `Bet: ${topNBAProp.betType} ` +
@@ -2999,7 +2971,7 @@ async function renderHomeSpotlights() {
 
     if (currentRules.showTopBet && topNHLGame) {
       const bestRank = [...topNHLGame.rankings]
-        .sort((a, b) => b.ev - a.ev)[0];
+        .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))[0];
 
       renderHomeSpotlightCard(
         "home-top-nhl-bet",
@@ -3009,11 +2981,12 @@ async function renderHomeSpotlights() {
             `${topNHLGame.homeTeam}`,
 
           meta:
-            `Featured High-EV Play | ` +
+            `Featured Sportacular Score | ` +
             `${topNHLGame.vendor} | ` +
             `${topNHLGame.gameDate}`,
 
           ev: bestRank.ev,
+          score: bestRank.sportacularScore,
           subtext: `Top Bet: ${bestRank.bet}`
         }
       );
@@ -3037,6 +3010,7 @@ async function renderHomeSpotlights() {
             `${topNHLProp.gameDate || "Today"}`,
 
           ev: topNHLProp.ev,
+          score: topNHLProp.sportacularScore,
 
           subtext:
             `Bet: ${topNHLProp.betType} ` +
@@ -3052,7 +3026,7 @@ async function renderHomeSpotlights() {
 
     if (currentRules.showTopBet && topMLBGame) {
       const bestRank = [...topMLBGame.rankings]
-        .sort((a, b) => b.ev - a.ev)[0];
+        .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))[0];
 
       renderHomeSpotlightCard(
         "home-top-mlb-bet",
@@ -3062,11 +3036,12 @@ async function renderHomeSpotlights() {
             `${topMLBGame.homeTeam}`,
 
           meta:
-            `Featured High-EV Play | ` +
+            `Featured Sportacular Score | ` +
             `${topMLBGame.vendor} | ` +
             `${topMLBGame.gameDate}`,
 
           ev: bestRank.ev,
+          score: bestRank.sportacularScore,
           subtext: `Top Bet: ${bestRank.bet}`
         }
       );
@@ -3090,6 +3065,7 @@ async function renderHomeSpotlights() {
             `${topMLBProp.gameDate || "Today"}`,
 
           ev: topMLBProp.ev,
+          score: topMLBProp.sportacularScore,
 
           subtext:
             `Bet: ${topMLBProp.betType} ` +
@@ -3105,7 +3081,7 @@ async function renderHomeSpotlights() {
 
     if (currentRules.showTopBet && topNFLGame) {
       const bestRank = [...topNFLGame.rankings]
-        .sort((a, b) => b.ev - a.ev)[0];
+        .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))[0];
 
       renderHomeSpotlightCard(
         "home-top-nfl-bet",
@@ -3115,11 +3091,12 @@ async function renderHomeSpotlights() {
             `${topNFLGame.homeTeam}`,
 
           meta:
-            `Featured High-EV Play | ` +
+            `Featured Sportacular Score | ` +
             `${topNFLGame.vendor} | ` +
             `${topNFLGame.gameDate}`,
 
           ev: bestRank.ev,
+          score: bestRank.sportacularScore,
           subtext: `Top Bet: ${bestRank.bet}`
         }
       );
@@ -3143,6 +3120,7 @@ async function renderHomeSpotlights() {
             `${topNFLProp.gameDate || "Today"}`,
 
           ev: topNFLProp.ev,
+          score: topNFLProp.sportacularScore,
 
           subtext:
             `Bet: ${topNFLProp.betType} ` +
@@ -3248,7 +3226,7 @@ const allProps = [
   ...nhlProps,
   ...mlbProps,
   ...nflProps
-].sort((a, b) => b.ev - a.ev);
+].sort((a, b) => (Number.isFinite(b.sportacularScore) ? b.sportacularScore : -1) - (Number.isFinite(a.sportacularScore) ? a.sportacularScore : -1) || (Number(b.ev) || 0) - (Number(a.ev) || 0));
 
     const visibleProps = allProps.slice(0, 5);
 
