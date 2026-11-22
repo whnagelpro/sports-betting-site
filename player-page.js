@@ -12,6 +12,14 @@
 let currentLeague = "";
 let currentPlayerId = "";
 let player = null;
+let trendHitRates = {};
+
+const PLAYER_TREND_CSV = {
+    nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1458653646&single=true&output=csv",
+    nhl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=620239444&single=true&output=csv",
+    mlb: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1443511953&single=true&output=csv",
+    nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1953623841&single=true&output=csv"
+};
 
 // ------------------------------------------------------
 // Startup
@@ -69,6 +77,8 @@ async function initPlayerPage() {
                 propsSection.hidden = true;
             }
         }
+
+        trendHitRates = await fetchPlayerTrendHitRates().catch(() => ({}));
 
         renderTrendCards();
 
@@ -2061,6 +2071,63 @@ function getTrendVisualState(trend) {
     };
 }
 
+async function fetchPlayerTrendHitRates() {
+    const url = PLAYER_TREND_CSV[currentLeague];
+    if (!url || !currentPlayerId) return {};
+
+    const response = await fetch(url);
+    if (!response.ok) return {};
+
+    const rows = parseProfileCSV(await response.text());
+    const rates = {};
+
+    rows.forEach((row) => {
+        if (String(row["Player ID"] || "").trim() !== String(currentPlayerId)) return;
+        const stat = String(row["Stat Type"] || "").trim();
+        const hitRate = String(row["Hit Rate Last 5"] || "").trim();
+        if (stat && hitRate) rates[stat] = hitRate;
+    });
+
+    return rates;
+}
+
+function parseProfileCSV(text) {
+    const lines = text.split(/\r?\n/).filter((line) => line.trim());
+    if (lines.length < 2) return [];
+
+    const parseLine = (line) => {
+        const values = [];
+        let current = "";
+        let quoted = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"' && line[i + 1] === '"') {
+                current += '"';
+                i++;
+            } else if (char === '"') {
+                quoted = !quoted;
+            } else if (char === "," && !quoted) {
+                values.push(current.trim());
+                current = "";
+            } else {
+                current += char;
+            }
+        }
+        values.push(current.trim());
+        return values;
+    };
+
+    const headers = parseLine(lines[0]);
+    return lines.slice(1).map((line) => {
+        const values = parseLine(line);
+        const row = {};
+        headers.forEach((header, index) => {
+            row[header] = values[index] || "";
+        });
+        return row;
+    });
+}
+
 function renderTrendCards() {
     
     console.log(
@@ -2409,6 +2476,18 @@ function renderTrendCards() {
                 class="trend-metric-value trend-score-value trend-score-${visualState.direction} trend-score-intensity-${trendScoreIntensity}"
             >
                 ${displayTrendScore}
+            </strong>
+
+        </div>
+
+        <div class="trend-metric">
+
+            <span class="trend-metric-label">
+                Hit Rate Last 5
+            </span>
+
+            <strong class="trend-metric-value">
+                ${trendHitRates[trend.title] || "-"}
             </strong>
 
         </div>
