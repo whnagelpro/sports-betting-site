@@ -1175,6 +1175,20 @@ function formatStoredPercent(value) {
   return `${number.toFixed(1)}%`;
 }
 
+function readTrendRate(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return NaN;
+  const number = toNumber(raw);
+  if (!Number.isFinite(number)) return NaN;
+  return raw.includes("%") || Math.abs(number) > 1 ? number / 100 : number;
+}
+
+function formatTrendScore(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "N/A";
+  return `${number > 0 ? "+" : ""}${number.toFixed(1)}`;
+}
+
 function formatComplementPercent(value) {
   const number = toNumber(value);
   if (!Number.isFinite(number)) return "—";
@@ -3949,7 +3963,7 @@ function createNBATrendCard(player) {
   const last3 = Number(player["Last 3 Avg"]);
   const last5 = Number(player["Last 5 Avg"]);
   const last10 = Number(player["Last 10 Avg"]);
-  const hitRate5 = Number(player["Hit Rate Last 5"]);
+  const hitRate5 = readTrendRate(player["Hit Rate Last 5"]);
   const aboveSeason = Number(player["Above Season %"]);
 
   const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
@@ -3972,28 +3986,18 @@ function createNBATrendCard(player) {
         <div class="trend-analytics">
 
           <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Model Edge</span>
-            <span class="trend-analytics-value">
-              ${
-                Number.isFinite(aboveSeason)
-                  ? `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`
-                  : "N/A"
-              }
-            </span>
+            <span class="trend-analytics-label">Direction</span>
+            <span class="trend-analytics-value">${player["Trend Direction"] || "N/A"}</span>
           </div>
 
           <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Confidence</span>
-            <span class="trend-analytics-value">
-              ${player["Consistency"] || "N/A"}
-            </span>
+            <span class="trend-analytics-label">Trend Score</span>
+            <span class="trend-analytics-value">${formatTrendScore(player["Trend Score"])}</span>
           </div>
 
           <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Recommendation</span>
-            <span class="trend-analytics-value">
-              ${player["Trend Strength"] || "N/A"}
-            </span>
+            <span class="trend-analytics-label">Risk</span>
+            <span class="trend-analytics-value">${player["Risk Tier"] || "N/A"}</span>
           </div>
 
         </div>
@@ -4025,6 +4029,10 @@ function createNBATrendCard(player) {
         Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
         |
         Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+        |
+        Hit 3: ${Number.isNaN(readTrendRate(player["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 3"]) * 100)}%`}
+        |
+        Hit 10: ${Number.isNaN(readTrendRate(player["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 10"]) * 100)}%`}
       </div>
 
       <div class="trend-note">
@@ -4107,15 +4115,15 @@ async function renderNBATrends() {
       }
 
       filteredRows.sort((a, b) => {
-        const aVal = Number(a["Last 5 Avg"]);
-        const bVal = Number(b["Last 5 Avg"]);
+        const aVal = Number(a["Trend Score"]);
+        const bVal = Number(b["Trend Score"]);
         return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
       });
 
       renderFilterSummary("nba-trends-filter-summary", [
         { label: "Trend", value: formatNBATrendLabel(selectedStat) },
         { label: "Player", value: selectedPlayer },
-        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Sort", value: selectedSort === "asc" ? "Weakest Trend First" : "Strongest Trend First" },
         { label: "Tier", value: currentTier }
       ]);
 
@@ -4166,7 +4174,7 @@ function createNBATeamTrendCard(teamRow) {
   const last3 = Number(teamRow["Last 3 Avg"]);
   const last5 = Number(teamRow["Last 5 Avg"]);
   const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRate5 = Number(teamRow["Hit Rate Last 5"]);
+  const hitRate5 = readTrendRate(teamRow["Hit Rate Last 5"]);
   const aboveSeason = Number(teamRow["Above Season %"]);
 
   const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
@@ -4359,7 +4367,7 @@ function createNHLTrendCard(player) {
   const last3 = Number(player["Last 3 Avg"]);
   const last5 = Number(player["Last 5 Avg"]);
   const last10 = Number(player["Last 10 Avg"]);
-  const hitRate5 = Number(player["Hit Rate Last 5"]);
+  const hitRate5 = readTrendRate(player["Hit Rate Last 5"]);
   const aboveSeason = Number(player["Above Season %"]);
 
   const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
@@ -4567,7 +4575,7 @@ function createNHLTeamTrendCard(teamRow) {
   const last3 = Number(teamRow["Last 3 Avg"]);
   const last5 = Number(teamRow["Last 5 Avg"]);
   const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRate5 = Number(teamRow["Hit Rate Last 5"]);
+  const hitRate5 = readTrendRate(teamRow["Hit Rate Last 5"]);
   const aboveSeason = Number(teamRow["Above Season %"]);
 
   const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
@@ -4773,7 +4781,7 @@ function createTrendCard(player) {
   const last3 = Number(player["Last 3 Avg"]);
   const last5 = Number(player["Last 5 Avg"]);
   const last10 = Number(player["Last 10 Avg"]);
-  const hitRate5 = Number(player["Hit Rate Last 5"]);
+  const hitRate5 = readTrendRate(player["Hit Rate Last 5"]);
   const aboveSeason = Number(player["Above Season %"]);
 
   const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
@@ -4995,7 +5003,7 @@ function createMLBTeamTrendCard(teamRow) {
   const last3 = Number(teamRow["Last 3 Avg"]);
   const last5 = Number(teamRow["Last 5 Avg"]);
   const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRate5 = Number(teamRow["Hit Rate Last 5"]);
+  const hitRate5 = readTrendRate(teamRow["Hit Rate Last 5"]);
   const aboveSeason = Number(teamRow["Above Season %"]);
 
   const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
@@ -5360,7 +5368,7 @@ function createNFLTrendCard(player) {
   const last3 = Number(player["Last 3 Avg"]);
   const last5 = Number(player["Last 5 Avg"]);
   const last10 = Number(player["Last 10 Avg"]);
-  const hitRateLast5 = Number(player["Hit Rate Last 5"]);
+  const hitRateLast5 = readTrendRate(player["Hit Rate Last 5"]);
   const aboveSeason = Number(player["Above Season %"]);
 
   const hitRateText = Number.isNaN(hitRateLast5)
@@ -5673,7 +5681,7 @@ function createNFLTeamTrendCard(teamRow) {
   const last3 = Number(teamRow["Last 3 Avg"]);
   const last5 = Number(teamRow["Last 5 Avg"]);
   const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRateLast5 = Number(
+  const hitRateLast5 = readTrendRate(
     teamRow["Hit Rate Last 5"]
   );
   const aboveSeason = Number(
