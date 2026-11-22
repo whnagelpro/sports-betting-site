@@ -3981,6 +3981,20 @@ async function fetchCurrentUserProfile() {
   return profile;
 }
 
+
+function playerProfileLink(league, row) {
+  const id = String(row["Player ID"] || row["Player Id"] || "").trim();
+  const name = row["Player Name"] || "Unknown Player";
+  if (!id) return name;
+  return `<a class="player-link" href="player.html?league=${encodeURIComponent(league)}&id=${encodeURIComponent(id)}">${name}</a>`;
+}
+
+function teamProfileLink(league, name) {
+  const team = name || "Unknown Team";
+  if (!team || team === "Unknown Team") return team;
+  return `<a class="player-link" href="${league}-team.html?league=${encodeURIComponent(league)}&team=${encodeURIComponent(team)}">${team}</a>`;
+}
+
 function formatNBATrendLabel(statKey) {
   return statKey || "Trend";
 }
@@ -4002,7 +4016,7 @@ function createNBATrendCard(player) {
     <div class="trend-card">
       <div class="trend-card-header">
         <div class="trend-title">
-          <h3>${player["Player Name"] || "Unknown Player"}</h3>
+          <h3>${playerProfileLink("nba", player)}</h3>
           <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
         </div>
 
@@ -4213,7 +4227,7 @@ function createNBATeamTrendCard(teamRow) {
     <div class="trend-card">
       <div class="trend-card-header">
         <div class="trend-title">
-          <h3>${teamRow["Team"] || "Unknown Team"}</h3>
+          <h3>${teamProfileLink("nba", teamRow["Team"])}</h3>
           <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
         </div>
 
@@ -4437,7 +4451,7 @@ function createNHLTrendCard(player) {
     <div class="trend-card">
       <div class="trend-card-header">
         <div class="trend-title">
-          <h3>${player["Player Name"] || "Unknown Player"}</h3>
+          <h3>${playerProfileLink("nhl", player)}</h3>
           <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
         </div>
 
@@ -4664,7 +4678,7 @@ function createNHLTeamTrendCard(teamRow) {
     <div class="trend-card">
       <div class="trend-card-header">
         <div class="trend-title">
-          <h3>${teamRow["Team"] || "Unknown Team"}</h3>
+          <h3>${teamProfileLink("nhl", teamRow["Team"])}</h3>
           <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
         </div>
 
@@ -4901,7 +4915,7 @@ function createTrendCard(player) {
     <div class="trend-card">
       <div class="trend-card-header">
         <div class="trend-title">
-          <h3>${player["Player Name"] || "Unknown Player"}</h3>
+          <h3>${playerProfileLink("mlb", player)}</h3>
           <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
         </div>
 
@@ -5142,7 +5156,7 @@ function createMLBTeamTrendCard(teamRow) {
     <div class="trend-card">
       <div class="trend-card-header">
         <div class="trend-title">
-          <h3>${teamRow["Team"] || "Unknown Team"}</h3>
+          <h3>${teamProfileLink("mlb", teamRow["Team"])}</h3>
           <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
         </div>
 
@@ -5540,7 +5554,7 @@ function createNFLTrendCard(player) {
   return `
     <div class="leaderboard-item">
       <strong>
-        ${player["Player Name"] || "Unknown Player"}
+        ${playerProfileLink("nfl", player)}
       </strong>
 
       <div>
@@ -5865,7 +5879,7 @@ function createNFLTeamTrendCard(teamRow) {
   return `
     <div class="leaderboard-item">
       <strong>
-        ${teamRow["Team"] || "Unknown Team"}
+        ${teamProfileLink("nfl", teamRow["Team"])}
       </strong>
 
       <div>
