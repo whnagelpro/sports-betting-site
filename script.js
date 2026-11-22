@@ -2528,8 +2528,17 @@ async function renderOddsPage(pageKey) {
         );
       }
 
+      const requestedTeam = new URLSearchParams(window.location.search).get("team");
+      if (requestedTeam) {
+        const teamName = requestedTeam.trim().toLowerCase();
+        filteredGames = filteredGames.filter((game) =>
+          game.awayTeam.toLowerCase() === teamName || game.homeTeam.toLowerCase() === teamName
+        );
+      }
+
       renderFilterSummary(config.summaryId, [
         { label: "Game", value: selectedGame },
+        { label: "Team", value: requestedTeam || "All" },
         { label: "Sportsbook", value: selectedSportsbook },
         { label: "Tier", value: currentTier }
       ]);
@@ -2672,7 +2681,22 @@ async function renderPropsPage(pageKey) {
         filteredProps = filteredProps.filter((prop) => prop.vendor === selectedSportsbook);
       }
 
+      const requestedTeam = new URLSearchParams(window.location.search).get("team");
+      if (requestedTeam) {
+        const teamName = requestedTeam.trim().toLowerCase();
+        filteredProps = filteredProps.filter((prop) =>
+          String(prop.awayTeam || "").toLowerCase() === teamName ||
+          String(prop.homeTeam || "").toLowerCase() === teamName
+        );
+      }
+
       populatePlayerFilter(config.playerFilterId, filteredProps, renderPage);
+
+      const requestedPlayer = new URLSearchParams(window.location.search).get("player");
+      const playerSelect = document.getElementById(config.playerFilterId);
+      if (requestedPlayer && playerSelect && (!playerSelect.value || playerSelect.value === "All")) {
+        playerSelect.value = requestedPlayer;
+      }
 
       const selectedPlayer = document.getElementById(config.playerFilterId)?.value || "All";
 
@@ -6725,6 +6749,18 @@ async function initTeamProfilePage() {
 
   document.getElementById("team-name").textContent =
     decodeURIComponent(team);
+
+  const teamSubtitle = document.getElementById("team-subtitle");
+  if (teamSubtitle && !document.getElementById("team-board-links")) {
+    const teamName = decodeURIComponent(team);
+    const links = document.createElement("div");
+    links.id = "team-board-links";
+    links.innerHTML = `
+      <a class="card-link" href="${league}-odds.html?team=${encodeURIComponent(teamName)}">Today's odds</a>
+      <a class="card-link" href="${league}-props.html?team=${encodeURIComponent(teamName)}">Today's props</a>
+    `;
+    teamSubtitle.insertAdjacentElement("afterend", links);
+  }
 
   document.getElementById("team-subtitle").textContent =
     league.toUpperCase();
