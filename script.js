@@ -1058,7 +1058,7 @@ function renderFilterSummary(containerId, filters) {
     .join("");
 }
 
-function renderLeaderboard(containerId, games, tierName = "Rookie") {
+function renderLeaderboard(containerId, games, tierName = "Rookie", league = "nba") {
   const container = document.getElementById(containerId);
   if (!container) return;
 
@@ -1072,7 +1072,7 @@ function renderLeaderboard(containerId, games, tierName = "Rookie") {
   const allRankings = games.flatMap((game) =>
     game.rankings.map((rank) => ({
       ...rank,
-      gameLabel: `${game.awayTeam} at ${game.homeTeam}`,
+      gameLabel: matchupLinks(league, game.awayTeam, game.homeTeam),
       vendor: game.vendor
     }))
   );
@@ -2543,7 +2543,7 @@ async function renderOddsPage(pageKey) {
         { label: "Tier", value: currentTier }
       ]);
 
-      renderLeaderboard(config.leaderboardId, filteredGames, currentTier);
+      renderLeaderboard(config.leaderboardId, filteredGames, currentTier, config.emptyLabel.toLowerCase());
 
       setOddsFiltersDisabled(config, false);
 
