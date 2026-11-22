@@ -1986,6 +1986,8 @@ function renderProps() {
 
         </div>
 
+        <a class="card-link" href="parlay.html?league=${encodeURIComponent(currentLeague)}&board=props&q=${encodeURIComponent(`${player.hero?.name || ""} ${prop.propType || prop.displayName || ""} ${prop.line ?? ""} ${recommendation}`.trim())}">Add to parlay</a>
+
         `;
 
         grid.appendChild(card);
