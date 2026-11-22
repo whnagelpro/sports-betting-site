@@ -1076,14 +1076,18 @@ function renderLeaderboard(containerId, games, tierName = "Rookie") {
     }))
   );
 
-  const limited = allRankings
-    .sort((a, b) => b.ev - a.ev)
+  const plays = allRankings.filter((item) => item.side && item.side !== "No Play" && Number.isFinite(item.sportacularScore));
+  const pool = plays.length ? plays : allRankings;
+
+  const limited = pool
+    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))
     .slice(0, rules.showLeaderboardCount);
 
   container.innerHTML = limited
     .map((item, index) => `
       <div class="leaderboard-item">
         <strong>#${index + 1} ${item.bet}</strong>
+        <div>Score: ${formatSportacularScore(item.sportacularScore)}</div>
         <div class="${getEVClass(item.ev)}">EV: ${formatEV(item.ev)}</div>
         <div>${item.gameLabel} | ${item.vendor}</div>
       </div>
@@ -1153,158 +1157,103 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
     .join("");
 }
 
+function readSheetNumber(value) {
+  const number = toNumber(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function formatSportacularScore(value) {
+  return Number.isFinite(value) ? Number(value).toFixed(1) : "—";
+}
+
+function formatStoredPercent(value) {
+  const number = toNumber(value);
+  if (!Number.isFinite(number)) return "—";
+  return `${number.toFixed(1)}%`;
+}
+
+function formatComplementPercent(value) {
+  const number = toNumber(value);
+  if (!Number.isFinite(number)) return "—";
+  return `${(100 - number).toFixed(1)}%`;
+}
+
+function oddsMarketHitRate(row, market, side) {
+  if (market === "Total") {
+    if (side === "Over") return formatStoredPercent(row["Total Over Rate"]);
+    if (side === "Under") return formatComplementPercent(row["Total Over Rate"]);
+  }
+
+  if (market === "Spread") {
+    if (side === "Away") return formatStoredPercent(row["Away Cover Rate"]);
+    if (side === "Home") return formatStoredPercent(row["Home Cover Rate"]);
+  }
+
+  return "—";
+}
+
 function buildRankingsFromRow(row) {
-  const rankings = [];
-  const totalValue = safeText(row["Total Value"], "");
   const awayTeam = safeText(row["Away Team"], "Away Team");
   const homeTeam = safeText(row["Home Team"], "Home Team");
+  const totalValue = safeText(row["Total Value"], "");
+  const markets = [
+    {
+      market: "Total",
+      sideKey: "Total Best Side",
+      scoreKey: "Total Sportacular Score",
+      riskKey: "Total Risk Tier",
+      confidenceKey: "Total Confidence Tier",
+      evKey: "Total Best EV"
+    },
+    {
+      market: "Spread",
+      sideKey: "Spread Best Side",
+      scoreKey: "Spread Sportacular Score",
+      riskKey: "Spread Risk Tier",
+      confidenceKey: "Spread Confidence Tier",
+      evKey: "Spread Best EV"
+    },
+    {
+      market: "Moneyline",
+      sideKey: "Moneyline Best Side",
+      scoreKey: "Moneyline Sportacular Score",
+      riskKey: "Moneyline Risk Tier",
+      confidenceKey: "Moneyline Confidence Tier",
+      evKey: "Moneyline Best EV"
+    }
+  ];
 
-  const overEV = toNumber(row["EV Total Over ($1 bet)"]);
-  const underEV = toNumber(row["EV Total Under ($1 bet)"]);
-  const awayML = toNumber(row["EV Away ML ($1 bet)"]);
-  const homeML = toNumber(row["EV Home ML ($1 bet)"]);
-  const awaySpreadEV = toNumber(row["EV Away Spread ($1 bet)"]);
-  const homeSpreadEV = toNumber(row["EV Home Spread ($1 bet)"]);
+  const rankings = markets.map((market) => {
+    const side = safeText(row[market.sideKey], "No Play");
+    let bet = market.market;
 
-  if (!Number.isNaN(overEV) && totalValue) {
-    rankings.push({
-        bet: `Over ${totalValue}`,
-        ev: overEV,
+    if (market.market === "Total" && side === "Over") bet = totalValue ? `Over ${totalValue}` : "Over";
+    if (market.market === "Total" && side === "Under") bet = totalValue ? `Under ${totalValue}` : "Under";
+    if (market.market === "Total" && side === "No Play") bet = "Total · No Play";
+    if (market.market === "Spread" && side === "Away") bet = `${awayTeam} ${safeText(row["Spread Away Value"], "")}`.trim();
+    if (market.market === "Spread" && side === "Home") bet = `${homeTeam} ${safeText(row["Spread Home Value"], "")}`.trim();
+    if (market.market === "Spread" && side === "No Play") bet = "Spread · No Play";
+    if (market.market === "Moneyline" && side === "Away") bet = `${awayTeam} ML`;
+    if (market.market === "Moneyline" && side === "Home") bet = `${homeTeam} ML`;
+    if (market.market === "Moneyline" && side === "No Play") bet = "Moneyline · No Play";
 
-        modelEdge: overEV,
+    const score = readSheetNumber(row[market.scoreKey]);
+    const ev = readSheetNumber(row[market.evKey]);
 
-        sportacularScore: Math.round(Math.max(0, Math.min(100, overEV * 100))),
+    return {
+      market: market.market,
+      bet,
+      side,
+      ev: ev === null ? NaN : ev,
+      sportacularScore: score,
+      risk: safeText(row[market.riskKey], "—"),
+      confidence: safeText(row[market.confidenceKey], "—"),
+      hitRate: oddsMarketHitRate(row, market.market, side),
+      recommendation: side
+    };
+  });
 
-        confidence:
-            overEV >= 0.25
-                ? "High"
-                : overEV >= 0.10
-                    ? "Medium"
-                    : "Low",
-
-        recommendation:
-            overEV >= 0
-                ? "Consider"
-                : "Pass"
-    });
-  }
-
-  if (!Number.isNaN(underEV) && totalValue) {
-    rankings.push({
-        bet: `Under ${totalValue}`,
-        ev: underEV,
-
-        modelEdge: underEV,
-
-        sportacularScore: Math.round(Math.max(0, Math.min(100, underEV * 100))),
-
-        confidence:
-            underEV >= 0.25
-                ? "High"
-                : underEV >= 0.10
-                    ? "Medium"
-                    : "Low",
-
-        recommendation:
-            underEV >= 0
-                ? "Consider"
-                : "Pass"
-    });
-  }
-
-  if (!Number.isNaN(awayML)) {
-    rankings.push({
-        bet: `${awayTeam} ML`,
-        ev: awayML,
-
-        modelEdge: toNumber(row["Moneyline Edge Away"]),
-
-        sportacularScore: Math.round(Math.max(0, Math.min(100, awayML * 100))),
-
-        confidence:
-            awayML >= 0.25
-                ? "High"
-                : awayML >= 0.10
-                    ? "Medium"
-                    : "Low",
-
-        recommendation:
-            awayML >= 0
-                ? "Consider"
-                : "Pass"
-    });
-  }
-
-  if (!Number.isNaN(homeML)) {
-    rankings.push({
-        bet: `${homeTeam} ML`,
-        ev: homeML,
-
-        modelEdge: toNumber(row["Moneyline Edge Home"]),
-
-        sportacularScore: Math.round(Math.max(0, Math.min(100, homeML * 100))),
-
-        confidence:
-            homeML >= 0.25
-                ? "High"
-                : homeML >= 0.10
-                    ? "Medium"
-                    : "Low",
-
-        recommendation:
-            homeML >= 0
-                ? "Consider"
-                : "Pass"
-    });
-  }
-
-  if (!Number.isNaN(awaySpreadEV)) {
-    rankings.push({
-        bet: `${awayTeam} ${safeText(row["Spread Away Value"], "")}`,
-        ev: awaySpreadEV,
-
-        modelEdge: awaySpreadEV,
-
-        sportacularScore: Math.round(Math.max(0, Math.min(100, awaySpreadEV * 100))),
-
-        confidence:
-            awaySpreadEV >= 0.25
-                ? "High"
-                : awaySpreadEV >= 0.10
-                    ? "Medium"
-                    : "Low",
-
-        recommendation:
-            awaySpreadEV >= 0
-                ? "Consider"
-                : "Pass"
-    });
-  }
-
-  if (!Number.isNaN(homeSpreadEV)) {
-    rankings.push({
-        bet: `${homeTeam} ${safeText(row["Spread Home Value"], "")}`,
-        ev: homeSpreadEV,
-
-        modelEdge: homeSpreadEV,
-
-        sportacularScore: Math.round(Math.max(0, Math.min(100, homeSpreadEV * 100))),
-
-        confidence:
-            homeSpreadEV >= 0.25
-                ? "High"
-                : homeSpreadEV >= 0.10
-                    ? "Medium"
-                    : "Low",
-
-        recommendation:
-            homeSpreadEV >= 0
-                ? "Consider"
-                : "Pass"
-    });
-  }
-
-  return rankings.sort((a, b) => b.ev - a.ev);
+  return rankings.sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
 }
 
 function transformRowsToGames(rows) {
@@ -1339,6 +1288,9 @@ function transformRowsToGames(rows) {
       moneylineEdgeAway: toNumber(row["Moneyline Edge Away"]),
       moneylineEdgeHome: toNumber(row["Moneyline Edge Home"]),
       bestMLEdge: toNumber(row["Best ML Edge"]),
+      bestMarket: safeText(row["Best Market"], "No Play"),
+      bestMarketSide: safeText(row["Best Market Side"], ""),
+      bestMarketScore: readSheetNumber(row["Best Market Score"]),
 
       rankings: buildRankingsFromRow(row)
     }))
@@ -1933,14 +1885,19 @@ function buildNFLPropsFromRows(rows) {
 
 function createBetCard(game, tierName = "Rookie") {
   const rules = TIER_RULES[tierName] || TIER_RULES.Rookie;
-  const visibleRankings = game.rankings.slice(0, rules.maxRankingsPerGame);
-  const topEV = [...visibleRankings].sort((a, b) => b.ev - a.ev)[0];
+  const ranked = [...game.rankings].sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
+  const visibleRankings = ranked.slice(0, rules.maxRankingsPerGame);
+  const isPlay = game.bestMarket && game.bestMarket !== "No Play" && game.bestMarket !== "N/A";
+  const headline = isPlay
+    ? game.rankings.find((item) => item.market === game.bestMarket) || null
+    : null;
 
   const rankingsHTML = visibleRankings
-    .sort((a, b) => b.ev - a.ev)
     .map((item, index) => `
       <div class="rank-item">
         <span><strong>#${index + 1} ${item.bet}</strong></span>
+        <span>Score: ${formatSportacularScore(item.sportacularScore)}</span>
+        <span>${item.side} · ${item.confidence} · Risk ${item.risk} · Hit ${item.hitRate}</span>
         <span class="${getEVClass(item.ev)}">EV: ${formatEV(item.ev)}</span>
       </div>
     `)
@@ -1958,47 +1915,39 @@ function createBetCard(game, tierName = "Rookie") {
         <div class="bet-card-analytics">
 
           <div class="analytics-row">
-              <span class="analytics-label">⭐ Score</span>
+              <span class="analytics-label">Best Market</span>
               <span class="analytics-value">
-                  ${topEV?.sportacularScore ?? "N/A"}
+                  ${isPlay ? `${game.bestMarket} · ${game.bestMarketSide}` : "No Play"}
               </span>
           </div>
 
           <div class="analytics-row">
-              <span class="analytics-label">📈 Model Edge</span>
+              <span class="analytics-label">Sportacular Score</span>
               <span class="analytics-value">
-                  ${
-                      topEV?.modelEdge != null
-                          ? `${topEV.modelEdge.toFixed(2)}%`
-                          : "N/A"
-                  }
+                  ${isPlay ? formatSportacularScore(game.bestMarketScore) : "—"}
               </span>
           </div>
 
           <div class="analytics-row">
-              <span class="analytics-label">🟢 Confidence</span>
+              <span class="analytics-label">Confidence</span>
               <span class="analytics-value">
-                  ${topEV?.confidence ?? "N/A"}
+                  ${headline?.confidence || "—"}
               </span>
           </div>
 
           <div class="analytics-row">
-              <span class="analytics-label">🏆 Recommendation</span>
+              <span class="analytics-label">Risk</span>
               <span class="analytics-value">
-                  ${topEV?.recommendation ?? "N/A"}
+                  ${headline?.risk || "—"}
               </span>
           </div>
 
-        </div>
-
-            <div style="margin-top:6px;">
-                <strong>Model Edge</strong><br>
-                ${
-                    topEV?.modelEdge != null
-                        ? formatEV(topEV.modelEdge)
-                        : "N/A"
-                }
-            </div>
+          <div class="analytics-row">
+              <span class="analytics-label">Hit Rate</span>
+              <span class="analytics-value">
+                  ${headline?.hitRate || "—"}
+              </span>
+          </div>
 
         </div>
       </div>
