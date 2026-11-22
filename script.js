@@ -2898,10 +2898,10 @@ async function renderHomeSpotlights() {
       fetchLeagueGames(MLB_CSV_URL).catch(() => []),
       fetchLeagueGames(NFL_CSV_URL).catch(() => []),
 
-      fetchTeaserPropsJson(NBA_PROPS_TEASER_URL).catch(() => []),
-      fetchTeaserPropsJson(NHL_PROPS_TEASER_URL).catch(() => []),
-      fetchTeaserPropsJson(MLB_PROPS_TEASER_URL).catch(() => []),
-      fetchTeaserPropsJson(NFL_PROPS_TEASER_URL).catch(() => [])
+      fetchHomepageProps("nba").catch(() => []),
+      fetchHomepageProps("nhl").catch(() => []),
+      fetchHomepageProps("mlb").catch(() => []),
+      fetchHomepageProps("nfl").catch(() => [])
     ]);
 
     const topNBAGame = topGameByScore(nbaGames);
@@ -3204,21 +3204,10 @@ async function renderHomeTopProps() {
   mlbProps,
   nflProps
 ] = await Promise.all([
-  fetchTeaserPropsJson(
-    NBA_PROPS_TEASER_URL
-  ).catch(() => []),
-
-  fetchTeaserPropsJson(
-    NHL_PROPS_TEASER_URL
-  ).catch(() => []),
-
-  fetchTeaserPropsJson(
-    MLB_PROPS_TEASER_URL
-  ).catch(() => []),
-
-  fetchTeaserPropsJson(
-    NFL_PROPS_TEASER_URL
-  ).catch(() => [])
+  fetchHomepageProps("nba").catch(() => []),
+  fetchHomepageProps("nhl").catch(() => []),
+  fetchHomepageProps("mlb").catch(() => []),
+  fetchHomepageProps("nfl").catch(() => [])
 ]);
 
 const allProps = [
@@ -3364,19 +3353,30 @@ async function renderTopBetOfTheDay() {
   }
 }
 
-async function fetchTeaserPropsJson(endpointUrl) {
-  if (DATA_CACHE.props[endpointUrl]) return DATA_CACHE.props[endpointUrl];
+const PUBLIC_PROPS_CSV = {
+  nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=590324617&single=true&output=csv",
+  nhl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1839953184&single=true&output=csv",
+  mlb: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1502960090&single=true&output=csv",
+  nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=2077637558&single=true&output=csv"
+};
 
-  const response = await fetch(endpointUrl);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch teaser props: ${response.status}`);
-  }
+function getPhoenixDateString() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Phoenix" }).format(new Date());
+}
 
-  const payload = await response.json();
-  const props = Array.isArray(payload.props) ? payload.props : [];
+async function fetchHomepageProps(league) {
+  const cacheKey = `homepage-props-${league}`;
+  if (DATA_CACHE.props[cacheKey]) return DATA_CACHE.props[cacheKey];
 
-  DATA_CACHE.props[endpointUrl] = props;
-  return props;
+  const response = await fetch(PUBLIC_PROPS_CSV[league]);
+  if (!response.ok) throw new Error(`Failed to fetch ${league} props: ${response.status}`);
+
+  const rows = parseCSV(await response.text());
+  const props = league === "nfl" ? buildNFLPropsFromRows(rows) : buildPropsFromRows(rows, league);
+  const today = getPhoenixDateString();
+  const todaysProps = props.filter((prop) => prop.gameDate === today);
+  DATA_CACHE.props[cacheKey] = todaysProps;
+  return todaysProps;
 }
 
 async function updateSessionStatus() {
