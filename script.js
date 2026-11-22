@@ -1912,7 +1912,7 @@ function buildNFLPropsFromRows(rows) {
   return consolidatedProps;
 }
 
-function createBetCard(game, tierName = "Rookie") {
+function createBetCard(game, tierName = "Rookie", league = "nba") {
   const rules = TIER_RULES[tierName] || TIER_RULES.Rookie;
   const ranked = [...game.rankings].sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
   const visibleRankings = ranked.slice(0, rules.maxRankingsPerGame);
@@ -1977,6 +1977,8 @@ function createBetCard(game, tierName = "Rookie") {
                   ${headline?.hitRate || "—"}
               </span>
           </div>
+
+          ${isPlay ? `<a class="card-link" href="parlay.html?league=${encodeURIComponent(league)}&board=odds&q=${encodeURIComponent(headline?.bet || `${game.awayTeam} at ${game.homeTeam}`)}">Add best side to parlay</a>` : ""}
 
         </div>
       </div>
@@ -2048,6 +2050,7 @@ function createPropCard(prop) {
           <div><strong>Confidence:</strong> ${confidenceText}</div>
           <div><strong>Risk:</strong> ${prop.riskTier || "—"}</div>
           <div><strong>Hit Rate:</strong> ${prop.lineHitRate || "—"}</div>
+          ${prop.playerId ? `<div><a class="card-link" href="parlay.html?league=${encodeURIComponent(prop.league || "")}&board=props&q=${encodeURIComponent(`${fullName} ${prop.propType || ""} ${prop.lineValue || ""} ${prop.bestSide || ""}`.trim())}">Add to parlay</a></div>` : ""}
         </div>
       </div>
   `;
@@ -2556,7 +2559,7 @@ async function renderOddsPage(pageKey) {
       }
 
       container.innerHTML = filteredGames
-        .map((game) => createBetCard(game, currentTier))
+        .map((game) => createBetCard(game, currentTier, config.emptyLabel.toLowerCase()))
         .join("");
     };
 

@@ -338,6 +338,17 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("parlay-search").addEventListener("keydown", event => {
     if (event.key === "Enter") findLegs();
   });
+  const parlayQuery = new URLSearchParams(window.location.search);
+  const requestedSearch = parlayQuery.get("q");
+  if (requestedSearch) {
+    const leagueSelect = document.getElementById("parlay-league");
+    const boardSelect = document.getElementById("parlay-board");
+    const searchInput = document.getElementById("parlay-search");
+    if (leagueSelect && parlayQuery.get("league")) leagueSelect.value = parlayQuery.get("league");
+    if (boardSelect && parlayQuery.get("board")) boardSelect.value = parlayQuery.get("board");
+    if (searchInput) searchInput.value = requestedSearch;
+    findLegs();
+  }
   document.getElementById("parlay-clear").addEventListener("click", () => {
     parlayLegs.length = 0;
     renderSlip();
