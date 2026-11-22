@@ -4193,6 +4193,21 @@ function createNBATeamTrendCard(teamRow) {
         <div class="trend-strength-badge">
           ${teamRow["Trend Strength"] || "N/A"}
         </div>
+
+        <div class="trend-analytics">
+          <div class="trend-analytics-item">
+            <span class="trend-analytics-label">Direction</span>
+            <span class="trend-analytics-value">${teamRow["Trend Direction"] || "N/A"}</span>
+          </div>
+          <div class="trend-analytics-item">
+            <span class="trend-analytics-label">Trend Score</span>
+            <span class="trend-analytics-value">${formatTrendScore(teamRow["Trend Score"])}</span>
+          </div>
+          <div class="trend-analytics-item">
+            <span class="trend-analytics-label">Risk</span>
+            <span class="trend-analytics-value">${teamRow["Risk Tier"] || "N/A"}</span>
+          </div>
+        </div>
       </div>
 
       <div class="trend-metric-grid">
@@ -4221,6 +4236,22 @@ function createNBATeamTrendCard(teamRow) {
         Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
         |
         Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
+        |
+        Hit 3: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 3"]) * 100)}%`}
+        |
+        Hit 10: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 10"]) * 100)}%`}
+      </div>
+
+      <div class="trend-secondary-line">
+        Offense ${teamRow["Offensive Rating"] || "N/A"}
+        |
+        Defense ${teamRow["Defensive Rating"] || "N/A"}
+        |
+        Overall ${teamRow["Overall Rating"] || "N/A"}
+        |
+        ${teamRow["Rating Tier"] || "N/A"}
+        |
+        League Rank ${teamRow["League Rank"] || "N/A"}
       </div>
 
       <div class="trend-note">
@@ -4303,15 +4334,15 @@ async function renderNBATeamTrends() {
       }
 
       filteredRows.sort((a, b) => {
-        const aVal = Number(a["Last 5 Avg"]);
-        const bVal = Number(b["Last 5 Avg"]);
+        const aVal = Number(a["Trend Score"]);
+        const bVal = Number(b["Trend Score"]);
         return selectedSort === "asc" ? aVal - bVal : bVal - aVal;
       });
 
       renderFilterSummary("nba-team-trends-filter-summary", [
         { label: "Team", value: selectedTeam },
         { label: "Trend", value: formatNBATeamTrendLabel(selectedStat) },
-        { label: "Sort", value: selectedSort === "asc" ? "Lowest First" : "Highest First" },
+        { label: "Sort", value: selectedSort === "asc" ? "Weakest Trend First" : "Strongest Trend First" },
         { label: "Tier", value: currentTier }
       ]);
 
