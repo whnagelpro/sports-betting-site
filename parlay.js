@@ -150,25 +150,32 @@ function oddsLegsFromRow(row, league) {
   const homeSpreadProb = blendProbability(vigFree(row["Spread Home Odds"], row["Spread Away Odds"]), parlayPercent(row["Home Cover Rate"]), parlayNumber(row["Home Cover Games"]));
   const awayMlProb = blendProbability(parlayNumber(row["Vig-Free Prob Away ML"]), null, 0);
   const homeMlProb = blendProbability(parlayNumber(row["Vig-Free Prob Home ML"]), null, 0);
+  const totalOverRate = parlayPercent(row["Total Over Rate"]);
   const legs = [
-    ["Total Over", row["Total Over Odds"], overProb, row["Total Model Confidence"], row["Total Risk Score"], `${matchup} over ${row["Total Value"]}`],
-    ["Total Under", row["Total Under Odds"], underProb, row["Total Model Confidence"], row["Total Risk Score"], `${matchup} under ${row["Total Value"]}`],
-    ["Spread Away", row["Spread Away Odds"], awaySpreadProb, row["Spread Model Confidence"], row["Spread Risk Score"], `${away} ${row["Spread Away Value"]}`],
-    ["Spread Home", row["Spread Home Odds"], homeSpreadProb, row["Spread Model Confidence"], row["Spread Risk Score"], `${home} ${row["Spread Home Value"]}`],
-    ["Moneyline Away", row["Moneyline Away Odds"], awayMlProb, row["Moneyline Model Confidence"], row["Moneyline Risk Score"], `${away} moneyline`],
-    ["Moneyline Home", row["Moneyline Home Odds"], homeMlProb, row["Moneyline Model Confidence"], row["Moneyline Risk Score"], `${home} moneyline`]
+    ["Total Over", row["Total Over Odds"], overProb, row["Total Model Confidence"], row["Total Risk Score"], `${matchup} over ${row["Total Value"]}`, totalOverRate, "Total Best Side", "Over", "Total Sportacular Score"],
+    ["Total Under", row["Total Under Odds"], underProb, row["Total Model Confidence"], row["Total Risk Score"], `${matchup} under ${row["Total Value"]}`, totalOverRate === null ? null : 1 - totalOverRate, "Total Best Side", "Under", "Total Sportacular Score"],
+    ["Spread Away", row["Spread Away Odds"], awaySpreadProb, row["Spread Model Confidence"], row["Spread Risk Score"], `${away} ${row["Spread Away Value"]}`, parlayPercent(row["Away Cover Rate"]), "Spread Best Side", "Away", "Spread Sportacular Score"],
+    ["Spread Home", row["Spread Home Odds"], homeSpreadProb, row["Spread Model Confidence"], row["Spread Risk Score"], `${home} ${row["Spread Home Value"]}`, parlayPercent(row["Home Cover Rate"]), "Spread Best Side", "Home", "Spread Sportacular Score"],
+    ["Moneyline Away", row["Moneyline Away Odds"], awayMlProb, row["Moneyline Model Confidence"], row["Moneyline Risk Score"], `${away} moneyline`, null, "Moneyline Best Side", "Away", "Moneyline Sportacular Score"],
+    ["Moneyline Home", row["Moneyline Home Odds"], homeMlProb, row["Moneyline Model Confidence"], row["Moneyline Risk Score"], `${home} moneyline`, null, "Moneyline Best Side", "Home", "Moneyline Sportacular Score"]
   ];
-  return legs.filter(leg => americanToDecimal(leg[1])).map(leg => ({
-    key: `${league}|${gameId}|${vendor}|${leg[0]}`,
-    league: league.toUpperCase(),
-    gameId,
-    vendor,
-    label: `${leg[5]} (${vendor})`,
-    odds: Number(leg[1]),
-    probability: Number.isFinite(leg[2]) ? leg[2] : null,
-    confidence: parlayNumber(leg[3]),
-    risk: parlayNumber(leg[4])
-  }));
+  return legs.filter(leg => americanToDecimal(leg[1])).map(leg => {
+    const hitRate = leg[6];
+    const boardScore = String(row[leg[7]] || "") === leg[8] ? parlayNumber(row[leg[9]]) : null;
+    return {
+      key: `${league}|${gameId}|${vendor}|${leg[0]}`,
+      league: league.toUpperCase(),
+      gameId,
+      vendor,
+      label: `${leg[5]} (${vendor})`,
+      odds: Number(leg[1]),
+      probability: Number.isFinite(leg[2]) ? leg[2] : null,
+      confidence: parlayNumber(leg[3]),
+      risk: parlayNumber(leg[4]),
+      hitRate: Number.isFinite(hitRate) ? hitRate : null,
+      boardScore
+    };
+  });
 }
 
 function propLegsFromRow(row, league) {
@@ -196,6 +203,9 @@ function propLegsFromRow(row, league) {
       probability: side.toLowerCase() === "under" ? underProb : (parlayNumber(row["Best Model Probability"]) || overProb)
     });
   }
+  const overRate = parlayPercent(row["Line Hit Rate"]);
+  const boardSide = String(row["Best Side"] || "");
+  const boardScore = parlayNumber(row["Sportacular Score"]);
   return legs.map(leg => ({
     key: `${league}|${gameId}|${row["Player Id"] || player}|${propType}|${line}|${vendor}|${leg.side}`,
     league: league.toUpperCase(),
@@ -205,7 +215,9 @@ function propLegsFromRow(row, league) {
     odds: leg.odds,
     probability: Number.isFinite(leg.probability) ? leg.probability : null,
     confidence,
-    risk
+    risk,
+    hitRate: overRate === null ? null : (leg.side === "Under" ? 1 - overRate : overRate),
+    boardScore: boardSide === leg.side ? boardScore : null
   }));
 }
 
@@ -259,7 +271,7 @@ function renderSlip() {
     <article class="parlay-leg">
       <div>
         <strong>${leg.league}</strong> ${leg.label}
-        <span>${formatOdds(leg.odds)} · model ${formatPercent(leg.probability)}</span>
+        <span>${formatOdds(leg.odds)} · hit ${formatPercent(leg.hitRate)} · score ${Number.isFinite(leg.boardScore) ? leg.boardScore.toFixed(1) : "—"}</span>
       </div>
       <button type="button" data-remove="${index}">Remove</button>
     </article>
@@ -267,11 +279,14 @@ function renderSlip() {
   const games = parlayLegs.map(leg => leg.gameId).filter(Boolean);
   warning.hidden = new Set(games).size === games.length;
   const result = scoreParlay(parlayLegs);
+  const hitRates = parlayLegs.map(leg => leg.hitRate).filter(value => Number.isFinite(value));
+  const combinedHitRate = hitRates.length === parlayLegs.length ? hitRates.reduce((product, value) => product * value, 1) : null;
   summary.innerHTML = `
     <div><span>Parlay odds</span><strong>${formatOdds(result.american)}</strong></div>
     <div><span>Decimal odds</span><strong>${result.decimal.toFixed(2)}</strong></div>
     <div><span>Implied probability</span><strong>${formatPercent(result.implied)}</strong></div>
     <div><span>Model probability</span><strong>${formatPercent(result.probability)}</strong></div>
+    <div><span>Combined hit rate</span><strong>${formatPercent(combinedHitRate)}</strong></div>
     <div><span>Expected value</span><strong>${formatSigned(result.ev)}</strong></div>
     <div><span>Price edge</span><strong>${formatPercent(result.priceEdge)}</strong></div>
     <div><span>Sportacular Score</span><strong>${Number.isFinite(result.score) ? result.score.toFixed(1) : "—"}</strong></div>
@@ -304,7 +319,7 @@ async function findLegs() {
       <article class="parlay-result">
         <div>
           <strong>${leg.label}</strong>
-          <span>${formatOdds(leg.odds)} · model ${formatPercent(leg.probability)}</span>
+          <span>${formatOdds(leg.odds)} · hit ${formatPercent(leg.hitRate)} · score ${Number.isFinite(leg.boardScore) ? leg.boardScore.toFixed(1) : "—"}</span>
         </div>
         <button type="button" data-add="${index}">Add</button>
       </article>
