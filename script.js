@@ -6249,6 +6249,16 @@ function createTeamTrendCard(trend) {
       ${trend["Hit Rate Last 5"]}
     </div>
 
+    <div>
+      <strong>Direction</strong><br>
+      ${trend["Trend Direction"] || "N/A"}
+    </div>
+
+    <div>
+      <strong>Trend Score</strong><br>
+      ${formatTrendScore(trend["Trend Score"])}
+    </div>
+
   </div>
 
   <div class="team-trend-note">
@@ -7689,8 +7699,12 @@ if (teamTrendsLoadError) {
 
 } else {
 
+  const rankedTeamTrends = [...teamTrends].sort(
+    (a, b) => Number(b["Trend Score"]) - Number(a["Trend Score"])
+  );
+
   trendsContainer.innerHTML =
-    teamTrends.map(createTeamTrendCard).join("");
+    rankedTeamTrends.map(createTeamTrendCard).join("");
 
     document
       .querySelectorAll(".team-trend-card")
