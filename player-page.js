@@ -13,12 +13,20 @@ let currentLeague = "";
 let currentPlayerId = "";
 let player = null;
 let trendHitRates = {};
+let propHitRates = {};
 
 const PLAYER_TREND_CSV = {
     nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1458653646&single=true&output=csv",
     nhl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=620239444&single=true&output=csv",
     mlb: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1443511953&single=true&output=csv",
     nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1953623841&single=true&output=csv"
+};
+
+const PLAYER_PROPS_CSV = {
+    nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=590324617&single=true&output=csv",
+    nhl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1839953184&single=true&output=csv",
+    mlb: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1502960090&single=true&output=csv",
+    nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=2077637558&single=true&output=csv"
 };
 
 // ------------------------------------------------------
@@ -67,6 +75,7 @@ async function initPlayerPage() {
         renderProps();
 
         trendHitRates = await fetchPlayerTrendHitRates().catch(() => ({}));
+        propHitRates = await fetchPlayerPropHitRates().catch(() => ({}));
 
         renderTrendCards();
 
@@ -1961,6 +1970,14 @@ function renderProps() {
 
             <div>
 
+                <span>Hit Rate</span>
+
+                <strong>${propHitRateFor(prop)}</strong>
+
+            </div>
+
+            <div>
+
                 <span>Probability</span>
 
                 <strong>${displayProbability}</strong>
@@ -2084,6 +2101,39 @@ async function fetchPlayerTrendHitRates() {
     });
 
     return rates;
+}
+
+async function fetchPlayerPropHitRates() {
+    const url = PLAYER_PROPS_CSV[currentLeague];
+    if (!url || !currentPlayerId) return {};
+
+    const response = await fetch(url);
+    if (!response.ok) return {};
+
+    const rows = parseProfileCSV(await response.text());
+    const rates = {};
+
+    rows.forEach((row) => {
+        const playerId = String(row["Player Id"] || row["Player ID"] || "").trim();
+        if (playerId !== String(currentPlayerId)) return;
+
+        const propType = String(row["Prop Type"] || "").trim().toLowerCase();
+        const line = Number(row["Line Value"]);
+        const side = String(row["Best Side"] || "").trim().toLowerCase();
+        const hitRate = String(row["Line Hit Rate"] || "").trim();
+        if (!propType || !Number.isFinite(line) || !hitRate) return;
+
+        rates[`${propType}|${line}|${side}`] = hitRate;
+    });
+
+    return rates;
+}
+
+function propHitRateFor(prop) {
+    const propType = String(prop.propType || prop.displayName || "").trim().toLowerCase();
+    const line = Number(prop.line);
+    const side = String(prop.recommendation || "").trim().toLowerCase();
+    return propHitRates[`${propType}|${line}|${side}`] || "-";
 }
 
 function parseProfileCSV(text) {
