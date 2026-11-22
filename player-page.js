@@ -1468,6 +1468,20 @@ function renderProps() {
 
     if (!section) return;
 
+    section.hidden = false;
+
+    if (!document.getElementById("player-board-link") && player?.hero?.name) {
+        const header = section.querySelector(".section-header");
+        if (header) {
+            const link = document.createElement("a");
+            link.id = "player-board-link";
+            link.className = "card-link";
+            link.href = `${currentLeague}-props.html?player=${encodeURIComponent(player.hero.name)}`;
+            link.textContent = "All props on the board";
+            header.appendChild(link);
+        }
+    }
+
     if (!player.props?.length) {
 
         section.hidden = false;
