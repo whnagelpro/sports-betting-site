@@ -2826,6 +2826,13 @@ function topPropByScore(props) {
   })[0];
 }
 
+function homePropTitle(league, prop) {
+  const name = getPropFullName(prop);
+  const label = formatPropTypeLabel(prop.propType);
+  if (!prop.playerId) return `${name} — ${label}`;
+  return `<a class="player-link" href="player.html?league=${encodeURIComponent(league)}&id=${encodeURIComponent(prop.playerId)}">${name}</a> — ${label}`;
+}
+
 function renderHomeSpotlightCard(containerId, data) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -2962,9 +2969,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-nba-bet",
         {
-          title:
-            `${topNBAGame.awayTeam} at ` +
-            `${topNBAGame.homeTeam}`,
+          title: matchupLinks("nba", topNBAGame.awayTeam, topNBAGame.homeTeam),
 
           meta:
             `Featured Sportacular Score | ` +
@@ -2986,9 +2991,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-nba-prop",
         {
-          title:
-            `${getPropFullName(topNBAProp)} — ` +
-            `${formatPropTypeLabel(topNBAProp.propType)}`,
+          title: homePropTitle("nba", topNBAProp),
 
           meta:
             `Top Free Props Today | ` +
@@ -3017,9 +3020,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-nhl-bet",
         {
-          title:
-            `${topNHLGame.awayTeam} at ` +
-            `${topNHLGame.homeTeam}`,
+          title: matchupLinks("nhl", topNHLGame.awayTeam, topNHLGame.homeTeam),
 
           meta:
             `Featured Sportacular Score | ` +
@@ -3041,9 +3042,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-nhl-prop",
         {
-          title:
-            `${getPropFullName(topNHLProp)} — ` +
-            `${formatPropTypeLabel(topNHLProp.propType)}`,
+          title: homePropTitle("nhl", topNHLProp),
 
           meta:
             `Top Free Props Today | ` +
@@ -3072,9 +3071,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-mlb-bet",
         {
-          title:
-            `${topMLBGame.awayTeam} at ` +
-            `${topMLBGame.homeTeam}`,
+          title: matchupLinks("mlb", topMLBGame.awayTeam, topMLBGame.homeTeam),
 
           meta:
             `Featured Sportacular Score | ` +
@@ -3096,9 +3093,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-mlb-prop",
         {
-          title:
-            `${getPropFullName(topMLBProp)} — ` +
-            `${formatPropTypeLabel(topMLBProp.propType)}`,
+          title: homePropTitle("mlb", topMLBProp),
 
           meta:
             `Top Free Props Today | ` +
@@ -3127,9 +3122,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-nfl-bet",
         {
-          title:
-            `${topNFLGame.awayTeam} at ` +
-            `${topNFLGame.homeTeam}`,
+          title: matchupLinks("nfl", topNFLGame.awayTeam, topNFLGame.homeTeam),
 
           meta:
             `Featured Sportacular Score | ` +
@@ -3151,9 +3144,7 @@ async function renderHomeSpotlights() {
       renderHomeSpotlightCard(
         "home-top-nfl-prop",
         {
-          title:
-            `${getPropFullName(topNFLProp)} — ` +
-            `${formatPropTypeLabel(topNFLProp.propType)}`,
+          title: homePropTitle("nfl", topNFLProp),
 
           meta:
             `Top Free Props Today | ` +
