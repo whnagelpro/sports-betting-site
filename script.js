@@ -959,6 +959,7 @@ function formatProbability(prob) {
 function formatSortLabel(sortValue) {
   const sortMap = {
     "ev-desc": "Highest EV",
+    "score-desc": "Highest Sportacular Score",
     "ev-asc": "Lowest EV",
     "prob-desc": "Highest Probability",
     "odds-desc": "Highest Odds",
@@ -1107,7 +1108,7 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
   }
 
   const topProps = [...props]
-    .sort((a, b) => b.ev - a.ev)
+    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))
     .slice(0, limit);
 
   container.innerHTML = topProps
@@ -1137,6 +1138,8 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
             }
             — ${formatPropTypeLabel(prop.propType)}
           </strong>
+
+          <div>Score: ${formatSportacularScore(prop.sportacularScore)}</div>
 
           <div class="${getEVClass(prop.ev)}">
             EV: ${formatEV(prop.ev)}
@@ -1627,6 +1630,8 @@ function buildPropsFromRows(rows, league = "mlb") {
           ""
         ),
 
+      lineHitRate: formatStoredPercent(row["Line Hit Rate"]),
+
       awayTeam,
 
       homeTeam,
@@ -1746,6 +1751,10 @@ function buildNFLPropsFromRows(rows) {
         ? modelConfidenceRaw
         : null;
 
+    const sportacularScore = readSheetNumber(row["Sportacular Score"]);
+    const confidenceTier = safeText(row["Confidence Tier"], "");
+    const lineHitRate = formatStoredPercent(row["Line Hit Rate"]);
+
     if (
       playerName &&
       vendor &&
@@ -1778,6 +1787,9 @@ function buildNFLPropsFromRows(rows) {
         bestPriceEdge,
         riskTier,
         modelConfidence,
+        sportacularScore,
+        confidenceTier,
+        lineHitRate,
 
         awayTeam,
         homeTeam,
@@ -1818,6 +1830,9 @@ function buildNFLPropsFromRows(rows) {
         bestPriceEdge,
         riskTier,
         modelConfidence,
+        sportacularScore,
+        confidenceTier,
+        lineHitRate,
 
         awayTeam,
         homeTeam,
@@ -2010,54 +2025,18 @@ function createPropCard(prop) {
   }
 
   const fullName = getPropFullName(prop);
-
-  const isNFLDecisionProp =
-    prop.league === "nfl" &&
-    prop.bestSide;
-
-  let nflDecisionHTML = "";
-
-  if (isNFLDecisionProp) {
-    const isNoPlay =
-      prop.bestSide === "No Play";
-
-    const bestEVText =
-      Number.isFinite(prop.bestEV)
-        ? formatEV(prop.bestEV)
-        : "—";
-
-    const edgeText =
-      Number.isFinite(prop.bestPriceEdge)
-        ? formatProbability(prop.bestPriceEdge)
-        : "—";
-
-    const confidenceText =
-      Number.isFinite(prop.modelConfidence)
-        ? `${prop.modelConfidence.toFixed(1)}`
-        : "—";
-
-    nflDecisionHTML = `
-      <div class="nfl-model-decision">
-        <div>
-          <strong>Sportacular Model:</strong>
-          ${isNoPlay ? "No Play" : prop.bestSide}
-        </div>
-
-        <div>
-          Best EV: ${bestEVText}
-        </div>
-
-        <div>
-          Edge: ${edgeText}
-        </div>
-
-        <div>
-          Risk: ${prop.riskTier || "—"}
-          | Confidence: ${confidenceText}
+  const confidenceText = prop.confidenceTier || (Number.isFinite(prop.modelConfidence) ? prop.modelConfidence.toFixed(1) : "—");
+  const decisionHTML = `
+      <div class="prop-lines">
+        <div class="prop-line">
+          <div><strong>Best Side:</strong> ${prop.bestSide || prop.betType || "—"}</div>
+          <div><strong>Sportacular Score:</strong> ${formatSportacularScore(prop.sportacularScore)}</div>
+          <div><strong>Confidence:</strong> ${confidenceText}</div>
+          <div><strong>Risk:</strong> ${prop.riskTier || "—"}</div>
+          <div><strong>Hit Rate:</strong> ${prop.lineHitRate || "—"}</div>
         </div>
       </div>
-    `;
-  }
+  `;
 
   return `
     <article class="prop-card">
@@ -2096,7 +2075,7 @@ ${formatPropTypeLabel(prop.propType)}
           <div><strong>Model Probability:</strong> ${probabilityText}</div>
         </div>
       </div>
-      ${nflDecisionHTML}
+      ${decisionHTML}
     </article>
   `;
 }
@@ -2438,6 +2417,9 @@ function sortProps(props, sortValue) {
     case "odds-asc":
       return sorted.sort((a, b) => getPropDisplayOdds(a) - getPropDisplayOdds(b));
 
+    case "score-desc":
+      return sorted.sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
+
     case "ev-desc":
     default:
       return sorted.sort((a, b) => b.ev - a.ev);
@@ -2657,7 +2639,7 @@ async function renderPropsPage(pageKey) {
       const selectedGame = document.getElementById(config.gameFilterId)?.value || "All";
       const selectedPropType = document.getElementById(config.propTypeFilterId)?.value || "All";
       const selectedSportsbook = document.getElementById(config.sportsbookFilterId)?.value || "All";
-      const sortValue = document.getElementById(config.sortFilterId)?.value || "ev-desc";
+      const sortValue = document.getElementById(config.sortFilterId)?.value || "score-desc";
 
       let filteredProps = props;
 
@@ -2688,7 +2670,7 @@ async function renderPropsPage(pageKey) {
         { label: "Prop Type", value: selectedPropType !== "All" ? formatPropTypeLabel(selectedPropType) : "All" },
         { label: "Player", value: selectedPlayer },
         { label: "Sportsbook", value: selectedSportsbook },
-        { label: "Sort", value: sortValue !== "ev-desc" ? formatSortLabel(sortValue) : "All" },
+        { label: "Sort", value: sortValue !== "score-desc" ? formatSortLabel(sortValue) : "All" },
         { label: "Tier", value: currentTier !== "Rookie" ? currentTier : "All" }
       ]);
 
@@ -2748,7 +2730,7 @@ container.innerHTML = `
       resetSelectToAll(config.propTypeFilterId);
       resetSelectToAll(config.playerFilterId);
       resetSelectToAll(config.sportsbookFilterId);
-      resetSelectToValue(config.sortFilterId, "ev-desc");
+      resetSelectToValue(config.sortFilterId, "score-desc");
       renderPage();
     });
 
