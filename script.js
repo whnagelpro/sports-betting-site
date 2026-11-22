@@ -1146,7 +1146,7 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
           </div>
 
           <div>
-            ${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}
+            ${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor}
           </div>
 
           <div>
@@ -1938,7 +1938,7 @@ function createBetCard(game, tierName = "Rookie", league = "nba") {
     <article class="bet-card">
       <div class="bet-card-header">
         <div>
-          <h3>${game.awayTeam} at ${game.homeTeam}</h3>
+          <h3>${matchupLinks(league, game.awayTeam, game.homeTeam)}</h3>
           <p class="bet-subtext">Sportsbook: ${game.vendor} | Game Date: ${game.gameDate}</p>
         </div>
         <div class="bet-card-analytics">
@@ -2079,7 +2079,7 @@ ${
 ${formatPropTypeLabel(prop.propType)}
 
 </h3>
-          <p class="prop-meta">${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}</p>
+          <p class="prop-meta">${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}</p>
         </div>
         <div class="ev-badge ${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
       </div>
@@ -3291,9 +3291,13 @@ const allProps = [
 
           return `
             <div class="leaderboard-item ${isLockedPreview ? "blurred" : ""}">
-              <strong>#${index + 1} ${fullName} — ${formatPropTypeLabel(prop.propType)}</strong>
+              <strong>#${index + 1} ${
+                prop.playerId && prop.league
+                  ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
+                  : fullName
+              } — ${formatPropTypeLabel(prop.propType)}</strong>
               <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
-              <div>${prop.gameLabel ? `${prop.gameLabel} | ` : ""}${prop.vendor}</div>
+              <div>${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor}</div>
               <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
               ${
                 isLockedPreview && !hasFullPropsAccess
@@ -3993,6 +3997,11 @@ function teamProfileLink(league, name) {
   const team = name || "Unknown Team";
   if (!team || team === "Unknown Team") return team;
   return `<a class="player-link" href="${league}-team.html?league=${encodeURIComponent(league)}&team=${encodeURIComponent(team)}">${team}</a>`;
+}
+
+function matchupLinks(league, away, home, fallback = "") {
+  if (!away || !home) return fallback;
+  return `${teamProfileLink(league, away)} at ${teamProfileLink(league, home)}`;
 }
 
 function formatNBATrendLabel(statKey) {
