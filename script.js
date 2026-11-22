@@ -2007,7 +2007,7 @@ function createBetCard(game, tierName = "Rookie") {
       </div>
 
       <div class="rank-list">
-        <h4>EV Rankings</h4>
+        <h4>Sportacular Scores</h4>
         ${rankingsHTML}
         ${lockedCount > 0 ? `
           <div class="locked-overlay">
