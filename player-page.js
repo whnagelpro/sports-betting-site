@@ -64,19 +64,7 @@ async function initPlayerPage() {
 
         renderSeasonPanels();
 
-        if (
-            currentLeague === "mlb" ||
-            currentLeague === "nfl"
-        ) {
-            renderProps();
-        } else {
-            const propsSection =
-                document.getElementById("player-props-section");
-
-            if (propsSection) {
-                propsSection.hidden = true;
-            }
-        }
+        renderProps();
 
         trendHitRates = await fetchPlayerTrendHitRates().catch(() => ({}));
 
@@ -1789,7 +1777,14 @@ function renderProps() {
 
     grid.innerHTML = "";
 
-    player.props.forEach(prop => {
+    const visibleProps = player.props
+        .filter((prop) => {
+            const side = String(prop.recommendation ?? prop.bestSide ?? "").trim().toLowerCase();
+            return side === "over" || side === "under";
+        })
+        .sort((a, b) => (Number(b.sportacularScore) || -1) - (Number(a.sportacularScore) || -1));
+
+    visibleProps.forEach(prop => {
 
         const analytics =
             prop.analytics ?? {};
