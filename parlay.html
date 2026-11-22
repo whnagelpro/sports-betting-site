@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parlay Calculator | Sportacular Analytics</title>
+  <meta name="description" content="Build a Sportacular parlay from game odds and player props. See the combined price, model probability, expected value, and Sportacular Score." />
+  <link rel="canonical" href="https://sportacularanalytics.com/parlay.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sportacular Analytics" />
+  <meta property="og:title" content="Parlay Calculator | Sportacular Analytics" />
+  <meta property="og:description" content="Build a Sportacular parlay from game odds and player props." />
+  <meta property="og:url" content="https://sportacularanalytics.com/parlay.html" />
+  <meta property="og:image" content="https://sportacularanalytics.com/social-share.png" />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script async src="https://plausible.io/js/pa-9G8t0yoXeeqqvOLtN6bvo.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="logo">
+        <a href="/"><img src="/logo.png" alt="Sportacular Analytics Logo" /></a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+      <nav id="site-nav">
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li class="dropdown"><a href="#">NBA</a>
+            <ul class="dropdown-menu">
+              <li><a href="nba-odds.html">Game Odds</a></li>
+              <li><a href="nba-props.html">Player Props</a></li>
+              <li><a href="nba-trends.html">Player Trends</a></li>
+              <li><a href="nba-team-trends.html">Team Trends</a></li>
+              <li><a href="nba-team-profiles.html">Team Profiles</a></li>
+              <li><a href="nba-player-profiles.html">Player Profiles</a></li>
+            </ul>
+          </li>
+          <li class="dropdown"><a href="#">NHL</a>
+            <ul class="dropdown-menu">
+              <li><a href="nhl-odds.html">Game Odds</a></li>
+              <li><a href="nhl-props.html">Player Props</a></li>
+              <li><a href="nhl-trends.html">Player Trends</a></li>
+              <li><a href="nhl-team-trends.html">Team Trends</a></li>
+              <li><a href="nhl-team-profiles.html">Team Profiles</a></li>
+              <li><a href="nhl-player-profiles.html">Player Profiles</a></li>
+            </ul>
+          </li>
+          <li class="dropdown"><a href="#">MLB</a>
+            <ul class="dropdown-menu">
+              <li><a href="mlb-odds.html">Game Odds</a></li>
+              <li><a href="mlb-props.html">Player Props</a></li>
+              <li><a href="mlb-trends.html">Player Trends</a></li>
+              <li><a href="mlb-team-trends.html">Team Trends</a></li>
+              <li><a href="mlb-team-profiles.html">Team Profiles</a></li>
+              <li><a href="mlb-player-profiles.html">Player Profiles</a></li>
+            </ul>
+          </li>
+          <li class="dropdown"><a href="#">NFL</a>
+            <ul class="dropdown-menu">
+              <li><a href="nfl-odds.html">Game Odds</a></li>
+              <li><a href="nfl-props.html">Player Props</a></li>
+              <li><a href="nfl-trends.html">Player Trends</a></li>
+              <li><a href="nfl-team-trends.html">Team Trends</a></li>
+              <li><a href="nfl-team-profiles.html">Team Profiles</a></li>
+              <li><a href="nfl-player-profiles.html">Player Profiles</a></li>
+            </ul>
+          </li>
+          <li><a href="parlay.html">Parlay</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li class="dropdown"><a href="#">Legal</a>
+            <ul class="dropdown-menu">
+              <li><a href="privacy.html">Privacy Policy</a></li>
+              <li><a href="terms.html">Terms of Service</a></li>
+              <li><a href="disclaimer.html">Disclaimer</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </li>
+          <li id="nav-login-item"><a href="auth.html">Login</a></li>
+          <li id="nav-account-item" style="display: none;"><a href="auth.html">Account</a></li>
+          <li id="nav-logout-item" style="display: none;"><a href="#" id="nav-logout-link">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="league-page">
+    <section class="league-hero">
+      <div class="container">
+        <h1>Sportacular Parlay Calculator</h1>
+        <p class="league-description">Add legs from the live boards or type American odds. The parlay price multiplies. The model probability multiplies. Same-game legs are allowed, and they are marked as correlated.</p>
+      </div>
+    </section>
+    <section class="container parlay-layout">
+      <div class="parlay-panel">
+        <h2>Add a board leg</h2>
+        <div class="parlay-controls">
+          <label>League
+            <select id="parlay-league">
+              <option value="nba">NBA</option>
+              <option value="nhl">NHL</option>
+              <option value="nfl">NFL</option>
+              <option value="mlb">MLB</option>
+            </select>
+          </label>
+          <label>Board
+            <select id="parlay-board">
+              <option value="odds">Game Odds</option>
+              <option value="props">Player Props</option>
+            </select>
+          </label>
+          <label>Search
+            <input id="parlay-search" type="search" placeholder="Team, player, or prop" />
+          </label>
+          <button id="parlay-search-btn" type="button">Find legs</button>
+        </div>
+        <p id="parlay-search-status" class="parlay-note">Finished games are left out.</p>
+        <div id="parlay-results" class="parlay-results"></div>
+
+        <h2>Or type a leg</h2>
+        <form id="parlay-manual" class="parlay-controls">
+          <label>Description
+            <input id="manual-label" type="text" placeholder="Chiefs -3.5" required />
+          </label>
+          <label>American odds
+            <input id="manual-odds" type="number" step="1" placeholder="-110" required />
+          </label>
+          <label>Model probability
+            <input id="manual-prob" type="number" min="0" max="1" step="0.01" placeholder="0.55 optional" />
+          </label>
+          <button type="submit">Add leg</button>
+        </form>
+      </div>
+
+      <div class="parlay-panel">
+        <div class="parlay-slip-head">
+          <h2>Parlay slip</h2>
+          <button id="parlay-clear" type="button">Clear</button>
+        </div>
+        <div id="parlay-slip" class="parlay-slip"></div>
+        <p id="parlay-correlation" class="parlay-warning" hidden>Two or more legs are from the same game. Those results are correlated, so the multiplied probability is not independent.</p>
+        <div id="parlay-summary" class="parlay-summary"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>Disclaimer:</strong> Data may include information from third-party sports data and odds providers. This website is for informational and educational purposes only. Nothing on this site guarantees results or should be considered financial advice. If you sports bet, always bet responsibly.</p>
+      <p class="support-email">We would love to hear from you! Contact us at support@sportacularanalytics.com.</p>
+      <p>&copy; 2026 Sportacular Analytics. All rights reserved.</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+  <script src="parlay.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("mobile-menu-toggle");
+      const nav = document.getElementById("site-nav");
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          nav.classList.toggle("mobile-open");
+          const isOpen = nav.classList.contains("mobile-open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+          toggle.textContent = isOpen ? "✕" : "☰";
+        });
+      }
+    });
+  </script>
+</body>
+</html>

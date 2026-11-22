@@ -53,6 +53,132 @@ body {
   color: #7dd3fc;
 }
 
+.parlay-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  padding: 30px 0 70px;
+}
+
+.parlay-panel {
+  background: #111a2b;
+  border: 1px solid #22304a;
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.parlay-panel h2 {
+  margin: 18px 0 12px;
+  font-size: 1.2rem;
+}
+
+.parlay-panel h2:first-child {
+  margin-top: 0;
+}
+
+.parlay-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.parlay-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #c7d2e3;
+  font-size: 0.9rem;
+}
+
+.parlay-controls input,
+.parlay-controls select,
+.parlay-panel button {
+  border: 1px solid #314867;
+  background: #0b1220;
+  color: #f5f7fb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.parlay-panel button {
+  cursor: pointer;
+  background: #164e63;
+}
+
+.parlay-results,
+.parlay-slip {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.parlay-result,
+.parlay-leg {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 10px;
+  background: #0b1220;
+}
+
+.parlay-result span,
+.parlay-leg span,
+.parlay-note {
+  display: block;
+  color: #9fb0c9;
+  font-size: 0.9rem;
+}
+
+.parlay-slip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.parlay-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.parlay-summary div {
+  background: #0b1220;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.parlay-summary span {
+  display: block;
+  color: #9fb0c9;
+  font-size: 0.85rem;
+}
+
+.parlay-warning {
+  margin-top: 12px;
+  color: #fbbf24;
+}
+
+.play {
+  color: #86efac;
+}
+
+.no-play {
+  color: #fca5a5;
+}
+
+@media (max-width: 800px) {
+  .parlay-layout,
+  .parlay-controls,
+  .parlay-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
 .hero {
   padding: 100px 0 80px;
   background: linear-gradient(135deg, #0b1220, #16233a);

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Player Profile | Sportacular Analytics</title>
+  <link rel="canonical" href="https://sportacularanalytics.com/player.html" />
+
 
     <link rel="icon" href="/favicon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
@@ -84,6 +86,7 @@
           </ul>
         </li>
 
+        <li><a href="parlay.html">Parlay</a></li>
         <li><a href="pricing.html">Pricing</a></li>
         <li><a href="index.html#about">About</a></li>
 
@@ -613,6 +616,23 @@
     <script src="script.js"></script>
 
     <!-- Existing Page Controller -->
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const toggle = document.getElementById("mobile-menu-toggle");
+        const nav = document.getElementById("site-nav");
+        if (toggle && nav && !toggle.dataset.bound) {
+          toggle.dataset.bound = "true";
+          toggle.addEventListener("click", () => {
+            nav.classList.toggle("mobile-open");
+            const isOpen = nav.classList.contains("mobile-open");
+            toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+            toggle.textContent = isOpen ? "✕" : "☰";
+          });
+        }
+      });
+    </script>
+
     <script src="player-page.js"></script>
 
 </body>

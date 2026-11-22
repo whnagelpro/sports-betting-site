@@ -1,0 +1,967 @@
+{
+  "generated": "2026-11-10T20:56:17.291376",
+  "files": {
+    "NBA": {
+      "path": "nba-appscript",
+      "totalLines": 30168,
+      "totalFunctions": 402
+    },
+    "MLB": {
+      "path": "mlb-appscript",
+      "totalLines": 44231,
+      "totalFunctions": 422
+    }
+  },
+  "functions": {
+    "NBA": [
+      {
+        "name": "refreshNBAPlayerTrendPipeline",
+        "line": 1149,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshNBATeamTrendPipeline",
+        "line": 1158,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshNBATopPlayerTrendPipeline",
+        "line": 1167,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshNBATopTeamTrendPipeline",
+        "line": 1173,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsSheet",
+        "line": 1210,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsForDateRange_",
+        "line": 1214,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsSheet",
+        "line": 1554,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsForDateRange_",
+        "line": 1558,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "clearNBAPlayerGameLogsSheetOnly",
+        "line": 1606,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "clearNBATeamGameLogsSheetOnly",
+        "line": 1632,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsOctober",
+        "line": 1671,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsNovember",
+        "line": 1675,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsDecember",
+        "line": 1679,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsJanuary",
+        "line": 1683,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsFebruary",
+        "line": 1687,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsMarch",
+        "line": 1691,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsApril",
+        "line": 1695,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsMay",
+        "line": 1699,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsJune",
+        "line": 1703,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsOctober",
+        "line": 1712,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsNovember",
+        "line": 1716,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsDecember",
+        "line": 1720,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsJanuary",
+        "line": 1724,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsFebruary",
+        "line": 1728,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsMarch",
+        "line": 1732,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsApril",
+        "line": 1736,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsMay",
+        "line": 1740,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshNBATeamGameLogsJune",
+        "line": 1744,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "getNBAPlayerIdsForTrendPipeline_",
+        "line": 2659,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "finalizeNBAHoldoutAccumulator_",
+        "line": 4580,
+        "categories": [
+          "staging"
+        ]
+      },
+      {
+        "name": "finalizeNBACalibrationAccumulator_",
+        "line": 10276,
+        "categories": [
+          "staging"
+        ]
+      },
+      {
+        "name": "getNBADailyAnalyticsDateKey_",
+        "line": 12234,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "getNBADailyAnalyticsState_",
+        "line": 12249,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "saveNBADailyAnalyticsState_",
+        "line": 12271,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "clearNBADailyAnalyticsState_",
+        "line": 12282,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "getNBAEligiblePipelineMonths_",
+        "line": 12292,
+        "categories": [
+          "pipeline",
+          "monthly"
+        ]
+      },
+      {
+        "name": "createNBADailyAnalyticsState_",
+        "line": 12304,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "scheduleNBADailyAnalyticsRetry_",
+        "line": 12380,
+        "categories": [
+          "pipeline",
+          "resume"
+        ]
+      },
+      {
+        "name": "clearNBADailyAnalyticsContinuationTriggers_",
+        "line": 12411,
+        "categories": [
+          "pipeline",
+          "resume"
+        ]
+      },
+      {
+        "name": "continueNBADailyAnalyticsPipeline",
+        "line": 12441,
+        "categories": [
+          "pipeline",
+          "resume"
+        ]
+      },
+      {
+        "name": "runNBADailyAnalyticsPipeline",
+        "line": 12450,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "resetNBADailyAnalyticsPipeline",
+        "line": 13321,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "logNBADailyAnalyticsPipelineState",
+        "line": 13365,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "testNBADailyAnalyticsTriggerSeparation",
+        "line": 13379,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "installNBADailyAnalyticsPermanentTriggers",
+        "line": 13472,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshNBAPlayerGameLogsForTeam_",
+        "line": 18368,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsAtlanta",
+        "line": 18761,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "resetNBAPlayerGameLogsStaging",
+        "line": 18894,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "stageNBAPlayerGameLogRowsForTeam_",
+        "line": 18936,
+        "categories": [
+          "staging"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsStagingAtlanta",
+        "line": 19325,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsStagingRetryAtlanta",
+        "line": 19940,
+        "categories": [
+          "player_logs",
+          "staging",
+          "resume"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsStagingSecondTeam",
+        "line": 20324,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "validateP35NBAPlayerGameLogsCompletionLedger_",
+        "line": 20996,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsStoredMinutes",
+        "line": 21106,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsMinutesPrecision",
+        "line": 21259,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsDateNormalization",
+        "line": 21387,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsStagingTypes",
+        "line": 21528,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsFingerprintNormalization",
+        "line": 21690,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "calculateP35NBAPlayerGameLogsFingerprint_",
+        "line": 21889,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsResumeState",
+        "line": 21995,
+        "categories": [
+          "player_logs",
+          "resume"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsStagingState",
+        "line": 22351,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "validateP35NBAPlayerGameLogsStagingState_",
+        "line": 22998,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "validateP35NBAPlayerGameLogsResumeState_",
+        "line": 23297,
+        "categories": [
+          "player_logs",
+          "resume"
+        ]
+      },
+      {
+        "name": "testP35NBAFingerprintSourceStagingCompatibility",
+        "line": 23659,
+        "categories": [
+          "staging"
+        ]
+      },
+      {
+        "name": "testP35NBAPipelineStateCapacity",
+        "line": 23856,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "testP35NBAPipelineStateMetadata",
+        "line": 23975,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsFingerprintLedger",
+        "line": 24089,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "validateP35NBAPlayerGameLogsFingerprints_",
+        "line": 24251,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "validateP35NBAPlayerGameLogsRowCounts_",
+        "line": 24455,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "validateP35NBAPlayerGameLogsStaging_",
+        "line": 24635,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "finalizeNBAPlayerGameLogsFromStaging_",
+        "line": 24778,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsFinalizerRejectsIncompleteStaging",
+        "line": 25218,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "testP35NBAD4BPipelineCompletionState",
+        "line": 25424,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsDataIntegrityReadOnly",
+        "line": 25558,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "testP35NBAPlayerGameLogsStagingReadOnly",
+        "line": 25753,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "validateP35NBATeamGameLogStatCoverage_",
+        "line": 28594,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "validateP35NBATeamGameLogStagingRows_",
+        "line": 29023,
+        "categories": [
+          "team_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "ensureP35NBATeamGameLogsStaging_",
+        "line": 29242,
+        "categories": [
+          "team_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "normalizeP35NBATeamGameLogStagingRow_",
+        "line": 29364,
+        "categories": [
+          "team_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "planP35NBATeamGameLogStagingReplacement_",
+        "line": 29436,
+        "categories": [
+          "team_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "calculateP35NBATeamGameLogsFingerprint_",
+        "line": 29782,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "validateP35NBATeamGameLogSheetIdentity_",
+        "line": 30098,
+        "categories": [
+          "team_logs"
+        ]
+      }
+    ],
+    "MLB": [
+      {
+        "name": "stageMLBTeamGameLogRowsForTeam_",
+        "line": 6479,
+        "categories": [
+          "staging"
+        ]
+      },
+      {
+        "name": "resetMLBTeamGameLogsStaging",
+        "line": 6806,
+        "categories": [
+          "team_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "resetMLBPlayerGameLogsStaging",
+        "line": 6860,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "stageMLBPlayerGameLogRowsForTeam_",
+        "line": 6924,
+        "categories": [
+          "staging"
+        ]
+      },
+      {
+        "name": "finalizeMLBPlayerGameLogsFromStaging_",
+        "line": 7143,
+        "categories": [
+          "player_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerTrendPipeline",
+        "line": 7446,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamTrendPipeline",
+        "line": 7455,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshMLBTopPlayerTrendPipeline",
+        "line": 7464,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshMLBTopTeamTrendPipeline",
+        "line": 7470,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsMarch",
+        "line": 7476,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsApril",
+        "line": 7480,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsMay",
+        "line": 7484,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsJune",
+        "line": 7488,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsJuly",
+        "line": 7492,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsAugust",
+        "line": 7496,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsSeptember",
+        "line": 7500,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsOctober",
+        "line": 7504,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsNovember",
+        "line": 7508,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsMarch",
+        "line": 7512,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsApril",
+        "line": 7516,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsMay",
+        "line": 7520,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsJune",
+        "line": 7524,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsJuly",
+        "line": 7528,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsAugust",
+        "line": 7532,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsSeptember",
+        "line": 7536,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsOctober",
+        "line": 7540,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsNovember",
+        "line": 7544,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsForTeam_",
+        "line": 7567,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsSheet",
+        "line": 7978,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBPlayerGameLogsForDateRange_",
+        "line": 7982,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "clearMLBPlayerGameLogsSheetOnly",
+        "line": 8268,
+        "categories": [
+          "player_logs"
+        ]
+      },
+      {
+        "name": "clearMLBTeamGameLogsSheetOnly",
+        "line": 8300,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsSheet",
+        "line": 8508,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsForDateRange_",
+        "line": 8512,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "refreshMLBTeamGameLogsForTeam_",
+        "line": 9648,
+        "categories": [
+          "team_logs"
+        ]
+      },
+      {
+        "name": "getDefaultMLBDailyAnalyticsState_",
+        "line": 37642,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "getMLBDailyAnalyticsState_",
+        "line": 37665,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "saveMLBDailyAnalyticsState_",
+        "line": 37698,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "clearMLBDailyAnalyticsState_",
+        "line": 37713,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "clearMLBDailyAnalyticsContinuationTriggers_",
+        "line": 37728,
+        "categories": [
+          "pipeline",
+          "resume"
+        ]
+      },
+      {
+        "name": "scheduleMLBDailyAnalyticsContinuation_",
+        "line": 37749,
+        "categories": [
+          "pipeline",
+          "resume"
+        ]
+      },
+      {
+        "name": "runMLBDailyAnalyticsStep_",
+        "line": 37774,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "continueMLBDailyAnalyticsPipeline",
+        "line": 37841,
+        "categories": [
+          "pipeline",
+          "resume"
+        ]
+      },
+      {
+        "name": "runMLBDailyAnalyticsPipeline",
+        "line": 37854,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "finalizeMLBTeamGameLogsFromStaging_",
+        "line": 38375,
+        "categories": [
+          "team_logs",
+          "staging"
+        ]
+      },
+      {
+        "name": "resetMLBDailyAnalyticsPipeline",
+        "line": 38819,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "logMLBDailyAnalyticsPipelineState",
+        "line": 38925,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "testMLBDailyAnalyticsTriggerSeparation",
+        "line": 39116,
+        "categories": [
+          "pipeline"
+        ]
+      },
+      {
+        "name": "installMLBDailyAnalyticsPermanentTriggers",
+        "line": 39216,
+        "categories": [
+          "pipeline"
+        ]
+      }
+    ]
+  }
+}

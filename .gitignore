@@ -13,3 +13,6 @@ p21-evidence/p21-allstar-auth-profile/
 
 # P21 Hall-of-Famer authenticated Playwright QA profile
 p21-evidence/p21-hof-auth-profile/
+
+# Local Netlify folder
+.netlify

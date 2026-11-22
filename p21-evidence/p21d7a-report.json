@@ -1,0 +1,122 @@
+{
+  "milestone": "P21 D7A",
+  "description": "Password Recovery UI + Request Contract QA",
+  "target": "https://sportacularanalytics.com",
+  "generatedAt": "2026-10-14T02:52:51.066Z",
+  "summary": {
+    "pass": 22,
+    "fail": 0
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Reset-password route returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Reset request view is visible"
+    },
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Reset email field is visible"
+    },
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Reset request form exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Send Reset Link button is visible"
+    },
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Reset request message container exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Reset email field uses email input type"
+    },
+    {
+      "status": "PASS",
+      "area": "Reset Request",
+      "check": "Reset email field is required"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Update-password route returned HTTP 200"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Create New Password view is visible"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Password update form exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "New password field is visible"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Confirm password field is visible"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Both password fields use password input type"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Both password fields are required"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Update Password button is visible"
+    },
+    {
+      "status": "PASS",
+      "area": "Update Password",
+      "check": "Password update message container exists"
+    },
+    {
+      "status": "PASS",
+      "area": "Validation",
+      "check": "Mismatched passwords are rejected before update"
+    },
+    {
+      "status": "PASS",
+      "area": "Browser Health",
+      "check": "No uncaught JavaScript exceptions"
+    },
+    {
+      "status": "PASS",
+      "area": "Browser Health",
+      "check": "No unexpected console errors"
+    },
+    {
+      "status": "PASS",
+      "area": "Browser Health",
+      "check": "No failed browser network requests"
+    },
+    {
+      "status": "PASS",
+      "area": "Browser Health",
+      "check": "No unexpected HTTP failures"
+    }
+  ]
+}

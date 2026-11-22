@@ -1,0 +1,73 @@
+ACTUAL BUSINESS LOGIC FUNCTIONS: 56
+PASS | Empty slate preserves checkpoint
+PASS | Incomplete daily slate is tracked
+PASS | Full slate initialization uses actual pagination
+PASS | Journal persists before checkpoint replacement
+PASS | Active assignment resumes without resetting
+PASS | Valid completed assignment reconciles
+PASS | Processed slate cannot initialize twice
+PASS | Older incomplete slate is recovered after midnight
+PASS | Suspended checkpoint is preserved
+PASS | Missing checkpoint blocks initialization
+PASS | API outage preserves checkpoint
+PASS | Schedule status mismatch blocks assignment
+PASS | Schedule date mismatch blocks assignment
+PASS | Invalid completed team inventory blocks reconciliation
+PASS | Completion reconciles before Schedule outage
+PASS | Journal-only interruption safely reauthorizes
+PASS | Checkpoint interruption recovers exact assignment
+PASS | Failed assignment write recovers without replacement
+PASS | Interrupted journal clearing remains idempotent
+PASS | Maintenance preserves current assigned processed slate
+
+TEST CASES: 23
+PASS: 20
+FAIL: 3
+EXECUTION ENVIRONMENT: LOCAL SIMULATED APPS SCRIPT INFRASTRUCTURE
+STATUS: FAIL
+
+--- STDERR ---
+FAIL | Next daily slate gets independent assignment
+AssertionError [ERR_ASSERTION]: {"action":"WAIT","reason":"NO_ELIGIBLE_COMPLETED_SLATE","attemptedDates":[],"registryBytes":342,"reconciled":false,"removedSlateCount":0}
+
+'WAIT' !== 'RUN'
+
+    at f.initialize (/Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:727:12)
+    at /Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:908:5
+    at Object.<anonymous> (/Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:1317:5)
+    at Module._compile (node:internal/modules/cjs/loader:1831:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1971:10)
+    at Module.load (node:internal/modules/cjs/loader:1552:32)
+    at Module._load (node:internal/modules/cjs/loader:1354:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+FAIL | Maintenance retires old unprotected processed slate
+AssertionError [ERR_ASSERTION]: {"action":"WAIT","reason":"NO_ELIGIBLE_COMPLETED_SLATE","attemptedDates":[],"registryBytes":342,"reconciled":false,"removedSlateCount":0}
+
+'WAIT' !== 'RUN'
+
+    at f.initialize (/Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:727:12)
+    at /Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:1231:5
+    at Object.<anonymous> (/Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:1317:5)
+    at Module._compile (node:internal/modules/cjs/loader:1831:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1971:10)
+    at Module.load (node:internal/modules/cjs/loader:1552:32)
+    at Module._load (node:internal/modules/cjs/loader:1354:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+FAIL | Realistic 45-day completed slate simulation
+AssertionError [ERR_ASSERTION]: Daily initialization: 2026-11-17 {"action":"WAIT","reason":"NO_ELIGIBLE_COMPLETED_SLATE","attemptedDates":[],"registryBytes":316,"reconciled":false,"removedSlateCount":0}
+
+'WAIT' !== 'RUN'
+
+    at /Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:1273:12
+    at Object.<anonymous> (/Users/billynagel/Desktop/props-site/p36-development/test-mlb-combined-integration.candidate.cjs:1317:5)
+    at Module._compile (node:internal/modules/cjs/loader:1831:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1971:10)
+    at Module.load (node:internal/modules/cjs/loader:1552:32)
+    at Module._load (node:internal/modules/cjs/loader:1354:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47

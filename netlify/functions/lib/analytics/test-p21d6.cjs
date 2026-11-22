@@ -833,7 +833,7 @@ async function runTier(tier) {
         /403|failed to load resource/i.test(message);
 
         const isExpectedPremiumPropsDenial =
-        /^(NBA|NHL|MLB|NFL) props render error:\s*Error:\s*(NBA|NHL|MLB|NFL) premium props require All-Star or higher$/i.test(
+        /^(NBA|NHL|MLB|NFL) props render error:\s*Error:\s*(NBA|NHL|MLB|NFL) premium props require All-Star or higher(?:\n|$)/i.test(
             message.trim()
         );
 

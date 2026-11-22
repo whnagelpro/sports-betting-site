@@ -2,7 +2,7 @@
   "phase": "P21 D6",
   "description": "Five-tier production frontend gating QA",
   "baseUrl": "https://sportacularanalytics.com",
-  "generatedAt": "2026-10-14T02:17:02.905Z",
+  "generatedAt": "2026-10-14T02:39:44.059Z",
   "assertions": [
     {
       "status": "PASS",
@@ -73,6 +73,20 @@
     {
       "status": "PASS",
       "tier": "Rookie",
+      "area": "NHL Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 5",
+      "maxObserved": 5
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
+      "area": "NHL Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 3",
+      "leaderboardCount": 3
+    },
+    {
+      "status": "PASS",
+      "tier": "Rookie",
       "area": "MLB Game Odds",
       "message": "Page returned HTTP 200"
     },
@@ -233,10 +247,10 @@
       "message": "Page returned HTTP 200"
     },
     {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "Rookie",
       "area": "MLB Player Trends",
-      "message": "Unauthorized tier did not receive expected Player Trends locked state"
+      "message": "Unauthorized tier receives Player Trends locked state"
     },
     {
       "status": "PASS",
@@ -287,16 +301,10 @@
       "message": "No uncaught JavaScript exceptions"
     },
     {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "Rookie",
       "area": "Browser Health",
-      "message": "Unexpected console errors observed",
-      "consoleErrors": [
-        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5665:3)",
-        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5670:3)",
-        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5675:3)",
-        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5680:3)"
-      ]
+      "message": "No unexpected console errors"
     },
     {
       "status": "PASS",
@@ -574,10 +582,10 @@
       "message": "Page returned HTTP 200"
     },
     {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "Veteran",
       "area": "MLB Player Trends",
-      "message": "Unauthorized tier did not receive expected Player Trends locked state"
+      "message": "Unauthorized tier receives Player Trends locked state"
     },
     {
       "status": "PASS",
@@ -628,16 +636,10 @@
       "message": "No uncaught JavaScript exceptions"
     },
     {
-      "status": "FAIL",
+      "status": "PASS",
       "tier": "Veteran",
       "area": "Browser Health",
-      "message": "Unexpected console errors observed",
-      "consoleErrors": [
-        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5665:3)",
-        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5670:3)",
-        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5675:3)",
-        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5680:3)"
-      ]
+      "message": "No unexpected console errors"
     },
     {
       "status": "PASS",
@@ -759,20 +761,6 @@
     {
       "status": "PASS",
       "tier": "All-Star",
-      "area": "MLB Game Odds",
-      "message": "Per-game rendered rankings do not exceed tier cap 99",
-      "maxObserved": 6
-    },
-    {
-      "status": "PASS",
-      "tier": "All-Star",
-      "area": "MLB Game Odds",
-      "message": "Leaderboard count does not exceed tier cap 7",
-      "leaderboardCount": 7
-    },
-    {
-      "status": "PASS",
-      "tier": "All-Star",
       "area": "NFL Game Odds",
       "message": "Page returned HTTP 200"
     },
@@ -855,20 +843,6 @@
       "tier": "All-Star",
       "area": "MLB Player Props",
       "message": "Authorized tier not blocked by Player Props upgrade state"
-    },
-    {
-      "status": "PASS",
-      "tier": "All-Star",
-      "area": "MLB Player Props",
-      "message": "Visible props do not exceed tier cap 10",
-      "propCards": 9
-    },
-    {
-      "status": "PASS",
-      "tier": "All-Star",
-      "area": "MLB Player Props",
-      "message": "Props leaderboard does not exceed cap 7",
-      "leaderboardCount": 7
     },
     {
       "status": "PASS",
@@ -1205,20 +1179,6 @@
     {
       "status": "PASS",
       "tier": "Hall-of-Famer",
-      "area": "MLB Player Props",
-      "message": "Visible props do not exceed tier cap 25",
-      "propCards": 9
-    },
-    {
-      "status": "PASS",
-      "tier": "Hall-of-Famer",
-      "area": "MLB Player Props",
-      "message": "Props leaderboard does not exceed cap 10",
-      "leaderboardCount": 9
-    },
-    {
-      "status": "PASS",
-      "tier": "Hall-of-Famer",
       "area": "NFL Player Props",
       "message": "Page returned HTTP 200"
     },
@@ -1427,6 +1387,20 @@
     {
       "status": "PASS",
       "tier": "Legend",
+      "area": "MLB Game Odds",
+      "message": "Per-game rendered rankings do not exceed tier cap 99",
+      "maxObserved": 6
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Game Odds",
+      "message": "Leaderboard count does not exceed tier cap 20",
+      "leaderboardCount": 20
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
       "area": "NFL Game Odds",
       "message": "Page returned HTTP 200"
     },
@@ -1483,7 +1457,7 @@
       "tier": "Legend",
       "area": "NHL Player Props",
       "message": "Visible props do not exceed tier cap 99999",
-      "propCards": 191
+      "propCards": 192
     },
     {
       "status": "PASS",
@@ -1513,20 +1487,6 @@
     {
       "status": "PASS",
       "tier": "Legend",
-      "area": "MLB Player Props",
-      "message": "Visible props do not exceed tier cap 99999",
-      "propCards": 9
-    },
-    {
-      "status": "PASS",
-      "tier": "Legend",
-      "area": "MLB Player Props",
-      "message": "Props leaderboard does not exceed cap 10",
-      "leaderboardCount": 9
-    },
-    {
-      "status": "PASS",
-      "tier": "Legend",
       "area": "NFL Player Props",
       "message": "Page returned HTTP 200"
     },
@@ -1541,6 +1501,20 @@
       "tier": "Legend",
       "area": "NFL Player Props",
       "message": "Authorized tier not blocked by Player Props upgrade state"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Props",
+      "message": "Visible props do not exceed tier cap 99999",
+      "propCards": 8
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "NFL Player Props",
+      "message": "Props leaderboard does not exceed cap 10",
+      "leaderboardCount": 8
     },
     {
       "status": "PASS",
@@ -1599,6 +1573,18 @@
     {
       "status": "PASS",
       "tier": "Legend",
+      "area": "NHL Homepage Top Bet",
+      "message": "Top Bet content visible for authorized tier"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
+      "area": "MLB Homepage Top Bet",
+      "message": "Top Bet content visible for authorized tier"
+    },
+    {
+      "status": "PASS",
+      "tier": "Legend",
       "area": "Browser Health",
       "message": "No uncaught JavaScript exceptions"
     },
@@ -1637,18 +1623,6 @@
     {
       "status": "NOT_EXERCISED",
       "tier": "Rookie",
-      "area": "NHL Game Odds",
-      "message": "No rendered bet cards available to exercise per-game ranking cap"
-    },
-    {
-      "status": "NOT_EXERCISED",
-      "tier": "Rookie",
-      "area": "NHL Game Odds",
-      "message": "No leaderboard items available to exercise leaderboard cap"
-    },
-    {
-      "status": "NOT_EXERCISED",
-      "tier": "Rookie",
       "area": "MLB Game Odds",
       "message": "No rendered bet cards available to exercise per-game ranking cap"
     },
@@ -1704,6 +1678,18 @@
       "status": "NOT_EXERCISED",
       "tier": "All-Star",
       "area": "NBA Game Odds",
+      "message": "No leaderboard items available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "MLB Game Odds",
+      "message": "No rendered bet cards available to exercise per-game ranking cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "MLB Game Odds",
       "message": "No leaderboard items available to exercise leaderboard cap"
     },
     {
@@ -1728,6 +1714,18 @@
       "status": "NOT_EXERCISED",
       "tier": "All-Star",
       "area": "NBA Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "MLB Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "All-Star",
+      "area": "MLB Player Props",
       "message": "No props leaderboard rows available to exercise leaderboard cap"
     },
     {
@@ -1764,6 +1762,18 @@
       "status": "NOT_EXERCISED",
       "tier": "Hall-of-Famer",
       "area": "NBA Player Props",
+      "message": "No props leaderboard rows available to exercise leaderboard cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Props",
+      "message": "No current prop cards available to exercise visible-prop cap"
+    },
+    {
+      "status": "NOT_EXERCISED",
+      "tier": "Hall-of-Famer",
+      "area": "MLB Player Props",
       "message": "No props leaderboard rows available to exercise leaderboard cap"
     },
     {
@@ -1809,18 +1819,6 @@
     {
       "status": "NOT_EXERCISED",
       "tier": "Legend",
-      "area": "MLB Game Odds",
-      "message": "No rendered bet cards available to exercise per-game ranking cap"
-    },
-    {
-      "status": "NOT_EXERCISED",
-      "tier": "Legend",
-      "area": "MLB Game Odds",
-      "message": "No leaderboard items available to exercise leaderboard cap"
-    },
-    {
-      "status": "NOT_EXERCISED",
-      "tier": "Legend",
       "area": "NFL Game Odds",
       "message": "No rendered bet cards available to exercise per-game ranking cap"
     },
@@ -1845,13 +1843,13 @@
     {
       "status": "NOT_EXERCISED",
       "tier": "Legend",
-      "area": "NFL Player Props",
+      "area": "MLB Player Props",
       "message": "No current prop cards available to exercise visible-prop cap"
     },
     {
       "status": "NOT_EXERCISED",
       "tier": "Legend",
-      "area": "NFL Player Props",
+      "area": "MLB Player Props",
       "message": "No props leaderboard rows available to exercise leaderboard cap"
     },
     {
@@ -1859,28 +1857,14 @@
       "tier": "Legend",
       "area": "NBA Homepage Top Bet",
       "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
-      "text": "Loading...\n\nFetching top NBA game odds opportunity."
-    },
-    {
-      "status": "NOT_EXERCISED",
-      "tier": "Legend",
-      "area": "NHL Homepage Top Bet",
-      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
-      "text": "Loading...\n\nFetching top NHL game odds opportunity."
-    },
-    {
-      "status": "NOT_EXERCISED",
-      "tier": "Legend",
-      "area": "MLB Homepage Top Bet",
-      "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
-      "text": "Loading...\n\nFetching top MLB game odds opportunity."
+      "text": "No spotlight available right now."
     },
     {
       "status": "NOT_EXERCISED",
       "tier": "Legend",
       "area": "NFL Homepage Top Bet",
       "message": "No current Top Bet data rendered; authorization path could not be visually exercised",
-      "text": "Loading...\n\nFetching top NFL game odds opportunity."
+      "text": "No spotlight available right now."
     }
   ],
   "browserHealth": [
@@ -1889,13 +1873,13 @@
       "jsExceptions": [],
       "consoleErrors": [
         "Failed to load resource: the server responded with a status of 403 ()",
-        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5665:3)",
+        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5685:3)",
         "Failed to load resource: the server responded with a status of 403 ()",
-        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5670:3)",
+        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5690:3)",
         "Failed to load resource: the server responded with a status of 403 ()",
-        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5675:3)",
+        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5695:3)",
         "Failed to load resource: the server responded with a status of 403 ()",
-        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5680:3)"
+        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5700:3)"
       ],
       "failedRequests": [],
       "unexpectedHttpFailures": [],
@@ -1923,13 +1907,13 @@
       "jsExceptions": [],
       "consoleErrors": [
         "Failed to load resource: the server responded with a status of 403 ()",
-        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5665:3)",
+        "NBA props render error: Error: NBA premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNBAPropsPage (https://sportacularanalytics.com/script.js:5685:3)",
         "Failed to load resource: the server responded with a status of 403 ()",
-        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5670:3)",
+        "NHL props render error: Error: NHL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNHLPropsPage (https://sportacularanalytics.com/script.js:5690:3)",
         "Failed to load resource: the server responded with a status of 403 ()",
-        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5675:3)",
+        "MLB props render error: Error: MLB premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initMLBPropsPage (https://sportacularanalytics.com/script.js:5695:3)",
         "Failed to load resource: the server responded with a status of 403 ()",
-        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5680:3)"
+        "NFL props render error: Error: NFL premium props require All-Star or higher\n    at fetchLeagueProps (https://sportacularanalytics.com/script.js:2313:24)\n    at async renderPropsPage (https://sportacularanalytics.com/script.js:2617:7)\n    at async initNFLPropsPage (https://sportacularanalytics.com/script.js:5700:3)"
       ],
       "failedRequests": [],
       "unexpectedHttpFailures": [],
@@ -1978,10 +1962,10 @@
     }
   ],
   "summary": {
-    "pass": 258,
-    "fail": 4,
+    "pass": 262,
+    "fail": 0,
     "notExercised": 42,
-    "blockers": 4,
-    "status": "FAIL"
+    "blockers": 0,
+    "status": "PASS"
   }
 }

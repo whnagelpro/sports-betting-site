@@ -331,7 +331,7 @@ function refreshNFLScheduleSheet() {
   // ------------------------------------------
 
   const season = 2026;
-  const week = 5;
+  const week = 11;
   const seasonType = 2; // 1 = Preseason
 
   Logger.log(
@@ -7959,6 +7959,9 @@ function upsertNFLRowsByKeyForDateRange_(sheet, headers, newRows, keyColumnIndex
   );
 
   writeNFLOutputSheet_(sheet, headers, finalRows);
+
+  // Keep Game Date display consistent across all NFL game-log upserts.
+  sheet.getRange("A:A").setNumberFormat("yyyy-mm-dd");
 }
 
 function normalizeNFLSheetDateForCompare_(value) {
@@ -12807,13 +12810,29 @@ const NFL_DAILY_ANALYTICS_TEAM_MONTHS = [
 function getDefaultNFLDailyAnalyticsState_() {
 
   return {
-    stage: "PLAYER_GAME_LOGS",
+
+    pipelineVersion: "NFL_TEAM_BASED_V1",
+
+    runDate: getTodayString_(),
+
+    stage: "TEAM_GAME_LOGS_BY_TEAM",
+
+    teamIndex: 0,
+    teamIds: [],
+
     playerMonthIndex: 0,
     teamMonthIndex: 0,
+
     completed: false,
+
+    retryAttempts: 0,
+    suspended: false,
+
     lastSuccessfulStep: null,
     lastError: null,
+
     updatedAt: new Date().toISOString()
+
   };
 
 }
@@ -12823,32 +12842,40 @@ function getNFLDailyAnalyticsState_() {
   const properties =
     PropertiesService.getScriptProperties();
 
-  const raw =
-    properties.getProperty(
-      NFL_DAILY_ANALYTICS_STATE_KEY
-    );
+  const raw = properties.getProperty(
+    NFL_DAILY_ANALYTICS_STATE_KEY
+  );
 
   if (!raw) {
     return getDefaultNFLDailyAnalyticsState_();
   }
 
+  let parsed;
+
   try {
 
-    const parsed = JSON.parse(raw);
-
-    return {
-      ...getDefaultNFLDailyAnalyticsState_(),
-      ...parsed
-    };
+    parsed = JSON.parse(raw);
 
   } catch (error) {
 
-    Logger.log(
-      "NFL mother pipeline state could not be parsed. Resetting state."
+    throw new Error(
+      "NFL_PIPELINE_STATE_INVALID: malformed JSON."
     );
 
-    return getDefaultNFLDailyAnalyticsState_();
   }
+
+  if (
+    !parsed ||
+    typeof parsed !== "object" ||
+    Array.isArray(parsed) ||
+    typeof parsed.completed !== "boolean"
+  ) {
+    throw new Error(
+      "NFL_PIPELINE_STATE_INVALID: invalid saved state."
+    );
+  }
+
+  return parsed;
 
 }
 
@@ -12885,20 +12912,49 @@ function clearNFLDailyAnalyticsContinuationTriggers_() {
 
 }
 
-function scheduleNFLDailyAnalyticsContinuation_() {
+function scheduleNFLDailyAnalyticsContinuation_(delayMs) {
 
-  clearNFLDailyAnalyticsContinuationTriggers_();
+  const delay =
+    delayMs === undefined
+      ? 60 * 1000
+      : delayMs;
 
-  ScriptApp
+  if (
+    !Number.isInteger(delay) ||
+    delay < 60 * 1000
+  ) {
+    throw new Error(
+      "Invalid NFL continuation delay."
+    );
+  }
+
+  const existing = ScriptApp.getProjectTriggers()
+    .filter(trigger =>
+      trigger.getHandlerFunction() ===
+        NFL_DAILY_ANALYTICS_CONTINUATION_HANDLER
+    );
+
+  const replacement = ScriptApp
     .newTrigger(
       NFL_DAILY_ANALYTICS_CONTINUATION_HANDLER
     )
     .timeBased()
-    .after(60 * 1000)
+    .after(delay)
     .create();
 
+  const replacementId =
+    replacement.getUniqueId();
+
+  existing.forEach(trigger => {
+
+    if (trigger.getUniqueId() !== replacementId) {
+      ScriptApp.deleteTrigger(trigger);
+    }
+
+  });
+
   Logger.log(
-    "NFL mother pipeline continuation scheduled."
+    `NFL continuation scheduled in at least ${delay} ms.`
   );
 
 }
@@ -12978,324 +13034,408 @@ function continueNFLDailyAnalyticsPipeline() {
 
 function runNFLDailyAnalyticsPipeline() {
 
-  const lock =
-    LockService.getScriptLock();
+  const lock = LockService.getScriptLock();
 
   if (!lock.tryLock(5000)) {
 
     Logger.log(
-      "NFL mother pipeline is already running. Exiting duplicate execution."
+      "NFL mother pipeline: another execution holds the lock."
     );
 
     return;
 
   }
 
+  let state = null;
+  let attemptStarted = false;
+
   try {
 
-    const state =
-      getNFLDailyAnalyticsState_();
+    state = getNFLDailyAnalyticsState_();
+
+    if (
+      state.pipelineVersion !== "NFL_TEAM_BASED_V1"
+    ) {
+
+      throw new Error(
+        "NFL pipeline migration required: explicit legacy migration."
+      );
+
+    }
+
+    // Validate before rollover or processing.
+    validateNFLTeamPipelineState_(state);
+
+    const today = getTodayString_();
+
+    if (
+      state.completed &&
+      state.runDate !== today
+    ) {
+
+      state = getDefaultNFLDailyAnalyticsState_();
+
+      validateNFLTeamPipelineState_(state);
+
+    }
 
     if (state.completed) {
 
-      Logger.log(
-        "NFL daily analytics mother pipeline is already complete."
-      );
-
       clearNFLDailyAnalyticsContinuationTriggers_();
+
+      Logger.log(
+        "NFL mother pipeline already completed today."
+      );
 
       return;
 
     }
 
-    Logger.log(
-      `NFL mother pipeline starting/resuming. Stage: ${state.stage}`
-    );
-
-    // ------------------------------------------------------------------------
-    // PLAYER GAME LOGS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "PLAYER_GAME_LOGS") {
-
-      if (
-        state.playerMonthIndex <
-        NFL_DAILY_ANALYTICS_PLAYER_MONTHS.length
-      ) {
-
-        const month =
-          NFL_DAILY_ANALYTICS_PLAYER_MONTHS[
-            state.playerMonthIndex
-          ];
-
-        const success =
-          executeNFLDailyAnalyticsFunction_(
-            month.fn,
-            `Player Game Logs ${month.label}`,
-            state
-          );
-
-        if (success) {
-
-          state.playerMonthIndex += 1;
-
-          if (
-            state.playerMonthIndex >=
-            NFL_DAILY_ANALYTICS_PLAYER_MONTHS.length
-          ) {
-
-            state.stage =
-              "TEAM_GAME_LOGS";
-
-          }
-
-          saveNFLDailyAnalyticsState_(state);
-
-        }
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "TEAM_GAME_LOGS";
-
-      saveNFLDailyAnalyticsState_(state);
-
-    }
-
-    // ------------------------------------------------------------------------
-    // TEAM GAME LOGS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "TEAM_GAME_LOGS") {
-
-      if (
-        state.teamMonthIndex <
-        NFL_DAILY_ANALYTICS_TEAM_MONTHS.length
-      ) {
-
-        const month =
-          NFL_DAILY_ANALYTICS_TEAM_MONTHS[
-            state.teamMonthIndex
-          ];
-
-        const success =
-          executeNFLDailyAnalyticsFunction_(
-            month.fn,
-            `Team Game Logs ${month.label}`,
-            state
-          );
-
-        if (success) {
-
-          state.teamMonthIndex += 1;
-
-          if (
-            state.teamMonthIndex >=
-            NFL_DAILY_ANALYTICS_TEAM_MONTHS.length
-          ) {
-
-            state.stage =
-              "PLAYER_SEASON_STATS";
-
-          }
-
-          saveNFLDailyAnalyticsState_(state);
-
-        }
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "PLAYER_SEASON_STATS";
-
-      saveNFLDailyAnalyticsState_(state);
-
-    }
-
-    // ------------------------------------------------------------------------
-    // PLAYER SEASON STATS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "PLAYER_SEASON_STATS") {
-
-      const success =
-        executeNFLDailyAnalyticsFunction_(
-          "refreshNFLPlayerSeasonStatsSheet",
-          "Player Season Stats",
-          state
-        );
-
-      if (!success) {
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "TEAM_SEASON_STATS";
-
-      saveNFLDailyAnalyticsState_(state);
-
-    }
-
-    // ------------------------------------------------------------------------
-    // TEAM SEASON STATS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "TEAM_SEASON_STATS") {
-
-      const success =
-        executeNFLDailyAnalyticsFunction_(
-          "refreshNFLTeamSeasonStatsSheet",
-          "Team Season Stats",
-          state
-        );
-
-      if (!success) {
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "PLAYER_TRENDS";
-
-      saveNFLDailyAnalyticsState_(state);
-
-    }
-
-    // ------------------------------------------------------------------------
-    // PLAYER TRENDS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "PLAYER_TRENDS") {
-
-      const success =
-        executeNFLDailyAnalyticsFunction_(
-          "refreshNFLPlayerTrendsSheet",
-          "Player Trends",
-          state
-        );
-
-      if (!success) {
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "TEAM_TRENDS";
-
-      saveNFLDailyAnalyticsState_(state);
-
-    }
-
-    // ------------------------------------------------------------------------
-    // TEAM TRENDS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "TEAM_TRENDS") {
-
-      const success =
-        executeNFLDailyAnalyticsFunction_(
-          "refreshNFLTeamTrendsOutputSheet",
-          "Team Trends",
-          state
-        );
-
-      if (!success) {
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "TOP_PLAYER_TRENDS";
-
-      saveNFLDailyAnalyticsState_(state);
-
-    }
-
-    // ------------------------------------------------------------------------
-    // TOP PLAYER TRENDS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "TOP_PLAYER_TRENDS") {
-
-      const success =
-        executeNFLDailyAnalyticsFunction_(
-          "refreshNFLTopPlayerTrendsSheet",
-          "Top Player Trends",
-          state
-        );
-
-      if (!success) {
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "TOP_TEAM_TRENDS";
-
-      saveNFLDailyAnalyticsState_(state);
-
-    }
-
-    // ------------------------------------------------------------------------
-    // TOP TEAM TRENDS
-    // ------------------------------------------------------------------------
-
-    if (state.stage === "TOP_TEAM_TRENDS") {
-
-      const success =
-        executeNFLDailyAnalyticsFunction_(
-          "refreshNFLTopTeamTrendsSheet",
-          "Top Team Trends",
-          state
-        );
-
-      if (!success) {
-
-        scheduleNFLDailyAnalyticsContinuation_();
-
-        return;
-
-      }
-
-      state.stage =
-        "COMPLETE";
-
-      state.completed =
-        true;
+    if (
+      state.suspended ||
+      state.retryAttempts >= 3
+    ) {
+
+      state.suspended = true;
+
+      state.lastError =
+        state.lastError ||
+        "NFL retry limit reached; review required.";
 
       saveNFLDailyAnalyticsState_(state);
 
       clearNFLDailyAnalyticsContinuationTriggers_();
 
       Logger.log(
-        "NFL DAILY ANALYTICS MOTHER PIPELINE COMPLETE."
+        "NFL mother pipeline SUSPENDED — checkpoint preserved."
+      );
+
+      return;
+
+    }
+
+    // Install recovery before starting potentially lengthy work.
+    // The delay is intentionally longer than a normal execution.
+
+    scheduleNFLDailyAnalyticsContinuation_(15 * 60 * 1000);
+
+    // Persist the attempt before processing.
+    // A hard termination will therefore consume an attempt.
+
+    state.retryAttempts++;
+
+    saveNFLDailyAnalyticsState_(state);
+
+    attemptStarted = true;
+
+    if (state.stage === "TEAM_GAME_LOGS_BY_TEAM") {
+
+      if (!state.teamIds.length) {
+
+        const ids = getNFLPipelineTeamIds_();
+
+        const initialized = {
+          ...state,
+          teamIds: ids
+        };
+
+        validateNFLTeamPipelineState_(initialized);
+
+        saveNFLDailyAnalyticsState_(initialized);
+
+        state = initialized;
+
+      }
+
+      if (state.teamIndex >= state.teamIds.length) {
+
+        const next = {
+
+          ...state,
+          stage: "PLAYER_SEASON_STATS",
+          retryAttempts: 0,
+          suspended: false,
+          lastError: null
+
+        };
+
+        validateNFLTeamPipelineState_(next);
+
+        saveNFLDailyAnalyticsState_(next);
+
+        state = next;
+        attemptStarted = false;
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+        return;
+
+      }
+
+      const teamId = state.teamIds[state.teamIndex];
+
+      Logger.log(
+        `NFL mother pipeline: processing team ` +
+        `${state.teamIndex + 1}/32 (ID ${teamId}), ` +
+        `attempt ${state.retryAttempts}/3.`
+      );
+
+      const result = processNFLTeamGameLogs_(teamId);
+
+      if (
+        !result ||
+        result.teamId !== teamId ||
+        !["COMPLETE", "NO_COMPLETED_GAMES"]
+          .includes(result.status)
+      ) {
+
+        throw new Error(
+          "NFL mother pipeline: invalid team processing result."
+        );
+
+      }
+
+      if (
+        result.status === "COMPLETE" &&
+        (
+          !Number.isInteger(result.games) ||
+          result.games <= 0 ||
+          !Number.isInteger(result.playerRows) ||
+          result.playerRows <= 0 ||
+          result.teamRows !== result.games * 2
+        )
+      ) {
+
+        throw new Error(
+          "NFL mother pipeline: invalid completed team counts."
+        );
+
+      }
+
+      if (
+        result.status === "NO_COMPLETED_GAMES" &&
+        (
+          result.games !== 0 ||
+          result.playerRows !== 0 ||
+          result.teamRows !== 0
+        )
+      ) {
+
+        throw new Error(
+          "NFL mother pipeline: invalid empty team result."
+        );
+
+      }
+
+      const nextIndex = state.teamIndex + 1;
+
+      const next = {
+
+        ...state,
+
+        teamIndex: nextIndex,
+
+        stage:
+          nextIndex === state.teamIds.length
+            ? "PLAYER_SEASON_STATS"
+            : "TEAM_GAME_LOGS_BY_TEAM",
+
+        retryAttempts: 0,
+        suspended: false,
+        lastError: null,
+
+        lastSuccessfulStep:
+          `Team Game Logs ${nextIndex}/32 (ID ${teamId})`
+
+      };
+
+      validateNFLTeamPipelineState_(next);
+
+      saveNFLDailyAnalyticsState_(next);
+
+      state = next;
+      attemptStarted = false;
+
+      scheduleNFLDailyAnalyticsContinuation_();
+
+      return;
+
+    }
+
+    const stages = [
+
+      {
+        stage: "PLAYER_SEASON_STATS",
+        fn: "refreshNFLPlayerSeasonStatsSheet",
+        label: "Player Season Stats",
+        next: "TEAM_SEASON_STATS"
+      },
+
+      {
+        stage: "TEAM_SEASON_STATS",
+        fn: "refreshNFLTeamSeasonStatsSheet",
+        label: "Team Season Stats",
+        next: "PLAYER_TRENDS"
+      },
+
+      {
+        stage: "PLAYER_TRENDS",
+        fn: "refreshNFLPlayerTrendsSheet",
+        label: "Player Trends",
+        next: "TEAM_TRENDS"
+      },
+
+      {
+        stage: "TEAM_TRENDS",
+        fn: "refreshNFLTeamTrendsOutputSheet",
+        label: "Team Trends",
+        next: "TOP_PLAYER_TRENDS"
+      },
+
+      {
+        stage: "TOP_PLAYER_TRENDS",
+        fn: "refreshNFLTopPlayerTrendsSheet",
+        label: "Top Player Trends",
+        next: "TOP_TEAM_TRENDS"
+      },
+
+      {
+        stage: "TOP_TEAM_TRENDS",
+        fn: "refreshNFLTopTeamTrendsSheet",
+        label: "Top Team Trends",
+        next: "COMPLETE"
+      }
+
+    ];
+
+    const step = stages.find(
+      item => item.stage === state.stage
+    );
+
+    if (!step) {
+
+      throw new Error(
+        "NFL_PIPELINE_STATE_INVALID: unknown downstream stage."
       );
 
     }
+
+    const fn = globalThis[step.fn];
+
+    if (typeof fn !== "function") {
+
+      throw new Error(
+        `NFL mother pipeline function missing: ${step.fn}`
+      );
+
+    }
+
+    Logger.log(
+      `NFL mother pipeline: refreshing ${step.label}, ` +
+      `attempt ${state.retryAttempts}/3.`
+    );
+
+    fn();
+
+    const next = {
+
+      ...state,
+
+      stage: step.next,
+
+      completed: step.next === "COMPLETE",
+
+      retryAttempts: 0,
+      suspended: false,
+      lastError: null,
+      lastSuccessfulStep: step.label
+
+    };
+
+    validateNFLTeamPipelineState_(next);
+
+    saveNFLDailyAnalyticsState_(next);
+
+    state = next;
+    attemptStarted = false;
+
+    if (state.completed) {
+
+      clearNFLDailyAnalyticsContinuationTriggers_();
+
+      Logger.log(
+        "NFL mother pipeline COMPLETE — all 32 teams " +
+        "and downstream analytics refreshed."
+      );
+
+    } else {
+
+      scheduleNFLDailyAnalyticsContinuation_();
+
+    }
+
+  } catch (error) {
+
+    const message = String(error.message || error);
+
+    Logger.log(
+      `NFL mother pipeline error: ${message}`
+    );
+
+    const permanent =
+      message.includes("NFL_PIPELINE_STATE_INVALID") ||
+      message.includes("NFL pipeline migration required") ||
+      message.includes("NFL team inventory validation failed");
+
+    if (permanent) {
+
+      clearNFLDailyAnalyticsContinuationTriggers_();
+
+      throw error;
+
+    }
+
+    if (attemptStarted) {
+
+      // Read the durable checkpoint rather than risk overwriting
+      // successfully persisted progress with stale local state.
+
+      const checkpoint = getNFLDailyAnalyticsState_();
+
+      validateNFLTeamPipelineState_(checkpoint);
+
+      checkpoint.lastError = message.slice(0, 1000);
+
+      if (
+        !checkpoint.completed &&
+        checkpoint.retryAttempts >= 3
+      ) {
+
+        checkpoint.suspended = true;
+
+      }
+
+      validateNFLTeamPipelineState_(checkpoint);
+
+      saveNFLDailyAnalyticsState_(checkpoint);
+
+      if (checkpoint.suspended || checkpoint.completed) {
+
+        clearNFLDailyAnalyticsContinuationTriggers_();
+
+      } else {
+
+        scheduleNFLDailyAnalyticsContinuation_();
+
+      }
+
+    }
+
+    // If continuation scheduling failed after a successful
+    // checkpoint, leave the existing recovery trigger intact
+    // wherever possible.
+
+    throw error;
 
   } finally {
 
@@ -15157,7 +15297,8 @@ function testNFLLiveProductionIntegrity_P19D3A() {
     new Set([
       "Low",
       "Medium",
-      "High"
+      "High",
+      "Very High"
     ]);
 
 
@@ -16805,6 +16946,3193 @@ function testNFLLiveProductionIntegrity_P19D3A() {
 
 
   return summary;
+}
+
+// ============================================================================
+// SPORTACULAR V1.0
+// P19 D3B — NFL STANDARDIZED PRODUCTION EVIDENCE
+//
+// PURPOSE:
+// Convert the successful P19 D3A live-production audit into the standardized
+// nine-domain P19 evidence contract.
+//
+// READ-ONLY:
+// - Does NOT refresh Player Props
+// - Does NOT call the provider API
+// - Does NOT modify production data
+// - Does NOT modify formulas
+// - Does NOT modify scoring
+//
+// SOURCE:
+// testNFLLiveProductionIntegrity_P19D3A()
+// ============================================================================
+
+function runSportacularP19D3NFLProductionAudit() {
+
+  const startedAt =
+    new Date();
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P19 D3B NFL AUTOMATED AUDIT"
+  );
+
+  Logger.log(
+    "FOUR-LEAGUE PRODUCTION QA — NFL EVIDENCE"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  // ==========================================================================
+  // RUN D3A SOURCE AUDIT
+  // ==========================================================================
+
+  let sourceSummary =
+    null;
+
+
+  let sourceStatus =
+    "FAIL";
+
+
+  let sourceError =
+    null;
+
+
+  const sourceStartedAt =
+    new Date();
+
+
+  try {
+
+    if (
+      typeof testNFLLiveProductionIntegrity_P19D3A !==
+      "function"
+    ) {
+
+      throw new Error(
+        "Required source audit not found: testNFLLiveProductionIntegrity_P19D3A"
+      );
+    }
+
+
+    sourceSummary =
+      testNFLLiveProductionIntegrity_P19D3A();
+
+
+    if (
+      !sourceSummary ||
+      sourceSummary.pass !== true
+    ) {
+
+      throw new Error(
+        "P19 D3A did not return pass:true"
+      );
+    }
+
+
+    sourceStatus =
+      "PASS";
+
+  } catch (error) {
+
+    sourceError =
+      error &&
+      error.message
+        ? String(error.message)
+        : String(error);
+  }
+
+
+  const sourceDurationMs =
+    new Date().getTime() -
+    sourceStartedAt.getTime();
+
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+  Logger.log(
+    `${sourceStatus} | NFL-P19-D3-001 | ` +
+    `Live Production Integrity | ${sourceDurationMs} ms`
+  );
+
+
+  if (
+    sourceError
+  ) {
+
+    Logger.log(
+      `ERROR | ${sourceError}`
+    );
+  }
+
+
+  // ==========================================================================
+  // STANDARDIZED NINE-DOMAIN P19 EVIDENCE
+  // ==========================================================================
+
+  const sourcePassed =
+    sourceStatus === "PASS" &&
+    sourceSummary &&
+    sourceSummary.pass === true;
+
+
+  const productionRows =
+    sourcePassed &&
+    Number.isFinite(
+      Number(
+        sourceSummary.productionRows
+      )
+    )
+      ? Number(
+          sourceSummary.productionRows
+        )
+      : null;
+
+
+  const domains = {
+
+    STRUCTURE: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "Exact frozen 36-column A:AJ contract, exact headers, production sheet existence, and formula independence."
+    },
+
+
+    ROW_INTEGRITY: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "Complete live production scan verifies populated rows, required fields, finite numerics, and stale-boundary protection."
+    },
+
+
+    NULL_INTEGRITY: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "Unsupported NFL markets preserve null probability/EV behavior instead of fabricating analytics."
+    },
+
+
+    IDENTITY: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "Every live row preserves required Game Id, provider Id, Player Id, Vendor, and Prop Type identity."
+    },
+
+
+    DUPLICATES: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "Provider IDs are unique and exact A:AJ duplicate production rows are rejected."
+    },
+
+
+    PROBABILITY_EV: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "NFL probabilities preserve frozen bounds and complementarity; Best EV and Best Model Probability agree with the internal EV candidate."
+    },
+
+
+    SCORING: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "AE:AF risk semantics, AH:AI scoring semantics, and P15 master-scorer parity are verified against live production."
+    },
+
+
+    ACTIONABILITY: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "Final Best Side and Confidence Tier agree with the frozen P15 actionability decision."
+    },
+
+
+    NO_DATA_STATE: {
+
+      status:
+        sourcePassed
+          ? "PASS"
+          : "FAIL",
+
+      sourceTests: [
+        "testNFLLiveProductionIntegrity_P19D3A"
+      ],
+
+      productionRowsAudited:
+        productionRows,
+
+      notes:
+        "NFL currently has active production data; production-boundary checks confirm no stale A:AJ values survive below current output. Zero-row offseason behavior is not invoked by this active-data run."
+    }
+
+  };
+
+
+  // ==========================================================================
+  // DOMAIN REPORT
+  // ==========================================================================
+
+  const domainIds = [
+    "STRUCTURE",
+    "ROW_INTEGRITY",
+    "NULL_INTEGRITY",
+    "IDENTITY",
+    "DUPLICATES",
+    "PROBABILITY_EV",
+    "SCORING",
+    "ACTIONABILITY",
+    "NO_DATA_STATE"
+  ];
+
+
+  Logger.log(
+    ""
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "P19 D3B — NFL STANDARDIZED DOMAIN EVIDENCE"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  domainIds.forEach(
+    domainId => {
+
+      const domain =
+        domains[
+          domainId
+        ];
+
+
+      Logger.log(
+        `${domain.status.padEnd(4)} | ` +
+        `${domainId} | ` +
+        `${
+          domain.productionRowsAudited === null
+            ? "rows unavailable"
+            : domain.productionRowsAudited +
+              " production rows"
+        }`
+      );
+    }
+  );
+
+
+  const passedDomains =
+    domainIds.filter(
+      domainId =>
+        domains[
+          domainId
+        ].status ===
+          "PASS"
+    ).length;
+
+
+  const failedDomains =
+    domainIds.length -
+    passedDomains;
+
+
+  const blockers =
+    (
+      sourcePassed
+        ? 0
+        : 1
+    ) +
+    failedDomains;
+
+
+  const status =
+    blockers === 0
+      ? "PASS"
+      : "BLOCKED";
+
+
+  const finishedAt =
+    new Date();
+
+
+  const durationMs =
+    finishedAt.getTime() -
+    startedAt.getTime();
+
+
+  // ==========================================================================
+  // CONSOLIDATED REPORT
+  // ==========================================================================
+
+  Logger.log(
+    ""
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+  Logger.log(
+    "SPORTACULAR V1.0 — P19 D3B NFL CONSOLIDATED REPORT"
+  );
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  Logger.log(
+    "Source audits registered: 1"
+  );
+
+  Logger.log(
+    `Source audits passed: ${
+      sourcePassed
+        ? 1
+        : 0
+    }`
+  );
+
+  Logger.log(
+    `Source audits failed: ${
+      sourcePassed
+        ? 0
+        : 1
+    }`
+  );
+
+  Logger.log(
+    `Production rows audited: ${
+      productionRows === null
+        ? "unavailable"
+        : productionRows
+    }`
+  );
+
+  if (
+    sourcePassed
+  ) {
+
+    Logger.log(
+      `Probability rows audited: ${sourceSummary.probabilityRows}`
+    );
+
+    Logger.log(
+      `Candidate rows audited: ${sourceSummary.candidateRows}`
+    );
+
+    Logger.log(
+      `Scoring rows audited: ${sourceSummary.scoringRows}`
+    );
+
+    Logger.log(
+      `Actionable rows audited: ${sourceSummary.actionableRows}`
+    );
+
+    Logger.log(
+      `No Play rows audited: ${sourceSummary.noPlayRows}`
+    );
+
+    Logger.log(
+      `Unique provider IDs: ${sourceSummary.uniqueProviderIds}`
+    );
+  }
+
+
+  Logger.log(
+    `P19 domains: ${domainIds.length}`
+  );
+
+  Logger.log(
+    `P19 domains passed: ${passedDomains}`
+  );
+
+  Logger.log(
+    `P19 domains failed: ${failedDomains}`
+  );
+
+  Logger.log(
+    `Release blockers: ${blockers}`
+  );
+
+  Logger.log(
+    `Runtime: ${durationMs} ms`
+  );
+
+
+  Logger.log(
+    "------------------------------------------------------------"
+  );
+
+
+  Logger.log(
+    `NFL P19 D3B STATUS: ${status}`
+  );
+
+
+  if (
+    status === "PASS"
+  ) {
+
+    Logger.log(
+      "NFL P19 PRODUCTION EVIDENCE: PASS"
+    );
+
+    Logger.log(
+      "NFL IS READY TO REGISTER IN THE P19 RELEASE CONTROLLER."
+    );
+
+  } else {
+
+    Logger.log(
+      "NFL P19 PRODUCTION EVIDENCE: BLOCKED"
+    );
+
+    Logger.log(
+      "DO NOT REGISTER NFL AS PASS IN THE P19 RELEASE CONTROLLER."
+    );
+  }
+
+
+  Logger.log(
+    "============================================================"
+  );
+
+
+  return {
+
+    deployment:
+      "P19-D3B",
+
+    league:
+      "NFL",
+
+    suite:
+      "Four-League Production QA — NFL Evidence",
+
+    status:
+      status,
+
+    productionRowsAudited:
+      productionRows,
+
+    probabilityRowsAudited:
+      sourcePassed
+        ? sourceSummary.probabilityRows
+        : null,
+
+    candidateRowsAudited:
+      sourcePassed
+        ? sourceSummary.candidateRows
+        : null,
+
+    scoringRowsAudited:
+      sourcePassed
+        ? sourceSummary.scoringRows
+        : null,
+
+    actionableRowsAudited:
+      sourcePassed
+        ? sourceSummary.actionableRows
+        : null,
+
+    noPlayRowsAudited:
+      sourcePassed
+        ? sourceSummary.noPlayRows
+        : null,
+
+    uniqueProviderIds:
+      sourcePassed
+        ? sourceSummary.uniqueProviderIds
+        : null,
+
+    sourceAuditsRegistered:
+      1,
+
+    sourceAuditsPassed:
+      sourcePassed
+        ? 1
+        : 0,
+
+    sourceAuditsFailed:
+      sourcePassed
+        ? 0
+        : 1,
+
+    domainsRegistered:
+      domainIds.length,
+
+    domainsPassed:
+      passedDomains,
+
+    domainsFailed:
+      failedDomains,
+
+    blockers:
+      blockers,
+
+    durationMs:
+      durationMs,
+
+    domains:
+      domains,
+
+    sourceSummary:
+      sourceSummary,
+
+    sourceError:
+      sourceError
+  };
+}
+
+function testNFLTeamPipelineRetrievalFoundation() {
+
+  const startedAt = Date.now();
+
+  Logger.log(
+    "=== NFL STEP 6 — TEAM RETRIEVAL FOUNDATION ==="
+  );
+
+  const season = 2026;
+  const seasonType = 2;
+
+  let passed = 0;
+  let failed = 0;
+
+  function check(label, condition) {
+
+    Logger.log(
+      `${condition ? "PASS" : "FAIL"} | ${label}`
+    );
+
+    if (condition) {
+      passed++;
+    } else {
+      failed++;
+    }
+
+    return condition;
+
+  }
+
+  // --------------------------------------------------
+  // TEAM INVENTORY
+  // --------------------------------------------------
+
+  Logger.log("\n--- TEAM INVENTORY ---");
+
+  const teams = fetchAllNFLTeams_();
+
+  const validTeams = teams.filter(team =>
+    Number.isInteger(Number(team.id)) &&
+    Number(team.id) > 0 &&
+    String(getNFLTeamName_(team)).trim()
+  );
+
+  const uniqueIds = new Set(
+    validTeams.map(team => String(team.id))
+  );
+
+  const uniqueNames = new Set(
+    validTeams.map(team => getNFLTeamName_(team))
+  );
+
+  Logger.log(`Returned teams: ${teams.length}`);
+  Logger.log(`Valid teams: ${validTeams.length}`);
+  Logger.log(`Unique team IDs: ${uniqueIds.size}`);
+  Logger.log(`Unique team names: ${uniqueNames.size}`);
+
+  check(
+    "Exactly 32 NFL teams returned",
+    teams.length === 32
+  );
+
+  check(
+    "All team identities valid",
+    validTeams.length === teams.length
+  );
+
+  check(
+    "32 unique team IDs",
+    uniqueIds.size === 32
+  );
+
+  check(
+    "32 unique team names",
+    uniqueNames.size === 32
+  );
+
+  if (failed > 0) {
+
+    Logger.log(
+      "STATUS: REVIEW REQUIRED — TEAM INVENTORY"
+    );
+
+    return;
+
+  }
+
+  // --------------------------------------------------
+  // SELECT REPRESENTATIVE TEAM
+  // --------------------------------------------------
+
+  const selectedTeam = validTeams.find(team => {
+
+    const name =
+      getNFLTeamName_(team).toLowerCase();
+
+    return name.includes("arizona") &&
+      name.includes("cardinals");
+
+  });
+
+  if (!check(
+    "Arizona Cardinals located",
+    Boolean(selectedTeam)
+  )) {
+
+    Logger.log(
+      "STATUS: REVIEW REQUIRED — TEAM SELECTION"
+    );
+
+    return;
+
+  }
+
+  const teamId = String(selectedTeam.id);
+
+  Logger.log(
+    `Selected team: ${getNFLTeamName_(selectedTeam)}`
+  );
+
+  Logger.log(`Selected team ID: ${teamId}`);
+
+  // --------------------------------------------------
+  // TEAM-FILTERED GAME RETRIEVAL
+  // --------------------------------------------------
+
+  Logger.log("\n--- TEAM-FILTERED GAME RETRIEVAL ---");
+
+  const games = [];
+  const seenCursors = new Set();
+
+  let cursor = null;
+  let requests = 0;
+
+  do {
+
+    const params = {
+
+      "seasons[]": season,
+      "team_ids[]": teamId,
+      season_type: seasonType,
+      per_page: 100
+
+    };
+
+    if (cursor !== null) {
+      params.cursor = cursor;
+    }
+
+    if (requests >= 10) {
+
+      throw new Error(
+        "NFL diagnostic pagination safety limit reached."
+      );
+
+    }
+
+    const response = fetchApi_(
+      "/nfl/v1/games",
+      params
+    );
+
+    requests++;
+
+    if (!response || !Array.isArray(response.data)) {
+
+      throw new Error(
+        "Invalid NFL games response."
+      );
+
+    }
+
+    games.push(...response.data);
+
+    cursor = response.meta &&
+      response.meta.next_cursor != null
+        ? response.meta.next_cursor
+        : null;
+
+    if (cursor !== null) {
+
+      const cursorKey = String(cursor);
+
+      if (seenCursors.has(cursorKey)) {
+
+        throw new Error(
+          "Repeated NFL pagination cursor."
+        );
+
+      }
+
+      seenCursors.add(cursorKey);
+
+    }
+
+  } while (cursor !== null);
+
+  const unrelatedGames = games.filter(game => {
+
+    const homeId = String(
+      (game.home_team && game.home_team.id) ||
+      game.home_team_id ||
+      ""
+    );
+
+    const awayId = String(
+      (game.away_team && game.away_team.id) ||
+      (game.visitor_team && game.visitor_team.id) ||
+      game.away_team_id ||
+      game.visitor_team_id ||
+      ""
+    );
+
+    return homeId !== teamId &&
+      awayId !== teamId;
+
+  });
+
+  const invalidGames = games.filter(game =>
+    !game.id ||
+    !getNFLGameAZDate_(game)
+  );
+
+  const gameIds = new Set(
+    games.map(game => String(game.id))
+  );
+
+  const completedGames =
+    games.filter(isCompletedNFLGame_);
+
+  const incompleteGames =
+    games.filter(game =>
+      !isCompletedNFLGame_(game)
+    );
+
+  const completedDates = completedGames
+    .map(getNFLGameAZDate_)
+    .sort();
+
+  Logger.log(`Season: ${season}`);
+  Logger.log(`Requested season type: ${seasonType}`);
+  Logger.log(`API requests: ${requests}`);
+  Logger.log(`Returned games: ${games.length}`);
+  Logger.log(`Unique game IDs: ${gameIds.size}`);
+  Logger.log(`Completed games: ${completedGames.length}`);
+  Logger.log(`Incomplete games: ${incompleteGames.length}`);
+  Logger.log(`Unrelated games: ${unrelatedGames.length}`);
+  Logger.log(`Invalid games: ${invalidGames.length}`);
+
+  check(
+    "Team-filtered games returned",
+    games.length > 0
+  );
+
+  check(
+    "No unrelated games",
+    unrelatedGames.length === 0
+  );
+
+  check(
+    "No duplicate game IDs",
+    gameIds.size === games.length
+  );
+
+  check(
+    "All game identities and dates valid",
+    invalidGames.length === 0
+  );
+
+  check(
+    "Completed regular-season game candidates found",
+    completedGames.length > 0
+  );
+
+  check(
+    "Plausible regular-season schedule size",
+    games.length <= 17
+  );
+
+  // --------------------------------------------------
+  // GAME SCHEMA DISCOVERY
+  // --------------------------------------------------
+
+  Logger.log("\n--- GAME SCHEMA DISCOVERY ---");
+
+  if (completedGames.length > 0) {
+
+    const sample = completedGames[0];
+
+    Logger.log(
+      `First completed date: ${completedDates[0]}`
+    );
+
+    Logger.log(
+      `Last completed date: ${
+        completedDates[completedDates.length - 1]
+      }`
+    );
+
+    Logger.log(
+      `Sample game ID: ${sample.id}`
+    );
+
+    Logger.log(
+      `Sample game status: ${sample.status || ""}`
+    );
+
+    Logger.log(
+      `Sample game status_state: ${sample.status_state || ""}`
+    );
+
+    Logger.log(
+      `Sample game season: ${sample.season ?? "NOT PROVIDED"}`
+    );
+
+    Logger.log(
+      `Sample game season_type: ${sample.season_type ?? "NOT PROVIDED"}`
+    );
+
+    Logger.log(
+      `Game object fields: ${Object.keys(sample).join(", ")}`
+    );
+
+  }
+
+  // --------------------------------------------------
+  // FINAL RESULTS
+  // --------------------------------------------------
+
+  Logger.log("\n--- FINAL RESULTS ---");
+
+  Logger.log(`PASSED: ${passed}`);
+  Logger.log(`FAILED: ${failed}`);
+
+  Logger.log(
+    `Duration: ${Date.now() - startedAt} ms`
+  );
+
+  Logger.log(
+    `STATUS: ${
+      failed === 0
+        ? "PASS — TEAM RETRIEVAL FOUNDATION"
+        : "REVIEW REQUIRED"
+    }`
+  );
+
+  Logger.log("PRODUCTION DATA MODIFIED: NO");
+  Logger.log("PIPELINE STATE MODIFIED: NO");
+  Logger.log("TRIGGERS MODIFIED: NO");
+
+}
+
+function testNFLTeamPipelineSharedStatisticsCoverage() {
+
+  const startedAt = Date.now();
+
+  Logger.log(
+    "=== NFL STEP 7 — SHARED STATISTICS COVERAGE ==="
+  );
+
+  const season = 2026;
+  const seasonType = 2;
+  const teamId = "33";
+
+  let passed = 0;
+  let failed = 0;
+
+  function check(label, condition) {
+
+    Logger.log(
+      `${condition ? "PASS" : "FAIL"} | ${label}`
+    );
+
+    if (condition) {
+      passed++;
+    } else {
+      failed++;
+    }
+
+    return condition;
+
+  }
+
+  // --------------------------------------------------
+  // RETRIEVE TEAM GAMES
+  // --------------------------------------------------
+
+  const allGames = [];
+  const seenCursors = new Set();
+
+  let cursor = null;
+  let requests = 0;
+
+  do {
+
+    if (requests >= 10) {
+
+      throw new Error(
+        "NFL diagnostic pagination safety limit reached."
+      );
+
+    }
+
+    const params = {
+      "seasons[]": season,
+      "team_ids[]": teamId,
+      season_type: seasonType,
+      per_page: 100
+    };
+
+    if (cursor !== null) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_(
+      "/nfl/v1/games",
+      params
+    );
+
+    requests++;
+
+    if (!response || !Array.isArray(response.data)) {
+
+      throw new Error(
+        "Invalid NFL games response."
+      );
+
+    }
+
+    allGames.push(...response.data);
+
+    cursor =
+      response.meta &&
+      response.meta.next_cursor != null
+        ? response.meta.next_cursor
+        : null;
+
+    if (cursor !== null) {
+
+      const key = String(cursor);
+
+      if (seenCursors.has(key)) {
+
+        throw new Error(
+          "Repeated NFL pagination cursor."
+        );
+
+      }
+
+      seenCursors.add(key);
+
+    }
+
+  } while (cursor !== null);
+
+  const games = allGames.filter(
+    isCompletedNFLGame_
+  );
+
+  const gameIds = games.map(
+    game => String(game.id)
+  );
+
+  const gameMap = new Map(
+    games.map(game => [
+      String(game.id),
+      game
+    ])
+  );
+
+  Logger.log("\n--- COMPLETED GAME INVENTORY ---");
+
+  Logger.log(`Selected team ID: ${teamId}`);
+  Logger.log(`Completed games: ${games.length}`);
+
+  check(
+    "Completed games available",
+    games.length > 0
+  );
+
+  check(
+    "Unique completed game IDs",
+    gameMap.size === games.length
+  );
+
+  check(
+    "Completed games belong to requested team",
+    games.every(game => {
+
+      const homeId = String(
+        game.home_team?.id || ""
+      );
+
+      const awayId = String(
+        game.away_team?.id ||
+        game.visitor_team?.id ||
+        ""
+      );
+
+      return homeId === teamId ||
+        awayId === teamId;
+
+    })
+  );
+
+  check(
+    "All completed games belong to the 2026 season",
+    games.every(game =>
+      Number(game.season) === season &&
+      game.postseason === false
+    )
+  );
+
+  if (failed > 0) {
+
+    Logger.log(
+      "STATUS: REVIEW REQUIRED — GAME INVENTORY"
+    );
+
+    return;
+
+  }
+
+  // --------------------------------------------------
+  // SHARED STATISTICS RETRIEVAL
+  // --------------------------------------------------
+
+  const statsStartedAt = Date.now();
+
+  const statRows =
+    fetchAllNFLStatsForGameIds_(
+      gameIds,
+      season,
+      seasonType
+    );
+
+  Logger.log("\n--- SHARED STATISTICS INVENTORY ---");
+
+  Logger.log(
+    `Statistics returned: ${statRows.length}`
+  );
+
+  Logger.log(
+    `Statistics retrieval duration: ${
+      Date.now() - statsStartedAt
+    } ms`
+  );
+
+  check(
+    "Statistics returned",
+    statRows.length > 0
+  );
+
+  // --------------------------------------------------
+  // VALIDATE STATISTICS COVERAGE
+  // --------------------------------------------------
+
+  const eligiblePositions = new Set([
+    "QB",
+    "QUARTERBACK",
+    "RB",
+    "RUNNING BACK",
+    "WR",
+    "WIDE RECEIVER",
+    "TE",
+    "TIGHT END"
+  ]);
+
+  const coverage = new Map();
+
+  const playerKeys = new Set();
+
+  let invalidGameIds = 0;
+  let unexpectedGameIds = 0;
+  let invalidTeamNames = 0;
+  let invalidEligiblePlayers = 0;
+  let duplicateEligiblePlayers = 0;
+  let eligiblePlayerRows = 0;
+
+  games.forEach(game => {
+
+    const homeTeam =
+      getNFLHomeTeamNameFromGame_(game);
+
+    const awayTeam =
+      getNFLAwayTeamNameFromGame_(game);
+
+    coverage.set(String(game.id), {
+
+      homeTeam,
+      awayTeam,
+
+      homeStats: 0,
+      awayStats: 0,
+
+      homeEligiblePlayers: 0,
+      awayEligiblePlayers: 0
+
+    });
+
+  });
+
+  statRows.forEach(stat => {
+
+    const gameId = String(
+      stat.game_id ||
+      stat.game?.id ||
+      ""
+    ).trim();
+
+    if (!gameId) {
+
+      invalidGameIds++;
+
+      return;
+
+    }
+
+    if (!gameMap.has(gameId)) {
+
+      unexpectedGameIds++;
+
+      return;
+
+    }
+
+    const record = coverage.get(gameId);
+
+    const teamName =
+      getNFLTeamName_(stat.team || {}) ||
+      stat.team_name ||
+      "";
+
+    const isHome =
+      teamName === record.homeTeam;
+
+    const isAway =
+      teamName === record.awayTeam;
+
+    if (!teamName || (!isHome && !isAway)) {
+
+      invalidTeamNames++;
+
+      return;
+
+    }
+
+    if (isHome) {
+      record.homeStats++;
+    }
+
+    if (isAway) {
+      record.awayStats++;
+    }
+
+    const position = String(
+      stat.player?.position ||
+      stat.position ||
+      ""
+    ).trim().toUpperCase();
+
+    if (!eligiblePositions.has(position)) {
+      return;
+    }
+
+    eligiblePlayerRows++;
+
+    const playerId = String(
+      stat.player_id ||
+      stat.player?.id ||
+      ""
+    ).trim();
+
+    const playerName = String(
+      getNFLPlayerNameFromStat_(stat) ||
+      ""
+    ).trim();
+
+    if (!playerId || !playerName) {
+
+      invalidEligiblePlayers++;
+
+      return;
+
+    }
+
+    const key = JSON.stringify([
+      gameId,
+      playerId
+    ]);
+
+    if (playerKeys.has(key)) {
+
+      duplicateEligiblePlayers++;
+
+    }
+
+    playerKeys.add(key);
+
+    if (isHome) {
+      record.homeEligiblePlayers++;
+    }
+
+    if (isAway) {
+      record.awayEligiblePlayers++;
+    }
+
+  });
+
+  // --------------------------------------------------
+  // PER-GAME COVERAGE
+  // --------------------------------------------------
+
+  Logger.log("\n--- PER-GAME COVERAGE ---");
+
+  let gamesWithBothTeams = 0;
+  let gamesWithBothEligibleTeams = 0;
+
+  coverage.forEach((record, gameId) => {
+
+    const bothTeams =
+      record.homeStats > 0 &&
+      record.awayStats > 0;
+
+    const bothEligibleTeams =
+      record.homeEligiblePlayers > 0 &&
+      record.awayEligiblePlayers > 0;
+
+    if (bothTeams) {
+      gamesWithBothTeams++;
+    }
+
+    if (bothEligibleTeams) {
+      gamesWithBothEligibleTeams++;
+    }
+
+    Logger.log(
+      `${gameId} | ` +
+      `${record.awayTeam} @ ${record.homeTeam} | ` +
+      `Stats: ${record.awayStats}/${record.homeStats} | ` +
+      `Eligible players: ` +
+      `${record.awayEligiblePlayers}/` +
+      `${record.homeEligiblePlayers}`
+    );
+
+  });
+
+  // --------------------------------------------------
+  // AGGREGATE VALIDATION
+  // --------------------------------------------------
+
+  Logger.log("\n--- STATISTICS VALIDATION ---");
+
+  Logger.log(`Total statistic rows: ${statRows.length}`);
+  Logger.log(`Eligible player rows: ${eligiblePlayerRows}`);
+  Logger.log(`Unique eligible player keys: ${playerKeys.size}`);
+  Logger.log(`Invalid game IDs: ${invalidGameIds}`);
+  Logger.log(`Unexpected game IDs: ${unexpectedGameIds}`);
+  Logger.log(`Invalid team names: ${invalidTeamNames}`);
+  Logger.log(`Invalid eligible players: ${invalidEligiblePlayers}`);
+  Logger.log(`Duplicate eligible players: ${duplicateEligiblePlayers}`);
+
+  Logger.log(
+    `Games with both teams represented: ` +
+    `${gamesWithBothTeams}/${games.length}`
+  );
+
+  Logger.log(
+    `Games with eligible players on both teams: ` +
+    `${gamesWithBothEligibleTeams}/${games.length}`
+  );
+
+  check(
+    "All statistic game IDs valid",
+    invalidGameIds === 0
+  );
+
+  check(
+    "No unexpected statistic game IDs",
+    unexpectedGameIds === 0
+  );
+
+  check(
+    "All statistic team names resolve correctly",
+    invalidTeamNames === 0
+  );
+
+  check(
+    "All games contain statistics for both teams",
+    gamesWithBothTeams === games.length
+  );
+
+  check(
+    "All games contain eligible players for both teams",
+    gamesWithBothEligibleTeams === games.length
+  );
+
+  check(
+    "All eligible players have valid identities",
+    invalidEligiblePlayers === 0
+  );
+
+  check(
+    "No duplicate eligible player keys",
+    duplicateEligiblePlayers === 0
+  );
+
+  // --------------------------------------------------
+  // SCHEMA DISCOVERY
+  // --------------------------------------------------
+
+  Logger.log("\n--- STATISTICS SCHEMA DISCOVERY ---");
+
+  if (statRows.length > 0) {
+
+    const sample = statRows[0];
+
+    Logger.log(
+      `Statistic fields: ${
+        Object.keys(sample).join(", ")
+      }`
+    );
+
+    Logger.log(
+      `Player fields: ${
+        Object.keys(sample.player || {}).join(", ")
+      }`
+    );
+
+    Logger.log(
+      `Team fields: ${
+        Object.keys(sample.team || {}).join(", ")
+      }`
+    );
+
+  }
+
+  // --------------------------------------------------
+  // FINAL RESULTS
+  // --------------------------------------------------
+
+  Logger.log("\n--- FINAL RESULTS ---");
+
+  Logger.log(`PASSED: ${passed}`);
+  Logger.log(`FAILED: ${failed}`);
+
+  Logger.log(
+    `Duration: ${Date.now() - startedAt} ms`
+  );
+
+  Logger.log(
+    `STATUS: ${
+      failed === 0
+        ? "PASS — SHARED STATISTICS COVERAGE"
+        : "REVIEW REQUIRED"
+    }`
+  );
+
+  Logger.log("PRODUCTION DATA MODIFIED: NO");
+  Logger.log("PIPELINE STATE MODIFIED: NO");
+  Logger.log("TRIGGERS MODIFIED: NO");
+
+}
+
+function testNFLTeamPipelineProductionReadiness() {
+
+  const started = Date.now();
+
+  Logger.log(
+    "=== NFL STEP 14A — PRODUCTION READINESS DIAGNOSTIC ==="
+  );
+
+  let passed = 0;
+  let failed = 0;
+  let warnings = 0;
+
+  function check(label, condition) {
+
+    if (condition) {
+
+      passed++;
+      Logger.log(`PASS | ${label}`);
+
+    } else {
+
+      failed++;
+      Logger.log(`FAIL | ${label}`);
+
+    }
+
+  }
+
+  function warn(message) {
+
+    warnings++;
+    Logger.log(`WARNING | ${message}`);
+
+  }
+
+  function fingerprint(value) {
+
+    return Utilities.computeDigest(
+      Utilities.DigestAlgorithm.SHA_256,
+      JSON.stringify(value),
+      Utilities.Charset.UTF_8
+    ).map(byte =>
+      ((byte + 256) % 256)
+        .toString(16)
+        .padStart(2, "0")
+    ).join("");
+
+  }
+
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+
+    Logger.log(
+      "STATUS: DEFERRED — ANOTHER EXECUTION HOLDS THE LOCK"
+    );
+
+    return;
+
+  }
+
+  try {
+
+    const properties =
+      PropertiesService.getScriptProperties();
+
+    const stateBefore = properties.getProperty(
+      NFL_DAILY_ANALYTICS_STATE_KEY
+    );
+
+    function triggerSnapshot() {
+
+      return ScriptApp.getProjectTriggers()
+        .map(trigger => ({
+
+          handler: trigger.getHandlerFunction(),
+          event: String(trigger.getEventType()),
+          id: trigger.getUniqueId()
+
+        }))
+        .sort((a, b) => a.id.localeCompare(b.id));
+
+    }
+
+    const triggersBefore = triggerSnapshot();
+
+    Logger.log("\n--- PRODUCTION PIPELINE STATE ---");
+
+    let state = null;
+
+    if (stateBefore) {
+
+      try {
+
+        state = JSON.parse(stateBefore);
+
+        check(
+          "Saved pipeline state successfully parsed",
+          !!state &&
+          typeof state === "object" &&
+          !Array.isArray(state)
+        );
+
+        Logger.log(JSON.stringify(state, null, 2));
+
+      } catch (error) {
+
+        check("Saved pipeline state successfully parsed", false);
+
+        Logger.log(String(error));
+
+      }
+
+    } else {
+
+      Logger.log("No saved pipeline state exists.");
+
+    }
+
+    check(
+      "Legacy pipeline is complete or uninitialized",
+      !stateBefore ||
+      (
+        !!state &&
+        state.completed === true &&
+        state.stage === "COMPLETE"
+      )
+    );
+
+    Logger.log("\n--- PRODUCTION TRIGGER INVENTORY ---");
+
+    triggersBefore.forEach(trigger => {
+
+      Logger.log(
+        `${trigger.handler} | ${trigger.event}`
+      );
+
+    });
+
+    const motherTriggers = triggersBefore.filter(
+      trigger =>
+        trigger.handler === "runNFLDailyAnalyticsPipeline"
+    );
+
+    const continuationTriggers = triggersBefore.filter(
+      trigger =>
+        trigger.handler ===
+        "continueNFLDailyAnalyticsPipeline"
+    );
+
+    const resetTriggers = triggersBefore.filter(
+      trigger =>
+        trigger.handler === "resetNFLDailyAnalyticsPipeline"
+    );
+
+    Logger.log(
+      `Total project triggers: ${triggersBefore.length}`
+    );
+
+    Logger.log(
+      `Permanent mother triggers: ${motherTriggers.length}`
+    );
+
+    Logger.log(
+      `Continuation triggers: ${continuationTriggers.length}`
+    );
+
+    Logger.log(
+      `Legacy reset triggers: ${resetTriggers.length}`
+    );
+
+    check(
+      "Exactly one permanent mother trigger",
+      motherTriggers.length === 1
+    );
+
+    check(
+      "No outstanding continuation triggers",
+      continuationTriggers.length === 0
+    );
+
+    if (resetTriggers.length > 0) {
+
+      warn(
+        "Legacy reset trigger must be retired during migration."
+      );
+
+    }
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    const specifications = [
+
+      {
+
+        name: "NFL Player Game Logs",
+
+        headers: [
+          "Game Date",
+          "Game ID",
+          "Player ID",
+          "Player Name",
+          "Team",
+          "Opponent",
+          "Passing Yards",
+          "Passing TDs",
+          "Interceptions",
+          "Completions",
+          "Pass Attempts",
+          "Rushing Yards",
+          "Rushing Attempts",
+          "Rushing TDs",
+          "Receptions",
+          "Receiving Yards",
+          "Receiving TDs"
+        ],
+
+        keys: [1, 2],
+        required: [0, 1, 2, 3, 4, 5],
+        statisticStart: 6,
+        teamColumn: 4
+
+      },
+
+      {
+
+        name: "NFL Team Game Logs",
+
+        headers: [
+          "Game Date",
+          "Game ID",
+          "Team",
+          "Opponent",
+          "Points For",
+          "Points Allowed",
+          "Passing Yards",
+          "Rushing Yards",
+          "Turnovers",
+          "Sacks"
+        ],
+
+        keys: [1, 2],
+        required: [0, 1, 2, 3],
+        statisticStart: 4,
+        teamColumn: 2
+
+      }
+
+    ];
+
+    const inventories = {};
+    const sheetFingerprints = {};
+
+    specifications.forEach(spec => {
+
+      Logger.log(`\n--- ${spec.name.toUpperCase()} ---`);
+
+      const sheet = ss.getSheetByName(spec.name);
+
+      check(`${spec.name}: sheet exists`, !!sheet);
+
+      if (!sheet) return;
+
+      const values = sheet.getDataRange().getValues();
+
+      sheetFingerprints[spec.name] = fingerprint(values);
+
+      const headers = values[0] || [];
+
+      const rows = values.slice(1).filter(row =>
+        row.some(value =>
+          value !== "" &&
+          value !== null &&
+          value !== undefined
+        )
+      );
+
+      check(
+        `${spec.name}: exact header schema`,
+        headers.length === spec.headers.length &&
+        spec.headers.every(
+          (header, index) => headers[index] === header
+        )
+      );
+
+      check(
+        `${spec.name}: contains historical records`,
+        rows.length > 0
+      );
+
+      const keys = new Set();
+      const games = new Set();
+      const teams = new Set();
+      const dates = [];
+      const gameTeams = new Map();
+
+      let duplicateKeys = 0;
+      let missingRequiredRows = 0;
+      let invalidStatCells = 0;
+      let invalidDates = 0;
+
+      rows.forEach(row => {
+
+        const key = JSON.stringify(
+          spec.keys.map(index =>
+            String(row[index] ?? "").trim()
+          )
+        );
+
+        if (keys.has(key)) {
+
+          duplicateKeys++;
+
+        }
+
+        keys.add(key);
+
+        if (spec.required.some(index =>
+          String(row[index] ?? "").trim() === ""
+        )) {
+
+          missingRequiredRows++;
+
+        }
+
+        row.slice(spec.statisticStart).forEach(value => {
+
+          if (
+            typeof value !== "number" ||
+            !Number.isFinite(value)
+          ) {
+
+            invalidStatCells++;
+
+          }
+
+        });
+
+        const date =
+          normalizeNFLSheetDateForCompare_(row[0]);
+
+        if (
+          typeof date !== "string" ||
+          !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+          !Number.isFinite(Date.parse(date)) ||
+          new Date(date).toISOString().slice(0, 10) !== date
+        ) {
+
+          invalidDates++;
+
+        } else {
+
+          dates.push(date);
+
+        }
+
+        const gameId = String(row[1] ?? "").trim();
+
+        const team = String(
+          row[spec.teamColumn] ?? ""
+        ).trim();
+
+        if (gameId && team) {
+
+          games.add(gameId);
+          teams.add(team);
+
+          if (!gameTeams.has(gameId)) {
+
+            gameTeams.set(gameId, new Set());
+
+          }
+
+          gameTeams.get(gameId).add(team);
+
+        }
+
+      });
+
+      dates.sort();
+
+      const incompleteGames = Array.from(
+        gameTeams.values()
+      ).filter(teamSet => teamSet.size !== 2).length;
+
+      Logger.log(`Historical data rows: ${rows.length}`);
+      Logger.log(`Unique record keys: ${keys.size}`);
+      Logger.log(`Distinct games: ${games.size}`);
+      Logger.log(`Distinct teams: ${teams.size}`);
+      Logger.log(`Duplicate keys: ${duplicateKeys}`);
+      Logger.log(`Missing required rows: ${missingRequiredRows}`);
+      Logger.log(`Invalid statistic cells: ${invalidStatCells}`);
+      Logger.log(`Invalid dates: ${invalidDates}`);
+      Logger.log(`Games without two teams: ${incompleteGames}`);
+      Logger.log(`Earliest date: ${dates[0] || "N/A"}`);
+      Logger.log(`Latest date: ${dates[dates.length - 1] || "N/A"}`);
+      Logger.log(`SHA-256: ${sheetFingerprints[spec.name]}`);
+
+      check(
+        `${spec.name}: no duplicate keys`,
+        duplicateKeys === 0
+      );
+
+      check(
+        `${spec.name}: no missing required fields`,
+        missingRequiredRows === 0
+      );
+
+      check(
+        `${spec.name}: valid statistic cells`,
+        invalidStatCells === 0
+      );
+
+      check(
+        `${spec.name}: valid game dates`,
+        invalidDates === 0
+      );
+
+      check(
+        `${spec.name}: all 32 teams represented`,
+        teams.size === 32
+      );
+
+      check(
+        `${spec.name}: two participating teams per game`,
+        incompleteGames === 0
+      );
+
+      inventories[spec.name] = {
+
+        rowCount: rows.length,
+        games: games,
+        keys: keys,
+        gameTeams: gameTeams
+
+      };
+
+    });
+
+    Logger.log("\n--- CROSS-SHEET GAME COVERAGE ---");
+
+    const player = inventories["NFL Player Game Logs"];
+    const team = inventories["NFL Team Game Logs"];
+
+    if (player && team) {
+
+      const playerOnly = Array.from(player.games)
+        .filter(id => !team.games.has(id));
+
+      const teamOnly = Array.from(team.games)
+        .filter(id => !player.games.has(id));
+
+      const mismatchedTeams = Array.from(player.games)
+        .filter(id => {
+
+          if (!team.gameTeams.has(id)) return false;
+
+          const playerTeams = player.gameTeams.get(id);
+          const teamTeams = team.gameTeams.get(id);
+
+          return playerTeams.size !== teamTeams.size ||
+            Array.from(playerTeams).some(
+              name => !teamTeams.has(name)
+            );
+
+        });
+
+      Logger.log(`Player-only game IDs: ${playerOnly.length}`);
+      Logger.log(`Team-only game IDs: ${teamOnly.length}`);
+      Logger.log(`Mismatched game teams: ${mismatchedTeams.length}`);
+
+      check(
+        "Player and team sheets cover identical games",
+        playerOnly.length === 0 &&
+        teamOnly.length === 0
+      );
+
+      check(
+        "Player and team sheets identify identical participating teams",
+        mismatchedTeams.length === 0
+      );
+
+      check(
+        "Exactly two team game-log rows per game",
+        team.rowCount === team.games.size * 2
+      );
+
+    }
+
+    Logger.log("\n--- DOWNSTREAM SHEET INVENTORY ---");
+
+    ss.getSheets().forEach(sheet => {
+
+      const name = sheet.getName();
+
+      if (
+        /season stats|trends/i.test(name)
+      ) {
+
+        Logger.log(
+          `${name} | Data rows: ` +
+          `${Math.max(0, sheet.getLastRow() - 1)} | ` +
+          `Columns: ${sheet.getLastColumn()}`
+        );
+
+      }
+
+    });
+
+    Logger.log("\n--- READ-ONLY INTEGRITY ---");
+
+    Object.keys(sheetFingerprints).forEach(name => {
+
+      const current = ss.getSheetByName(name)
+        .getDataRange()
+        .getValues();
+
+      check(
+        `${name}: data fingerprint unchanged`,
+        fingerprint(current) === sheetFingerprints[name]
+      );
+
+    });
+
+    check(
+      "Production pipeline state unchanged",
+      properties.getProperty(
+        NFL_DAILY_ANALYTICS_STATE_KEY
+      ) === stateBefore
+    );
+
+    check(
+      "Production trigger inventory unchanged",
+      JSON.stringify(triggerSnapshot()) ===
+      JSON.stringify(triggersBefore)
+    );
+
+    Logger.log("\n--- FINAL RESULTS ---");
+    Logger.log(`TOTAL CHECKS: ${passed + failed}`);
+    Logger.log(`PASSED: ${passed}`);
+    Logger.log(`FAILED: ${failed}`);
+    Logger.log(`WARNINGS: ${warnings}`);
+    Logger.log(`DURATION MS: ${Date.now() - started}`);
+
+    Logger.log(
+      failed === 0
+        ? "STATUS: PASS — PRODUCTION BASELINE VERIFIED"
+        : "STATUS: REVIEW REQUIRED — PRODUCTION BASELINE"
+    );
+
+    Logger.log("\n--- SAFETY ---");
+    Logger.log("LIVE API REQUESTS: 0");
+    Logger.log("SPREADSHEET DATA WRITES: 0");
+    Logger.log("PIPELINE STATE WRITES: 0");
+    Logger.log("TRIGGER CHANGES: 0");
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
+
+function backupNFLTeamPipelineProductionData() {
+
+  const started = Date.now();
+
+  Logger.log(
+    "=== NFL STEP 14B — PRODUCTION DATA RECOVERY BACKUP ==="
+  );
+
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+
+    Logger.log(
+      "STATUS: DEFERRED — ANOTHER EXECUTION HOLDS THE LOCK"
+    );
+
+    return;
+
+  }
+
+  try {
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    const properties =
+      PropertiesService.getScriptProperties();
+
+    const stateBefore = properties.getProperty(
+      NFL_DAILY_ANALYTICS_STATE_KEY
+    );
+
+    function fingerprint(value) {
+
+      return Utilities.computeDigest(
+        Utilities.DigestAlgorithm.SHA_256,
+        JSON.stringify(value),
+        Utilities.Charset.UTF_8
+      ).map(byte =>
+        ((byte + 256) % 256)
+          .toString(16)
+          .padStart(2, "0")
+      ).join("");
+
+    }
+
+    function triggerSnapshot() {
+
+      return ScriptApp.getProjectTriggers()
+        .map(trigger => ({
+
+          handler: trigger.getHandlerFunction(),
+          event: String(trigger.getEventType()),
+          id: trigger.getUniqueId()
+
+        }))
+        .sort((a, b) => a.id.localeCompare(b.id));
+
+    }
+
+    const triggersBefore = triggerSnapshot();
+
+    if (!stateBefore) {
+
+      throw new Error(
+        "Expected unfinished legacy state is missing."
+      );
+
+    }
+
+    const state = JSON.parse(stateBefore);
+
+    if (
+      state.completed !== false ||
+      state.stage !== "TEAM_GAME_LOGS" ||
+      state.playerMonthIndex !== 7 ||
+      state.teamMonthIndex !== 0 ||
+      state.updatedAt !== "2026-11-15T08:27:12.416Z"
+    ) {
+
+      throw new Error(
+        "Legacy state changed since readiness diagnostic."
+      );
+
+    }
+
+    Logger.log("PASS | Expected legacy state verified");
+
+    const names = [
+
+      "NFL Player Game Logs",
+      "NFL Team Game Logs",
+      "NFL Player Season Stats",
+      "NFL Team Season Stats",
+      "NFL Player Trends",
+      "NFL Team Trends",
+      "NFL Top Player Trends",
+      "NFL Top Team Trends"
+
+    ];
+
+    const expectedFingerprints = {
+
+      "NFL Player Game Logs":
+        "b6e851494e8112cdc4e249a72299073a3f03adcd2bdf05a2be2283c68122fb5e",
+
+      "NFL Team Game Logs":
+        "663d0e0197b679741d33230e3d354cbb2ff3772b2a703442ac746f02bb03b416"
+
+    };
+
+    const snapshots = [];
+
+    Logger.log("\n--- SOURCE DATA INSPECTION ---");
+
+    for (const name of names) {
+
+      const sheet = ss.getSheetByName(name);
+
+      if (!sheet) {
+
+        throw new Error(
+          `Required spreadsheet tab missing: ${name}`
+        );
+
+      }
+
+      const values = sheet.getDataRange().getValues();
+
+      if (
+        values.length < 2 ||
+        !values[0].length
+      ) {
+
+        throw new Error(
+          `Required spreadsheet tab is empty: ${name}`
+        );
+
+      }
+
+      const hash = fingerprint(values);
+
+      if (
+        expectedFingerprints[name] &&
+        expectedFingerprints[name] !== hash
+      ) {
+
+        throw new Error(
+          `Data changed since readiness diagnostic: ${name}`
+        );
+
+      }
+
+      snapshots.push({
+
+        name: name,
+        values: values,
+        hash: hash,
+        rows: values.length,
+        columns: values[0].length
+
+      });
+
+      Logger.log(
+        `PASS | ${name} | ` +
+        `${values.length - 1} data rows | ` +
+        `${values[0].length} columns`
+      );
+
+    }
+
+    Logger.log(
+      "PASS | Both historical game-log fingerprints verified"
+    );
+
+    const timestamp = Utilities.formatDate(
+      new Date(),
+      "America/Phoenix",
+      "yyyyMMdd-HHmmss"
+    );
+
+    const backup = SpreadsheetApp.create(
+      `Sportacular NFL Pre-Migration Backup ${timestamp}`
+    );
+
+    Logger.log("\n--- RECOVERY SPREADSHEET ---");
+    Logger.log(`Backup URL: ${backup.getUrl()}`);
+
+    backup.setSpreadsheetTimeZone(
+      ss.getSpreadsheetTimeZone()
+    );
+
+    backup.setSpreadsheetLocale(
+      ss.getSpreadsheetLocale()
+    );
+
+    const metadata = backup.getSheets()[0];
+
+    metadata.setName("Migration Metadata");
+
+    let verified = 0;
+    let totalRows = 0;
+
+    Logger.log("\n--- BACKUP CREATION AND VERIFICATION ---");
+
+    for (const snapshot of snapshots) {
+
+      const target = backup.insertSheet(snapshot.name);
+
+      if (target.getMaxRows() < snapshot.rows) {
+
+        target.insertRowsAfter(
+          target.getMaxRows(),
+          snapshot.rows - target.getMaxRows()
+        );
+
+      }
+
+      if (target.getMaxColumns() < snapshot.columns) {
+
+        target.insertColumnsAfter(
+          target.getMaxColumns(),
+          snapshot.columns - target.getMaxColumns()
+        );
+
+      }
+
+      target.getRange(
+        1,
+        1,
+        snapshot.rows,
+        snapshot.columns
+      ).setValues(snapshot.values);
+
+      target.setFrozenRows(1);
+
+      SpreadsheetApp.flush();
+
+      const copied = target.getRange(
+        1,
+        1,
+        snapshot.rows,
+        snapshot.columns
+      ).getValues();
+
+      if (fingerprint(copied) !== snapshot.hash) {
+
+        throw new Error(
+          `Backup fingerprint mismatch: ${snapshot.name}`
+        );
+
+      }
+
+      verified++;
+      totalRows += snapshot.rows - 1;
+
+      Logger.log(
+        `PASS | Backup verified: ${snapshot.name}`
+      );
+
+    }
+
+    const metadataRows = [
+
+      ["Backup Type", "NFL Pre-Migration Recovery"],
+      ["Created At", new Date().toISOString()],
+      ["Source Spreadsheet ID", ss.getId()],
+      ["Legacy Pipeline State", stateBefore],
+      ["Trigger Inventory", JSON.stringify(triggersBefore)],
+      ["Verified Backup Tabs", verified],
+      ["Total Historical and Analytics Rows", totalRows],
+      ["", ""],
+      ["Spreadsheet Tab", "SHA-256"]
+
+    ];
+
+    snapshots.forEach(snapshot => {
+
+      metadataRows.push([
+        snapshot.name,
+        snapshot.hash
+      ]);
+
+    });
+
+    metadata.getRange(
+      1,
+      1,
+      metadataRows.length,
+      2
+    ).setValues(metadataRows);
+
+    SpreadsheetApp.flush();
+
+    if (
+      metadata.getRange(4, 2).getValue() !== stateBefore ||
+      metadata.getRange(5, 2).getValue() !==
+        JSON.stringify(triggersBefore)
+    ) {
+
+      throw new Error(
+        "Backup migration metadata verification failed."
+      );
+
+    }
+
+    Logger.log("PASS | Recovery metadata verified");
+
+    Logger.log("\n--- PRODUCTION INTEGRITY VERIFICATION ---");
+
+    for (const snapshot of snapshots) {
+
+      const current = ss.getSheetByName(snapshot.name)
+        .getDataRange()
+        .getValues();
+
+      if (fingerprint(current) !== snapshot.hash) {
+
+        throw new Error(
+          `Production data changed: ${snapshot.name}`
+        );
+
+      }
+
+      Logger.log(
+        `PASS | Production unchanged: ${snapshot.name}`
+      );
+
+    }
+
+    if (
+      properties.getProperty(
+        NFL_DAILY_ANALYTICS_STATE_KEY
+      ) !== stateBefore
+    ) {
+
+      throw new Error(
+        "Production pipeline state changed."
+      );
+
+    }
+
+    Logger.log("PASS | Production state unchanged");
+
+    if (
+      JSON.stringify(triggerSnapshot()) !==
+      JSON.stringify(triggersBefore)
+    ) {
+
+      throw new Error(
+        "Production trigger inventory changed."
+      );
+
+    }
+
+    Logger.log("PASS | Production triggers unchanged");
+
+    Logger.log("\n--- FINAL RESULTS ---");
+    Logger.log(`Backup tabs verified: ${verified}/8`);
+    Logger.log(`Total backed-up data rows: ${totalRows}`);
+    Logger.log("Legacy pipeline state preserved: YES");
+    Logger.log("Trigger inventory preserved: YES");
+    Logger.log(`Backup URL: ${backup.getUrl()}`);
+    Logger.log(`Duration MS: ${Date.now() - started}`);
+
+    Logger.log(
+      "STATUS: PASS — PRODUCTION RECOVERY BACKUP VERIFIED"
+    );
+
+    Logger.log("\n--- SAFETY ---");
+    Logger.log("RECOVERY SPREADSHEET CREATED: YES");
+    Logger.log("PRODUCTION SPREADSHEET WRITES: 0");
+    Logger.log("PRODUCTION PIPELINE STATE WRITES: 0");
+    Logger.log("PRODUCTION TRIGGER CHANGES: 0");
+    Logger.log("LIVE SPORTS API REQUESTS: 0");
+
+  } catch (error) {
+
+    Logger.log(
+      `STATUS: FAIL — ${error.message || error}`
+    );
+
+    throw error;
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
+
+function auditNFLTeamPipelineFinalRecovery() {
+
+  Logger.log(
+    "=== NFL STEP 15B.4 — FINAL RECOVERY COMPARISON ==="
+  );
+
+  const started = Date.now();
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+    Logger.log("STATUS: DEFERRED — PIPELINE BUSY");
+    return;
+  }
+
+  let passed = 0;
+  let failed = 0;
+
+  function check(label, condition) {
+    if (condition) {
+      passed++;
+      Logger.log(`PASS | ${label}`);
+    } else {
+      failed++;
+      Logger.log(`FAIL | ${label}`);
+    }
+  }
+
+  function fingerprint(values) {
+    return Utilities.computeDigest(
+      Utilities.DigestAlgorithm.SHA_256,
+      JSON.stringify(values),
+      Utilities.Charset.UTF_8
+    ).map(byte =>
+      ((byte + 256) % 256)
+        .toString(16)
+        .padStart(2, "0")
+    ).join("");
+  }
+
+  function triggerSnapshot() {
+    return ScriptApp.getProjectTriggers()
+      .map(trigger => ({
+        handler: trigger.getHandlerFunction(),
+        event: String(trigger.getEventType()),
+        id: trigger.getUniqueId()
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+  }
+
+  try {
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    const backup = SpreadsheetApp.openById(
+      "1Cf3TlIjoqAPcqWPTIEiGJmECuHe1gwVO3dRvT9qLlEA"
+    );
+
+    const properties =
+      PropertiesService.getScriptProperties();
+
+    const stateBefore = properties.getProperty(
+      NFL_DAILY_ANALYTICS_STATE_KEY
+    );
+
+    const archiveBefore = properties.getProperty(
+      "NFL_DAILY_ANALYTICS_LEGACY_STATE"
+    );
+
+    const triggersBefore = triggerSnapshot();
+
+    const state = JSON.parse(stateBefore);
+
+    const metadata =
+      backup.getSheetByName("Migration Metadata");
+
+    if (!metadata) {
+      throw new Error("Recovery backup metadata missing.");
+    }
+
+    check(
+      "Recovery backup belongs to production spreadsheet",
+      metadata.getRange("B3").getValue() === ss.getId()
+    );
+
+    check(
+      "Legacy archive exists and matches recovery backup",
+      !!archiveBefore &&
+      archiveBefore === metadata.getRange("B4").getValue()
+    );
+
+    validateNFLTeamPipelineState_(state);
+
+    check(
+      "Team-based pipeline completed successfully",
+      state.pipelineVersion === "NFL_TEAM_BASED_V1" &&
+      state.stage === "COMPLETE" &&
+      state.completed === true &&
+      state.teamIndex === 32 &&
+      state.retryAttempts === 0 &&
+      state.suspended === false &&
+      state.lastError === null
+    );
+
+    const specifications = [
+      {
+        name: "NFL Player Game Logs",
+        expectedRows: 3001,
+        hash: "b6e851494e8112cdc4e249a72299073a3f03adcd2bdf05a2be2283c68122fb5e"
+      },
+      {
+        name: "NFL Team Game Logs",
+        expectedRows: 274,
+        hash: "663d0e0197b679741d33230e3d354cbb2ff3772b2a703442ac746f02bb03b416"
+      }
+    ];
+
+    const snapshots = {};
+
+    let totalOriginalKeys = 0;
+    let totalPreservedKeys = 0;
+
+    specifications.forEach(spec => {
+
+      Logger.log(`\n--- ${spec.name.toUpperCase()} ---`);
+
+      const historical = backup
+        .getSheetByName(spec.name)
+        .getDataRange()
+        .getValues();
+
+      const current = ss
+        .getSheetByName(spec.name)
+        .getDataRange()
+        .getValues();
+
+      snapshots[spec.name] = fingerprint(current);
+
+      check(
+        `${spec.name}: recovery fingerprint verified`,
+        fingerprint(historical) === spec.hash
+      );
+
+      function keys(values) {
+        return values.slice(1)
+          .filter(row =>
+            row.some(value =>
+              value !== "" && value !== null
+            )
+          )
+          .map(row =>
+            JSON.stringify([
+              String(row[1] ?? "").trim(),
+              String(row[2] ?? "").trim()
+            ])
+          );
+      }
+
+      const originalKeys = keys(historical);
+      const currentKeys = keys(current);
+
+      const originalSet = new Set(originalKeys);
+      const currentSet = new Set(currentKeys);
+
+      const missing = originalKeys.filter(
+        key => !currentSet.has(key)
+      );
+
+      const added = currentKeys.filter(
+        key => !originalSet.has(key)
+      );
+
+      check(
+        `${spec.name}: exact original key count`,
+        originalKeys.length === spec.expectedRows &&
+        originalSet.size === spec.expectedRows
+      );
+
+      check(
+        `${spec.name}: no duplicate current keys`,
+        currentKeys.length === currentSet.size
+      );
+
+      check(
+        `${spec.name}: all original keys preserved`,
+        missing.length === 0
+      );
+
+      totalOriginalKeys += originalKeys.length;
+      totalPreservedKeys += originalKeys.length - missing.length;
+
+      Logger.log(`Original keys: ${originalKeys.length}`);
+      Logger.log(`Current keys: ${currentKeys.length}`);
+      Logger.log(`Missing historical keys: ${missing.length}`);
+      Logger.log(`New keys: ${added.length}`);
+
+    });
+
+    Logger.log("\n--- PERMANENT TRIGGER VERIFICATION ---");
+
+    const permanentHandlers = [
+      "runNFLDailyAnalyticsPipeline",
+      "refreshNFLScheduleSheet",
+      "refreshNFLPlayerPropsSheet",
+      "refreshNFLRostersSheet",
+      "refreshNFLGameOddsSheet"
+    ];
+
+    const originalTriggers = JSON.parse(
+      metadata.getRange("B5").getValue()
+    );
+
+    check(
+      "Exactly five permanent production triggers",
+      triggersBefore.length === 5
+    );
+
+    permanentHandlers.forEach(handler => {
+
+      const original = originalTriggers.filter(
+        trigger => trigger.handler === handler
+      );
+
+      const current = triggersBefore.filter(
+        trigger => trigger.handler === handler
+      );
+
+      check(
+        `${handler}: original trigger ID preserved`,
+        original.length === 1 &&
+        current.length === 1 &&
+        original[0].id === current[0].id &&
+        current[0].event === "CLOCK"
+      );
+
+    });
+
+    check(
+      "No continuation or legacy reset triggers",
+      !triggersBefore.some(trigger =>
+        [
+          "continueNFLDailyAnalyticsPipeline",
+          "resetNFLDailyAnalyticsPipeline"
+        ].includes(trigger.handler)
+      )
+    );
+
+    Logger.log("\n--- READ-ONLY INTEGRITY ---");
+
+    Object.keys(snapshots).forEach(name => {
+
+      check(
+        `${name}: production data unchanged during audit`,
+        fingerprint(
+          ss.getSheetByName(name)
+            .getDataRange()
+            .getValues()
+        ) === snapshots[name]
+      );
+
+    });
+
+    check(
+      "Pipeline state unchanged",
+      properties.getProperty(
+        NFL_DAILY_ANALYTICS_STATE_KEY
+      ) === stateBefore
+    );
+
+    check(
+      "Legacy archive unchanged",
+      properties.getProperty(
+        "NFL_DAILY_ANALYTICS_LEGACY_STATE"
+      ) === archiveBefore
+    );
+
+    check(
+      "Trigger inventory unchanged",
+      JSON.stringify(triggerSnapshot()) ===
+      JSON.stringify(triggersBefore)
+    );
+
+    Logger.log("\n--- FINAL RESULTS ---");
+
+    Logger.log(`Original historical keys: ${totalOriginalKeys}`);
+    Logger.log(`Preserved historical keys: ${totalPreservedKeys}`);
+    Logger.log(`TOTAL CHECKS: ${passed + failed}`);
+    Logger.log(`PASSED: ${passed}`);
+    Logger.log(`FAILED: ${failed}`);
+    Logger.log(`DURATION MS: ${Date.now() - started}`);
+
+    Logger.log(
+      failed === 0
+        ? "STATUS: PASS — FINAL NFL RECOVERY AUDIT"
+        : "STATUS: REVIEW REQUIRED"
+    );
+
+    Logger.log("\n--- SAFETY ---");
+    Logger.log("LIVE API REQUESTS: 0");
+    Logger.log("SPREADSHEET DATA WRITES: 0");
+    Logger.log("PIPELINE STATE WRITES: 0");
+    Logger.log("TRIGGER CHANGES: 0");
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
+
+function testP36NFLLiveGameStatuses() {
+
+  Logger.log(
+    "=== P36 D2 STEP 3D — NFL LIVE GAME STATUS DIAGNOSTIC ==="
+  );
+
+  // Diagnostic sample only.
+  // These values do not control production scheduling.
+
+  const season = 2026;
+  const week = 10;
+  const seasonType = 2;
+
+  const games =
+    fetchNFLGamesBySeasonWeek_(
+      season,
+      week,
+      seasonType
+    );
+
+  if (!Array.isArray(games)) {
+
+    throw new Error(
+      "Invalid NFL schedule response."
+    );
+
+  }
+
+  Logger.log(`Season: ${season}`);
+  Logger.log(`Week: ${week}`);
+  Logger.log(`Games returned: ${games.length}`);
+
+  const statusFields = [
+    "status",
+    "status_state",
+    "game_state",
+    "state",
+    "detailed_state"
+  ];
+
+  const fieldCounts = {};
+  const statusCombinations = {};
+  const dailySlates = {};
+
+  let completedGames = 0;
+  let missingRawStatuses = 0;
+  let missingAllStatuses = 0;
+  let invalidDates = 0;
+
+  for (const game of games) {
+
+    const fields = {};
+
+    for (const field of Object.keys(game)) {
+
+      if (
+        /status|state|period|clock|date|time|finish|complete|postpon|cancel|quarter|delay|suspend/i
+          .test(field)
+      ) {
+
+        fieldCounts[field] =
+          (fieldCounts[field] || 0) + 1;
+
+        fields[field] = game[field];
+
+      }
+
+    }
+
+    const statuses = {};
+
+    for (const field of statusFields) {
+
+      statuses[field] =
+        game[field] ?? null;
+
+    }
+
+    if (!String(game.status ?? "").trim()) {
+
+      missingRawStatuses++;
+
+    }
+
+    if (
+      !statusFields.some(field =>
+        String(game[field] ?? "").trim()
+      )
+    ) {
+
+      missingAllStatuses++;
+
+    }
+
+    const completed =
+      isCompletedNFLGame_(game);
+
+    if (completed) {
+
+      completedGames++;
+
+    }
+
+    const combination =
+      JSON.stringify(statuses);
+
+    statusCombinations[combination] =
+      (statusCombinations[combination] || 0) + 1;
+
+    let slateDate =
+      getNFLGameAZDate_(game);
+
+    if (
+      !slateDate ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(slateDate)
+    ) {
+
+      invalidDates++;
+      slateDate = "[INVALID DATE]";
+
+    }
+
+    if (!dailySlates[slateDate]) {
+
+      dailySlates[slateDate] = {
+        total: 0,
+        completed: 0
+      };
+
+    }
+
+    dailySlates[slateDate].total++;
+
+    if (completed) {
+
+      dailySlates[slateDate].completed++;
+
+    }
+
+    Logger.log(
+      JSON.stringify({
+        gameId: game.id ?? null,
+        slateDate: slateDate,
+        completedByExistingLogic: completed,
+        fields: fields
+      })
+    );
+
+  }
+
+  Logger.log("--- STATUS FIELD INVENTORY ---");
+  Logger.log(JSON.stringify(fieldCounts));
+
+  Logger.log("--- UNIQUE STATUS COMBINATIONS ---");
+
+  for (
+    const [combination, count]
+    of Object.entries(statusCombinations)
+  ) {
+
+    Logger.log(`${count} games: ${combination}`);
+
+  }
+
+  Logger.log("--- DAILY SLATE BREAKDOWN ---");
+
+  for (const date of Object.keys(dailySlates).sort()) {
+
+    const slate = dailySlates[date];
+
+    Logger.log(
+      `${date}: ${slate.completed}/${slate.total} completed`
+    );
+
+  }
+
+  Logger.log("--- FINAL RESULTS ---");
+
+  Logger.log(`Total games: ${games.length}`);
+  Logger.log(`Completed games: ${completedGames}`);
+  Logger.log(`Missing raw statuses: ${missingRawStatuses}`);
+  Logger.log(`Missing all status fields: ${missingAllStatuses}`);
+  Logger.log(`Invalid slate dates: ${invalidDates}`);
+  Logger.log(`Distinct daily slates: ${Object.keys(dailySlates).length}`);
+
+  Logger.log("SPREADSHEET DATA WRITES: 0");
+  Logger.log("PIPELINE STATE WRITES: 0");
+  Logger.log("PIPELINE RESETS: 0");
+  Logger.log("PIPELINE EXECUTIONS: 0");
+  Logger.log("TRIGGER CHANGES: 0");
+
+  Logger.log(
+    "STATUS: LIVE DIAGNOSTIC COMPLETE"
+  );
+
+}
+
+function transitionNFLCompletedCheckpointToSmartV1() {
+  const p = PropertiesService.getScriptProperties();
+  const lock = LockService.getScriptLock();
+
+  const STATE = "NFL_DAILY_ANALYTICS_PIPELINE_STATE";
+  const ARCHIVE = "NFL_SMART_PRE_ACTIVATION_CHECKPOINT_ARCHIVE_V1";
+  const ENABLE = "NFL_SMART_SCHEDULER_ENABLED_V1";
+
+  if (!lock.tryLock(5000)) {
+    throw new Error("STOP: Could not acquire script lock.");
+  }
+
+  try {
+    if (p.getProperty(ENABLE) === "true") {
+      throw new Error("STOP: Smart Mode is already enabled.");
+    }
+
+    const raw = p.getProperty(STATE);
+
+    if (!raw) {
+      throw new Error("STOP: Existing checkpoint missing.");
+    }
+
+    const state = JSON.parse(raw);
+
+    if (
+      state.pipelineVersion !== "NFL_TEAM_BASED_V1" ||
+      state.runDate !== "2026-11-18" ||
+      state.stage !== "COMPLETE" ||
+      state.completed !== true ||
+      state.teamIndex !== 32 ||
+      !Array.isArray(state.teamIds) ||
+      state.teamIds.length !== 32 ||
+      new Set(state.teamIds).size !== 32 ||
+      state.suspended !== false ||
+      state.retryAttempts !== 0 ||
+      state.lastError !== null ||
+      state.lastSuccessfulStep !== "Top Team Trends" ||
+      state.updatedAt !== "2026-11-18T09:50:02.296Z" ||
+      state.smartRunId !== undefined ||
+      state.smartGameDate !== undefined
+    ) {
+      throw new Error("STOP: Unexpected checkpoint state.");
+    }
+
+    const existingArchive = p.getProperty(ARCHIVE);
+
+    if (existingArchive !== null && existingArchive !== raw) {
+      throw new Error("STOP: Conflicting archive already exists.");
+    }
+
+    if (existingArchive === null) {
+      p.setProperty(ARCHIVE, raw);
+    }
+
+    if (p.getProperty(ARCHIVE) !== raw) {
+      throw new Error("STOP: Archive verification failed.");
+    }
+
+    if (p.getProperty(STATE) !== raw) {
+      throw new Error("STOP: Checkpoint changed during transition.");
+    }
+
+    p.deleteProperty(STATE);
+
+    if (p.getProperty(STATE) !== null) {
+      throw new Error("STOP: Checkpoint retirement failed.");
+    }
+
+    Logger.log("PASS | Completed legacy checkpoint verified");
+    Logger.log("PASS | Exact checkpoint archived");
+    Logger.log("PASS | Archive verified");
+    Logger.log("PASS | Completed checkpoint retired");
+    Logger.log("PASS | Smart Mode remains disabled");
+    Logger.log("STATUS: NFL SMART TRANSITION COMPLETE");
+
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function activateNFLSmartSchedulerP36() {
+  const p = PropertiesService.getScriptProperties();
+
+  const ENABLE = "NFL_SMART_SCHEDULER_ENABLED_V1";
+  const LEDGER = "NFL_SMART_SCHEDULING_LEDGER_V1";
+  const RECEIPTS = "NFL_SMART_COMPLETION_RECEIPTS_V1";
+  const STATE = "NFL_DAILY_ANALYTICS_PIPELINE_STATE";
+  const ARCHIVE = "NFL_SMART_PRE_ACTIVATION_CHECKPOINT_ARCHIVE_V1";
+
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+    throw new Error("STOP: Script lock unavailable.");
+  }
+
+  try {
+    if (p.getProperty(ENABLE) === "true") {
+      throw new Error("STOP: Smart Mode already enabled.");
+    }
+
+    if (p.getProperty(STATE) !== null) {
+      throw new Error("STOP: Existing checkpoint detected.");
+    }
+
+    const archived = p.getProperty(ARCHIVE);
+
+    if (!archived) {
+      throw new Error("STOP: Completed checkpoint archive missing.");
+    }
+
+    const checkpoint = JSON.parse(archived);
+
+    if (
+      checkpoint.pipelineVersion !== "NFL_TEAM_BASED_V1" ||
+      checkpoint.stage !== "COMPLETE" ||
+      checkpoint.completed !== true ||
+      checkpoint.teamIndex !== 32 ||
+      checkpoint.suspended !== false ||
+      checkpoint.retryAttempts !== 0 ||
+      checkpoint.lastError !== null
+    ) {
+      throw new Error("STOP: Archived checkpoint invalid.");
+    }
+
+    const ledger = {
+      version: "NFL_SMART_LEDGER_V1",
+      processedDates: [],
+      activeRun: null
+    };
+
+    const receipts = {
+      version: "NFL_SMART_RECEIPTS_V1",
+      receipts: []
+    };
+
+    const existingLedger = p.getProperty(LEDGER);
+    const existingReceipts = p.getProperty(RECEIPTS);
+
+    if (existingLedger !== null || existingReceipts !== null) {
+      throw new Error("STOP: Smart scheduling state already exists.");
+    }
+
+    const legacyTriggers = ScriptApp.getProjectTriggers()
+      .filter(t =>
+        t.getHandlerFunction() === "runNFLDailyAnalyticsPipeline"
+      );
+
+    const existingMonitor = ScriptApp.getProjectTriggers()
+      .filter(t =>
+        t.getHandlerFunction() === "runNFLSmartMonitor"
+      );
+
+    if (
+      legacyTriggers.length !== 1 ||
+      existingMonitor.length !== 0
+    ) {
+      throw new Error("STOP: Unexpected trigger configuration.");
+    }
+
+    p.setProperty(LEDGER, JSON.stringify(ledger));
+    p.setProperty(RECEIPTS, JSON.stringify(receipts));
+
+    if (
+      p.getProperty(LEDGER) !== JSON.stringify(ledger) ||
+      p.getProperty(RECEIPTS) !== JSON.stringify(receipts)
+    ) {
+      throw new Error("STOP: Smart state verification failed.");
+    }
+
+    p.setProperty(ENABLE, "true");
+
+    if (!isNFLSmartSchedulerEnabled_()) {
+      throw new Error("STOP: Smart Mode enablement failed.");
+    }
+
+    Logger.log("PASS | Smart ledger initialized");
+    Logger.log("PASS | Completion receipts initialized");
+    Logger.log("PASS | Smart Mode enabled");
+
+  } finally {
+    lock.releaseLock();
+  }
+
+  const result = installNFLSmartMonitorTriggers();
+
+  Logger.log("PASS | Smart Monitor installed");
+  Logger.log(JSON.stringify(result));
+  Logger.log("STATUS: NFL SMART SCHEDULER ACTIVATED");
+}
+
+function testP36SmartFunctionsAvailable() {
+  Logger.log("=== P36 NFL SMART FUNCTION CHECK ===");
+
+  Logger.log(
+    "Smart Mode Helper: " +
+    typeof isNFLSmartSchedulerEnabled_
+  );
+
+  Logger.log(
+    "Smart Monitor: " +
+    typeof runNFLSmartMonitor
+  );
+
+  Logger.log(
+    "Trigger Installer: " +
+    typeof installNFLSmartMonitorTriggers
+  );
+
+  Logger.log(
+    "STATUS: READ-ONLY CHECK COMPLETE"
+  );
 }
 
 function onOpen() {
@@ -19864,4 +23192,1894 @@ function BDL_API(endpoint, paramsJson) {
   }
   const response = fetchApi_(endpoint, params);
   return toSheet_(response.data);
+}
+
+// ============================================================================
+// NFL TEAM-BASED GAME LOG ROW BUILDERS
+// ============================================================================
+
+function buildNFLPlayerGameLogRows_(games, statRows) {
+
+  if (!Array.isArray(games) || !Array.isArray(statRows)) {
+    throw new Error("Invalid NFL player game-log builder inputs.");
+  }
+
+  const gameMap = {};
+
+  const gameIds =
+    games
+      .map(game => {
+
+        const gameId =
+          String(
+            game.id || ""
+          );
+
+        gameMap[gameId] = {
+
+          date:
+            getNFLGameAZDate_(game),
+
+          homeTeam:
+            getNFLHomeTeamNameFromGame_(
+              game
+            ),
+
+          awayTeam:
+            getNFLAwayTeamNameFromGame_(
+              game
+            )
+
+        };
+
+        return gameId;
+
+      })
+      .filter(Boolean);
+
+  const rows = [];
+
+  statRows.forEach(stat => {
+    const gameId = String(stat.game_id || (stat.game && stat.game.id) || "");
+    const gameInfo = gameMap[gameId] || {};
+
+    const playerId = stat.player_id || (stat.player && stat.player.id) || "";
+    const playerName = getNFLPlayerNameFromStat_(stat);
+
+    const playerPosition =
+      String(
+        (stat.player && stat.player.position) ||
+        stat.position ||
+        ""
+      )
+        .trim()
+        .toUpperCase();
+
+    const eligiblePositions = [
+      "QB",
+      "QUARTERBACK",
+      "RB",
+      "RUNNING BACK",
+      "WR",
+      "WIDE RECEIVER",
+      "TE",
+      "TIGHT END"
+    ];
+
+    if (!eligiblePositions.includes(playerPosition)) {
+      return;
+    }
+
+    const team = stat.team || {};
+    const teamName = getNFLTeamName_(team) || stat.team_name || "";
+
+    const opponent =
+      teamName === gameInfo.homeTeam
+        ? gameInfo.awayTeam
+        : teamName === gameInfo.awayTeam
+          ? gameInfo.homeTeam
+          : "";
+
+    const passingYards = getNFLStatNumber_(stat, ["passing_yards", "pass_yards", "passing.yds", "passing.yards"]);
+    const passingTDs = getNFLStatNumber_(stat, ["passing_touchdowns", "passing_tds", "pass_tds", "passing.td"]);
+    const interceptions = getNFLStatNumber_(stat, ["interceptions", "passing_interceptions", "passing.int"]);
+    const completions = getNFLStatNumber_(stat, ["completions", "passing_completions", "passing.cmp"]);
+    const passAttempts = getNFLStatNumber_(stat, ["pass_attempts", "passing_attempts", "passing.att"]);
+
+    const rushingYards = getNFLStatNumber_(stat, ["rushing_yards", "rush_yards", "rushing.yds", "rushing.yards"]);
+    const rushingAttempts = getNFLStatNumber_(stat, ["rushing_attempts", "rush_attempts", "rushing.att"]);
+    const rushingTDs = getNFLStatNumber_(stat, ["rushing_touchdowns", "rushing_tds", "rush_tds", "rushing.td"]);
+
+    const receptions = getNFLStatNumber_(stat, ["receptions", "receiving_receptions", "receiving.rec"]);
+    const receivingYards = getNFLStatNumber_(stat, ["receiving_yards", "rec_yards", "receiving.yds", "receiving.yards"]);
+    const receivingTDs = getNFLStatNumber_(stat, ["receiving_touchdowns", "receiving_tds", "rec_tds", "receiving.td"]);
+
+    if (!playerId && !playerName) return;
+
+    rows.push([
+      gameInfo.date,
+      gameId,
+      playerId,
+      playerName,
+      teamName,
+      opponent,
+      passingYards,
+      passingTDs,
+      interceptions,
+      completions,
+      passAttempts,
+      rushingYards,
+      rushingAttempts,
+      rushingTDs,
+      receptions,
+      receivingYards,
+      receivingTDs
+    ]);
+  });
+
+  return rows;
+}
+
+function buildNFLTeamGameLogRows_(games, statRows) {
+
+  if (!Array.isArray(games) || !Array.isArray(statRows)) {
+    throw new Error("Invalid NFL team game-log builder inputs.");
+  }
+
+  const rows = [];
+
+  games.forEach(game => {
+    const gameStats = statRows.filter(stat =>
+      String(stat.game_id || (stat.game && stat.game.id) || "") === String(game.id)
+    );
+
+    const buildTeamRow = (teamName, opponentName) => {
+
+      const teamStats = gameStats.filter(s => {
+        const statTeam =
+          getNFLTeamName_(s.team || {}) ||
+          s.team_name ||
+          "";
+
+        return statTeam === teamName;
+      });
+
+      const sum = keys =>
+        teamStats.reduce((total, stat) => {
+          return total + getNFLStatNumber_(stat, keys);
+        }, 0);
+
+      const isHome =
+        teamName ===
+        getNFLHomeTeamNameFromGame_(game);
+
+      const pointsFor = isHome
+        ? Number(game.home_team_score || game.home_score || 0)
+        : Number(game.visitor_team_score || game.away_team_score || 0);
+
+      const pointsAllowed = isHome
+        ? Number(game.visitor_team_score || game.away_team_score || 0)
+        : Number(game.home_team_score || game.home_score || 0);
+
+      return [
+
+        getNFLGameAZDate_(game),
+
+        game.id,
+
+        teamName,
+
+        opponentName,
+
+        pointsFor,
+
+        pointsAllowed,
+
+        sum([
+          "passing_yards",
+          "pass_yards",
+          "passing.yds",
+          "passing.yards"
+        ]),
+
+        sum([
+          "rushing_yards",
+          "rush_yards",
+          "rushing.yds",
+          "rushing.yards"
+        ]),
+
+        sum([
+          "turnovers",
+          "fumbles_lost",
+          "interceptions"
+        ]),
+
+        sum([
+          "sacks",
+          "defensive_sacks"
+        ])
+
+      ];
+
+    };
+
+    const homeTeam =
+      getNFLHomeTeamNameFromGame_(game);
+
+    const awayTeam =
+      getNFLAwayTeamNameFromGame_(game);
+
+    rows.push(
+      buildTeamRow(
+        awayTeam,
+        homeTeam
+      )
+    );
+
+    rows.push(
+      buildTeamRow(
+        homeTeam,
+        awayTeam
+      )
+    );
+  });
+
+  return rows;
+}
+
+
+// ============================================================================
+// NFL TEAM-BASED SAFE GAME LOG WRITERS
+// ============================================================================
+
+function writeNFLSafeGameLogSheet_(sheet, headers, rows) {
+
+  if (!sheet) {
+    throw new Error("NFL safe writer: missing spreadsheet tab.");
+  }
+
+  if (!Array.isArray(headers) || headers.length === 0) {
+    throw new Error("NFL safe writer: invalid headers.");
+  }
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw new Error("NFL safe writer: no replacement rows.");
+  }
+
+  if (rows.some(row =>
+    !Array.isArray(row) ||
+    row.length !== headers.length
+  )) {
+    throw new Error("NFL safe writer: invalid row width.");
+  }
+
+  const previousLastRow = sheet.getLastRow();
+  const previousLastColumn = sheet.getLastColumn();
+
+  if (previousLastRow > 0) {
+
+    if (previousLastColumn !== headers.length) {
+      throw new Error(
+        "NFL safe writer: existing column count mismatch."
+      );
+    }
+
+    const existingHeaders = sheet
+      .getRange(1, 1, 1, headers.length)
+      .getValues()[0];
+
+    if (existingHeaders.some(
+      (header, index) =>
+        String(header) !== headers[index]
+    )) {
+      throw new Error(
+        "NFL safe writer: existing header mismatch."
+      );
+    }
+
+  }
+
+  const values = [headers, ...rows];
+
+  const maxRows = sheet.getMaxRows();
+  const maxColumns = sheet.getMaxColumns();
+
+  if (values.length > maxRows) {
+    sheet.insertRowsAfter(
+      maxRows,
+      values.length - maxRows
+    );
+  }
+
+  if (headers.length > maxColumns) {
+    sheet.insertColumnsAfter(
+      maxColumns,
+      headers.length - maxColumns
+    );
+  }
+
+  sheet
+    .getRange(1, 1, values.length, headers.length)
+    .setValues(values);
+
+  SpreadsheetApp.flush();
+
+  if (previousLastRow > values.length) {
+
+    sheet.getRange(
+      values.length + 1,
+      1,
+      previousLastRow - values.length,
+      headers.length
+    ).clearContent();
+
+    SpreadsheetApp.flush();
+
+  }
+
+  sheet.getRange("A:A")
+    .setNumberFormat("yyyy-mm-dd");
+
+  sheet.setFrozenRows(1);
+
+  sheet.getRange(1, 1, 1, headers.length)
+    .setFontWeight("bold");
+
+}
+
+function upsertNFLSafeGameLogRowsByKey_(
+  sheet,
+  headers,
+  newRows,
+  keyColumnIndexes
+) {
+
+  if (!sheet) {
+    throw new Error("NFL safe upsert: missing spreadsheet tab.");
+  }
+
+  if (!Array.isArray(headers) || headers.length === 0) {
+    throw new Error("NFL safe upsert: invalid headers.");
+  }
+
+  if (!Array.isArray(newRows) || newRows.length === 0) {
+    throw new Error("NFL safe upsert: no new game-log rows.");
+  }
+
+  if (
+    !Array.isArray(keyColumnIndexes) ||
+    keyColumnIndexes.length === 0 ||
+    new Set(keyColumnIndexes).size !== keyColumnIndexes.length ||
+    keyColumnIndexes.some(index =>
+      !Number.isInteger(index) ||
+      index < 0 ||
+      index >= headers.length
+    )
+  ) {
+    throw new Error("NFL safe upsert: invalid key columns.");
+  }
+
+  const existingValues =
+    sheet.getDataRange().getValues();
+
+  const existingRows =
+    existingValues.length > 1
+      ? existingValues.slice(1)
+      : [];
+
+  const rowMap = new Map();
+  const incomingKeys = new Set();
+
+  function addRow(row, incoming) {
+
+    if (!Array.isArray(row)) {
+      throw new Error("NFL safe upsert: invalid row.");
+    }
+
+    const blank = row.every(value =>
+      value === "" ||
+      value === null ||
+      value === undefined
+    );
+
+    if (blank) {
+
+      if (incoming) {
+        throw new Error(
+          "NFL safe upsert: blank incoming row."
+        );
+      }
+
+      return;
+    }
+
+    if (row.length !== headers.length) {
+      throw new Error("NFL safe upsert: invalid row width.");
+    }
+
+    const keyParts = keyColumnIndexes.map(index =>
+      String(row[index] ?? "").trim()
+    );
+
+    if (keyParts.some(part => !part)) {
+      throw new Error(
+        "NFL safe upsert: incomplete record key."
+      );
+    }
+
+    const key = JSON.stringify(keyParts);
+
+    if (incoming) {
+
+      if (incomingKeys.has(key)) {
+        throw new Error(
+          "NFL safe upsert: duplicate incoming key."
+        );
+      }
+
+      incomingKeys.add(key);
+
+    } else if (rowMap.has(key)) {
+
+      throw new Error(
+        "NFL safe upsert: duplicate existing key."
+      );
+
+    }
+
+    rowMap.set(key, row);
+
+  }
+
+  existingRows.forEach(row => addRow(row, false));
+  newRows.forEach(row => addRow(row, true));
+
+  const finalRows = Array.from(rowMap.values());
+
+  const datedRows = finalRows.map(row => {
+
+    const date = normalizeNFLSheetDateForCompare_(row[0]);
+
+    if (
+      typeof date !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+      !Number.isFinite(Date.parse(date)) ||
+      new Date(date).toISOString().slice(0, 10) !== date
+    ) {
+      throw new Error(
+        "NFL safe upsert: invalid game date."
+      );
+    }
+
+    return {row, date};
+
+  });
+
+  datedRows.sort((a, b) =>
+    b.date.localeCompare(a.date)
+  );
+
+  const sortedRows = datedRows.map(item => item.row);
+
+  writeNFLSafeGameLogSheet_(
+    sheet,
+    headers,
+    sortedRows
+  );
+
+  Logger.log(
+    `NFL safe upsert: ${existingRows.length} existing rows, ` +
+    `${newRows.length} incoming rows, ` +
+    `${sortedRows.length} final rows.`
+  );
+
+}
+
+
+// ============================================================================
+// NFL TEAM-BASED GAME LOG PROCESSING
+// ============================================================================
+
+function getNFLCompletedGamesForTeam_(teamId) {
+
+  const id = String(teamId ?? "").trim();
+
+  if (!/^[1-9]\d*$/.test(id)) {
+    throw new Error("NFL team retrieval: invalid team ID.");
+  }
+
+  const season = 2026;
+  const seasonType = 2;
+  const startDate = "2026-08-01";
+  const endDate = "2027-02-28";
+  const today = getTodayString_();
+
+  const games = [];
+  const gameIds = new Set();
+  const cursors = new Set();
+
+  let cursor = null;
+  let pages = 0;
+
+  do {
+
+    if (++pages > 10) {
+      throw new Error("NFL team retrieval: pagination limit exceeded.");
+    }
+
+    const params = {
+      "seasons[]": season,
+      "team_ids[]": id,
+      season_type: seasonType,
+      per_page: 100
+    };
+
+    if (cursor !== null) {
+      params.cursor = cursor;
+    }
+
+    const response = fetchApi_("/nfl/v1/games", params);
+
+    if (!response || !Array.isArray(response.data)) {
+      throw new Error("NFL team retrieval: invalid API response.");
+    }
+
+    response.data.forEach(game => {
+
+      const gameId = String(game.id ?? "").trim();
+
+      const homeId = String(game.home_team?.id ?? "");
+      const awayId = String(
+        (game.away_team || game.visitor_team)?.id ?? ""
+      );
+
+      const date = getNFLGameAZDate_(game);
+
+      if (
+        !gameId ||
+        !homeId ||
+        !awayId ||
+        homeId === awayId ||
+        (homeId !== id && awayId !== id) ||
+        Number(game.season) !== season ||
+        game.postseason !== false ||
+        !date ||
+        date < startDate ||
+        date > endDate
+      ) {
+        throw new Error(
+          `NFL team retrieval: invalid or unrelated game ${gameId}.`
+        );
+      }
+
+      if (gameIds.has(gameId)) {
+        throw new Error(
+          `NFL team retrieval: duplicate game ${gameId}.`
+        );
+      }
+
+      gameIds.add(gameId);
+
+      if (isCompletedNFLGame_(game)) {
+
+        if (date > today) {
+          throw new Error(
+            `NFL team retrieval: future completed game ${gameId}.`
+          );
+        }
+
+        games.push(game);
+
+      }
+
+    });
+
+    cursor = response.meta?.next_cursor ?? null;
+
+    if (cursor === "") cursor = null;
+
+    if (cursor !== null) {
+
+      const key = String(cursor);
+
+      if (cursors.has(key)) {
+        throw new Error("NFL team retrieval: repeated cursor.");
+      }
+
+      cursors.add(key);
+
+    }
+
+  } while (cursor !== null);
+
+  if (gameIds.size !== 17) {
+    throw new Error(
+      `NFL team retrieval: expected 17 scheduled games, received ${gameIds.size}.`
+    );
+  }
+
+  games.sort((a, b) =>
+    getNFLGameAZDate_(a).localeCompare(getNFLGameAZDate_(b))
+  );
+
+  Logger.log(
+    `NFL team ${id}: ${gameIds.size} scheduled games, ` +
+    `${games.length} completed games.`
+  );
+
+  return games;
+
+}
+
+
+function fetchNFLSharedGameLogStats_(games) {
+
+  if (!Array.isArray(games) || !games.length) {
+    throw new Error("NFL shared stats: no completed games.");
+  }
+
+  const allStats = [];
+
+  games.forEach(game => {
+
+    const gameId = String(game.id);
+    const cursors = new Set();
+
+    let cursor = null;
+    let pages = 0;
+    let count = 0;
+
+    do {
+
+      if (++pages > 20) {
+        throw new Error(
+          `NFL shared stats: pagination limit for game ${gameId}.`
+        );
+      }
+
+      const params = {
+        "game_ids[]": gameId,
+        "seasons[]": 2026,
+        season_type: 2,
+        per_page: 100
+      };
+
+      if (cursor !== null) {
+        params.cursor = cursor;
+      }
+
+      const response = fetchApi_("/nfl/v1/stats", params);
+
+      if (!response || !Array.isArray(response.data)) {
+        throw new Error(
+          `NFL shared stats: invalid response for game ${gameId}.`
+        );
+      }
+
+      response.data.forEach(stat => {
+
+        const actualId = String(
+          stat.game_id || stat.game?.id || ""
+        );
+
+        if (actualId !== gameId) {
+          throw new Error(
+            `NFL shared stats: unexpected game ID ${actualId}.`
+          );
+        }
+
+        allStats.push(stat);
+        count++;
+
+      });
+
+      cursor = response.meta?.next_cursor ?? null;
+
+      if (cursor === "") cursor = null;
+
+      if (cursor !== null) {
+
+        const key = String(cursor);
+
+        if (cursors.has(key)) {
+          throw new Error("NFL shared stats: repeated cursor.");
+        }
+
+        cursors.add(key);
+
+      }
+
+    } while (cursor !== null);
+
+    if (!count) {
+      throw new Error(
+        `NFL shared stats: empty statistics for game ${gameId}.`
+      );
+    }
+
+    Utilities.sleep(150);
+
+  });
+
+  Logger.log(
+    `NFL shared stats: ${allStats.length} records ` +
+    `for ${games.length} games.`
+  );
+
+  return allStats;
+
+}
+
+
+function validateNFLTeamGameLogCoverage_(games, stats, playerRows, teamRows) {
+
+  if (
+    !Array.isArray(games) || !games.length ||
+    !Array.isArray(stats) || !stats.length ||
+    !Array.isArray(playerRows) || !playerRows.length ||
+    !Array.isArray(teamRows) || !teamRows.length
+  ) {
+    throw new Error("NFL game-log coverage: empty or invalid input.");
+  }
+
+  const inventory = new Map();
+
+  games.forEach(game => {
+
+    const id = String(game.id ?? "").trim();
+
+    const home = getNFLHomeTeamNameFromGame_(game);
+    const away = getNFLAwayTeamNameFromGame_(game);
+
+    if (!id || !home || !away || home === away || inventory.has(id)) {
+      throw new Error("NFL game-log coverage: invalid game inventory.");
+    }
+
+    inventory.set(id, {
+      date: getNFLGameAZDate_(game),
+      teams: new Set([home, away]),
+      rawTeams: new Set(),
+      playerTeams: new Set(),
+      teamRows: new Set()
+    });
+
+  });
+
+  stats.forEach(stat => {
+
+    const id = String(stat.game_id || stat.game?.id || "");
+
+    const team =
+      getNFLTeamName_(stat.team || {}) ||
+      stat.team_name ||
+      "";
+
+    const item = inventory.get(id);
+
+    if (!item || !item.teams.has(team)) {
+      throw new Error(
+        `NFL game-log coverage: unexpected statistic record ${id}.`
+      );
+    }
+
+    item.rawTeams.add(team);
+
+  });
+
+  const playerKeys = new Set();
+
+  playerRows.forEach(row => {
+
+    if (!Array.isArray(row) || row.length !== 17) {
+      throw new Error("NFL game-log coverage: invalid player row width.");
+    }
+
+    const id = String(row[1] ?? "").trim();
+    const playerId = String(row[2] ?? "").trim();
+    const playerName = String(row[3] ?? "").trim();
+    const item = inventory.get(id);
+
+    const key = JSON.stringify([id, playerId]);
+
+    if (
+      !item ||
+      !playerId ||
+      !playerName ||
+      row[0] !== item.date ||
+      !item.teams.has(row[4]) ||
+      !item.teams.has(row[5]) ||
+      row[4] === row[5] ||
+      playerKeys.has(key) ||
+      !row.slice(6).every(Number.isFinite)
+    ) {
+      throw new Error(
+        `NFL game-log coverage: invalid player row ${key}.`
+      );
+    }
+
+    playerKeys.add(key);
+    item.playerTeams.add(row[4]);
+
+  });
+
+  const teamKeys = new Set();
+
+  teamRows.forEach(row => {
+
+    if (!Array.isArray(row) || row.length !== 10) {
+      throw new Error("NFL game-log coverage: invalid team row width.");
+    }
+
+    const id = String(row[1] ?? "").trim();
+    const item = inventory.get(id);
+    const key = JSON.stringify([id, row[2]]);
+
+    if (
+      !item ||
+      row[0] !== item.date ||
+      !item.teams.has(row[2]) ||
+      !item.teams.has(row[3]) ||
+      row[2] === row[3] ||
+      teamKeys.has(key) ||
+      !row.slice(4).every(Number.isFinite)
+    ) {
+      throw new Error(
+        `NFL game-log coverage: invalid team row ${key}.`
+      );
+    }
+
+    teamKeys.add(key);
+    item.teamRows.add(row[2]);
+
+  });
+
+  inventory.forEach((item, id) => {
+
+    if (
+      item.rawTeams.size !== 2 ||
+      item.playerTeams.size !== 2 ||
+      item.teamRows.size !== 2
+    ) {
+      throw new Error(
+        `NFL game-log coverage: incomplete participating teams for game ${id}.`
+      );
+    }
+
+  });
+
+  if (teamRows.length !== games.length * 2) {
+    throw new Error("NFL game-log coverage: incorrect team row count.");
+  }
+
+  return {
+    games: games.length,
+    playerRows: playerRows.length,
+    teamRows: teamRows.length
+  };
+
+}
+
+
+function processNFLTeamGameLogs_(teamId) {
+
+  const id = String(teamId ?? "").trim();
+
+  const games = getNFLCompletedGamesForTeam_(id);
+
+  if (!games.length) {
+
+    Logger.log(
+      `NFL team ${id}: no completed games. No writes performed.`
+    );
+
+    return {
+      status: "NO_COMPLETED_GAMES",
+      teamId: id,
+      games: 0,
+      playerRows: 0,
+      teamRows: 0
+    };
+
+  }
+
+  const stats = fetchNFLSharedGameLogStats_(games);
+
+  const playerRows = buildNFLPlayerGameLogRows_(games, stats);
+  const teamRows = buildNFLTeamGameLogRows_(games, stats);
+
+  const coverage = validateNFLTeamGameLogCoverage_(
+    games,
+    stats,
+    playerRows,
+    teamRows
+  );
+
+  const playerHeaders = [
+    "Game Date",
+    "Game ID",
+    "Player ID",
+    "Player Name",
+    "Team",
+    "Opponent",
+    "Passing Yards",
+    "Passing TDs",
+    "Interceptions",
+    "Completions",
+    "Pass Attempts",
+    "Rushing Yards",
+    "Rushing Attempts",
+    "Rushing TDs",
+    "Receptions",
+    "Receiving Yards",
+    "Receiving TDs"
+  ];
+
+  const teamHeaders = [
+    "Game Date",
+    "Game ID",
+    "Team",
+    "Opponent",
+    "Points For",
+    "Points Allowed",
+    "Passing Yards",
+    "Rushing Yards",
+    "Turnovers",
+    "Sacks"
+  ];
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const playerSheet = ss.getSheetByName("NFL Player Game Logs");
+  const teamSheet = ss.getSheetByName("NFL Team Game Logs");
+
+  if (!playerSheet || !teamSheet) {
+    throw new Error("NFL team processor: required game-log sheet missing.");
+  }
+
+  // Check both sheet schemas before initiating either write.
+  [
+    [playerSheet, playerHeaders],
+    [teamSheet, teamHeaders]
+  ].forEach(([sheet, headers]) => {
+
+    if (sheet.getLastRow() > 0) {
+
+      if (sheet.getLastColumn() !== headers.length) {
+        throw new Error("NFL team processor: sheet column count mismatch.");
+      }
+
+      const actual = sheet.getRange(
+        1, 1, 1, headers.length
+      ).getValues()[0];
+
+      if (actual.some((value, i) => String(value) !== headers[i])) {
+        throw new Error("NFL team processor: sheet header mismatch.");
+      }
+
+    }
+
+  });
+
+  upsertNFLSafeGameLogRowsByKey_(
+    playerSheet,
+    playerHeaders,
+    playerRows,
+    [1, 2]
+  );
+
+  upsertNFLSafeGameLogRowsByKey_(
+    teamSheet,
+    teamHeaders,
+    teamRows,
+    [1, 2]
+  );
+
+  Logger.log(
+    `NFL team ${id} complete: ${coverage.games} games, ` +
+    `${coverage.playerRows} player rows, ` +
+    `${coverage.teamRows} team rows.`
+  );
+
+  return {
+    status: "COMPLETE",
+    teamId: id,
+    ...coverage
+  };
+
+}
+
+
+// ============================================================================
+// NFL TEAM-BASED MOTHER PIPELINE SUPPORT
+// ============================================================================
+
+function getNFLPipelineTeamIds_() {
+
+  const teams = fetchAllNFLTeams_();
+
+  if (!Array.isArray(teams) || teams.length !== 32) {
+
+    throw new Error(
+      "NFL team inventory validation failed: expected 32 teams."
+    );
+
+  }
+
+  const ids = teams.map(team =>
+    String(team.id ?? "").trim()
+  );
+
+  const names = teams.map(team =>
+    String(getNFLTeamName_(team) || "").trim()
+  );
+
+  if (
+    ids.some(id => !/^[1-9]\d*$/.test(id)) ||
+    names.some(name => !name) ||
+    new Set(ids).size !== 32 ||
+    new Set(names).size !== 32
+  ) {
+
+    throw new Error(
+      "NFL team inventory validation failed: invalid or duplicate teams."
+    );
+
+  }
+
+  ids.sort((a, b) => Number(a) - Number(b));
+
+  Logger.log(
+    `NFL mother pipeline: validated ${ids.length} NFL teams.`
+  );
+
+  return ids;
+
+}
+
+
+function validateNFLTeamPipelineState_(state) {
+
+  function fail(message) {
+
+    throw new Error(
+      `NFL_PIPELINE_STATE_INVALID: ${message}`
+    );
+
+  }
+
+  const stages = [
+
+    "TEAM_GAME_LOGS_BY_TEAM",
+    "PLAYER_SEASON_STATS",
+    "TEAM_SEASON_STATS",
+    "PLAYER_TRENDS",
+    "TEAM_TRENDS",
+    "TOP_PLAYER_TRENDS",
+    "TOP_TEAM_TRENDS",
+    "COMPLETE"
+
+  ];
+
+  if (
+    !state ||
+    state.pipelineVersion !== "NFL_TEAM_BASED_V1"
+  ) {
+    fail("incorrect pipeline version");
+  }
+
+  if (
+    typeof state.runDate !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(state.runDate) ||
+    !Number.isFinite(Date.parse(state.runDate)) ||
+    new Date(state.runDate).toISOString().slice(0, 10)
+      !== state.runDate ||
+    state.runDate > getTodayString_()
+  ) {
+    fail("invalid run date");
+  }
+
+  if (!stages.includes(state.stage)) {
+    fail("unknown pipeline stage");
+  }
+
+  if (typeof state.completed !== "boolean") {
+    fail("invalid completion flag");
+  }
+
+  if (!Array.isArray(state.teamIds)) {
+    fail("invalid team inventory");
+  }
+
+  if (
+    !Number.isInteger(state.teamIndex) ||
+    state.teamIndex < 0 ||
+    state.teamIndex > state.teamIds.length
+  ) {
+    fail("invalid team progress index");
+  }
+
+  if (state.teamIds.length === 0) {
+
+    if (
+      state.teamIndex !== 0 ||
+      state.stage !== "TEAM_GAME_LOGS_BY_TEAM" ||
+      state.completed
+    ) {
+      fail("invalid uninitialized state");
+    }
+
+  } else {
+
+    if (
+      state.teamIds.length !== 32 ||
+      new Set(state.teamIds).size !== 32 ||
+      state.teamIds.some(
+        id => typeof id !== "string" ||
+          !/^[1-9]\d*$/.test(id)
+      )
+    ) {
+      fail("invalid 32-team inventory");
+    }
+
+    if (
+      state.teamIds.some(
+        (id, index) =>
+          index > 0 &&
+          Number(id) <= Number(state.teamIds[index - 1])
+      )
+    ) {
+      fail("team inventory is not strictly ordered");
+    }
+
+    if (
+      state.stage !== "TEAM_GAME_LOGS_BY_TEAM" &&
+      state.teamIndex !== 32
+    ) {
+      fail("downstream stage reached before all teams completed");
+    }
+
+  }
+
+  if (
+    state.completed !== (state.stage === "COMPLETE")
+  ) {
+    fail("inconsistent completion state");
+  }
+
+  if (
+    !Number.isInteger(state.retryAttempts) ||
+    state.retryAttempts < 0 ||
+    state.retryAttempts > 3
+  ) {
+    fail("invalid retry attempt counter");
+  }
+
+  if (typeof state.suspended !== "boolean") {
+    fail("invalid suspension flag");
+  }
+
+  if (
+    state.suspended &&
+    (state.completed || state.retryAttempts !== 3)
+  ) {
+    fail("inconsistent suspended state");
+  }
+
+  if (
+    state.completed &&
+    state.retryAttempts !== 0
+  ) {
+    fail("completed state contains retry attempts");
+  }
+
+  return true;
+
+}
+
+
+function prepareNFLTeamPipelineProductionMigration() {
+
+  Logger.log(
+    "=== NFL STEP 14C.3B — CONTROLLED LEGACY MIGRATION ==="
+  );
+
+  const started = Date.now();
+
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+
+    throw new Error(
+      "Migration aborted: another execution holds the script lock."
+    );
+
+  }
+
+  try {
+
+    const properties =
+      PropertiesService.getScriptProperties();
+
+    const stateKey =
+      NFL_DAILY_ANALYTICS_STATE_KEY;
+
+    const archiveKey =
+      "NFL_DAILY_ANALYTICS_LEGACY_STATE";
+
+    const rawState =
+      properties.getProperty(stateKey);
+
+    function requireCondition(condition, message) {
+
+      if (!condition) {
+        throw new Error(`MIGRATION ABORTED: ${message}`);
+      }
+
+      Logger.log(`PASS | ${message}`);
+
+    }
+
+    function fingerprint(values) {
+
+      return Utilities.computeDigest(
+        Utilities.DigestAlgorithm.SHA_256,
+        JSON.stringify(values),
+        Utilities.Charset.UTF_8
+      )
+      .map(byte =>
+        ("0" + ((byte + 256) % 256).toString(16))
+          .slice(-2)
+      )
+      .join("");
+
+    }
+
+    Logger.log("\n--- LEGACY STATE VERIFICATION ---");
+
+    requireCondition(
+      Boolean(rawState),
+      "Legacy pipeline state exists"
+    );
+
+    const state = JSON.parse(rawState);
+
+    requireCondition(
+      state.stage === "TEAM_GAME_LOGS" &&
+      state.completed === false &&
+      state.playerMonthIndex === 7 &&
+      state.teamMonthIndex === 0 &&
+      state.lastSuccessfulStep === "Player Game Logs 2027-02" &&
+      state.lastError === null &&
+      state.updatedAt === "2026-11-15T08:27:12.416Z" &&
+      state.pipelineVersion === undefined,
+      "Exact expected legacy checkpoint verified"
+    );
+
+    requireCondition(
+      properties.getProperty(archiveKey) === null,
+      "Legacy archive does not already exist"
+    );
+
+    Logger.log("\n--- RECOVERY BACKUP VERIFICATION ---");
+
+    const ss =
+      SpreadsheetApp.getActiveSpreadsheet();
+
+    const backup = SpreadsheetApp.openById(
+      "1Cf3TlIjoqAPcqWPTIEiGJmECuHe1gwVO3dRvT9qLlEA"
+    );
+
+    const metadata =
+      backup.getSheetByName("Migration Metadata");
+
+    requireCondition(
+      Boolean(metadata),
+      "Recovery metadata sheet exists"
+    );
+
+    requireCondition(
+      metadata.getRange("B3").getValue() === ss.getId(),
+      "Recovery backup belongs to this production spreadsheet"
+    );
+
+    requireCondition(
+      metadata.getRange("B4").getValue() === rawState,
+      "Recovery backup contains exact legacy state"
+    );
+
+    const expectedSheets = [
+
+      ["NFL Player Game Logs", 3001, 17],
+      ["NFL Team Game Logs", 274, 10],
+      ["NFL Player Season Stats", 550, 16],
+      ["NFL Team Season Stats", 32, 9],
+      ["NFL Player Trends", 6050, 19],
+      ["NFL Team Trends", 192, 24],
+      ["NFL Top Player Trends", 25, 15],
+      ["NFL Top Team Trends", 25, 13]
+
+    ];
+
+    const sourceFingerprints = {};
+
+    let totalRows = 0;
+
+    expectedSheets.forEach(([name, rows, columns]) => {
+
+      const productionSheet =
+        ss.getSheetByName(name);
+
+      const backupSheet =
+        backup.getSheetByName(name);
+
+      requireCondition(
+        Boolean(productionSheet && backupSheet),
+        `${name}: production and backup sheets exist`
+      );
+
+      requireCondition(
+        productionSheet.getLastRow() === rows + 1 &&
+        productionSheet.getLastColumn() === columns &&
+        backupSheet.getLastRow() === rows + 1 &&
+        backupSheet.getLastColumn() === columns,
+        `${name}: expected dimensions verified`
+      );
+
+      const productionHash = fingerprint(
+        productionSheet.getDataRange().getValues()
+      );
+
+      const backupHash = fingerprint(
+        backupSheet.getDataRange().getValues()
+      );
+
+      requireCondition(
+        productionHash === backupHash,
+        `${name}: production matches recovery backup`
+      );
+
+      sourceFingerprints[name] =
+        productionHash;
+
+      totalRows += rows;
+
+    });
+
+    requireCondition(
+      totalRows === 10149,
+      "All 10149 recovery records verified"
+    );
+
+    requireCondition(
+      sourceFingerprints["NFL Player Game Logs"] ===
+        "b6e851494e8112cdc4e249a72299073a3f03adcd2bdf05a2be2283c68122fb5e",
+      "Original player game-log fingerprint verified"
+    );
+
+    requireCondition(
+      sourceFingerprints["NFL Team Game Logs"] ===
+        "663d0e0197b679741d33230e3d354cbb2ff3772b2a703442ac746f02bb03b416",
+      "Original team game-log fingerprint verified"
+    );
+
+    Logger.log("\n--- TRIGGER MIGRATION PREFLIGHT ---");
+
+    const preserveHandlers = [
+
+      "runNFLDailyAnalyticsPipeline",
+      "refreshNFLScheduleSheet",
+      "refreshNFLPlayerPropsSheet",
+      "refreshNFLRostersSheet",
+      "refreshNFLGameOddsSheet"
+
+    ];
+
+    const retireHandlers = [
+
+      "resetNFLDailyAnalyticsPipeline",
+      "continueNFLDailyAnalyticsPipeline"
+
+    ];
+
+    const triggers =
+      ScriptApp.getProjectTriggers();
+
+    requireCondition(
+      triggers.length === 7,
+      "Exactly seven existing triggers"
+    );
+
+    [...preserveHandlers, ...retireHandlers]
+      .forEach(handler => {
+
+        const matching = triggers.filter(
+          trigger =>
+            trigger.getHandlerFunction() === handler
+        );
+
+        requireCondition(
+          matching.length === 1 &&
+          matching[0].getEventType() ===
+            ScriptApp.EventType.CLOCK,
+          `Expected clock trigger: ${handler}`
+        );
+
+      });
+
+    const preserveIds = triggers
+      .filter(trigger =>
+        preserveHandlers.includes(
+          trigger.getHandlerFunction()
+        )
+      )
+      .map(trigger => trigger.getUniqueId())
+      .sort();
+
+    const retireTriggers = triggers.filter(
+      trigger =>
+        retireHandlers.includes(
+          trigger.getHandlerFunction()
+        )
+    );
+
+    requireCondition(
+      preserveIds.length === 5 &&
+      retireTriggers.length === 2,
+      "Exactly five preserved and two retired triggers"
+    );
+
+    requireCondition(
+      properties.getProperty(stateKey) === rawState,
+      "Active legacy state remains unchanged"
+    );
+
+    Logger.log("\n--- LEGACY STATE ARCHIVAL ---");
+
+    properties.setProperty(
+      archiveKey,
+      rawState
+    );
+
+    requireCondition(
+      properties.getProperty(archiveKey) === rawState,
+      "Durable legacy state archive verified"
+    );
+
+    Logger.log("\n--- OBSOLETE TRIGGER RETIREMENT ---");
+
+    retireTriggers.forEach(trigger => {
+
+      const handler =
+        trigger.getHandlerFunction();
+
+      ScriptApp.deleteTrigger(trigger);
+
+      Logger.log(`RETIRED | ${handler}`);
+
+    });
+
+    Logger.log("\n--- POST-MIGRATION VERIFICATION ---");
+
+    const remaining =
+      ScriptApp.getProjectTriggers();
+
+    const remainingIds = remaining
+      .map(trigger => trigger.getUniqueId())
+      .sort();
+
+    requireCondition(
+      remaining.length === 5,
+      "Exactly five permanent triggers remain"
+    );
+
+    requireCondition(
+      JSON.stringify(remainingIds) ===
+        JSON.stringify(preserveIds),
+      "All five original permanent triggers preserved"
+    );
+
+    requireCondition(
+      properties.getProperty(stateKey) === rawState,
+      "Active legacy state preserved"
+    );
+
+    requireCondition(
+      properties.getProperty(archiveKey) === rawState,
+      "Archived legacy state preserved"
+    );
+
+    expectedSheets.forEach(([name]) => {
+
+      const currentHash = fingerprint(
+        ss.getSheetByName(name)
+          .getDataRange()
+          .getValues()
+      );
+
+      requireCondition(
+        currentHash === sourceFingerprints[name],
+        `${name}: production data unchanged`
+      );
+
+    });
+
+    Logger.log("\n--- FINAL RESULTS ---");
+    Logger.log("Recovery backup tabs verified: 8/8");
+    Logger.log("Recovery records verified: 10149");
+    Logger.log("Legacy state archived: YES");
+    Logger.log("Active legacy state preserved: YES");
+    Logger.log("Obsolete triggers retired: 2");
+    Logger.log("Original permanent triggers preserved: 5/5");
+    Logger.log("Production data unchanged: 8/8");
+    Logger.log(`Duration MS: ${Date.now() - started}`);
+
+    Logger.log(
+      "STATUS: PASS — LEGACY MIGRATION PREPARATION COMPLETE"
+    );
+
+    Logger.log("\n--- SAFETY ---");
+    Logger.log("LIVE SPORTS API REQUESTS: 0");
+    Logger.log("SPREADSHEET DATA WRITES: 0");
+    Logger.log("ACTIVE PIPELINE STATE WRITES: 0");
+    Logger.log("LEGACY ARCHIVE PROPERTY WRITES: 1");
+    Logger.log("TRIGGERS DELETED: 2");
+    Logger.log("TRIGGERS CREATED: 0");
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
+
+function initializeNFLTeamPipelineProductionState() {
+
+  Logger.log(
+    "=== NFL TEAM PIPELINE — CONTROLLED INITIALIZATION ==="
+  );
+
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+    throw new Error("Initialization aborted: script lock unavailable.");
+  }
+
+  try {
+
+    const properties =
+      PropertiesService.getScriptProperties();
+
+    const stateKey =
+      NFL_DAILY_ANALYTICS_STATE_KEY;
+
+    const archiveKey =
+      "NFL_DAILY_ANALYTICS_LEGACY_STATE";
+
+    const rawState =
+      properties.getProperty(stateKey);
+
+    const archivedState =
+      properties.getProperty(archiveKey);
+
+    function requireCondition(condition, message) {
+
+      if (!condition) {
+        throw new Error(`INITIALIZATION ABORTED: ${message}`);
+      }
+
+      Logger.log(`PASS | ${message}`);
+
+    }
+
+    requireCondition(
+      Boolean(rawState && archivedState),
+      "Active and archived legacy states exist"
+    );
+
+    requireCondition(
+      rawState === archivedState,
+      "Active legacy state exactly matches durable archive"
+    );
+
+    const legacy = JSON.parse(rawState);
+
+    requireCondition(
+      legacy.pipelineVersion === undefined &&
+      legacy.stage === "TEAM_GAME_LOGS" &&
+      legacy.playerMonthIndex === 7 &&
+      legacy.teamMonthIndex === 0 &&
+      legacy.completed === false &&
+      legacy.lastSuccessfulStep === "Player Game Logs 2027-02" &&
+      legacy.lastError === null &&
+      legacy.updatedAt === "2026-11-15T08:27:12.416Z",
+      "Exact expected legacy checkpoint verified"
+    );
+
+    const ss =
+      SpreadsheetApp.getActiveSpreadsheet();
+
+    const backup = SpreadsheetApp.openById(
+      "1Cf3TlIjoqAPcqWPTIEiGJmECuHe1gwVO3dRvT9qLlEA"
+    );
+
+    const metadata =
+      backup.getSheetByName("Migration Metadata");
+
+    requireCondition(
+      Boolean(metadata),
+      "Recovery backup metadata exists"
+    );
+
+    requireCondition(
+      metadata.getRange("B3").getValue() === ss.getId(),
+      "Recovery backup belongs to this production spreadsheet"
+    );
+
+    requireCondition(
+      metadata.getRange("B4").getValue() === archivedState,
+      "Recovery backup contains exact archived state"
+    );
+
+    const expectedHandlers = [
+
+      "runNFLDailyAnalyticsPipeline",
+      "refreshNFLScheduleSheet",
+      "refreshNFLPlayerPropsSheet",
+      "refreshNFLRostersSheet",
+      "refreshNFLGameOddsSheet"
+
+    ].sort();
+
+    const triggers =
+      ScriptApp.getProjectTriggers();
+
+    const handlers = triggers
+      .map(trigger => trigger.getHandlerFunction())
+      .sort();
+
+    requireCondition(
+      JSON.stringify(handlers) ===
+        JSON.stringify(expectedHandlers) &&
+      triggers.every(trigger =>
+        trigger.getEventType() === ScriptApp.EventType.CLOCK
+      ),
+      "Exactly five expected permanent clock triggers"
+    );
+
+    const expectedHashes = {
+
+      "NFL Player Game Logs":
+        "b6e851494e8112cdc4e249a72299073a3f03adcd2bdf05a2be2283c68122fb5e",
+
+      "NFL Team Game Logs":
+        "663d0e0197b679741d33230e3d354cbb2ff3772b2a703442ac746f02bb03b416"
+
+    };
+
+    Object.entries(expectedHashes).forEach(([name, expected]) => {
+
+      const sheet = ss.getSheetByName(name);
+
+      requireCondition(
+        Boolean(sheet),
+        `${name}: production sheet exists`
+      );
+
+      const actual = Utilities.computeDigest(
+        Utilities.DigestAlgorithm.SHA_256,
+        JSON.stringify(sheet.getDataRange().getValues()),
+        Utilities.Charset.UTF_8
+      )
+      .map(byte =>
+        ("0" + ((byte + 256) % 256).toString(16)).slice(-2)
+      )
+      .join("");
+
+      requireCondition(
+        actual === expected,
+        `${name}: historical fingerprint verified`
+      );
+
+    });
+
+    const next =
+      getDefaultNFLDailyAnalyticsState_();
+
+    validateNFLTeamPipelineState_(next);
+
+    requireCondition(
+      next.stage === "TEAM_GAME_LOGS_BY_TEAM" &&
+      next.teamIndex === 0 &&
+      next.teamIds.length === 0 &&
+      next.retryAttempts === 0 &&
+      next.suspended === false &&
+      next.completed === false,
+      "Fresh team-based pipeline state validated"
+    );
+
+    requireCondition(
+      properties.getProperty(stateKey) === rawState &&
+      properties.getProperty(archiveKey) === archivedState,
+      "Legacy state and archive unchanged before initialization"
+    );
+
+    saveNFLDailyAnalyticsState_(next);
+
+    const initialized =
+      getNFLDailyAnalyticsState_();
+
+    validateNFLTeamPipelineState_(initialized);
+
+    requireCondition(
+      JSON.stringify(initialized) === JSON.stringify(next),
+      "Durable team-based state verified"
+    );
+
+    requireCondition(
+      properties.getProperty(archiveKey) === archivedState,
+      "Legacy state archive remains intact"
+    );
+
+    Logger.log("\n--- INITIALIZED PIPELINE STATE ---");
+    Logger.log(JSON.stringify(initialized, null, 2));
+
+    Logger.log("\n--- FINAL RESULTS ---");
+    Logger.log("Pipeline version: NFL_TEAM_BASED_V1");
+    Logger.log("Team checkpoint: 0/32");
+    Logger.log("Permanent triggers preserved: 5/5");
+    Logger.log("Legacy archive preserved: YES");
+    Logger.log("Pipeline execution started: NO");
+
+    Logger.log(
+      "STATUS: PASS — TEAM-BASED PIPELINE INITIALIZED"
+    );
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
+
+function resumeNFLSuspendedTeamPipeline() {
+
+  Logger.log(
+    "=== NFL TEAM PIPELINE — SUSPENDED CHECKPOINT RECOVERY ==="
+  );
+
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(5000)) {
+    throw new Error("Recovery aborted: script lock unavailable.");
+  }
+
+  try {
+
+    const properties =
+      PropertiesService.getScriptProperties();
+
+    const stateKey =
+      NFL_DAILY_ANALYTICS_STATE_KEY;
+
+    const rawState =
+      properties.getProperty(stateKey);
+
+    if (!rawState) {
+      throw new Error("Recovery aborted: saved state missing.");
+    }
+
+    const state =
+      getNFLDailyAnalyticsState_();
+
+    validateNFLTeamPipelineState_(state);
+
+    if (
+      state.completed ||
+      state.retryAttempts !== 3
+    ) {
+
+      throw new Error(
+        "Recovery aborted: pipeline has not reached its retry limit."
+      );
+
+    }
+
+    const triggers =
+      ScriptApp.getProjectTriggers();
+
+    const motherTriggers = triggers.filter(trigger =>
+      trigger.getHandlerFunction() ===
+        "runNFLDailyAnalyticsPipeline"
+    );
+
+    const resetTriggers = triggers.filter(trigger =>
+      trigger.getHandlerFunction() ===
+        "resetNFLDailyAnalyticsPipeline"
+    );
+
+    if (
+      motherTriggers.length !== 1 ||
+      motherTriggers[0].getEventType() !==
+        ScriptApp.EventType.CLOCK ||
+      resetTriggers.length !== 0
+    ) {
+
+      throw new Error(
+        "Recovery aborted: unexpected permanent trigger architecture."
+      );
+
+    }
+
+    const archiveKey =
+      "NFL_DAILY_ANALYTICS_LAST_SUSPENDED_STATE";
+
+    properties.setProperty(
+      archiveKey,
+      rawState
+    );
+
+    if (properties.getProperty(archiveKey) !== rawState) {
+      throw new Error("Recovery aborted: checkpoint archive failed.");
+    }
+
+    const next = {
+
+      ...state,
+
+      retryAttempts: 0,
+      suspended: false,
+      lastError: null
+
+    };
+
+    validateNFLTeamPipelineState_(next);
+
+    if (properties.getProperty(stateKey) !== rawState) {
+      throw new Error("Recovery aborted: checkpoint changed.");
+    }
+
+    // Arm recovery before making the checkpoint eligible again.
+
+    scheduleNFLDailyAnalyticsContinuation_(15 * 60 * 1000);
+
+    saveNFLDailyAnalyticsState_(next);
+
+    const saved =
+      getNFLDailyAnalyticsState_();
+
+    validateNFLTeamPipelineState_(saved);
+
+    if (
+      JSON.stringify(saved) !== JSON.stringify(next)
+    ) {
+
+      throw new Error(
+        "Recovery checkpoint verification failed."
+      );
+
+    }
+
+    scheduleNFLDailyAnalyticsContinuation_();
+
+    Logger.log("\n--- RECOVERED CHECKPOINT ---");
+    Logger.log(JSON.stringify(saved, null, 2));
+
+    Logger.log("Historical progress preserved: YES");
+    Logger.log("Previous failed checkpoint archived: YES");
+    Logger.log("Retry counter reset: YES");
+    Logger.log("Automatic continuation scheduled: YES");
+
+    Logger.log(
+      "STATUS: PASS — SUSPENDED PIPELINE RECOVERY SCHEDULED"
+    );
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
 }

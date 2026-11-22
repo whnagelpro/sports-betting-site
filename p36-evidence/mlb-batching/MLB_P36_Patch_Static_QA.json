@@ -1,0 +1,18 @@
+{
+  "checks": {
+    "syntax": true,
+    "production_root_retained": true,
+    "batch_limit_five": true,
+    "batch_budget_180s": true,
+    "fresh_identity": true,
+    "all_team_indices": true,
+    "pending_does_not_advance": true,
+    "cache_cleanup": true,
+    "production_staging_unchanged": true,
+    "runner_count": true,
+    "worker_count": true
+  },
+  "passed": 11,
+  "total": 11,
+  "note": "Static QA only. Live Apps Script and simulated retry tests not executed."
+}
