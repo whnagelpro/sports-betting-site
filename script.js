@@ -1983,7 +1983,7 @@ function createBetCard(game, tierName = "Rookie", league = "nba") {
               </span>
           </div>
 
-          ${isPlay ? `<a class="card-link" href="parlay.html?league=${encodeURIComponent(league)}&board=odds&q=${encodeURIComponent(headline?.bet || `${game.awayTeam} at ${game.homeTeam}`)}">Add best side to parlay</a>` : ""}
+          ${isPlay && !gameHasStarted(game.scheduleStatus) ? `<a class="card-link" href="parlay.html?league=${encodeURIComponent(league)}&board=odds&q=${encodeURIComponent(headline?.bet || `${game.awayTeam} at ${game.homeTeam}`)}">Add best side to parlay</a>` : ""}
 
         </div>
       </div>
@@ -2055,7 +2055,7 @@ function createPropCard(prop) {
           <div><strong>Confidence:</strong> ${confidenceText}</div>
           <div><strong>Risk:</strong> ${prop.riskTier || "—"}</div>
           <div><strong>Hit Rate:</strong> ${prop.lineHitRate || "—"}</div>
-          ${prop.playerId ? `<div><a class="card-link" href="parlay.html?league=${encodeURIComponent(prop.league || "")}&board=props&q=${encodeURIComponent(`${fullName} ${prop.propType || ""} ${prop.lineValue || ""} ${prop.bestSide || ""}`.trim())}">Add to parlay</a></div>` : ""}
+          ${prop.playerId && !gameHasStarted(prop.scheduleStatus) ? `<div><a class="card-link" href="parlay.html?league=${encodeURIComponent(prop.league || "")}&board=props&q=${encodeURIComponent(`${fullName} ${prop.propType || ""} ${prop.lineValue || ""} ${prop.bestSide || ""}`.trim())}">Add to parlay</a></div>` : ""}
         </div>
       </div>
   `;

@@ -30,6 +30,7 @@ const PLAYER_SCHEDULE_CSV = {
 };
 
 let closedPropKeys = new Set();
+let playerGameHasStarted = false;
 
 const PLAYER_PROPS_CSV = {
     nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=590324617&single=true&output=csv",
@@ -72,7 +73,6 @@ async function initPlayerPage() {
         updatePlayerProfileSEO();
 
         renderHero();
-        renderPlayerTonight();
 
         renderInsights();
 
@@ -84,6 +84,7 @@ async function initPlayerPage() {
 
         trendHitRates = await fetchPlayerTrendHitRates().catch(() => ({}));
         propHitRates = await fetchPlayerPropHitRates().catch(() => ({}));
+        await renderPlayerTonight();
 
         renderProps();
 
@@ -546,6 +547,13 @@ function renderHero() {
 
 }
 
+function profileGameHasStarted(status) {
+    const value = String(status || "").trim().toLowerCase();
+    if (!value || value === "scheduled" || value === "pregame" || value === "delayed") return false;
+    if (/^\d{1,2}:\d{2}/.test(value)) return false;
+    return true;
+}
+
 async function renderPlayerTonight() {
     const teamName = String(player?.hero?.team || "").trim();
     const teamEl = document.getElementById("player-team");
@@ -570,7 +578,8 @@ async function renderPlayerTonight() {
         const isAway = away.toLowerCase() === name;
         const note = document.createElement("p");
         note.id = "player-tonight";
-        note.textContent = `Tonight: ${isAway ? "at" : "vs"} ${isAway ? home : away} · ${tonight.Status || "Scheduled"}`;
+        playerGameHasStarted = profileGameHasStarted(tonight.Status);
+        note.textContent = `Tonight: ${isAway ? "at" : "vs"} ${isAway ? home : away} · ${playerGameHasStarted ? `${tonight.Status || "Started"} · Pregame lines` : (tonight.Status || "Scheduled")}`;
         teamEl.insertAdjacentElement("afterend", note);
     } catch (error) {
         console.error("Player schedule lookup failed:", error);
@@ -2052,7 +2061,7 @@ function renderProps() {
 
         </div>
 
-        <a class="card-link" href="parlay.html?league=${encodeURIComponent(currentLeague)}&board=props&q=${encodeURIComponent(`${player.hero?.name || ""} ${prop.propType || prop.displayName || ""} ${prop.line ?? ""} ${recommendation}`.trim())}">Add to parlay</a>
+        ${playerGameHasStarted ? "" : `<a class="card-link" href="parlay.html?league=${encodeURIComponent(currentLeague)}&board=props&q=${encodeURIComponent(`${player.hero?.name || ""} ${prop.propType || prop.displayName || ""} ${prop.line ?? ""} ${recommendation}`.trim())}">Add to parlay</a>`}
 
         `;
 

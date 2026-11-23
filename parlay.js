@@ -140,11 +140,24 @@ function isFinalStatus(status) {
   return ["final", "complete", "completed", "postponed", "cancelled", "canceled"].includes(value);
 }
 
-async function finalGameIds(league) {
-  if (parlayCache[`${league}-final`]) return parlayCache[`${league}-final`];
+function parlayGameHasStarted(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (!value || value === "scheduled" || value === "pregame" || value === "delayed") return false;
+  if (/^\d{1,2}:\d{2}/.test(value)) return false;
+  return true;
+}
+
+async function unavailableGameIds(league) {
+  const key = `${league}-unavailable`;
+  if (parlayCache[key]) return parlayCache[key];
   const rows = await loadParlayCSV(PARLAY_SCHEDULE_URLS[league]);
-  const ids = new Set(rows.filter(row => isFinalStatus(row.Status)).map(row => String(row["Game Id"] || "").trim()).filter(Boolean));
-  parlayCache[`${league}-final`] = ids;
+  const ids = new Set(
+    rows
+      .filter(row => isFinalStatus(row.Status) || parlayGameHasStarted(row.Status))
+      .map(row => String(row["Game Id"] || "").trim())
+      .filter(Boolean)
+  );
+  parlayCache[key] = ids;
   return ids;
 }
 
@@ -325,16 +338,16 @@ async function findLegs() {
   status.textContent = "Loading the live board...";
   results.innerHTML = "";
   try {
-    const finals = await finalGameIds(league);
+    const unavailable = await unavailableGameIds(league);
     const today = parlayToday();
     const rows = await loadParlayCSV(board === "odds" ? PARLAY_ODDS_URLS[league] : PARLAY_PROPS_URLS[league]);
     const openRows = rows.filter(row => {
       const gameId = String(row["Game Id"] || "").trim();
-      return parlayDate(row["Game Date"]) === today && (!gameId || !finals.has(gameId));
+      return parlayDate(row["Game Date"]) === today && (!gameId || !unavailable.has(gameId));
     });
     const legs = openRows.flatMap(row => board === "odds" ? oddsLegsFromRow(row, league) : propLegsFromRow(row, league));
     const matches = legs.filter(leg => !query || leg.label.toLowerCase().includes(query)).slice(0, 24);
-    status.textContent = matches.length ? `${matches.length} legs ready.` : "No open legs matched that search.";
+    status.textContent = matches.length ? `${matches.length} legs ready.` : "No upcoming legs matched. Games that have already started stay off the parlay.";
     results.innerHTML = matches.map((leg, index) => `
       <article class="parlay-result">
         <div>
