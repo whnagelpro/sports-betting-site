@@ -72,6 +72,7 @@ async function initPlayerPage() {
         updatePlayerProfileSEO();
 
         renderHero();
+        renderPlayerTonight();
 
         renderInsights();
 
@@ -543,6 +544,37 @@ function renderHero() {
 
     });
 
+}
+
+async function renderPlayerTonight() {
+    const teamName = String(player?.hero?.team || "").trim();
+    const teamEl = document.getElementById("player-team");
+    const url = PLAYER_SCHEDULE_CSV[currentLeague];
+    if (!teamName || !teamEl || !url || document.getElementById("player-tonight")) return;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return;
+        const rows = parseProfileCSV(await response.text());
+        const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Phoenix" }).format(new Date());
+        const name = teamName.toLowerCase();
+        const tonight = rows.find((row) => {
+            const away = String(row["Away Team"] || "").trim().toLowerCase();
+            const home = String(row["Home Team"] || "").trim().toLowerCase();
+            return profileSheetDate(row["Game Date"]) === today && (away === name || home === name);
+        });
+        if (!tonight) return;
+
+        const away = String(tonight["Away Team"] || "").trim();
+        const home = String(tonight["Home Team"] || "").trim();
+        const isAway = away.toLowerCase() === name;
+        const note = document.createElement("p");
+        note.id = "player-tonight";
+        note.textContent = `Tonight: ${isAway ? "at" : "vs"} ${isAway ? home : away} · ${tonight.Status || "Scheduled"}`;
+        teamEl.insertAdjacentElement("afterend", note);
+    } catch (error) {
+        console.error("Player schedule lookup failed:", error);
+    }
 }
 
 function renderQuickStats() {
