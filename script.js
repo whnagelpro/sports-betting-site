@@ -2957,6 +2957,10 @@ function topPropByScore(props) {
   })[0];
 }
 
+function homePropMeta(prop) {
+  return `Top Free Props Today | ${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${prop.scheduleStatus}` : ""}`;
+}
+
 function homeGameMeta(game) {
   return `Featured Sportacular Score | ${game.vendor} | ${game.gameDate}${game.scheduleStatus ? ` | ${game.scheduleStatus}` : ""}`;
 }
@@ -3125,10 +3129,7 @@ async function renderHomeSpotlights() {
         {
           title: homePropTitle("nba", topNBAProp),
 
-          meta:
-            `Top Free Props Today | ` +
-            `${topNBAProp.vendor} | ` +
-            `${topNBAProp.gameDate || "Today"}`,
+          meta: homePropMeta(topNBAProp),
 
           ev: topNBAProp.ev,
           score: topNBAProp.sportacularScore,
@@ -3173,10 +3174,7 @@ async function renderHomeSpotlights() {
         {
           title: homePropTitle("nhl", topNHLProp),
 
-          meta:
-            `Top Free Props Today | ` +
-            `${topNHLProp.vendor} | ` +
-            `${topNHLProp.gameDate || "Today"}`,
+          meta: homePropMeta(topNHLProp),
 
           ev: topNHLProp.ev,
           score: topNHLProp.sportacularScore,
@@ -3221,10 +3219,7 @@ async function renderHomeSpotlights() {
         {
           title: homePropTitle("mlb", topMLBProp),
 
-          meta:
-            `Top Free Props Today | ` +
-            `${topMLBProp.vendor} | ` +
-            `${topMLBProp.gameDate || "Today"}`,
+          meta: homePropMeta(topMLBProp),
 
           ev: topMLBProp.ev,
           score: topMLBProp.sportacularScore,
@@ -3269,10 +3264,7 @@ async function renderHomeSpotlights() {
         {
           title: homePropTitle("nfl", topNFLProp),
 
-          meta:
-            `Top Free Props Today | ` +
-            `${topNFLProp.vendor} | ` +
-            `${topNFLProp.gameDate || "Today"}`,
+          meta: homePropMeta(topNFLProp),
 
           ev: topNFLProp.ev,
           score: topNFLProp.sportacularScore,
@@ -3533,10 +3525,16 @@ async function fetchHomepageProps(league) {
   const rows = parseCSV(await response.text());
   const props = league === "nfl" ? buildNFLPropsFromRows(rows) : buildPropsFromRows(rows, league);
   const today = getPhoenixDateString();
-  const finals = await finalGameIds(league);
+  const statuses = await gameStatusMap(league);
+  const finals = new Set(
+    Object.entries(statuses)
+      .filter(([, status]) => isClosedGameStatus(status))
+      .map(([id]) => id)
+  );
   const todaysProps = props
     .filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide))
-    .filter((prop) => !prop.gameId || !finals.has(String(prop.gameId)));
+    .filter((prop) => !prop.gameId || !finals.has(String(prop.gameId)))
+    .map((prop) => ({ ...prop, scheduleStatus: statuses[String(prop.gameId)] || "" }));
   DATA_CACHE.props[cacheKey] = todaysProps;
   return todaysProps;
 }
