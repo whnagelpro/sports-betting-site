@@ -2151,6 +2151,48 @@ function isClosedGameStatus(status) {
 
 const GAME_STATUS_CACHE = {};
 
+const TONIGHT_STATUS = {};
+let ACTIVE_TONIGHT = {};
+
+async function loadTonightStatuses(league) {
+  if (TONIGHT_STATUS[league]) {
+    ACTIVE_TONIGHT = TONIGHT_STATUS[league];
+    return ACTIVE_TONIGHT;
+  }
+
+  const map = {};
+  const url = SCHEDULE_CSV[league];
+  if (url) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const rows = parseCSV(await response.text());
+        const today = getTodayDateString();
+        rows.forEach((row) => {
+          if (normalizeDate(row["Game Date"]) !== today) return;
+          const status = String(row.Status || "").trim();
+          if (!status) return;
+          [row["Away Team"], row["Home Team"]].forEach((team) => {
+            const name = String(team || "").trim().toLowerCase();
+            if (name) map[name] = status;
+          });
+        });
+      }
+    } catch (error) {
+      console.error("Trend schedule lookup failed:", error);
+    }
+  }
+
+  TONIGHT_STATUS[league] = map;
+  ACTIVE_TONIGHT = map;
+  return map;
+}
+
+function tonightStatus(team) {
+  const status = ACTIVE_TONIGHT[String(team || "").trim().toLowerCase()] || "";
+  return status ? ` • ${status}` : "";
+}
+
 async function teamTonight(league, teamName) {
   const url = SCHEDULE_CSV[league];
   if (!url || !teamName) return null;
@@ -4101,7 +4143,7 @@ function createNBATrendCard(player) {
       <div class="trend-card-header">
         <div class="trend-title">
           <h3>${playerProfileLink("nba", player)}</h3>
-          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
+          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}</div>
         </div>
 
         <div class="trend-strength-badge">
@@ -4168,6 +4210,7 @@ function createNBATrendCard(player) {
 }
 
 async function renderNBATrends() {
+  await loadTonightStatuses("nba");
   const container = document.getElementById("nba-trends-container");
   if (!container) return;
 
@@ -4312,7 +4355,7 @@ function createNBATeamTrendCard(teamRow) {
       <div class="trend-card-header">
         <div class="trend-title">
           <h3>${teamProfileLink("nba", teamRow["Team"])}</h3>
-          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
+          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}</div>
         </div>
 
         <div class="trend-strength-badge">
@@ -4387,6 +4430,7 @@ function createNBATeamTrendCard(teamRow) {
 }
 
 async function renderNBATeamTrends() {
+  await loadTonightStatuses("nba");
   const container = document.getElementById("nba-team-trends-container");
   if (!container) return;
 
@@ -4536,7 +4580,7 @@ function createNHLTrendCard(player) {
       <div class="trend-card-header">
         <div class="trend-title">
           <h3>${playerProfileLink("nhl", player)}</h3>
-          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
+          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}</div>
         </div>
 
         <div class="trend-strength-badge">
@@ -4599,6 +4643,7 @@ function createNHLTrendCard(player) {
 }
 
 async function renderNHLTrends() {
+  await loadTonightStatuses("nhl");
   const container = document.getElementById("nhl-trends-container");
   if (!container) return;
 
@@ -4763,7 +4808,7 @@ function createNHLTeamTrendCard(teamRow) {
       <div class="trend-card-header">
         <div class="trend-title">
           <h3>${teamProfileLink("nhl", teamRow["Team"])}</h3>
-          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
+          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}</div>
         </div>
 
         <div class="trend-strength-badge">
@@ -4838,6 +4883,7 @@ function createNHLTeamTrendCard(teamRow) {
 }
 
 async function renderNHLTeamTrends() {
+  await loadTonightStatuses("nhl");
   const container = document.getElementById("nhl-team-trends-container");
   if (!container) return;
 
@@ -5000,7 +5046,7 @@ function createTrendCard(player) {
       <div class="trend-card-header">
         <div class="trend-title">
           <h3>${playerProfileLink("mlb", player)}</h3>
-          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}</div>
+          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}</div>
         </div>
 
         <div class="trend-strength-badge">
@@ -5134,6 +5180,7 @@ async function initNHLTrendsPage() {
 }
 
 async function renderMLBTopPlayerTrends() {
+  await loadTonightStatuses("mlb");
   const container = document.getElementById("mlb-top-player-trends-container");
   if (!container) return;
 
@@ -5157,7 +5204,7 @@ async function renderMLBTopPlayerTrends() {
         <div class="trend-card-header">
           <div class="trend-title">
             <h3>#${row["Rank"] || ""} ${row["Player Name"] || "Unknown Player"}</h3>
-            <div class="trend-subtitle">${row["Team"] || "N/A"} • ${row["Stat Type"] || "Trend"}</div>
+            <div class="trend-subtitle">${row["Team"] || "N/A"} • ${row["Stat Type"] || "Trend"}${tonightStatus(row["Team"])}</div>
           </div>
 
           <div class="trend-strength-badge">
@@ -5177,6 +5224,7 @@ async function renderMLBTopPlayerTrends() {
 }
 
 async function renderMLBTopTeamTrends() {
+  await loadTonightStatuses("mlb");
   const container = document.getElementById("mlb-top-team-trends-container");
   if (!container) return;
 
@@ -5200,7 +5248,7 @@ async function renderMLBTopTeamTrends() {
         <div class="trend-card-header">
           <div class="trend-title">
             <h3>#${row["Rank"] || ""} ${row["Team"] || "Unknown Team"}</h3>
-            <div class="trend-subtitle">${row["Metric"] || "Trend"}</div>
+            <div class="trend-subtitle">${row["Metric"] || "Trend"}${tonightStatus(row["Team"])}</div>
           </div>
 
           <div class="trend-strength-badge">
@@ -5241,7 +5289,7 @@ function createMLBTeamTrendCard(teamRow) {
       <div class="trend-card-header">
         <div class="trend-title">
           <h3>${teamProfileLink("mlb", teamRow["Team"])}</h3>
-          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}</div>
+          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}</div>
         </div>
 
         <div class="trend-strength-badge">
@@ -5332,6 +5380,7 @@ function populateTeamFilter(selectId, rows, onChange) {
 }
 
 async function renderMLBTeamTrends() {
+  await loadTonightStatuses("mlb");
   const container = document.getElementById("mlb-team-trends-container");
   if (!container) return;
 
@@ -5464,6 +5513,7 @@ async function initMLBTeamTrendsPage() {
 }
 
 async function renderMLBTrends() {
+  await loadTonightStatuses("mlb");
   const container = document.getElementById("mlb-trends-container");
   if (!container) return;
 
@@ -5643,7 +5693,7 @@ function createNFLTrendCard(player) {
 
       <div>
         ${player["Team"] || "N/A"} |
-        ${formatNFLTrendLabel(player["Stat Type"])}
+        ${formatNFLTrendLabel(player["Stat Type"])}${tonightStatus(player["Team"])}
       </div>
 
       <div>
@@ -5696,6 +5746,7 @@ function createNFLTrendCard(player) {
 }
 
 async function renderNFLTrends() {
+  await loadTonightStatuses("nfl");
   const container =
     document.getElementById("nfl-trends-container");
 
@@ -5969,7 +6020,7 @@ function createNFLTeamTrendCard(teamRow) {
       <div>
         ${formatNFLTeamTrendLabel(
           teamRow["Metric"]
-        )}
+        )}${tonightStatus(teamRow["Team"])}
       </div>
 
       <div>
@@ -6034,6 +6085,7 @@ function createNFLTeamTrendCard(teamRow) {
 }
 
 async function renderNFLTeamTrends() {
+  await loadTonightStatuses("nfl");
   const container =
     document.getElementById(
       "nfl-team-trends-container"
