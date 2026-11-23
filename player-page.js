@@ -22,6 +22,15 @@ const PLAYER_TREND_CSV = {
     nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1953623841&single=true&output=csv"
 };
 
+const PLAYER_SCHEDULE_CSV = {
+    nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=1724367340&single=true&output=csv",
+    nhl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=2048323486&single=true&output=csv",
+    mlb: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=314629327&single=true&output=csv",
+    nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1131205016&single=true&output=csv"
+};
+
+let closedPropKeys = new Set();
+
 const PLAYER_PROPS_CSV = {
     nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=590324617&single=true&output=csv",
     nhl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1839953184&single=true&output=csv",
@@ -72,10 +81,10 @@ async function initPlayerPage() {
 
         renderSeasonPanels();
 
-        renderProps();
-
         trendHitRates = await fetchPlayerTrendHitRates().catch(() => ({}));
         propHitRates = await fetchPlayerPropHitRates().catch(() => ({}));
+
+        renderProps();
 
         renderTrendCards();
 
@@ -1803,9 +1812,20 @@ function renderProps() {
     const visibleProps = player.props
         .filter((prop) => {
             const side = String(prop.recommendation ?? prop.bestSide ?? "").trim().toLowerCase();
-            return side === "over" || side === "under";
+            const propKey = `${String(prop.propType || prop.displayName || "").trim().toLowerCase()}|${Number(prop.line)}`;
+            return (side === "over" || side === "under") && !closedPropKeys.has(propKey);
         })
         .sort((a, b) => (Number(b.sportacularScore) || -1) - (Number(a.sportacularScore) || -1));
+
+    if (!visibleProps.length) {
+        grid.innerHTML = `
+            <article class="trend-card empty-state">
+                <h3>No Open Props</h3>
+                <p>This player's props are for a game that is already final, postponed, or cancelled.</p>
+            </article>
+        `;
+        return;
+    }
 
     visibleProps.forEach(prop => {
 
@@ -2119,14 +2139,39 @@ async function fetchPlayerTrendHitRates() {
     return rates;
 }
 
+async function profileFinalGameIds(league) {
+    const url = PLAYER_SCHEDULE_CSV[league];
+    if (!url) return new Set();
+    const response = await fetch(url);
+    if (!response.ok) return new Set();
+    const rows = parseProfileCSV(await response.text());
+    return new Set(
+        rows
+            .filter((row) => ["final", "complete", "completed", "postponed", "cancelled", "canceled"].includes(String(row.Status || "").trim().toLowerCase()))
+            .map((row) => String(row["Game Id"] || "").trim())
+            .filter(Boolean)
+    );
+}
+
+function profileSheetDate(value) {
+    const raw = String(value || "").trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
+    const match = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!match) return "";
+    return `${match[3]}-${match[1].padStart(2, "0")}-${match[2].padStart(2, "0")}`;
+}
+
 async function fetchPlayerPropHitRates() {
     const url = PLAYER_PROPS_CSV[currentLeague];
+    closedPropKeys = new Set();
     if (!url || !currentPlayerId) return {};
 
     const response = await fetch(url);
     if (!response.ok) return {};
 
     const rows = parseProfileCSV(await response.text());
+    const finals = await profileFinalGameIds(currentLeague).catch(() => new Set());
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Phoenix" }).format(new Date());
     const rates = {};
 
     rows.forEach((row) => {
@@ -2137,9 +2182,13 @@ async function fetchPlayerPropHitRates() {
         const line = Number(row["Line Value"]);
         const side = String(row["Best Side"] || "").trim().toLowerCase();
         const hitRate = String(row["Line Hit Rate"] || "").trim();
-        if (!propType || !Number.isFinite(line) || !hitRate) return;
+        const gameId = String(row["Game Id"] || "").trim();
+        if (!propType || !Number.isFinite(line)) return;
 
-        rates[`${propType}|${line}|${side}`] = hitRate;
+        if (hitRate) rates[`${propType}|${line}|${side}`] = hitRate;
+        if (profileSheetDate(row["Game Date"]) === today && gameId && finals.has(gameId)) {
+            closedPropKeys.add(`${propType}|${line}`);
+        }
     });
 
     return rates;
