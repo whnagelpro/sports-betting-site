@@ -123,9 +123,21 @@ async function loadParlayCSV(url) {
   return parseParlayCSV(await response.text());
 }
 
+function parlayToday() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Phoenix" }).format(new Date());
+}
+
+function parlayDate(value) {
+  const raw = String(value || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
+  const match = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!match) return "";
+  return `${match[3]}-${match[1].padStart(2, "0")}-${match[2].padStart(2, "0")}`;
+}
+
 function isFinalStatus(status) {
   const value = String(status || "").trim().toLowerCase();
-  return value === "final" || value === "complete" || value === "completed";
+  return ["final", "complete", "completed", "postponed", "cancelled", "canceled"].includes(value);
 }
 
 async function finalGameIds(league) {
@@ -314,8 +326,12 @@ async function findLegs() {
   results.innerHTML = "";
   try {
     const finals = await finalGameIds(league);
+    const today = parlayToday();
     const rows = await loadParlayCSV(board === "odds" ? PARLAY_ODDS_URLS[league] : PARLAY_PROPS_URLS[league]);
-    const openRows = rows.filter(row => !finals.has(String(row["Game Id"] || "").trim()));
+    const openRows = rows.filter(row => {
+      const gameId = String(row["Game Id"] || "").trim();
+      return parlayDate(row["Game Date"]) === today && (!gameId || !finals.has(gameId));
+    });
     const legs = openRows.flatMap(row => board === "odds" ? oddsLegsFromRow(row, league) : propLegsFromRow(row, league));
     const matches = legs.filter(leg => !query || leg.label.toLowerCase().includes(query)).slice(0, 24);
     status.textContent = matches.length ? `${matches.length} legs ready.` : "No open legs matched that search.";
