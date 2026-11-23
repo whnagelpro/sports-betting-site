@@ -1735,6 +1735,9 @@ function renderProps() {
 
     if (topPropTrendButton) {
         topPropTrendButton.style.display = "";
+        topPropTrendButton.onclick = () => {
+            document.getElementById("trend-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        };
     }
 
     const topPropBadge =
