@@ -8498,4 +8498,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const page = leaguePages[link.textContent.trim().toLowerCase()];
     if (page) link.setAttribute("href", page);
   });
+
+  if (!document.getElementById("about")) {
+    document.querySelectorAll('a[href="#about"]').forEach((link) => {
+      link.setAttribute("href", "index.html#about");
+    });
+  }
 });
