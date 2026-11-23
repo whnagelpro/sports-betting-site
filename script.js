@@ -2895,6 +2895,10 @@ function topPropByScore(props) {
   })[0];
 }
 
+function homeGameMeta(game) {
+  return `Featured Sportacular Score | ${game.vendor} | ${game.gameDate}${game.scheduleStatus ? ` | ${game.scheduleStatus}` : ""}`;
+}
+
 function homePropTitle(league, prop) {
   const name = getPropFullName(prop);
   const label = formatPropTypeLabel(prop.propType);
@@ -3040,10 +3044,7 @@ async function renderHomeSpotlights() {
         {
           title: matchupLinks("nba", topNBAGame.awayTeam, topNBAGame.homeTeam),
 
-          meta:
-            `Featured Sportacular Score | ` +
-            `${topNBAGame.vendor} | ` +
-            `${topNBAGame.gameDate}`,
+          meta: homeGameMeta(topNBAGame),
 
           ev: bestRank.ev,
           score: bestRank.sportacularScore,
@@ -3091,10 +3092,7 @@ async function renderHomeSpotlights() {
         {
           title: matchupLinks("nhl", topNHLGame.awayTeam, topNHLGame.homeTeam),
 
-          meta:
-            `Featured Sportacular Score | ` +
-            `${topNHLGame.vendor} | ` +
-            `${topNHLGame.gameDate}`,
+          meta: homeGameMeta(topNHLGame),
 
           ev: bestRank.ev,
           score: bestRank.sportacularScore,
@@ -3142,10 +3140,7 @@ async function renderHomeSpotlights() {
         {
           title: matchupLinks("mlb", topMLBGame.awayTeam, topMLBGame.homeTeam),
 
-          meta:
-            `Featured Sportacular Score | ` +
-            `${topMLBGame.vendor} | ` +
-            `${topMLBGame.gameDate}`,
+          meta: homeGameMeta(topMLBGame),
 
           ev: bestRank.ev,
           score: bestRank.sportacularScore,
@@ -3193,10 +3188,7 @@ async function renderHomeSpotlights() {
         {
           title: matchupLinks("nfl", topNFLGame.awayTeam, topNFLGame.homeTeam),
 
-          meta:
-            `Featured Sportacular Score | ` +
-            `${topNFLGame.vendor} | ` +
-            `${topNFLGame.gameDate}`,
+          meta: homeGameMeta(topNFLGame),
 
           ev: bestRank.ev,
           score: bestRank.sportacularScore,
