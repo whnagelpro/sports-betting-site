@@ -2314,8 +2314,8 @@ if (
   console.log("First 5 props before date filter:", props.slice(0, 5));
 
   const todaysProps = props
-    .filter((prop) => prop.gameDate === today)
-    .sort((a, b) => b.ev - a.ev);
+    .filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide))
+    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
 
   console.log("Today props count:", todaysProps.length);
   console.log("First 5 today props:", todaysProps.slice(0, 5));
@@ -2801,6 +2801,11 @@ container.innerHTML = `
     </div>
   `;
 }
+}
+
+function isPlayableSide(side) {
+  const value = String(side || "").trim().toLowerCase();
+  return value === "over" || value === "under";
 }
 
 function bestScoredRank(game) {
@@ -3406,7 +3411,7 @@ async function fetchHomepageProps(league) {
   const rows = parseCSV(await response.text());
   const props = league === "nfl" ? buildNFLPropsFromRows(rows) : buildPropsFromRows(rows, league);
   const today = getPhoenixDateString();
-  const todaysProps = props.filter((prop) => prop.gameDate === today);
+  const todaysProps = props.filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide));
   DATA_CACHE.props[cacheKey] = todaysProps;
   return todaysProps;
 }
