@@ -1870,22 +1870,15 @@ function buildNFLPropsFromRows(rows) {
       return;
     }
 
-    const currentEV =
-      Number.isFinite(prop.bestEV)
-        ? prop.bestEV
-        : -Infinity;
+    const currentScore = Number.isFinite(prop.sportacularScore) ? prop.sportacularScore : -Infinity;
+    const existingScore = Number.isFinite(existing.sportacularScore) ? existing.sportacularScore : -Infinity;
 
-    const existingEV =
-      Number.isFinite(existing.bestEV)
-        ? existing.bestEV
-        : -Infinity;
-
-    if (currentEV > existingEV) {
+    if (currentScore > existingScore) {
       bestMarkets.set(marketKey, prop);
       return;
     }
 
-    if (currentEV === existingEV) {
+    if (currentScore === existingScore) {
       const currentProbability =
         Number.isFinite(prop.bestModelProbability)
           ? prop.bestModelProbability
