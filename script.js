@@ -1933,7 +1933,7 @@ function createBetCard(game, tierName = "Rookie", league = "nba") {
       <div class="bet-card-header">
         <div>
           <h3>${matchupLinks(league, game.awayTeam, game.homeTeam)}</h3>
-          <p class="bet-subtext">Sportsbook: ${game.vendor} | Game Date: ${game.gameDate}</p>
+          <p class="bet-subtext">Sportsbook: ${game.vendor} | Game Date: ${game.gameDate}${game.scheduleStatus ? ` | ${game.scheduleStatus}` : ""}</p>
         </div>
         <div class="bet-card-analytics">
 
@@ -2073,7 +2073,7 @@ ${
 ${formatPropTypeLabel(prop.propType)}
 
 </h3>
-          <p class="prop-meta">${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}</p>
+          <p class="prop-meta">${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${prop.scheduleStatus}` : ""}</p>
         </div>
         <div class="ev-badge ${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
       </div>
@@ -2136,8 +2136,6 @@ const SCHEDULE_CSV = {
   nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=1131205016&single=true&output=csv"
 };
 
-const FINAL_GAME_CACHE = {};
-
 function leagueFromOddsUrl(csvUrl) {
   if (csvUrl === NBA_CSV_URL) return "nba";
   if (csvUrl === NHL_CSV_URL) return "nhl";
@@ -2151,26 +2149,37 @@ function isClosedGameStatus(status) {
   return ["final", "complete", "completed", "postponed", "cancelled", "canceled"].includes(value);
 }
 
-async function finalGameIds(league) {
-  if (FINAL_GAME_CACHE[league]) return FINAL_GAME_CACHE[league];
+const GAME_STATUS_CACHE = {};
+
+async function gameStatusMap(league) {
+  if (GAME_STATUS_CACHE[league]) return GAME_STATUS_CACHE[league];
   const url = SCHEDULE_CSV[league];
-  if (!url) return new Set();
+  if (!url) return {};
   try {
     const response = await fetch(url);
-    if (!response.ok) return new Set();
+    if (!response.ok) return {};
     const rows = parseCSV(await response.text());
-    const ids = new Set(
-      rows
-        .filter((row) => isClosedGameStatus(row.Status))
-        .map((row) => String(row["Game Id"] || "").trim())
-        .filter(Boolean)
-    );
-    FINAL_GAME_CACHE[league] = ids;
-    return ids;
+    const statuses = {};
+    rows.forEach((row) => {
+      const id = String(row["Game Id"] || "").trim();
+      const status = String(row.Status || "").trim();
+      if (id && status) statuses[id] = status;
+    });
+    GAME_STATUS_CACHE[league] = statuses;
+    return statuses;
   } catch (error) {
-    console.error("Final game lookup failed:", error);
-    return new Set();
+    console.error("Game status lookup failed:", error);
+    return {};
   }
+}
+
+async function finalGameIds(league) {
+  const statuses = await gameStatusMap(league);
+  return new Set(
+    Object.entries(statuses)
+      .filter(([, status]) => isClosedGameStatus(status))
+      .map(([id]) => id)
+  );
 }
 
 async function fetchLeagueGames(csvUrl) {
@@ -2210,7 +2219,15 @@ async function fetchLeagueGames(csvUrl) {
     .filter((game) => game.gameDate === today)
     .sort((a, b) => (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1));
   const league = leagueFromOddsUrl(csvUrl);
-  const finals = league ? await finalGameIds(league) : new Set();
+  const statuses = league ? await gameStatusMap(league) : {};
+  todaysGames.forEach((game) => {
+    game.scheduleStatus = statuses[String(game.gameId)] || "";
+  });
+  const finals = new Set(
+    Object.entries(statuses)
+      .filter(([, status]) => isClosedGameStatus(status))
+      .map(([id]) => id)
+  );
   const openGames = todaysGames.filter((game) => !game.gameId || !finals.has(String(game.gameId)));
   console.log("Today's games:", openGames.length);
   console.log(openGames);
@@ -2354,10 +2371,16 @@ if (
   console.log("Built props count:", props.length);
   console.log("First 5 props before date filter:", props.slice(0, 5));
 
-  const finals = await finalGameIds(league);
+  const statuses = await gameStatusMap(league);
+  const finals = new Set(
+    Object.entries(statuses)
+      .filter(([, status]) => isClosedGameStatus(status))
+      .map(([id]) => id)
+  );
   const todaysProps = props
     .filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide))
     .filter((prop) => !prop.gameId || !finals.has(String(prop.gameId)))
+    .map((prop) => ({ ...prop, scheduleStatus: statuses[String(prop.gameId)] || "" }))
     .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
 
   console.log("Today props count:", todaysProps.length);
