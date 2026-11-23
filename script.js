@@ -1944,7 +1944,7 @@ function createBetCard(game, tierName = "Rookie", league = "nba") {
       <div class="bet-card-header">
         <div>
           <h3>${matchupLinks(league, game.awayTeam, game.homeTeam)}</h3>
-          <p class="bet-subtext">Sportsbook: ${game.vendor} | Game Date: ${game.gameDate}${game.scheduleStatus ? ` | ${game.scheduleStatus}` : ""}</p>
+          <p class="bet-subtext">Sportsbook: ${game.vendor} | Game Date: ${game.gameDate}${game.scheduleStatus ? ` | ${statusLabel(game.scheduleStatus)}` : ""}</p>
         </div>
         <div class="bet-card-analytics">
 
@@ -2084,7 +2084,7 @@ ${
 ${formatPropTypeLabel(prop.propType)}
 
 </h3>
-          <p class="prop-meta">${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${prop.scheduleStatus}` : ""}</p>
+          <p class="prop-meta">${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${statusLabel(prop.scheduleStatus)}` : ""}</p>
         </div>
         <div class="ev-badge ${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
       </div>
@@ -2165,6 +2165,12 @@ function gameHasStarted(status) {
   if (!value || value === "scheduled" || value === "pregame" || value === "delayed") return false;
   if (/^\d{1,2}:\d{2}/.test(value)) return false;
   return true;
+}
+
+function statusLabel(status) {
+  const value = String(status || "").trim();
+  if (!value) return "";
+  return gameHasStarted(value) ? `${value} · Pregame lines` : value;
 }
 
 const GAME_STATUS_CACHE = {};
@@ -2993,11 +2999,11 @@ function topPropByScore(props) {
 }
 
 function homePropMeta(prop) {
-  return `Top Free Props Today | ${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${prop.scheduleStatus}` : ""}`;
+  return `Top Free Props Today | ${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${statusLabel(prop.scheduleStatus)}` : ""}`;
 }
 
 function homeGameMeta(game) {
-  return `Featured Sportacular Score | ${game.vendor} | ${game.gameDate}${game.scheduleStatus ? ` | ${game.scheduleStatus}` : ""}`;
+  return `Featured Sportacular Score | ${game.vendor} | ${game.gameDate}${game.scheduleStatus ? ` | ${statusLabel(game.scheduleStatus)}` : ""}`;
 }
 
 function homePropTitle(league, prop) {
