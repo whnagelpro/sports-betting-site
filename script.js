@@ -2151,6 +2151,26 @@ function isClosedGameStatus(status) {
 
 const GAME_STATUS_CACHE = {};
 
+async function teamTonight(league, teamName) {
+  const url = SCHEDULE_CSV[league];
+  if (!url || !teamName) return null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const rows = parseCSV(await response.text());
+    const today = getTodayDateString();
+    const name = teamName.trim().toLowerCase();
+    return rows.find((row) => {
+      const away = String(row["Away Team"] || "").trim().toLowerCase();
+      const home = String(row["Home Team"] || "").trim().toLowerCase();
+      return normalizeDate(row["Game Date"]) === today && (away === name || home === name);
+    }) || null;
+  } catch (error) {
+    console.error("Team schedule lookup failed:", error);
+    return null;
+  }
+}
+
 async function gameStatusMap(league) {
   if (GAME_STATUS_CACHE[league]) return GAME_STATUS_CACHE[league];
   const url = SCHEDULE_CSV[league];
@@ -6838,6 +6858,16 @@ async function initTeamProfilePage() {
       <a class="card-link" href="${league}-props.html?team=${encodeURIComponent(teamName)}">Today's props</a>
     `;
     teamSubtitle.insertAdjacentElement("afterend", links);
+    const tonight = await teamTonight(league, teamName);
+    if (tonight) {
+      const away = String(tonight["Away Team"] || "").trim();
+      const home = String(tonight["Home Team"] || "").trim();
+      const isAway = away.toLowerCase() === teamName.trim().toLowerCase();
+      const note = document.createElement("p");
+      note.id = "team-tonight";
+      note.textContent = `Tonight: ${isAway ? "at" : "vs"} ${isAway ? home : away} · ${tonight.Status || "Scheduled"}`;
+      links.insertAdjacentElement("afterend", note);
+    }
   }
 
   document.getElementById("team-subtitle").textContent =
