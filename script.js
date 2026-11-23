@@ -1914,7 +1914,9 @@ function buildNFLPropsFromRows(rows) {
 
 function createBetCard(game, tierName = "Rookie", league = "nba") {
   const rules = TIER_RULES[tierName] || TIER_RULES.Rookie;
-  const ranked = [...game.rankings].sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
+  const ranked = [...game.rankings]
+    .filter((item) => String(item.side || "").trim().toLowerCase() !== "no play")
+    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
   const visibleRankings = ranked.slice(0, rules.maxRankingsPerGame);
   const isPlay = game.bestMarket && game.bestMarket !== "No Play" && game.bestMarket !== "N/A";
   const headline = isPlay
@@ -1932,7 +1934,7 @@ function createBetCard(game, tierName = "Rookie", league = "nba") {
     `)
     .join("");
 
-  const lockedCount = Math.max(game.rankings.length - visibleRankings.length, 0);
+  const lockedCount = Math.max(ranked.length - visibleRankings.length, 0);
 
   return `
     <article class="bet-card">
