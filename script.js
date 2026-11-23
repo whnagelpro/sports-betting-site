@@ -2170,11 +2170,7 @@ async function fetchLeagueGames(csvUrl) {
   games.slice(0,10).forEach(g => console.log(g.gameDate));
   const todaysGames = games
     .filter((game) => game.gameDate === today)
-    .sort((a, b) => {
-      const aTopEV = Math.max(...a.rankings.map((item) => item.ev));
-      const bTopEV = Math.max(...b.rankings.map((item) => item.ev));
-      return bTopEV - aTopEV;
-    });
+    .sort((a, b) => (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1));
   console.log("Today's games:", todaysGames.length);
   console.log(todaysGames);
 
