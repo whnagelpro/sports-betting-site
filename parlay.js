@@ -159,7 +159,10 @@ function oddsLegsFromRow(row, league) {
     ["Moneyline Away", row["Moneyline Away Odds"], awayMlProb, row["Moneyline Model Confidence"], row["Moneyline Risk Score"], `${away} moneyline`, null, "Moneyline Best Side", "Away", "Moneyline Sportacular Score"],
     ["Moneyline Home", row["Moneyline Home Odds"], homeMlProb, row["Moneyline Model Confidence"], row["Moneyline Risk Score"], `${home} moneyline`, null, "Moneyline Best Side", "Home", "Moneyline Sportacular Score"]
   ];
-  return legs.filter(leg => americanToDecimal(leg[1])).map(leg => {
+  return legs.filter(leg => {
+    const bestSide = String(row[leg[7]] || "").trim().toLowerCase();
+    return bestSide && bestSide !== "no play" && americanToDecimal(leg[1]);
+  }).map(leg => {
     const hitRate = leg[6];
     const boardScore = String(row[leg[7]] || "") === leg[8] ? parlayNumber(row[leg[9]]) : null;
     return {
@@ -179,6 +182,7 @@ function oddsLegsFromRow(row, league) {
 }
 
 function propLegsFromRow(row, league) {
+  if (String(row["Best Side"] || "").trim().toLowerCase() === "no play") return [];
   const gameId = String(row["Game Id"] || "").trim();
   const player = row["Player Name"] || "Player";
   const propType = row["Prop Type"] || "Prop";
