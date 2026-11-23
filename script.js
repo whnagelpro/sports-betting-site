@@ -2809,12 +2809,14 @@ function isPlayableSide(side) {
 function bestScoredRank(game) {
   const rankings = Array.isArray(game?.rankings) ? game.rankings : [];
   const plays = rankings.filter((item) => item.side && item.side !== "No Play" && Number.isFinite(item.sportacularScore));
-  const pool = plays.length ? plays : rankings;
-  return [...pool].sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))[0] || null;
+  if (!plays.length) return null;
+  return [...plays].sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))[0];
 }
 
 function topGameByScore(games) {
-  return [...games].sort((a, b) => (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1))[0];
+  return [...games]
+    .filter((game) => bestScoredRank(game))
+    .sort((a, b) => bestScoredRank(b).sportacularScore - bestScoredRank(a).sportacularScore)[0];
 }
 
 function topPropByScore(props) {
