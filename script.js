@@ -8485,3 +8485,17 @@ document.addEventListener(
 
   }
 );
+
+document.addEventListener("DOMContentLoaded", () => {
+  const leaguePages = {
+    nba: "nba-odds.html",
+    nhl: "nhl-odds.html",
+    mlb: "mlb-odds.html",
+    nfl: "nfl-odds.html"
+  };
+
+  document.querySelectorAll(".dropdown > a").forEach((link) => {
+    const page = leaguePages[link.textContent.trim().toLowerCase()];
+    if (page) link.setAttribute("href", page);
+  });
+});
