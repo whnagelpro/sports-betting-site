@@ -1069,7 +1069,8 @@ function renderLeaderboard(containerId, games, tierName = "Rookie", league = "nb
     game.rankings.map((rank) => ({
       ...rank,
       gameLabel: matchupLinks(league, game.awayTeam, game.homeTeam),
-      vendor: game.vendor
+      vendor: game.vendor,
+      scheduleStatus: game.scheduleStatus
     }))
   );
 
@@ -1077,7 +1078,12 @@ function renderLeaderboard(containerId, games, tierName = "Rookie", league = "nb
   const pool = plays.length ? plays : allRankings;
 
   const limited = pool
-    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))
+    .sort((a, b) => {
+      const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
+      const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
+      if (aStarted !== bStarted) return aStarted - bStarted;
+      return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
+    })
     .slice(0, rules.showLeaderboardCount);
 
   container.innerHTML = limited
@@ -1104,7 +1110,12 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
   }
 
   const topProps = [...props]
-    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1))
+    .sort((a, b) => {
+      const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
+      const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
+      if (aStarted !== bStarted) return aStarted - bStarted;
+      return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
+    })
     .slice(0, limit);
 
   container.innerHTML = topProps
@@ -2149,6 +2160,13 @@ function isClosedGameStatus(status) {
   return ["final", "complete", "completed", "postponed", "cancelled", "canceled"].includes(value);
 }
 
+function gameHasStarted(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (!value || value === "scheduled" || value === "pregame" || value === "delayed") return false;
+  if (/^\d{1,2}:\d{2}/.test(value)) return false;
+  return true;
+}
+
 const GAME_STATUS_CACHE = {};
 
 const TONIGHT_STATUS = {};
@@ -2277,13 +2295,17 @@ async function fetchLeagueGames(csvUrl) {
 
   console.log("First 10 game dates:");
   games.slice(0,10).forEach(g => console.log(g.gameDate));
-  const todaysGames = games
-    .filter((game) => game.gameDate === today)
-    .sort((a, b) => (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1));
+  const todaysGames = games.filter((game) => game.gameDate === today);
   const league = leagueFromOddsUrl(csvUrl);
   const statuses = league ? await gameStatusMap(league) : {};
   todaysGames.forEach((game) => {
     game.scheduleStatus = statuses[String(game.gameId)] || "";
+  });
+  todaysGames.sort((a, b) => {
+    const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
+    const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
+    if (aStarted !== bStarted) return aStarted - bStarted;
+    return (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1);
   });
   const finals = new Set(
     Object.entries(statuses)
@@ -2443,7 +2465,12 @@ if (
     .filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide))
     .filter((prop) => !prop.gameId || !finals.has(String(prop.gameId)))
     .map((prop) => ({ ...prop, scheduleStatus: statuses[String(prop.gameId)] || "" }))
-    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
+    .sort((a, b) => {
+      const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
+      const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
+      if (aStarted !== bStarted) return aStarted - bStarted;
+      return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
+    });
 
   console.log("Today props count:", todaysProps.length);
   console.log("First 5 today props:", todaysProps.slice(0, 5));
@@ -2559,7 +2586,12 @@ function sortProps(props, sortValue) {
       return sorted.sort((a, b) => getPropDisplayOdds(a) - getPropDisplayOdds(b));
 
     case "score-desc":
-      return sorted.sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
+      return sorted.sort((a, b) => {
+        const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
+        const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
+        if (aStarted !== bStarted) return aStarted - bStarted;
+        return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
+      });
 
     case "ev-desc":
     default:
@@ -2944,13 +2976,16 @@ function bestScoredRank(game) {
 }
 
 function topGameByScore(games) {
-  return [...games]
-    .filter((game) => bestScoredRank(game))
-    .sort((a, b) => bestScoredRank(b).sportacularScore - bestScoredRank(a).sportacularScore)[0];
+  const open = [...games].filter((game) => bestScoredRank(game));
+  const upcoming = open.filter((game) => !gameHasStarted(game.scheduleStatus));
+  const pool = upcoming.length ? upcoming : open;
+  return pool.sort((a, b) => bestScoredRank(b).sportacularScore - bestScoredRank(a).sportacularScore)[0];
 }
 
 function topPropByScore(props) {
-  return [...props].sort((a, b) => {
+  const upcoming = props.filter((prop) => !gameHasStarted(prop.scheduleStatus));
+  const pool = upcoming.length ? upcoming : props;
+  return [...pool].sort((a, b) => {
     const scoreDiff = (Number.isFinite(b.sportacularScore) ? b.sportacularScore : -1) - (Number.isFinite(a.sportacularScore) ? a.sportacularScore : -1);
     if (scoreDiff !== 0) return scoreDiff;
     return (Number(b.ev) || 0) - (Number(a.ev) || 0);
@@ -3362,7 +3397,14 @@ const allProps = [
   ...nhlProps,
   ...mlbProps,
   ...nflProps
-].sort((a, b) => (Number.isFinite(b.sportacularScore) ? b.sportacularScore : -1) - (Number.isFinite(a.sportacularScore) ? a.sportacularScore : -1) || (Number(b.ev) || 0) - (Number(a.ev) || 0));
+].sort((a, b) => {
+  const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
+  const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
+  if (aStarted !== bStarted) return aStarted - bStarted;
+  const scoreDiff = (Number.isFinite(b.sportacularScore) ? b.sportacularScore : -1) - (Number.isFinite(a.sportacularScore) ? a.sportacularScore : -1);
+  if (scoreDiff !== 0) return scoreDiff;
+  return (Number(b.ev) || 0) - (Number(a.ev) || 0);
+});
 
     const visibleProps = allProps.slice(0, 5);
 
