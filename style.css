@@ -1238,8 +1238,16 @@ input.sportsbook-select {
   padding: 18px;
 }
 
-.home-top-card .home-stat-table {
-  margin-top: 12px;
+.market-group-title,
+.leaderboard-group {
+  margin: 8px 0 14px;
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+
+.home-top-grid .market-group-title {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
 }
 
 .premium-preview-section {

@@ -1077,25 +1077,29 @@ function renderLeaderboard(containerId, games, tierName = "Rookie", league = "nb
   const plays = allRankings.filter((item) => item.side && item.side !== "No Play" && Number.isFinite(item.sportacularScore));
   const pool = plays.length ? plays : allRankings;
 
-  const limited = pool
-    .sort((a, b) => {
-      const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
-      const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
-      if (aStarted !== bStarted) return aStarted - bStarted;
-      return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
-    })
-    .slice(0, rules.showLeaderboardCount);
-
-  container.innerHTML = limited
-    .map((item, index) => `
+  const limited = splitBalanced(
+    pool.sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1)),
+    rules.showLeaderboardCount
+  );
+  const rows = [];
+  const addGroup = (title, items) => {
+    if (!items.length) return;
+    rows.push(`<div class="leaderboard-group">${title}</div>`);
+    items.forEach((item, index) => {
+      rows.push(`
       <div class="leaderboard-item">
         <strong>#${index + 1} ${item.bet}</strong>
         <div>Score: ${formatSportacularScore(item.sportacularScore)}</div>
         <div class="${getEVClass(item.ev)}">EV: ${formatEV(item.ev)}</div>
         <div>${item.gameLabel} | ${item.vendor}</div>
       </div>
-    `)
-    .join("");
+    `);
+    });
+  };
+  addGroup("Live", limited.live);
+  addGroup("Upcoming", limited.upcoming);
+
+  container.innerHTML = rows.join("");
 }
 
 function renderPropsLeaderboard(containerId, props, limit = 5) {
@@ -1109,62 +1113,41 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
     return;
   }
 
-  const topProps = [...props]
-    .sort((a, b) => {
-      const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
-      const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
-      if (aStarted !== bStarted) return aStarted - bStarted;
-      return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
-    })
-    .slice(0, limit);
-
-  container.innerHTML = topProps
-    .map((prop, index) => {
+  const ranked = [...props].sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
+  const groups = splitBalanced(ranked, limit);
+  const blocks = [];
+  const addGroup = (title, items) => {
+    if (!items.length) return;
+    blocks.push(`<div class="leaderboard-group">${title}</div>`);
+    items.forEach((prop, index) => {
       const fullName = getPropFullName(prop);
       const probabilityText =
         prop.league === "nfl" &&
         Number.isFinite(prop.bestModelProbability)
           ? formatProbability(prop.bestModelProbability)
           : formatProbability(prop.impliedProbability);
-
-      return `
+      blocks.push(`
         <div class="leaderboard-item">
           <strong>
             #${index + 1}
             ${
               prop.playerId && prop.league
-                ? `
-                  <a
-                    class="player-link"
-                    href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}"
-                  >
-                    ${fullName}
-                  </a>
-                `
+                ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
                 : fullName
             }
             — ${formatPropTypeLabel(prop.propType)}
           </strong>
-
           <div>Score: ${formatSportacularScore(prop.sportacularScore)}</div>
-
-          <div class="${getEVClass(prop.ev)}">
-            EV: ${formatEV(prop.ev)}
-          </div>
-
-          <div>
-            ${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor}
-          </div>
-
-          <div>
-            Line: ${formatLineValue(prop.lineValue)}
-            | Bet: ${prop.betType}
-            | Probability: ${probabilityText}
-          </div>
+          <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
+          <div>${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor}</div>
+          <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
         </div>
-      `;
-    })
-    .join("");
+      `);
+    });
+  };
+  addGroup("Live", groups.live);
+  addGroup("Upcoming", groups.upcoming);
+  container.innerHTML = blocks.join("");
 }
 
 function readSheetNumber(value) {
@@ -2170,7 +2153,30 @@ function gameHasStarted(status) {
 function statusLabel(status) {
   const value = String(status || "").trim();
   if (!value) return "";
-  return gameHasStarted(value) ? `${value} · Pregame lines` : value;
+  return value;
+}
+
+function splitBalanced(items, limit) {
+  const live = items.filter((item) => gameHasStarted(item.scheduleStatus));
+  const upcoming = items.filter((item) => !gameHasStarted(item.scheduleStatus));
+  if (!Number.isFinite(limit) || limit >= items.length) return { live, upcoming };
+  if (!live.length) return { live, upcoming: upcoming.slice(0, limit) };
+  if (!upcoming.length) return { live: live.slice(0, limit), upcoming };
+
+  let liveSlots = Math.min(live.length, Math.ceil(limit / 2));
+  let upcomingSlots = Math.min(upcoming.length, limit - liveSlots);
+  if (liveSlots + upcomingSlots < limit) {
+    liveSlots = Math.min(live.length, limit - upcomingSlots);
+  }
+  return {
+    live: live.slice(0, liveSlots),
+    upcoming: upcoming.slice(0, upcomingSlots)
+  };
+}
+
+function marketGroupHTML(title, cards) {
+  if (!cards) return "";
+  return `<h3 class="market-group-title">${title}</h3>${cards}`;
 }
 
 const GAME_STATUS_CACHE = {};
@@ -2307,12 +2313,7 @@ async function fetchLeagueGames(csvUrl) {
   todaysGames.forEach((game) => {
     game.scheduleStatus = statuses[String(game.gameId)] || "";
   });
-  todaysGames.sort((a, b) => {
-    const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
-    const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
-    if (aStarted !== bStarted) return aStarted - bStarted;
-    return (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1);
-  });
+  todaysGames.sort((a, b) => (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1));
   const finals = new Set(
     Object.entries(statuses)
       .filter(([, status]) => isClosedGameStatus(status))
@@ -2471,12 +2472,7 @@ if (
     .filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide))
     .filter((prop) => !prop.gameId || !finals.has(String(prop.gameId)))
     .map((prop) => ({ ...prop, scheduleStatus: statuses[String(prop.gameId)] || "" }))
-    .sort((a, b) => {
-      const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
-      const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
-      if (aStarted !== bStarted) return aStarted - bStarted;
-      return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
-    });
+    .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
 
   console.log("Today props count:", todaysProps.length);
   console.log("First 5 today props:", todaysProps.slice(0, 5));
@@ -2592,12 +2588,7 @@ function sortProps(props, sortValue) {
       return sorted.sort((a, b) => getPropDisplayOdds(a) - getPropDisplayOdds(b));
 
     case "score-desc":
-      return sorted.sort((a, b) => {
-        const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
-        const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
-        if (aStarted !== bStarted) return aStarted - bStarted;
-        return (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1);
-      });
+      return sorted.sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
 
     case "ev-desc":
     default:
@@ -2729,9 +2720,11 @@ async function renderOddsPage(pageKey) {
         return;
       }
 
-      container.innerHTML = filteredGames
-        .map((game) => createBetCard(game, currentTier, config.emptyLabel.toLowerCase()))
-        .join("");
+      const groups = splitBalanced(filteredGames, filteredGames.length);
+      container.innerHTML = [
+        marketGroupHTML("Live", groups.live.map((game) => createBetCard(game, currentTier, config.emptyLabel.toLowerCase())).join("")),
+        marketGroupHTML("Upcoming", groups.upcoming.map((game) => createBetCard(game, currentTier, config.emptyLabel.toLowerCase())).join(""))
+      ].join("");
     };
 
     bindButton(config.resetButtonId, () => {
@@ -2883,8 +2876,10 @@ async function renderPropsPage(pageKey) {
         Math.min(currentRules.showLeaderboardCount || 5, 10)
       );
 
-      const visibleProps = filteredProps.slice(0, currentRules.maxPropsToShow);
-      const hiddenPropsCount = Math.max(filteredProps.length - visibleProps.length, 0);
+      const propLimit = currentRules.maxPropsToShow;
+      const groups = splitBalanced(filteredProps, propLimit);
+      const visibleCount = groups.live.length + groups.upcoming.length;
+      const hiddenPropsCount = Math.max(filteredProps.length - visibleCount, 0);
 
 setPropsFiltersDisabled(config, !currentRules.showPlayerProps);
 
@@ -2898,7 +2893,7 @@ if (props.length === 0) {
   return;
 }
 
-if (visibleProps.length === 0) {
+if (visibleCount === 0) {
   container.innerHTML = `
     <div class="empty-state">
       <h3>No ${config.emptyLabel} props found for this filter.</h3>
@@ -2909,14 +2904,15 @@ if (visibleProps.length === 0) {
 }
 
 container.innerHTML = `
-  ${visibleProps.map(createPropCard).join("")}
+  ${marketGroupHTML("Live", groups.live.map(createPropCard).join(""))}
+  ${marketGroupHTML("Upcoming", groups.upcoming.map(createPropCard).join(""))}
   ${
     hiddenPropsCount > 0
       ? `
         <div class="locked-overlay">
           <h4>Unlock More Props</h4>
           <p>
-            You’re viewing ${visibleProps.length} of ${filteredProps.length} props for this tier.
+            You’re viewing ${visibleCount} of ${filteredProps.length} props for this tier.
             Upgrade for deeper access.
           </p>
         </div>
@@ -2983,15 +2979,11 @@ function bestScoredRank(game) {
 
 function topGameByScore(games) {
   const open = [...games].filter((game) => bestScoredRank(game));
-  const upcoming = open.filter((game) => !gameHasStarted(game.scheduleStatus));
-  const pool = upcoming.length ? upcoming : open;
-  return pool.sort((a, b) => bestScoredRank(b).sportacularScore - bestScoredRank(a).sportacularScore)[0];
+  return open.sort((a, b) => bestScoredRank(b).sportacularScore - bestScoredRank(a).sportacularScore)[0];
 }
 
 function topPropByScore(props) {
-  const upcoming = props.filter((prop) => !gameHasStarted(prop.scheduleStatus));
-  const pool = upcoming.length ? upcoming : props;
-  return [...pool].sort((a, b) => {
+  return [...props].sort((a, b) => {
     const scoreDiff = (Number.isFinite(b.sportacularScore) ? b.sportacularScore : -1) - (Number.isFinite(a.sportacularScore) ? a.sportacularScore : -1);
     if (scoreDiff !== 0) return scoreDiff;
     return (Number(b.ev) || 0) - (Number(a.ev) || 0);
@@ -3366,16 +3358,12 @@ async function renderHomeTopGames() {
       fetchLeagueGames(MLB_CSV_URL).then((games) => games.map((game) => ({ ...game, league: "mlb" }))).catch(() => []),
       fetchLeagueGames(NFL_CSV_URL).then((games) => games.map((game) => ({ ...game, league: "nfl" }))).catch(() => [])
     ]);
-    const games = groups.flat()
-      .map((game) => ({ game, rank: bestScoredRank(game) }))
+    const rankedGames = groups.flat()
+      .map((game) => ({ game, rank: bestScoredRank(game), scheduleStatus: game.scheduleStatus }))
       .filter((item) => item.rank)
-      .sort((a, b) => {
-        const aStarted = gameHasStarted(a.game.scheduleStatus) ? 1 : 0;
-        const bStarted = gameHasStarted(b.game.scheduleStatus) ? 1 : 0;
-        if (aStarted !== bStarted) return aStarted - bStarted;
-        return (b.rank.sportacularScore ?? -1) - (a.rank.sportacularScore ?? -1);
-      })
-      .slice(0, 5);
+      .sort((a, b) => (b.rank.sportacularScore ?? -1) - (a.rank.sportacularScore ?? -1));
+    const balancedGames = splitBalanced(rankedGames, 5);
+    const games = [...balancedGames.live, ...balancedGames.upcoming];
 
     if (!games.length) {
       container.innerHTML = `
@@ -3387,7 +3375,8 @@ async function renderHomeTopGames() {
       return;
     }
 
-    container.innerHTML = games.map(({ game, rank }, index) => `
+    container.innerHTML = [
+      marketGroupHTML("Live", balancedGames.live.map(({ game, rank }, index) => `
       <article class="home-top-card">
         <div class="home-spotlight-title">#${index + 1} ${matchupLinks(game.league, game.awayTeam, game.homeTeam)}</div>
         ${homeStatTable([
@@ -3399,7 +3388,21 @@ async function renderHomeTopGames() {
           ["Bet", rank.bet || "—"]
         ], rank.ev)}
       </article>
-    `).join("");
+    `).join("")),
+      marketGroupHTML("Upcoming", balancedGames.upcoming.map(({ game, rank }, index) => `
+      <article class="home-top-card">
+        <div class="home-spotlight-title">#${index + 1} ${matchupLinks(game.league, game.awayTeam, game.homeTeam)}</div>
+        ${homeStatTable([
+          ["League", String(game.league || "").toUpperCase()],
+          ["Book", displayBook(game.vendor)],
+          ["Status", homeStatus(game.scheduleStatus)],
+          ["Score", formatSportacularScore(rank.sportacularScore)],
+          ["EV", formatEV(rank.ev)],
+          ["Bet", rank.bet || "—"]
+        ], rank.ev)}
+      </article>
+    `).join(""))
+    ].join("");
   } catch (error) {
     console.error("Home top games render error:", error);
     container.innerHTML = `
@@ -3442,15 +3445,13 @@ const allProps = [
   ...mlbProps,
   ...nflProps
 ].sort((a, b) => {
-  const aStarted = gameHasStarted(a.scheduleStatus) ? 1 : 0;
-  const bStarted = gameHasStarted(b.scheduleStatus) ? 1 : 0;
-  if (aStarted !== bStarted) return aStarted - bStarted;
   const scoreDiff = (Number.isFinite(b.sportacularScore) ? b.sportacularScore : -1) - (Number.isFinite(a.sportacularScore) ? a.sportacularScore : -1);
   if (scoreDiff !== 0) return scoreDiff;
   return (Number(b.ev) || 0) - (Number(a.ev) || 0);
 });
 
-    const visibleProps = allProps.slice(0, 5);
+    const propGroups = splitBalanced(allProps, 5);
+    const visibleProps = [...propGroups.live, ...propGroups.upcoming];
 
     const hasFullPropsAccess =
       currentTier === "All-Star" ||
@@ -3468,13 +3469,10 @@ const allProps = [
       return;
     }
 
-    container.innerHTML =
-      visibleProps
-        .map((prop, index) => {
+    container.innerHTML = [
+      marketGroupHTML("Live", propGroups.live.map((prop, index) => {
           const fullName = getPropFullName(prop);
-          const isLockedPreview =
-            index >= 3 && !hasFullPropsAccess;
-
+          const isLockedPreview = index >= 3 && !hasFullPropsAccess;
           return `
             <article class="home-top-card ${isLockedPreview ? "blurred" : ""}">
               <div class="home-spotlight-title">#${index + 1} ${
@@ -3494,8 +3492,31 @@ const allProps = [
               ${isLockedPreview ? `<div class="prop-upgrade-hint">Unlock the full prop board with All-Star</div>` : ""}
             </article>
           `;
-        })
-        .join("") +
+        }).join("")),
+      marketGroupHTML("Upcoming", propGroups.upcoming.map((prop, index) => {
+          const fullName = getPropFullName(prop);
+          const isLockedPreview = (propGroups.live.length + index) >= 3 && !hasFullPropsAccess;
+          return `
+            <article class="home-top-card ${isLockedPreview ? "blurred" : ""}">
+              <div class="home-spotlight-title">#${index + 1} ${
+                prop.playerId && prop.league
+                  ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
+                  : fullName
+              } — ${formatPropTypeLabel(prop.propType)}</div>
+              ${homeStatTable([
+                ["League", String(prop.league || "").toUpperCase()],
+                ["Book", displayBook(prop.vendor)],
+                ["Matchup", prop.awayTeam && prop.homeTeam ? matchupLinks(prop.league, prop.awayTeam, prop.homeTeam) : "—"],
+                ["Status", homeStatus(prop.scheduleStatus)],
+                ["Score", formatSportacularScore(prop.sportacularScore)],
+                ["EV", formatEV(prop.ev)],
+                ["Bet", `${prop.betType || ""} ${formatLineValue(prop.lineValue)}`.trim()]
+              ], prop.ev)}
+              ${isLockedPreview ? `<div class="prop-upgrade-hint">Unlock the full prop board with All-Star</div>` : ""}
+            </article>
+          `;
+        }).join(""))
+    ].join("") +
       (hasFullPropsAccess
         ? ""
         : `
