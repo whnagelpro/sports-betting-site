@@ -3305,3 +3305,9 @@ transition:.2s;
     border-radius: 0;
   }
 }
+
+.league-hero .container,
+.league-hero h1,
+.league-hero .league-description {
+  text-align: center;
+}
