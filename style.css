@@ -1074,6 +1074,16 @@ input.sportsbook-select {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
 }
 
+.market-hub-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.market-hub-card .card-link {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
 .market-hub-card h3,
 .spotlight-card h3 {
   margin-bottom: 10px;
