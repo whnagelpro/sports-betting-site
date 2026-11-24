@@ -2335,6 +2335,24 @@ select:disabled {
   color: #9ca3af;
 }
 
+.support-email a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #9ca3af;
+  text-decoration: none;
+}
+
+.support-email svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.support-email a:hover {
+  color: #ffffff;
+}
+
 .hero-cta-note {
   margin-top: 28px;
   color: #9ca3af;
