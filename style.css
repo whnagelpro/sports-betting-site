@@ -1106,6 +1106,17 @@ input.sportsbook-select {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
 }
 
+.spotlight-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.spotlight-card > div[id] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .market-hub-card {
   display: flex;
   flex-direction: column;
@@ -1157,7 +1168,10 @@ input.sportsbook-select {
 }
 
 .home-spotlight-item {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
   gap: 8px;
 }
 
@@ -1166,11 +1180,12 @@ input.sportsbook-select {
   font-weight: bold;
   color: #ffffff;
   line-height: 1.35;
+  min-height: 2.7em;
 }
 
 .home-stat-table {
   display: grid;
-  margin-top: 12px;
+  margin-top: auto;
   border: 1px solid #22304a;
   border-radius: 10px;
   overflow: hidden;
@@ -1216,6 +1231,8 @@ input.sportsbook-select {
 }
 
 .home-top-card {
+  display: flex;
+  flex-direction: column;
   background: #131d31;
   border: 1px solid #25324a;
   border-radius: 16px;
