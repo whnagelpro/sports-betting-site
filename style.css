@@ -1053,9 +1053,57 @@ input.sportsbook-select {
   border-color: #22c55e;
 }
 
-.market-hub-section,
 .spotlight-section {
   padding: 70px 0;
+}
+
+.home-fold {
+  padding: 8px 0;
+}
+
+.home-accordion {
+  background: #131d31;
+  border: 1px solid #25324a;
+  border-radius: 16px;
+  padding: 0 22px;
+}
+
+.home-accordion summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 4px;
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.home-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.home-accordion summary::after {
+  content: "+";
+  color: #7dd3fc;
+  font-size: 1.7rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.home-accordion[open] summary::after {
+  content: "–";
+}
+
+.home-accordion-body {
+  padding: 0 4px 22px;
+}
+
+.home-accordion-body > p {
+  color: #c7d2e3;
+  margin-bottom: 16px;
 }
 
 .market-hub-grid,
