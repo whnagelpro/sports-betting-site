@@ -2143,17 +2143,25 @@ function isClosedGameStatus(status) {
   return ["final", "complete", "completed", "postponed", "cancelled", "canceled"].includes(value);
 }
 
+function isKickoffStatus(status) {
+  const value = String(status || "").trim();
+  if (!value) return false;
+  if (/^\d{4}-\d{2}-\d{2}T/i.test(value)) return true;
+  if (/^\d{1,2}\/\d{1,2}/.test(value)) return true;
+  if (/^(mon|tue|wed|thu|fri|sat|sun)\b/i.test(value) && /\d{1,2}:\d{2}/.test(value)) return true;
+  if (/^\d{1,2}:\d{2}/.test(value)) return true;
+  return false;
+}
+
 function gameHasStarted(status) {
   const value = String(status || "").trim().toLowerCase();
-  if (!value || value === "scheduled" || value === "pregame" || value === "delayed") return false;
-  if (/^\d{1,2}:\d{2}/.test(value)) return false;
+  if (!value || value === "scheduled" || value === "pregame" || value === "delayed" || value === "not started") return false;
+  if (isKickoffStatus(value)) return false;
   return true;
 }
 
 function statusLabel(status) {
-  const value = String(status || "").trim();
-  if (!value) return "";
-  return value;
+  return homeStatus(status);
 }
 
 function splitBalanced(items, limit) {
@@ -2210,6 +2218,28 @@ function marketGroupHTML(title, cards) {
 }
 
 const GAME_STATUS_CACHE = {};
+const GAME_SLATE_CACHE = {};
+
+function scheduleTeamKey(awayTeam, homeTeam) {
+  const away = String(awayTeam || "").trim().toLowerCase();
+  const home = String(homeTeam || "").trim().toLowerCase();
+  return away && home ? `${away}|${home}` : "";
+}
+
+function lookupScheduleStatus(statuses, game) {
+  const id = String(game.gameId || "").trim();
+  if (id && statuses[id]) return statuses[id];
+  const teams = scheduleTeamKey(game.awayTeam, game.homeTeam);
+  return teams && statuses[`teams:${teams}`] ? statuses[`teams:${teams}`] : "";
+}
+
+function isOnScheduleSlate(league, game) {
+  const slate = GAME_SLATE_CACHE[league];
+  if (!slate) return false;
+  const id = String(game.gameId || "").trim();
+  const teams = scheduleTeamKey(game.awayTeam, game.homeTeam);
+  return (id && slate.has(id)) || (teams && slate.has(`teams:${teams}`));
+}
 
 const TONIGHT_STATUS = {};
 let ACTIVE_TONIGHT = {};
@@ -2282,12 +2312,22 @@ async function gameStatusMap(league) {
     if (!response.ok) return {};
     const rows = parseCSV(await response.text());
     const statuses = {};
+    const slate = new Set();
     rows.forEach((row) => {
       const id = String(row["Game Id"] || "").trim();
       const status = String(row.Status || "").trim();
-      if (id && status) statuses[id] = status;
+      const teams = scheduleTeamKey(row["Away Team"], row["Home Team"]);
+      if (id) {
+        slate.add(id);
+        if (status) statuses[id] = status;
+      }
+      if (teams) {
+        slate.add(`teams:${teams}`);
+        if (status) statuses[`teams:${teams}`] = status;
+      }
     });
     GAME_STATUS_CACHE[league] = statuses;
+    GAME_SLATE_CACHE[league] = slate;
     return statuses;
   } catch (error) {
     console.error("Game status lookup failed:", error);
@@ -2337,11 +2377,13 @@ async function fetchLeagueGames(csvUrl) {
 
   console.log("First 10 game dates:");
   games.slice(0,10).forEach(g => console.log(g.gameDate));
-  const todaysGames = games.filter((game) => game.gameDate === today);
   const league = leagueFromOddsUrl(csvUrl);
   const statuses = league ? await gameStatusMap(league) : {};
+  const todaysGames = league === "nfl"
+    ? games.filter((game) => isOnScheduleSlate(league, game))
+    : games.filter((game) => game.gameDate === today);
   todaysGames.forEach((game) => {
-    game.scheduleStatus = statuses[String(game.gameId)] || "";
+    game.scheduleStatus = lookupScheduleStatus(statuses, game);
   });
   todaysGames.sort((a, b) => (bestScoredRank(b)?.sportacularScore ?? -1) - (bestScoredRank(a)?.sportacularScore ?? -1));
   const finals = new Set(
@@ -2499,9 +2541,9 @@ if (
       .map(([id]) => id)
   );
   const todaysProps = props
-    .filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide))
+    .filter((prop) => (league === "nfl" ? isOnScheduleSlate(league, prop) : prop.gameDate === today) && isPlayableSide(prop.bestSide))
     .filter((prop) => !prop.gameId || !finals.has(String(prop.gameId)))
-    .map((prop) => ({ ...prop, scheduleStatus: statuses[String(prop.gameId)] || "" }))
+    .map((prop) => ({ ...prop, scheduleStatus: lookupScheduleStatus(statuses, prop) }))
     .sort((a, b) => (b.sportacularScore ?? -1) - (a.sportacularScore ?? -1));
 
   console.log("Today props count:", todaysProps.length);
@@ -3043,11 +3085,7 @@ function displayBook(vendor) {
 
 function homeStatus(status) {
   const value = String(status || "").trim();
-  if (!value) return "Scheduled";
-  if (/^\d{4}-\d{2}-\d{2}T/.test(value) || /\d{1,2}:\d{2}/.test(value) || /^\d{1,2}\/\d{1,2}/.test(value)) {
-    return "Not started";
-  }
-  if (!gameHasStarted(value)) return value;
+  if (!value || isKickoffStatus(value)) return "Scheduled";
   return value;
 }
 
@@ -3663,9 +3701,9 @@ async function fetchHomepageProps(league) {
       .map(([id]) => id)
   );
   const todaysProps = props
-    .filter((prop) => prop.gameDate === today && isPlayableSide(prop.bestSide))
+    .filter((prop) => (league === "nfl" ? isOnScheduleSlate(league, prop) : prop.gameDate === today) && isPlayableSide(prop.bestSide))
     .filter((prop) => !prop.gameId || !finals.has(String(prop.gameId)))
-    .map((prop) => ({ ...prop, scheduleStatus: statuses[String(prop.gameId)] || "" }));
+    .map((prop) => ({ ...prop, scheduleStatus: lookupScheduleStatus(statuses, prop) }));
   DATA_CACHE.props[cacheKey] = todaysProps;
   return todaysProps;
 }
