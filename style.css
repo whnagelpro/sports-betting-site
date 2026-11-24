@@ -1126,13 +1126,40 @@ input.sportsbook-select {
   line-height: 1.35;
 }
 
-.home-spotlight-meta {
-  color: #9fb0cc;
-  font-size: 0.95rem;
+.home-stat-table {
+  display: grid;
+  margin-top: 12px;
+  border: 1px solid #22304a;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.home-spotlight-ev {
-  font-weight: bold;
+.home-stat {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  align-items: baseline;
+  padding: 7px 10px;
+  background: #0f1727;
+  border-top: 1px solid #22304a;
+}
+
+.home-stat:first-child {
+  border-top: none;
+}
+
+.home-stat span {
+  color: #9fb0cc;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.home-stat strong {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.35;
 }
 
 .premium-preview-section {

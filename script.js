@@ -2998,12 +2998,29 @@ function topPropByScore(props) {
   })[0];
 }
 
-function homePropMeta(prop) {
-  return `Top Free Props Today | ${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${statusLabel(prop.scheduleStatus)}` : ""}`;
+function displayBook(vendor) {
+  const value = String(vendor || "").trim();
+  const names = {
+    draftkings: "DraftKings",
+    fanduel: "FanDuel",
+    betmgm: "BetMGM",
+    caesars: "Caesars",
+    kalshi: "Kalshi",
+    pointsbet: "PointsBet",
+    betrivers: "BetRivers",
+    espnbet: "ESPN BET"
+  };
+  return names[value.toLowerCase().replace(/[\s_-]/g, "")] || value || "—";
 }
 
-function homeGameMeta(game) {
-  return `Featured Sportacular Score | ${game.vendor} | ${game.gameDate}${game.scheduleStatus ? ` | ${statusLabel(game.scheduleStatus)}` : ""}`;
+function homeStatus(status) {
+  const value = String(status || "").trim();
+  if (!value) return "Scheduled";
+  if (/^\d{4}-\d{2}-\d{2}T/.test(value) || /\d{1,2}:\d{2}/.test(value) || /^\d{1,2}\/\d{1,2}/.test(value)) {
+    return "Not started";
+  }
+  if (!gameHasStarted(value)) return value;
+  return `${value} · Pregame lines`;
 }
 
 function homePropTitle(league, prop) {
@@ -3011,6 +3028,30 @@ function homePropTitle(league, prop) {
   const label = formatPropTypeLabel(prop.propType);
   if (!prop.playerId) return `${name} — ${label}`;
   return `<a class="player-link" href="player.html?league=${encodeURIComponent(league)}&id=${encodeURIComponent(prop.playerId)}">${name}</a> — ${label}`;
+}
+
+function homeGameCard(league, game, bestRank) {
+  return {
+    title: matchupLinks(league, game.awayTeam, game.homeTeam),
+    book: game.vendor,
+    date: game.gameDate,
+    status: game.scheduleStatus,
+    score: bestRank?.sportacularScore,
+    ev: bestRank?.ev,
+    bet: bestRank?.bet || "—"
+  };
+}
+
+function homePropCard(league, prop) {
+  return {
+    title: homePropTitle(league, prop),
+    book: prop.vendor,
+    date: prop.gameDate,
+    status: prop.scheduleStatus,
+    score: prop.sportacularScore,
+    ev: prop.ev,
+    bet: `${prop.betType || ""} ${formatLineValue(prop.lineValue)}`.trim()
+  };
 }
 
 function renderHomeSpotlightCard(containerId, data) {
@@ -3022,13 +3063,26 @@ function renderHomeSpotlightCard(containerId, data) {
     return;
   }
 
+  const rows = [
+    ["Book", displayBook(data.book)],
+    ["Date", data.date || "Today"],
+    ["Status", homeStatus(data.status)],
+    ["Score", formatSportacularScore(data.score)],
+    ["EV", formatEV(data.ev)],
+    ["Bet", data.bet || "—"]
+  ];
+
   container.innerHTML = `
     <div class="home-spotlight-item">
       <div class="home-spotlight-title">${data.title}</div>
-      <div class="home-spotlight-meta">${data.meta}</div>
-      <div class="home-spotlight-meta">Score: ${formatSportacularScore(data.score)}</div>
-      <div class="home-spotlight-ev ${getEVClass(data.ev)}">EV: ${formatEV(data.ev)}</div>
-      <div class="home-spotlight-meta">${data.subtext}</div>
+      <div class="home-stat-table">
+        ${rows.map(([label, value]) => `
+          <div class="home-stat">
+            <span>${label}</span>
+            <strong class="${label === "EV" ? getEVClass(data.ev) : ""}">${value}</strong>
+          </div>
+        `).join("")}
+      </div>
     </div>
   `;
 }
@@ -3148,15 +3202,7 @@ async function renderHomeSpotlights() {
 
       renderHomeSpotlightCard(
         "home-top-nba-bet",
-        {
-          title: matchupLinks("nba", topNBAGame.awayTeam, topNBAGame.homeTeam),
-
-          meta: homeGameMeta(topNBAGame),
-
-          ev: bestRank.ev,
-          score: bestRank.sportacularScore,
-          subtext: `Top Bet: ${bestRank.bet}`
-        }
+        homeGameCard("nba", topNBAGame, bestRank)
       );
     } else {
       renderHomeTopBetLockedState(
@@ -3167,18 +3213,7 @@ async function renderHomeSpotlights() {
     if (topNBAProp) {
       renderHomeSpotlightCard(
         "home-top-nba-prop",
-        {
-          title: homePropTitle("nba", topNBAProp),
-
-          meta: homePropMeta(topNBAProp),
-
-          ev: topNBAProp.ev,
-          score: topNBAProp.sportacularScore,
-
-          subtext:
-            `Bet: ${topNBAProp.betType} ` +
-            `${formatLineValue(topNBAProp.lineValue)}`
-        }
+        homePropCard("nba", topNBAProp)
       );
     } else {
       renderHomeSpotlightCard(
@@ -3193,15 +3228,7 @@ async function renderHomeSpotlights() {
 
       renderHomeSpotlightCard(
         "home-top-nhl-bet",
-        {
-          title: matchupLinks("nhl", topNHLGame.awayTeam, topNHLGame.homeTeam),
-
-          meta: homeGameMeta(topNHLGame),
-
-          ev: bestRank.ev,
-          score: bestRank.sportacularScore,
-          subtext: `Top Bet: ${bestRank.bet}`
-        }
+        homeGameCard("nhl", topNHLGame, bestRank)
       );
     } else {
       renderHomeTopBetLockedState(
@@ -3212,18 +3239,7 @@ async function renderHomeSpotlights() {
     if (topNHLProp) {
       renderHomeSpotlightCard(
         "home-top-nhl-prop",
-        {
-          title: homePropTitle("nhl", topNHLProp),
-
-          meta: homePropMeta(topNHLProp),
-
-          ev: topNHLProp.ev,
-          score: topNHLProp.sportacularScore,
-
-          subtext:
-            `Bet: ${topNHLProp.betType} ` +
-            `${formatLineValue(topNHLProp.lineValue)}`
-        }
+        homePropCard("nhl", topNHLProp)
       );
     } else {
       renderHomeSpotlightCard(
@@ -3238,15 +3254,7 @@ async function renderHomeSpotlights() {
 
       renderHomeSpotlightCard(
         "home-top-mlb-bet",
-        {
-          title: matchupLinks("mlb", topMLBGame.awayTeam, topMLBGame.homeTeam),
-
-          meta: homeGameMeta(topMLBGame),
-
-          ev: bestRank.ev,
-          score: bestRank.sportacularScore,
-          subtext: `Top Bet: ${bestRank.bet}`
-        }
+        homeGameCard("mlb", topMLBGame, bestRank)
       );
     } else {
       renderHomeTopBetLockedState(
@@ -3257,18 +3265,7 @@ async function renderHomeSpotlights() {
     if (topMLBProp) {
       renderHomeSpotlightCard(
         "home-top-mlb-prop",
-        {
-          title: homePropTitle("mlb", topMLBProp),
-
-          meta: homePropMeta(topMLBProp),
-
-          ev: topMLBProp.ev,
-          score: topMLBProp.sportacularScore,
-
-          subtext:
-            `Bet: ${topMLBProp.betType} ` +
-            `${formatLineValue(topMLBProp.lineValue)}`
-        }
+        homePropCard("mlb", topMLBProp)
       );
     } else {
       renderHomeSpotlightCard(
@@ -3283,15 +3280,7 @@ async function renderHomeSpotlights() {
 
       renderHomeSpotlightCard(
         "home-top-nfl-bet",
-        {
-          title: matchupLinks("nfl", topNFLGame.awayTeam, topNFLGame.homeTeam),
-
-          meta: homeGameMeta(topNFLGame),
-
-          ev: bestRank.ev,
-          score: bestRank.sportacularScore,
-          subtext: `Top Bet: ${bestRank.bet}`
-        }
+        homeGameCard("nfl", topNFLGame, bestRank)
       );
     } else {
       renderHomeTopBetLockedState(
@@ -3302,18 +3291,7 @@ async function renderHomeSpotlights() {
     if (topNFLProp) {
       renderHomeSpotlightCard(
         "home-top-nfl-prop",
-        {
-          title: homePropTitle("nfl", topNFLProp),
-
-          meta: homePropMeta(topNFLProp),
-
-          ev: topNFLProp.ev,
-          score: topNFLProp.sportacularScore,
-
-          subtext:
-            `Bet: ${topNFLProp.betType} ` +
-            `${formatLineValue(topNFLProp.lineValue)}`
-        }
+        homePropCard("nfl", topNFLProp)
       );
     } else {
       renderHomeSpotlightCard(
