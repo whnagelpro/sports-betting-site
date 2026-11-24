@@ -335,7 +335,7 @@ async function findLegs() {
   const query = document.getElementById("parlay-search").value.trim().toLowerCase();
   const status = document.getElementById("parlay-search-status");
   const results = document.getElementById("parlay-results");
-  status.textContent = "Loading the live board...";
+  status.textContent = "Loading today’s legs...";
   results.innerHTML = "";
   try {
     const unavailable = await unavailableGameIds(league);
