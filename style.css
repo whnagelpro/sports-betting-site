@@ -1162,6 +1162,28 @@ input.sportsbook-select {
   line-height: 1.35;
 }
 
+.home-top-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.home-top-grid .upgrade-cta-box,
+.home-top-grid .empty-state {
+  grid-column: 1 / -1;
+}
+
+.home-top-card {
+  background: #131d31;
+  border: 1px solid #25324a;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.home-top-card .home-stat-table {
+  margin-top: 12px;
+}
+
 .premium-preview-section {
   padding: 70px 0;
 }

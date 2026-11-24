@@ -3054,6 +3054,19 @@ function homePropCard(league, prop) {
   };
 }
 
+function homeStatTable(rows, ev) {
+  return `
+    <div class="home-stat-table">
+      ${rows.map(([label, value]) => `
+        <div class="home-stat">
+          <span>${label}</span>
+          <strong class="${label === "EV" ? getEVClass(ev) : ""}">${value}</strong>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderHomeSpotlightCard(containerId, data) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -3063,26 +3076,17 @@ function renderHomeSpotlightCard(containerId, data) {
     return;
   }
 
-  const rows = [
-    ["Book", displayBook(data.book)],
-    ["Date", data.date || "Today"],
-    ["Status", homeStatus(data.status)],
-    ["Score", formatSportacularScore(data.score)],
-    ["EV", formatEV(data.ev)],
-    ["Bet", data.bet || "—"]
-  ];
-
   container.innerHTML = `
     <div class="home-spotlight-item">
       <div class="home-spotlight-title">${data.title}</div>
-      <div class="home-stat-table">
-        ${rows.map(([label, value]) => `
-          <div class="home-stat">
-            <span>${label}</span>
-            <strong class="${label === "EV" ? getEVClass(data.ev) : ""}">${value}</strong>
-          </div>
-        `).join("")}
-      </div>
+      ${homeStatTable([
+        ["Book", displayBook(data.book)],
+        ["Date", data.date || "Today"],
+        ["Status", homeStatus(data.status)],
+        ["Score", formatSportacularScore(data.score)],
+        ["EV", formatEV(data.ev)],
+        ["Bet", data.bet || "—"]
+      ], data.ev)}
     </div>
   `;
 }
@@ -3351,6 +3355,68 @@ async function renderHomeSpotlights() {
   }
 }
 
+async function renderHomeTopGames() {
+  const container = document.getElementById("home-top-games");
+  if (!container) return;
+
+  try {
+    const groups = await Promise.all([
+      fetchLeagueGames(NBA_CSV_URL).then((games) => games.map((game) => ({ ...game, league: "nba" }))).catch(() => []),
+      fetchLeagueGames(NHL_CSV_URL).then((games) => games.map((game) => ({ ...game, league: "nhl" }))).catch(() => []),
+      fetchLeagueGames(MLB_CSV_URL).then((games) => games.map((game) => ({ ...game, league: "mlb" }))).catch(() => []),
+      fetchLeagueGames(NFL_CSV_URL).then((games) => games.map((game) => ({ ...game, league: "nfl" }))).catch(() => [])
+    ]);
+    const games = groups.flat()
+      .map((game) => ({ game, rank: bestScoredRank(game) }))
+      .filter((item) => item.rank)
+      .sort((a, b) => {
+        const aStarted = gameHasStarted(a.game.scheduleStatus) ? 1 : 0;
+        const bStarted = gameHasStarted(b.game.scheduleStatus) ? 1 : 0;
+        if (aStarted !== bStarted) return aStarted - bStarted;
+        return (b.rank.sportacularScore ?? -1) - (a.rank.sportacularScore ?? -1);
+      })
+      .slice(0, 5);
+
+    if (!games.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No games available right now.</h3>
+          <p>Please check back once today’s games are live.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = games.map(({ game, rank }, index) => `
+      <article class="home-top-card">
+        <div class="home-spotlight-title">#${index + 1} ${matchupLinks(game.league, game.awayTeam, game.homeTeam)}</div>
+        ${homeStatTable([
+          ["League", String(game.league || "").toUpperCase()],
+          ["Book", displayBook(game.vendor)],
+          ["Status", homeStatus(game.scheduleStatus)],
+          ["Score", formatSportacularScore(rank.sportacularScore)],
+          ["EV", formatEV(rank.ev)],
+          ["Bet", rank.bet || "—"]
+        ], rank.ev)}
+      </article>
+    `).join("") + `
+      <div class="upgrade-cta-box">
+        <h3>See the Full Odds Board</h3>
+        <p>Open a league board for every game still on today’s slate.</p>
+        <a href="nba-odds.html" class="btn btn-primary">View NBA Game Odds</a>
+      </div>
+    `;
+  } catch (error) {
+    console.error("Home top games render error:", error);
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Unable to load top games right now.</h3>
+        <p>Please try again later.</p>
+      </div>
+    `;
+  }
+}
+
 async function renderHomeTopProps() {
   const container = document.getElementById("home-top-props");
   if (!container) return;
@@ -3412,31 +3478,27 @@ const allProps = [
       visibleProps
         .map((prop, index) => {
           const fullName = getPropFullName(prop);
-          const probabilityValue =
-            prop.poissonProbOver && prop.poissonProbOver > 0
-              ? prop.poissonProbOver
-              : prop.poissonProbExact;
-
-          const probabilityText = formatProbability(probabilityValue);
           const isLockedPreview =
             index >= 3 && !hasFullPropsAccess;
 
           return `
-            <div class="leaderboard-item ${isLockedPreview ? "blurred" : ""}">
-              <strong>#${index + 1} ${
+            <article class="home-top-card ${isLockedPreview ? "blurred" : ""}">
+              <div class="home-spotlight-title">#${index + 1} ${
                 prop.playerId && prop.league
                   ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
                   : fullName
-              } — ${formatPropTypeLabel(prop.propType)}</strong>
-              <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
-              <div>${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor}</div>
-              <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
-              ${
-                isLockedPreview && !hasFullPropsAccess
-                  ? `<div class="prop-upgrade-hint">🔒 Unlock full prop board with All-Star</div>`
-                  : ""
-              }
-            </div>
+              } — ${formatPropTypeLabel(prop.propType)}</div>
+              ${homeStatTable([
+                ["League", String(prop.league || "").toUpperCase()],
+                ["Book", displayBook(prop.vendor)],
+                ["Matchup", prop.awayTeam && prop.homeTeam ? matchupLinks(prop.league, prop.awayTeam, prop.homeTeam) : "—"],
+                ["Status", homeStatus(prop.scheduleStatus)],
+                ["Score", formatSportacularScore(prop.sportacularScore)],
+                ["EV", formatEV(prop.ev)],
+                ["Bet", `${prop.betType || ""} ${formatLineValue(prop.lineValue)}`.trim()]
+              ], prop.ev)}
+              ${isLockedPreview ? `<div class="prop-upgrade-hint">Unlock the full prop board with All-Star</div>` : ""}
+            </article>
           `;
         })
         .join("") +

@@ -279,6 +279,21 @@
     </section>
 
     <section class="top-props-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Today’s Top Game Odds</h2>
+          <p>The strongest game sides across the NBA, the NHL, MLB, and the NFL, ranked by Sportacular Score.</p>
+        </div>
+        <div id="home-top-games" class="home-top-grid">
+          <div class="empty-state">
+            <h3>Loading top games...</h3>
+            <p>Please wait while today’s games load.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="top-props-section">
   <div class="container">
     <div class="section-header">
       <h2>Today’s Top Player Props</h2>
@@ -291,7 +306,7 @@
         <p class="leaderboard-subtext">
           Today’s top five props across our supported leagues.
         </p>
-      <div id="home-top-props">
+      <div id="home-top-props" class="home-top-grid">
         <div class="empty-state">
           <h3>Loading top props...</h3>
           <p>Please wait while today’s props load.</p>
@@ -560,6 +575,7 @@
   <script src="script.js"></script>
   <script>
     renderHomeSpotlights();
+    renderHomeTopGames();
     renderHomeTopProps();
   </script>
 
