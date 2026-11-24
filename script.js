@@ -3399,13 +3399,7 @@ async function renderHomeTopGames() {
           ["Bet", rank.bet || "—"]
         ], rank.ev)}
       </article>
-    `).join("") + `
-      <div class="upgrade-cta-box">
-        <h3>See the Full Odds Board</h3>
-        <p>Open a league board for every game still on today’s slate.</p>
-        <a href="nba-odds.html" class="btn btn-primary">View NBA Game Odds</a>
-      </div>
-    `;
+    `).join("");
   } catch (error) {
     console.error("Home top games render error:", error);
     container.innerHTML = `
@@ -3502,29 +3496,21 @@ const allProps = [
           `;
         })
         .join("") +
-      `
+      (hasFullPropsAccess
+        ? ""
+        : `
         <div class="upgrade-cta-box">
-          ${
-            hasFullPropsAccess
-              ? `
-                <h3>Your Full Prop Board Is Unlocked</h3>
-                <p>View the complete player prop board with your current plan.</p>
-                <a href="nba-props.html" class="btn btn-primary">View Full Prop Board</a>
-              `
-              : `
-                <h3>Unlock the Full Prop Board</h3>
-                <p>Upgrade to All-Star or higher for the full board, advanced filters, and deeper prop analytics.</p>
-                <a
-                  href="pricing.html"
-                  class="btn btn-primary"
-                  data-upgrade-analytics="true"
-                  data-upgrade-feature="full_prop_board"
-                  data-upgrade-required-tier="All-Star"
-                >Compare Plans</a>
-              `
-          }
+          <h3>Unlock the Full Prop Board</h3>
+          <p>Upgrade to All-Star or higher for the full board, advanced filters, and deeper prop analytics.</p>
+          <a
+            href="pricing.html"
+            class="btn btn-primary"
+            data-upgrade-analytics="true"
+            data-upgrade-feature="full_prop_board"
+            data-upgrade-required-tier="All-Star"
+          >Compare Plans</a>
         </div>
-      `;
+      `);
 
     updateHomeLastUpdated();
   } catch (error) {
