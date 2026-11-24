@@ -2174,6 +2174,36 @@ function splitBalanced(items, limit) {
   };
 }
 
+function ensureLinesFilter(pageKey, beforeFilterId, onChange) {
+  const selectId = `${pageKey}-lines-filter`;
+  let select = document.getElementById(selectId);
+  if (!select) {
+    const anchor = document.getElementById(beforeFilterId);
+    const box = anchor && anchor.closest(".control-box");
+    if (!box || !box.parentElement) return "both";
+    const wrap = document.createElement("div");
+    wrap.className = "control-box";
+    wrap.innerHTML = `
+      <span class="control-label">Lines</span>
+      <select id="${selectId}" class="sportsbook-select">
+        <option value="both">Live and pregame</option>
+        <option value="live">Live lines</option>
+        <option value="pregame">Pregame lines</option>
+      </select>
+    `;
+    box.parentElement.insertBefore(wrap, box);
+    select = wrap.querySelector("select");
+  }
+  select.onchange = onChange;
+  return select.value || "both";
+}
+
+function matchesLinesFilter(status, linesFilter) {
+  if (linesFilter === "live") return gameHasStarted(status);
+  if (linesFilter === "pregame") return !gameHasStarted(status);
+  return true;
+}
+
 function marketGroupHTML(title, cards) {
   if (!cards) return "";
   return `<h3 class="market-group-title">${title}</h3>${cards}`;
@@ -2662,12 +2692,13 @@ async function renderOddsPage(pageKey) {
 
       populateSportsbookFilter(config.sportsbookFilterId, games, renderPage);
 
+      const linesFilter = ensureLinesFilter(pageKey, config.gameFilterId, renderPage);
       const selectedGame =
         document.getElementById(config.gameFilterId)?.value || "All";
       const selectedSportsbook =
         document.getElementById(config.sportsbookFilterId)?.value || "All";
 
-      let filteredGames = games;
+      let filteredGames = games.filter((game) => matchesLinesFilter(game.scheduleStatus, linesFilter));
 
       if (selectedGame !== "All") {
         filteredGames = filteredGames.filter(
@@ -2690,6 +2721,7 @@ async function renderOddsPage(pageKey) {
       }
 
       renderFilterSummary(config.summaryId, [
+        { label: "Lines", value: linesFilter === "live" ? "Live lines" : linesFilter === "pregame" ? "Pregame lines" : "All" },
         { label: "Game", value: selectedGame },
         { label: "Team", value: requestedTeam || "All" },
         { label: "Sportsbook", value: selectedSportsbook },
@@ -2730,6 +2762,7 @@ async function renderOddsPage(pageKey) {
     bindButton(config.resetButtonId, () => {
       resetSelectToAll(config.gameFilterId);
       resetSelectToAll(config.sportsbookFilterId);
+      resetSelectToValue(`${pageKey}-lines-filter`, "both");
       renderPage();
     });
 
@@ -2817,12 +2850,13 @@ async function renderPropsPage(pageKey) {
       populatePropTypeFilter(config.propTypeFilterId, props, renderPage);
       populateSportsbookFilter(config.sportsbookFilterId, props, renderPage);
 
+      const linesFilter = ensureLinesFilter(pageKey, config.gameFilterId, renderPage);
       const selectedGame = document.getElementById(config.gameFilterId)?.value || "All";
       const selectedPropType = document.getElementById(config.propTypeFilterId)?.value || "All";
       const selectedSportsbook = document.getElementById(config.sportsbookFilterId)?.value || "All";
       const sortValue = document.getElementById(config.sortFilterId)?.value || "score-desc";
 
-      let filteredProps = props;
+      let filteredProps = props.filter((prop) => matchesLinesFilter(prop.scheduleStatus, linesFilter));
 
       if (selectedGame !== "All") {
         filteredProps = filteredProps.filter((prop) => prop.gameLabel === selectedGame);
@@ -2862,6 +2896,7 @@ async function renderPropsPage(pageKey) {
       filteredProps = sortProps(filteredProps, sortValue);
 
       renderFilterSummary(config.summaryId, [
+        { label: "Lines", value: linesFilter === "live" ? "Live lines" : linesFilter === "pregame" ? "Pregame lines" : "All" },
         { label: "Game", value: selectedGame },
         { label: "Prop Type", value: selectedPropType !== "All" ? formatPropTypeLabel(selectedPropType) : "All" },
         { label: "Player", value: selectedPlayer },
@@ -2930,6 +2965,7 @@ container.innerHTML = `
       resetSelectToAll(config.playerFilterId);
       resetSelectToAll(config.sportsbookFilterId);
       resetSelectToValue(config.sortFilterId, "score-desc");
+      resetSelectToValue(`${pageKey}-lines-filter`, "both");
       renderPage();
     });
 
@@ -3012,7 +3048,7 @@ function homeStatus(status) {
     return "Not started";
   }
   if (!gameHasStarted(value)) return value;
-  return `${value} · Pregame lines`;
+  return value;
 }
 
 function homePropTitle(league, prop) {

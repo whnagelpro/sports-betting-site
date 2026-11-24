@@ -1943,9 +1943,47 @@ select:disabled {
 }
 
 .controls-left {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  display: grid;
+  gap: 0;
+  border: 1px solid #22304a;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f1727;
+}
+
+.league-controls .control-box {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+  padding: 10px 12px;
+  background: #0f1727;
+  border: none;
+  border-radius: 0;
+  border-top: 1px solid #22304a;
+}
+
+.league-controls .controls-left .control-box:first-child {
+  border-top: none;
+}
+
+.league-controls .control-label {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.league-controls .sportsbook-select,
+.league-controls .filter-reset-btn {
+  width: 100%;
+  margin: 0;
+}
+
+.league-controls .last-updated-text {
+  margin: 0;
+  padding: 10px 12px;
+  border-top: 1px solid #22304a;
 }
 
 .controls-right {

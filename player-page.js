@@ -579,7 +579,7 @@ async function renderPlayerTonight() {
         const note = document.createElement("p");
         note.id = "player-tonight";
         playerGameHasStarted = profileGameHasStarted(tonight.Status);
-        note.textContent = `Tonight: ${isAway ? "at" : "vs"} ${isAway ? home : away} · ${playerGameHasStarted ? `${tonight.Status || "Started"} · Pregame lines` : (tonight.Status || "Scheduled")}`;
+        note.textContent = `Tonight: ${isAway ? "at" : "vs"} ${isAway ? home : away} · ${tonight.Status || (playerGameHasStarted ? "Started" : "Scheduled")}`;
         teamEl.insertAdjacentElement("afterend", note);
     } catch (error) {
         console.error("Player schedule lookup failed:", error);
