@@ -1119,31 +1119,50 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
   const addGroup = (title, items) => {
     if (!items.length) return;
     blocks.push(`<div class="leaderboard-group">${title}</div>`);
-    items.forEach((prop, index) => {
-      const fullName = getPropFullName(prop);
-      const probabilityText =
-        prop.league === "nfl" &&
-        Number.isFinite(prop.bestModelProbability)
-          ? formatProbability(prop.bestModelProbability)
-          : formatProbability(prop.impliedProbability);
       blocks.push(`
-        <div class="leaderboard-item">
-          <strong>
-            #${index + 1}
-            ${
-              prop.playerId && prop.league
-                ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
-                : fullName
-            }
-            — ${formatPropTypeLabel(prop.propType)}
-          </strong>
-          <div>Score: ${formatSportacularScore(prop.sportacularScore)}</div>
-          <div class="${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
-          <div>${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor}</div>
-          <div>Line: ${formatLineValue(prop.lineValue)} | Bet: ${prop.betType} | Probability: ${probabilityText}</div>
+        <div class="odds-table-wrap">
+          <table class="odds-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Bet</th>
+                <th>Line</th>
+                <th>Score</th>
+                <th>EV</th>
+                <th>Probability</th>
+                <th>Matchup</th>
+                <th>Book</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map((prop, index) => {
+                const fullName = getPropFullName(prop);
+                const probabilityText =
+                  prop.league === "nfl" && Number.isFinite(prop.bestModelProbability)
+                    ? formatProbability(prop.bestModelProbability)
+                    : formatProbability(prop.impliedProbability);
+                const playerCell = prop.playerId && prop.league
+                  ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
+                  : fullName;
+                return `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${playerCell}</td>
+                    <td>${prop.betType || "—"} ${formatPropTypeLabel(prop.propType)}</td>
+                    <td>${formatLineValue(prop.lineValue)}</td>
+                    <td>${formatSportacularScore(prop.sportacularScore)}</td>
+                    <td class="${getEVClass(prop.ev)}">${formatEV(prop.ev)}</td>
+                    <td>${probabilityText}</td>
+                    <td>${prop.awayTeam && prop.homeTeam ? matchupLinks(prop.league, prop.awayTeam, prop.homeTeam) : "—"}</td>
+                    <td>${displayBook(prop.vendor)}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
         </div>
       `);
-    });
   };
   addGroup("Live", groups.live);
   addGroup("Upcoming", groups.upcoming);
@@ -2085,57 +2104,49 @@ function createPropCard(prop) {
 
   const fullName = getPropFullName(prop);
   const confidenceText = prop.confidenceTier || (Number.isFinite(prop.modelConfidence) ? prop.modelConfidence.toFixed(1) : "—");
-  const decisionHTML = `
-      <div class="prop-lines">
-        <div class="prop-line">
-          <div><strong>Best Side:</strong> ${prop.bestSide || prop.betType || "—"}</div>
-          <div><strong>Sportacular Score:</strong> ${formatSportacularScore(prop.sportacularScore)}</div>
-          <div><strong>Confidence:</strong> ${confidenceText}</div>
-          <div><strong>Risk:</strong> ${prop.riskTier || "—"}</div>
-          <div><strong>Hit Rate:</strong> ${prop.lineHitRate || "—"}</div>
-          ${prop.playerId && !gameHasStarted(prop.scheduleStatus) ? `<div><a class="card-link" href="parlay.html?league=${encodeURIComponent(prop.league || "")}&board=props&q=${encodeURIComponent(`${fullName} ${prop.propType || ""} ${prop.lineValue || ""} ${prop.bestSide || ""}`.trim())}">Add to parlay</a></div>` : ""}
-        </div>
-      </div>
-  `;
+  const playerTitle = prop.playerId && prop.league
+    ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
+    : fullName;
+  const parlayLink = prop.playerId && !gameHasStarted(prop.scheduleStatus)
+    ? `<a class="card-link" href="parlay.html?league=${encodeURIComponent(prop.league || "")}&board=props&q=${encodeURIComponent(`${fullName} ${prop.propType || ""} ${prop.lineValue || ""} ${prop.bestSide || ""}`.trim())}">Add to parlay</a>`
+    : "";
 
   return `
     <article class="prop-card">
       <div class="prop-card-header">
         <div>
-          <h3>
-
-${
-    prop.playerId && prop.league
-        ? `
-            <a
-                class="player-link"
-                href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}"
-            >
-                ${fullName}
-            </a>
-        `
-        : fullName
-}
-
-—
-
-${formatPropTypeLabel(prop.propType)}
-
-</h3>
+          <h3>${playerTitle} — ${formatPropTypeLabel(prop.propType)}</h3>
           <p class="prop-meta">${prop.awayTeam && prop.homeTeam ? `${matchupLinks(prop.league, prop.awayTeam, prop.homeTeam)} | ` : ""}${prop.vendor} | ${prop.gameDate || "Today"}${prop.scheduleStatus ? ` | ${statusLabel(prop.scheduleStatus)}` : ""}</p>
         </div>
-        <div class="ev-badge ${getEVClass(prop.ev)}">EV: ${formatEV(prop.ev)}</div>
-      </div>
-
-      <div class="prop-lines">
-        <div class="prop-line">
-          <div><strong>Bet Type:</strong> ${prop.betType}</div>
-          <div><strong>Line:</strong> ${formatLineValue(prop.lineValue)}</div>
-          <div><strong>Odds:</strong> ${oddsToShow}</div>
-          <div><strong>Model Probability:</strong> ${probabilityText}</div>
+        <div class="bet-card-analytics">
+          <table class="odds-table odds-summary-table">
+            <tbody>
+              <tr><th scope="row">Best Side</th><td>${prop.bestSide || prop.betType || "—"}</td></tr>
+              <tr><th scope="row">Sportacular Score</th><td>${formatSportacularScore(prop.sportacularScore)}</td></tr>
+              <tr><th scope="row">Confidence</th><td>${confidenceText}</td></tr>
+              <tr><th scope="row">Risk</th><td>${prop.riskTier || "—"}</td></tr>
+              <tr><th scope="row">Hit Rate</th><td>${prop.lineHitRate || "—"}</td></tr>
+              <tr><th scope="row">EV</th><td class="${getEVClass(prop.ev)}">${formatEV(prop.ev)}</td></tr>
+            </tbody>
+          </table>
+          ${parlayLink}
         </div>
       </div>
-      ${decisionHTML}
+      <div class="odds-table-wrap">
+        <table class="odds-table">
+          <thead>
+            <tr><th>Bet Type</th><th>Line</th><th>Odds</th><th>Model Probability</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${prop.betType || "—"}</td>
+              <td>${formatLineValue(prop.lineValue)}</td>
+              <td>${oddsToShow}</td>
+              <td>${probabilityText}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </article>
   `;
 }
@@ -4351,88 +4362,119 @@ function formatNBATrendLabel(statKey) {
   return statKey || "Trend";
 }
 
-function createNBATrendCard(player) {
-  const seasonAvg = Number(player["Season Avg"]);
-  const last3 = Number(player["Last 3 Avg"]);
-  const last5 = Number(player["Last 5 Avg"]);
-  const last10 = Number(player["Last 10 Avg"]);
-  const hitRate5 = readTrendRate(player["Hit Rate Last 5"]);
-  const aboveSeason = Number(player["Above Season %"]);
 
-  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
-  const aboveSeasonText = Number.isNaN(aboveSeason)
-    ? "N/A"
-    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
+function trendSummaryRow(label, value) {
+  if (value === undefined || value === null || String(value).trim() === "") return "";
+  return `<tr><th scope="row">${label}</th><td>${value}</td></tr>`;
+}
 
+function formatTrendAvg(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return "";
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(2) : "N/A";
+}
+
+function formatTrendHit(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return "";
+  const number = readTrendRate(value);
+  return Number.isFinite(number) ? `${Math.round(number * 100)}%` : "N/A";
+}
+
+function formatAboveSeason(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return "";
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "N/A";
+  return `${number >= 0 ? "+" : ""}${number.toFixed(1)}%`;
+}
+
+function trendSummaryTable(row) {
+  const scoreRaw = row["Trend Score"];
+  const score = scoreRaw === undefined || String(scoreRaw).trim() === "" ? "" : formatTrendScore(scoreRaw);
+  return `
+    <table class="odds-table odds-summary-table">
+      <tbody>
+        ${trendSummaryRow("Strength", row["Trend Strength"])}
+        ${trendSummaryRow("Direction", row["Trend Direction"])}
+        ${trendSummaryRow("Trend Score", score)}
+        ${trendSummaryRow("Confidence", row["Confidence Score"])}
+        ${trendSummaryRow("Risk", row["Risk Tier"])}
+      </tbody>
+    </table>
+  `;
+}
+
+function trendWindowTable(row) {
+  const windows = [
+    ["Last 3", "Last 3 Avg", "Hit Rate Last 3"],
+    ["Last 5", "Last 5 Avg", "Hit Rate Last 5"],
+    ["Last 10", "Last 10 Avg", "Hit Rate Last 10"]
+  ];
+  const body = [];
+  windows.forEach(([label, avgKey, hitKey]) => {
+    const avg = formatTrendAvg(row[avgKey]);
+    const hit = formatTrendHit(row[hitKey]);
+    if (!avg && !hit) return;
+    body.push(`<tr><td>${label}</td><td>${avg || "—"}</td><td>${hit || "—"}</td></tr>`);
+  });
+  const season = formatTrendAvg(row["Season Avg"]);
+  if (season) body.push(`<tr><td>Season</td><td>${season}</td><td>—</td></tr>`);
+  const above = formatAboveSeason(row["Above Season %"]);
+  if (above) body.push(`<tr><td>Above Season</td><td>${above}</td><td>—</td></tr>`);
+  if (!body.length) return "";
+  return `
+    <div class="odds-table-wrap">
+      <table class="odds-table">
+        <thead>
+          <tr><th>Window</th><th>Average</th><th>Hit Rate</th></tr>
+        </thead>
+        <tbody>${body.join("")}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function teamRatingTable(row, columns) {
+  if (!columns.some(([, key]) => String(row[key] || "").trim())) return "";
+  return `
+    <div class="odds-table-wrap">
+      <table class="odds-table">
+        <thead>
+          <tr>${columns.map(([label]) => `<th>${label}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+          <tr>${columns.map(([, key]) => `<td>${row[key] || "N/A"}</td>`).join("")}</tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function trendCardShell(titleHtml, subtitle, row, extraHtml = "") {
+  const note = String(row["Trend Note"] || "").trim();
   return `
     <div class="trend-card">
       <div class="trend-card-header">
         <div class="trend-title">
-          <h3>${playerProfileLink("nba", player)}</h3>
-          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}</div>
+          <h3>${titleHtml}</h3>
+          <div class="trend-subtitle">${subtitle}</div>
         </div>
-
-        <div class="trend-strength-badge">
-          ${player["Trend Strength"] || "N/A"}
-        </div>
-
-        <div class="trend-analytics">
-
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Direction</span>
-            <span class="trend-analytics-value">${player["Trend Direction"] || "N/A"}</span>
-          </div>
-
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Trend Score</span>
-            <span class="trend-analytics-value">${formatTrendScore(player["Trend Score"])}</span>
-          </div>
-
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Risk</span>
-            <span class="trend-analytics-value">${player["Risk Tier"] || "N/A"}</span>
-          </div>
-
+        <div class="bet-card-analytics">
+          ${trendSummaryTable(row)}
         </div>
       </div>
-
-      <div class="trend-metric-grid">
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Last 5 Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Hit Rate Last 5</div>
-          <div class="trend-metric-value">${hitRateText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Above Season</div>
-          <div class="trend-metric-value">${aboveSeasonText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Season Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="trend-secondary-line">
-        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(player["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(player["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div class="trend-note">
-        ${player["Trend Note"] || ""}
-      </div>
+      ${trendWindowTable(row)}
+      ${extraHtml || ""}
+      ${note ? `<div class="trend-note">${note}</div>` : ""}
     </div>
   `;
+}
+
+function createNBATrendCard(player) {
+  return trendCardShell(
+    playerProfileLink("nba", player),
+    `${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}`,
+    player
+  );
 }
 
 async function renderNBATrends() {
@@ -4564,95 +4606,18 @@ function formatNBATeamTrendLabel(statKey) {
 }
 
 function createNBATeamTrendCard(teamRow) {
-  const seasonAvg = Number(teamRow["Season Avg"]);
-  const last3 = Number(teamRow["Last 3 Avg"]);
-  const last5 = Number(teamRow["Last 5 Avg"]);
-  const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRate5 = readTrendRate(teamRow["Hit Rate Last 5"]);
-  const aboveSeason = Number(teamRow["Above Season %"]);
-
-  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
-  const aboveSeasonText = Number.isNaN(aboveSeason)
-    ? "N/A"
-    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
-
-  return `
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-title">
-          <h3>${teamProfileLink("nba", teamRow["Team"])}</h3>
-          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}</div>
-        </div>
-
-        <div class="trend-strength-badge">
-          ${teamRow["Trend Strength"] || "N/A"}
-        </div>
-
-        <div class="trend-analytics">
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Direction</span>
-            <span class="trend-analytics-value">${teamRow["Trend Direction"] || "N/A"}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Trend Score</span>
-            <span class="trend-analytics-value">${formatTrendScore(teamRow["Trend Score"])}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Risk</span>
-            <span class="trend-analytics-value">${teamRow["Risk Tier"] || "N/A"}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="trend-metric-grid">
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Last 5 Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Hit Rate Last 5</div>
-          <div class="trend-metric-value">${hitRateText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Above Season</div>
-          <div class="trend-metric-value">${aboveSeasonText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Season Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="trend-secondary-line">
-        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div class="trend-secondary-line">
-        Offense ${teamRow["Offensive Rating"] || "N/A"}
-        |
-        Defense ${teamRow["Defensive Rating"] || "N/A"}
-        |
-        Overall ${teamRow["Overall Rating"] || "N/A"}
-        |
-        ${teamRow["Rating Tier"] || "N/A"}
-        |
-        League Rank ${teamRow["League Rank"] || "N/A"}
-      </div>
-
-      <div class="trend-note">
-        ${teamRow["Trend Note"] || ""}
-      </div>
-    </div>
-  `;
+  return trendCardShell(
+    teamProfileLink("nba", teamRow["Team"]),
+    `${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}`,
+    teamRow,
+    teamRatingTable(teamRow, [
+      ["Offense", "Offensive Rating"],
+      ["Defense", "Defensive Rating"],
+      ["Overall", "Overall Rating"],
+      ["Tier", "Rating Tier"],
+      ["League Rank", "League Rank"]
+    ])
+  );
 }
 
 async function renderNBATeamTrends() {
@@ -4789,83 +4754,11 @@ function formatNHLTrendLabel(statKey) {
 }
 
 function createNHLTrendCard(player) {
-  const seasonAvg = Number(player["Season Avg"]);
-  const last3 = Number(player["Last 3 Avg"]);
-  const last5 = Number(player["Last 5 Avg"]);
-  const last10 = Number(player["Last 10 Avg"]);
-  const hitRate5 = readTrendRate(player["Hit Rate Last 5"]);
-  const aboveSeason = Number(player["Above Season %"]);
-
-  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
-  const aboveSeasonText = Number.isNaN(aboveSeason)
-    ? "N/A"
-    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
-
-  return `
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-title">
-          <h3>${playerProfileLink("nhl", player)}</h3>
-          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}</div>
-        </div>
-
-        <div class="trend-strength-badge">
-          ${player["Trend Strength"] || "N/A"}
-        </div>
-
-        <div class="trend-analytics">
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Direction</span>
-            <span class="trend-analytics-value">${player["Trend Direction"] || "N/A"}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Trend Score</span>
-            <span class="trend-analytics-value">${formatTrendScore(player["Trend Score"])}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Risk</span>
-            <span class="trend-analytics-value">${player["Risk Tier"] || "N/A"}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="trend-metric-grid">
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Last 5 Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Hit Rate Last 5</div>
-          <div class="trend-metric-value">${hitRateText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Above Season</div>
-          <div class="trend-metric-value">${aboveSeasonText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Season Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="trend-secondary-line">
-        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(player["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(player["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div class="trend-note">
-        ${player["Trend Note"] || ""}
-      </div>
-    </div>
-  `;
+  return trendCardShell(
+    playerProfileLink("nhl", player),
+    `${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}`,
+    player
+  );
 }
 
 async function renderNHLTrends() {
@@ -5017,95 +4910,18 @@ function formatNHLTeamTrendLabel(statKey) {
 }
 
 function createNHLTeamTrendCard(teamRow) {
-  const seasonAvg = Number(teamRow["Season Avg"]);
-  const last3 = Number(teamRow["Last 3 Avg"]);
-  const last5 = Number(teamRow["Last 5 Avg"]);
-  const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRate5 = readTrendRate(teamRow["Hit Rate Last 5"]);
-  const aboveSeason = Number(teamRow["Above Season %"]);
-
-  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
-  const aboveSeasonText = Number.isNaN(aboveSeason)
-    ? "N/A"
-    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
-
-  return `
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-title">
-          <h3>${teamProfileLink("nhl", teamRow["Team"])}</h3>
-          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}</div>
-        </div>
-
-        <div class="trend-strength-badge">
-          ${teamRow["Trend Strength"] || "N/A"}
-        </div>
-
-        <div class="trend-analytics">
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Direction</span>
-            <span class="trend-analytics-value">${teamRow["Trend Direction"] || "N/A"}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Trend Score</span>
-            <span class="trend-analytics-value">${formatTrendScore(teamRow["Trend Score"])}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Risk</span>
-            <span class="trend-analytics-value">${teamRow["Risk Tier"] || "N/A"}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="trend-metric-grid">
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Last 5 Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Hit Rate Last 5</div>
-          <div class="trend-metric-value">${hitRateText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Above Season</div>
-          <div class="trend-metric-value">${aboveSeasonText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Season Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="trend-secondary-line">
-        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div class="trend-secondary-line">
-        Offense ${teamRow["Offensive Rating"] || "N/A"}
-        |
-        Defense ${teamRow["Defensive Rating"] || "N/A"}
-        |
-        Overall ${teamRow["Overall Rating"] || "N/A"}
-        |
-        ${teamRow["Rating Tier"] || "N/A"}
-        |
-        League Rank ${teamRow["League Rank"] || "N/A"}
-      </div>
-
-      <div class="trend-note">
-        ${teamRow["Trend Note"] || ""}
-      </div>
-    </div>
-  `;
+  return trendCardShell(
+    teamProfileLink("nhl", teamRow["Team"]),
+    `${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}`,
+    teamRow,
+    teamRatingTable(teamRow, [
+      ["Offense", "Offensive Rating"],
+      ["Defense", "Defensive Rating"],
+      ["Overall", "Overall Rating"],
+      ["Tier", "Rating Tier"],
+      ["League Rank", "League Rank"]
+    ])
+  );
 }
 
 async function renderNHLTeamTrends() {
@@ -5255,83 +5071,11 @@ function formatTrendLabel(statKey) {
 }
 
 function createTrendCard(player) {
-  const seasonAvg = Number(player["Season Avg"]);
-  const last3 = Number(player["Last 3 Avg"]);
-  const last5 = Number(player["Last 5 Avg"]);
-  const last10 = Number(player["Last 10 Avg"]);
-  const hitRate5 = readTrendRate(player["Hit Rate Last 5"]);
-  const aboveSeason = Number(player["Above Season %"]);
-
-  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
-  const aboveSeasonText = Number.isNaN(aboveSeason)
-    ? "N/A"
-    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
-
-  return `
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-title">
-          <h3>${playerProfileLink("mlb", player)}</h3>
-          <div class="trend-subtitle">${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}</div>
-        </div>
-
-        <div class="trend-strength-badge">
-          ${player["Trend Strength"] || "N/A"}
-        </div>
-
-        <div class="trend-analytics">
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Direction</span>
-            <span class="trend-analytics-value">${player["Trend Direction"] || "N/A"}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Trend Score</span>
-            <span class="trend-analytics-value">${formatTrendScore(player["Trend Score"])}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Risk</span>
-            <span class="trend-analytics-value">${player["Risk Tier"] || "N/A"}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="trend-metric-grid">
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Last 5 Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Hit Rate Last 5</div>
-          <div class="trend-metric-value">${hitRateText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Above Season</div>
-          <div class="trend-metric-value">${aboveSeasonText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Season Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="trend-secondary-line">
-        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(player["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(player["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div class="trend-note">
-        ${player["Trend Note"] || ""}
-      </div>
-    </div>
-  `;
+  return trendCardShell(
+    playerProfileLink("mlb", player),
+    `${player["Team"] || "N/A"} • ${player["Stat Type"] || "Trend"}${tonightStatus(player["Team"])}`,
+    player
+  );
 }
 
 function populateTrendsPlayerFilter(selectId, rows, onChange) {
@@ -5425,24 +5169,11 @@ async function renderMLBTopPlayerTrends() {
       return;
     }
 
-    container.innerHTML = topRows.map(row => `
-      <div class="trend-card">
-        <div class="trend-card-header">
-          <div class="trend-title">
-            <h3>#${row["Rank"] || ""} ${row["Player Name"] || "Unknown Player"}</h3>
-            <div class="trend-subtitle">${row["Team"] || "N/A"} • ${row["Stat Type"] || "Trend"}${tonightStatus(row["Team"])}</div>
-          </div>
-
-          <div class="trend-strength-badge">
-            ${row["Trend Strength"] || "N/A"}
-          </div>
-        </div>
-
-        <div class="trend-note">
-          ${row["Trend Note"] || ""}
-        </div>
-      </div>
-    `).join("");
+    container.innerHTML = topRows.map((row) => trendCardShell(
+      `#${row["Rank"] || ""} ${playerProfileLink("mlb", row)}`,
+      `${row["Team"] || "N/A"} • ${row["Stat Type"] || "Trend"}${tonightStatus(row["Team"])}`,
+      row
+    )).join("");
   } catch (error) {
     console.error("Top MLB player trends error:", error);
     container.innerHTML = "";
@@ -5469,24 +5200,11 @@ async function renderMLBTopTeamTrends() {
       return;
     }
 
-    container.innerHTML = topRows.map(row => `
-      <div class="trend-card">
-        <div class="trend-card-header">
-          <div class="trend-title">
-            <h3>#${row["Rank"] || ""} ${row["Team"] || "Unknown Team"}</h3>
-            <div class="trend-subtitle">${row["Metric"] || "Trend"}${tonightStatus(row["Team"])}</div>
-          </div>
-
-          <div class="trend-strength-badge">
-            ${row["Trend Strength"] || "N/A"}
-          </div>
-        </div>
-
-        <div class="trend-note">
-          ${row["Trend Note"] || ""}
-        </div>
-      </div>
-    `).join("");
+    container.innerHTML = topRows.map((row) => trendCardShell(
+      `#${row["Rank"] || ""} ${teamProfileLink("mlb", row["Team"])}`,
+      `${row["Metric"] || "Trend"}${tonightStatus(row["Team"])}`,
+      row
+    )).join("");
   } catch (error) {
     console.error("Top MLB team trends error:", error);
     container.innerHTML = "";
@@ -5498,95 +5216,18 @@ function formatMLBTeamTrendLabel(statKey) {
 }
 
 function createMLBTeamTrendCard(teamRow) {
-  const seasonAvg = Number(teamRow["Season Avg"]);
-  const last3 = Number(teamRow["Last 3 Avg"]);
-  const last5 = Number(teamRow["Last 5 Avg"]);
-  const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRate5 = readTrendRate(teamRow["Hit Rate Last 5"]);
-  const aboveSeason = Number(teamRow["Above Season %"]);
-
-  const hitRateText = Number.isNaN(hitRate5) ? "N/A" : `${Math.round(hitRate5 * 100)}%`;
-  const aboveSeasonText = Number.isNaN(aboveSeason)
-    ? "N/A"
-    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
-
-  return `
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-title">
-          <h3>${teamProfileLink("mlb", teamRow["Team"])}</h3>
-          <div class="trend-subtitle">${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}</div>
-        </div>
-
-        <div class="trend-strength-badge">
-          ${teamRow["Trend Strength"] || "N/A"}
-        </div>
-
-        <div class="trend-analytics">
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Direction</span>
-            <span class="trend-analytics-value">${teamRow["Trend Direction"] || "N/A"}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Trend Score</span>
-            <span class="trend-analytics-value">${formatTrendScore(teamRow["Trend Score"])}</span>
-          </div>
-          <div class="trend-analytics-item">
-            <span class="trend-analytics-label">Risk</span>
-            <span class="trend-analytics-value">${teamRow["Risk Tier"] || "N/A"}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="trend-metric-grid">
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Last 5 Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Hit Rate Last 5</div>
-          <div class="trend-metric-value">${hitRateText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Above Season</div>
-          <div class="trend-metric-value">${aboveSeasonText}</div>
-        </div>
-
-        <div class="trend-metric-box">
-          <div class="trend-metric-label">Season Avg</div>
-          <div class="trend-metric-value">${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}</div>
-        </div>
-      </div>
-
-      <div class="trend-secondary-line">
-        Last 3: ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10: ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div class="trend-secondary-line">
-        Offense ${teamRow["Offensive Rating"] || "N/A"}
-        |
-        Pitching ${teamRow["Pitching Rating"] || "N/A"}
-        |
-        Overall ${teamRow["Overall Rating"] || "N/A"}
-        |
-        ${teamRow["Rating Tier"] || "N/A"}
-        |
-        League Rank ${teamRow["League Rank"] || "N/A"}
-      </div>
-
-      <div class="trend-note">
-        ${teamRow["Trend Note"] || ""}
-      </div>
-    </div>
-  `;
+  return trendCardShell(
+    teamProfileLink("mlb", teamRow["Team"]),
+    `${teamRow["Metric"] || "Trend"}${tonightStatus(teamRow["Team"])}`,
+    teamRow,
+    teamRatingTable(teamRow, [
+      ["Offense", "Offensive Rating"],
+      ["Pitching", "Pitching Rating"],
+      ["Overall", "Overall Rating"],
+      ["Tier", "Rating Tier"],
+      ["League Rank", "League Rank"]
+    ])
+  );
 }
 
 function populateTeamFilter(selectId, rows, onChange) {
@@ -5896,79 +5537,11 @@ function formatNFLTrendLabel(statKey) {
 }
 
 function createNFLTrendCard(player) {
-  const seasonAvg = Number(player["Season Avg"]);
-  const last3 = Number(player["Last 3 Avg"]);
-  const last5 = Number(player["Last 5 Avg"]);
-  const last10 = Number(player["Last 10 Avg"]);
-  const hitRateLast5 = readTrendRate(player["Hit Rate Last 5"]);
-  const aboveSeason = Number(player["Above Season %"]);
-
-  const hitRateText = Number.isNaN(hitRateLast5)
-    ? "N/A"
-    : `${Math.round(hitRateLast5 * 100)}%`;
-
-  const aboveSeasonText = Number.isNaN(aboveSeason)
-    ? "N/A"
-    : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
-
-  return `
-    <div class="leaderboard-item">
-      <strong>
-        ${playerProfileLink("nfl", player)}
-      </strong>
-
-      <div>
-        ${player["Team"] || "N/A"} |
-        ${formatNFLTrendLabel(player["Stat Type"])}${tonightStatus(player["Team"])}
-      </div>
-
-      <div>
-        Last 5 Avg:
-        ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}
-      </div>
-
-      <div>
-        Season Avg:
-        ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}
-      </div>
-
-      <div>
-        Last 3:
-        ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10:
-        ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-      </div>
-
-      <div>
-        Hit Rate Last 5: ${hitRateText}
-        |
-        Above Season: ${aboveSeasonText}
-      </div>
-
-      <div>
-        Direction: ${player["Trend Direction"] || "N/A"}
-        |
-        Trend Score: ${formatTrendScore(player["Trend Score"])}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(player["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(player["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(player["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div>
-        Trend Strength:
-        ${player["Trend Strength"] || "N/A"}
-        |
-        Risk:
-        ${player["Risk Tier"] || "N/A"}
-      </div>
-
-      <div>
-        ${player["Trend Note"] || ""}
-      </div>
-    </div>
-  `;
+  return trendCardShell(
+    playerProfileLink("nfl", player),
+    `${player["Team"] || "N/A"} • ${formatNFLTrendLabel(player["Stat Type"])}${tonightStatus(player["Team"])}`,
+    player
+  );
 }
 
 async function renderNFLTrends() {
@@ -6217,97 +5790,18 @@ function formatNFLTeamTrendLabel(statKey) {
 }
 
 function createNFLTeamTrendCard(teamRow) {
-  const seasonAvg = Number(teamRow["Season Avg"]);
-  const last3 = Number(teamRow["Last 3 Avg"]);
-  const last5 = Number(teamRow["Last 5 Avg"]);
-  const last10 = Number(teamRow["Last 10 Avg"]);
-  const hitRateLast5 = readTrendRate(
-    teamRow["Hit Rate Last 5"]
+  return trendCardShell(
+    teamProfileLink("nfl", teamRow["Team"]),
+    `${formatNFLTeamTrendLabel(teamRow["Metric"])}${tonightStatus(teamRow["Team"])}`,
+    teamRow,
+    teamRatingTable(teamRow, [
+      ["Offense", "Offensive Rating"],
+      ["Defense", "Defensive Rating"],
+      ["Overall", "Overall Rating"],
+      ["Tier", "Rating Tier"],
+      ["League Rank", "League Rank"]
+    ])
   );
-  const aboveSeason = Number(
-    teamRow["Above Season %"]
-  );
-
-  const hitRateText = Number.isNaN(hitRateLast5)
-    ? "N/A"
-    : `${Math.round(hitRateLast5 * 100)}%`;
-
-  const aboveSeasonText =
-    Number.isNaN(aboveSeason)
-      ? "N/A"
-      : `${aboveSeason >= 0 ? "+" : ""}${aboveSeason.toFixed(1)}%`;
-
-  return `
-    <div class="leaderboard-item">
-      <strong>
-        ${teamProfileLink("nfl", teamRow["Team"])}
-      </strong>
-
-      <div>
-        ${formatNFLTeamTrendLabel(
-          teamRow["Metric"]
-        )}${tonightStatus(teamRow["Team"])}
-      </div>
-
-      <div>
-        Last 5 Avg:
-        ${Number.isNaN(last5) ? "N/A" : last5.toFixed(2)}
-      </div>
-
-      <div>
-        Season Avg:
-        ${Number.isNaN(seasonAvg) ? "N/A" : seasonAvg.toFixed(2)}
-      </div>
-
-      <div>
-        Last 3:
-        ${Number.isNaN(last3) ? "N/A" : last3.toFixed(2)}
-        |
-        Last 10:
-        ${Number.isNaN(last10) ? "N/A" : last10.toFixed(2)}
-      </div>
-
-      <div>
-        Hit Rate Last 5: ${hitRateText}
-        |
-        Above Season: ${aboveSeasonText}
-      </div>
-
-      <div>
-        Direction: ${teamRow["Trend Direction"] || "N/A"}
-        |
-        Trend Score: ${formatTrendScore(teamRow["Trend Score"])}
-        |
-        Hit 3: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 3"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 3"]) * 100)}%`}
-        |
-        Hit 10: ${Number.isNaN(readTrendRate(teamRow["Hit Rate Last 10"])) ? "N/A" : `${Math.round(readTrendRate(teamRow["Hit Rate Last 10"]) * 100)}%`}
-      </div>
-
-      <div>
-        Offense ${teamRow["Offensive Rating"] || "N/A"}
-        |
-        Defense ${teamRow["Defensive Rating"] || "N/A"}
-        |
-        Overall ${teamRow["Overall Rating"] || "N/A"}
-        |
-        ${teamRow["Rating Tier"] || "N/A"}
-        |
-        League Rank ${teamRow["League Rank"] || "N/A"}
-      </div>
-
-      <div>
-        Trend Strength:
-        ${teamRow["Trend Strength"] || "N/A"}
-        |
-        Risk:
-        ${teamRow["Risk Tier"] || "N/A"}
-      </div>
-
-      <div>
-        ${teamRow["Trend Note"] || ""}
-      </div>
-    </div>
-  `;
 }
 
 async function renderNFLTeamTrends() {

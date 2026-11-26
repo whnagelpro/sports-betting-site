@@ -921,10 +921,19 @@ body {
   margin-top: 10px;
 }
 
-.odds-score-table td:nth-child(3),
-.odds-score-table td:nth-child(6),
-.odds-score-table td:nth-child(7) {
-  font-weight: 700;
+.odds-summary-table td.ev-bright-green { color: #22c55e; }
+.odds-summary-table td.ev-light-green { color: #4ade80; }
+.odds-summary-table td.ev-yellow { color: #facc15; }
+.odds-summary-table td.ev-red { color: #ef4444; }
+
+.trend-card .odds-table-wrap,
+.prop-card .odds-table-wrap,
+.leaderboard-box .odds-table-wrap {
+  margin-top: 14px;
+}
+
+.leaderboard-group + .odds-table-wrap {
+  margin-top: 8px;
 }
 
 @media (max-width: 768px) {
