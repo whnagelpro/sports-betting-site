@@ -1909,16 +1909,19 @@ function createBetCard(game, tierName = "Rookie", league = "nba") {
     ? game.rankings.find((item) => item.market === game.bestMarket) || null
     : null;
 
-  const rankingsHTML = visibleRankings
-    .map((item, index) => `
-      <div class="rank-item">
-        <span><strong>#${index + 1} ${item.bet}</strong></span>
-        <span>Score: ${formatSportacularScore(item.sportacularScore)}</span>
-        <span>${item.side} · ${item.confidence} · Risk ${item.risk} · Hit ${item.hitRate}</span>
-        <span class="${getEVClass(item.ev)}">EV: ${formatEV(item.ev)}</span>
-      </div>
-    `)
-    .join("");
+  const rankingsHTML = visibleRankings.length
+    ? visibleRankings.map((item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${item.bet}</td>
+          <td>${formatSportacularScore(item.sportacularScore)}</td>
+          <td>${item.confidence || "—"}</td>
+          <td>${item.risk || "—"}</td>
+          <td>${item.hitRate || "—"}</td>
+          <td class="${getEVClass(item.ev)}">${formatEV(item.ev)}</td>
+        </tr>
+      `).join("")
+    : `<tr><td colspan="7">No ranked sides</td></tr>`;
 
   const lockedCount = Math.max(ranked.length - visibleRankings.length, 0);
 
@@ -1930,75 +1933,127 @@ function createBetCard(game, tierName = "Rookie", league = "nba") {
           <p class="bet-subtext">Sportsbook: ${game.vendor} | Game Date: ${game.gameDate}${game.scheduleStatus ? ` | ${statusLabel(game.scheduleStatus)}` : ""}</p>
         </div>
         <div class="bet-card-analytics">
-
-          <div class="analytics-row">
-              <span class="analytics-label">Best Market</span>
-              <span class="analytics-value">
-                  ${isPlay ? `${game.bestMarket} · ${game.bestMarketSide}` : "No Play"}
-              </span>
-          </div>
-
-          <div class="analytics-row">
-              <span class="analytics-label">Sportacular Score</span>
-              <span class="analytics-value">
-                  ${isPlay ? formatSportacularScore(game.bestMarketScore) : "—"}
-              </span>
-          </div>
-
-          <div class="analytics-row">
-              <span class="analytics-label">Confidence</span>
-              <span class="analytics-value">
-                  ${headline?.confidence || "—"}
-              </span>
-          </div>
-
-          <div class="analytics-row">
-              <span class="analytics-label">Risk</span>
-              <span class="analytics-value">
-                  ${headline?.risk || "—"}
-              </span>
-          </div>
-
-          <div class="analytics-row">
-              <span class="analytics-label">Hit Rate</span>
-              <span class="analytics-value">
-                  ${headline?.hitRate || "—"}
-              </span>
-          </div>
-
+          <table class="odds-table odds-summary-table">
+            <tbody>
+              <tr>
+                <th scope="row">Best Market</th>
+                <td>${isPlay ? `${game.bestMarket} · ${game.bestMarketSide}` : "No Play"}</td>
+              </tr>
+              <tr>
+                <th scope="row">Sportacular Score</th>
+                <td>${isPlay ? formatSportacularScore(game.bestMarketScore) : "—"}</td>
+              </tr>
+              <tr>
+                <th scope="row">Confidence</th>
+                <td>${headline?.confidence || "—"}</td>
+              </tr>
+              <tr>
+                <th scope="row">Risk</th>
+                <td>${headline?.risk || "—"}</td>
+              </tr>
+              <tr>
+                <th scope="row">Hit Rate</th>
+                <td>${headline?.hitRate || "—"}</td>
+              </tr>
+            </tbody>
+          </table>
           ${isPlay && !gameHasStarted(game.scheduleStatus) ? `<a class="card-link" href="parlay.html?league=${encodeURIComponent(league)}&board=odds&q=${encodeURIComponent(headline?.bet || `${game.awayTeam} at ${game.homeTeam}`)}">Add best side to parlay</a>` : ""}
-
         </div>
       </div>
 
       <div class="market-grid">
         <div class="market-box">
           <h4>Spread</h4>
-          <p class="market-line">${game.awayTeam} ${formatLineValue(game.spreadAwayValue)} (${formatAmericanOdds(game.spreadAwayOdds)})</p>
-          <p class="market-line">${game.homeTeam} ${formatLineValue(game.spreadHomeValue)} (${formatAmericanOdds(game.spreadHomeOdds)})</p>
+          <div class="odds-table-wrap">
+            <table class="odds-table">
+              <thead>
+                <tr><th>Team</th><th>Line</th><th>Odds</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${game.awayTeam}</td>
+                  <td>${formatLineValue(game.spreadAwayValue)}</td>
+                  <td>${formatAmericanOdds(game.spreadAwayOdds)}</td>
+                </tr>
+                <tr>
+                  <td>${game.homeTeam}</td>
+                  <td>${formatLineValue(game.spreadHomeValue)}</td>
+                  <td>${formatAmericanOdds(game.spreadHomeOdds)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="market-box">
           <h4>Moneyline</h4>
-          <p class="market-line">${game.awayTeam} (${formatAmericanOdds(game.moneylineAwayOdds)})</p>
-          <p class="market-line">${game.homeTeam} (${formatAmericanOdds(game.moneylineHomeOdds)})</p>
-
-          <div class="market-prob-breakdown" style="margin-top: 10px;">
-            <p class="market-line"><strong>Implied:</strong> ${game.awayTeam} ${formatProbability(game.impliedProbAwayML)} | ${game.homeTeam} ${formatProbability(game.impliedProbHomeML)}</p>
-            <p class="market-line"><strong>Vig-Free:</strong> ${game.awayTeam} ${formatProbability(game.vigFreeProbAwayML)} | ${game.homeTeam} ${formatProbability(game.vigFreeProbHomeML)}</p>
+          <div class="odds-table-wrap">
+            <table class="odds-table">
+              <thead>
+                <tr><th>Team</th><th>Odds</th><th>Implied</th><th>Vig-Free</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${game.awayTeam}</td>
+                  <td>${formatAmericanOdds(game.moneylineAwayOdds)}</td>
+                  <td>${formatProbability(game.impliedProbAwayML)}</td>
+                  <td>${formatProbability(game.vigFreeProbAwayML)}</td>
+                </tr>
+                <tr>
+                  <td>${game.homeTeam}</td>
+                  <td>${formatAmericanOdds(game.moneylineHomeOdds)}</td>
+                  <td>${formatProbability(game.impliedProbHomeML)}</td>
+                  <td>${formatProbability(game.vigFreeProbHomeML)}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
         <div class="market-box">
           <h4>Total</h4>
-          <p class="market-line">Over ${formatLineValue(game.totalValue)} (${formatAmericanOdds(game.totalOverOdds)})</p>
-          <p class="market-line">Under ${formatLineValue(game.totalValue)} (${formatAmericanOdds(game.totalUnderOdds)})</p>
+          <div class="odds-table-wrap">
+            <table class="odds-table">
+              <thead>
+                <tr><th>Side</th><th>Line</th><th>Odds</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Over</td>
+                  <td>${formatLineValue(game.totalValue)}</td>
+                  <td>${formatAmericanOdds(game.totalOverOdds)}</td>
+                </tr>
+                <tr>
+                  <td>Under</td>
+                  <td>${formatLineValue(game.totalValue)}</td>
+                  <td>${formatAmericanOdds(game.totalUnderOdds)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <div class="rank-list">
         <h4>Sportacular Scores</h4>
-        ${rankingsHTML}
+        <div class="odds-table-wrap">
+          <table class="odds-table odds-score-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Bet</th>
+                <th>Score</th>
+                <th>Confidence</th>
+                <th>Risk</th>
+                <th>Hit</th>
+                <th>EV</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rankingsHTML}
+            </tbody>
+          </table>
+        </div>
         ${lockedCount > 0 ? `
           <div class="locked-overlay">
             <h4>Unlock More Bets</h4>

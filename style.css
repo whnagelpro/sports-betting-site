@@ -859,6 +859,81 @@ body {
   margin-bottom: 0;
 }
 
+.bet-card .market-grid {
+  grid-template-columns: 1fr;
+}
+
+.odds-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.odds-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #0f1727;
+  border: 1px solid #22304a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.odds-table th,
+.odds-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.odds-table thead th {
+  color: #9fb0cc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #111827;
+}
+
+.odds-table td {
+  color: #dbe7ff;
+}
+
+.odds-table tr:last-child td,
+.odds-table tr:last-child th {
+  border-bottom: 0;
+}
+
+.odds-summary-table th {
+  color: #9fb0cc;
+  font-weight: 700;
+  width: 52%;
+}
+
+.odds-summary-table td {
+  text-align: right;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.bet-card-analytics .card-link {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.odds-score-table td:nth-child(3),
+.odds-score-table td:nth-child(6),
+.odds-score-table td:nth-child(7) {
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .bet-card-analytics {
+    max-width: none;
+    flex-basis: 100%;
+  }
+}
+
 .section-header {
   margin-bottom: 40px;
 }
