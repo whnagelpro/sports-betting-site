@@ -1130,18 +1130,11 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
                 <th>Line</th>
                 <th>Score</th>
                 <th>EV</th>
-                <th>Probability</th>
-                <th>Matchup</th>
-                <th>Book</th>
               </tr>
             </thead>
             <tbody>
               ${items.map((prop, index) => {
                 const fullName = getPropFullName(prop);
-                const probabilityText =
-                  prop.league === "nfl" && Number.isFinite(prop.bestModelProbability)
-                    ? formatProbability(prop.bestModelProbability)
-                    : formatProbability(prop.impliedProbability);
                 const playerCell = prop.playerId && prop.league
                   ? `<a class="player-link" href="player.html?league=${encodeURIComponent(prop.league)}&id=${encodeURIComponent(prop.playerId)}">${fullName}</a>`
                   : fullName;
@@ -1153,9 +1146,6 @@ function renderPropsLeaderboard(containerId, props, limit = 5) {
                     <td>${formatLineValue(prop.lineValue)}</td>
                     <td>${formatSportacularScore(prop.sportacularScore)}</td>
                     <td class="${getEVClass(prop.ev)}">${formatEV(prop.ev)}</td>
-                    <td>${probabilityText}</td>
-                    <td>${prop.awayTeam && prop.homeTeam ? matchupLinks(prop.league, prop.awayTeam, prop.homeTeam) : "—"}</td>
-                    <td>${displayBook(prop.vendor)}</td>
                   </tr>
                 `;
               }).join("")}
@@ -4396,6 +4386,7 @@ function trendSummaryTable(row) {
         ${trendSummaryRow("Strength", row["Trend Strength"])}
         ${trendSummaryRow("Direction", row["Trend Direction"])}
         ${trendSummaryRow("Trend Score", score)}
+        ${trendSummaryRow("Above Season", formatAboveSeason(row["Above Season %"]))}
         ${trendSummaryRow("Confidence", row["Confidence Score"])}
         ${trendSummaryRow("Risk", row["Risk Tier"])}
       </tbody>
@@ -4418,8 +4409,6 @@ function trendWindowTable(row) {
   });
   const season = formatTrendAvg(row["Season Avg"]);
   if (season) body.push(`<tr><td>Season</td><td>${season}</td><td>—</td></tr>`);
-  const above = formatAboveSeason(row["Above Season %"]);
-  if (above) body.push(`<tr><td>Above Season</td><td>${above}</td><td>—</td></tr>`);
   if (!body.length) return "";
   return `
     <div class="odds-table-wrap">
