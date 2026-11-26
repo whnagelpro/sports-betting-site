@@ -54,6 +54,7 @@ const MLB_PROPS_PREMIUM_URL = "/.netlify/functions/mlb-props-premium";
 const MLB_PROPS_TEASER_URL = "/.netlify/functions/mlb-props-teaser";
 const NFL_PROPS_PREMIUM_URL = "/.netlify/functions/nfl-props-premium";
 const NFL_PROPS_TEASER_URL = "/.netlify/functions/nfl-props-teaser";
+const NFL_PROPS_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=2077637558&single=true&output=csv";
 
 const TEAM_PROFILE_CONFIG = {
 
@@ -238,7 +239,7 @@ const PROPS_PAGE_CONFIG = {
   },
 
   nfl: {
-    csvUrl: NFL_PROPS_PREMIUM_URL,
+    csvUrl: NFL_PROPS_SHEET_URL,
     teaserUrl: NFL_PROPS_TEASER_URL,
     containerId: "nfl-props-container",
     leaderboardId: "nfl-props-leaderboard",
@@ -1697,6 +1698,8 @@ function buildNFLPropsFromRows(rows) {
 
     const overOdds = safeText(row["Over Odds"], "");
     const underOdds = safeText(row["Under Odds"], "");
+    const listedOdds = safeText(row["Odds"], "");
+    const overPrice = overOdds || listedOdds;
 
     const awayTeam = safeText(row["Away Team"], "");
     const homeTeam = safeText(row["Home Team"], "");
@@ -1774,7 +1777,7 @@ function buildNFLPropsFromRows(rows) {
       vendor &&
       propType &&
       lineValue !== "" &&
-      overOdds !== "" &&
+      overPrice !== "" &&
       !Number.isNaN(overEV)
     ) {
     if (bestSide === "Over") {
@@ -1790,9 +1793,9 @@ function buildNFLPropsFromRows(rows) {
         propType,
         lineValue,
         betType: "Over",
-        overOdds,
+        overOdds: overPrice,
         underOdds,
-        genericOdds: overOdds,
+        genericOdds: overPrice,
         impliedProbability: impliedProbOver,
         ev: overEV,
 
@@ -2085,11 +2088,11 @@ function createPropCard(prop) {
   let oddsToShow = "N/A";
 
   if (betTypeLower.includes("over")) {
-    oddsToShow = formatAmericanOdds(prop.overOdds);
+    oddsToShow = formatAmericanOdds(prop.overOdds || prop.genericOdds);
   } else if (betTypeLower.includes("under")) {
-    oddsToShow = formatAmericanOdds(prop.underOdds);
+    oddsToShow = formatAmericanOdds(prop.underOdds || prop.genericOdds);
   } else {
-    oddsToShow = formatAmericanOdds(prop.genericOdds);
+    oddsToShow = formatAmericanOdds(prop.genericOdds || prop.overOdds || prop.underOdds);
   }
 
   const fullName = getPropFullName(prop);
@@ -3737,7 +3740,7 @@ const PUBLIC_PROPS_CSV = {
   nba: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=590324617&single=true&output=csv",
   nhl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQYTgu9bsGUhI1gicOOfLrgYHmNMfrl3W1OKhAVs9cdrdd2CagJZSVM3F25hQ8vk0aRK7hapVmbNWQP/pub?gid=1839953184&single=true&output=csv",
   mlb: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRp1qdWZXtA4IB8NB6xnrtirs_Lv3EWNyyJbfpmR4_BZNujv-u4KgaOcJ6do9OfSWnIXeS56EfYQaZx/pub?gid=1502960090&single=true&output=csv",
-  nfl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7eg-0liRvxa9q2k6IM2mipst48DHUMa8yXltD8irldOtim2Emic7w0rtl1gfT5xl_AVhR29jBrqY1/pub?gid=2077637558&single=true&output=csv"
+  nfl: NFL_PROPS_SHEET_URL
 };
 
 function getPhoenixDateString() {
