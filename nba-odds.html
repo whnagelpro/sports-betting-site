@@ -175,10 +175,34 @@
 
         <div class="guide-panel-links">
           <div class="hover-guide-item">
+            <span class="hover-guide-term">Best Market</span>
+            <div class="hover-guide-tooltip">
+              <strong>Best Market</strong><br>
+              The first line on the card. It names the market and side Sportacular ranks first, such as Spread · Home or Total · Over. If nothing qualifies, it says No Play.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
             <span class="hover-guide-term">Sportacular Score</span>
             <div class="hover-guide-tooltip">
               <strong>Sportacular Score</strong><br>
-              The 0 to 100 grade for the best side. It blends the price edge, confidence, risk, and recent trend. Higher means a stronger Sportacular play. No Play rows stay off the board.
+              The 0 to 100 grade for that side. It blends the price edge, confidence, risk, and recent trend. Higher means a stronger Sportacular play. The same grade is labeled Score on each ranked row.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Confidence</span>
+            <div class="hover-guide-tooltip">
+              <strong>Confidence</strong><br>
+              The confidence tier for that side. It is not the hit rate, the EV, or the risk.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Risk</span>
+            <div class="hover-guide-tooltip">
+              <strong>Risk</strong><br>
+              The risk tier for that side, shown as Risk on the card. It is separate from confidence. A higher score can still carry more risk.
             </div>
           </div>
 
@@ -186,23 +210,7 @@
             <span class="hover-guide-term">Hit Rate</span>
             <div class="hover-guide-tooltip">
               <strong>Hit Rate</strong><br>
-              How often this result has happened in the logged games. A 70% hit rate means it landed in 7 of every 10 logged games that counted.
-            </div>
-          </div>
-
-          <div class="hover-guide-item">
-            <span class="hover-guide-term">EV</span>
-            <div class="hover-guide-tooltip">
-              <strong>EV (Expected Value)</strong><br>
-              A quick way to measure how much value certain data may actually have. Positive EV means the model thinks the price may be better than it should be.
-            </div>
-          </div>
-
-          <div class="hover-guide-item">
-            <span class="hover-guide-term">Model Probability</span>
-            <div class="hover-guide-tooltip">
-              <strong>Model Probability</strong><br>
-              The model’s estimate of how often the odds should hit.
+              How often this result has happened in the logged games. A 70% hit rate means it landed in 7 of every 10 logged games that counted. On a ranked row it is labeled Hit.
             </div>
           </div>
 
@@ -210,7 +218,7 @@
             <span class="hover-guide-term">Spread</span>
             <div class="hover-guide-tooltip">
               <strong>Spread</strong><br>
-              The margin a team must cover. Favorites usually have a negative number and underdogs usually have a positive number.
+              The margin box. Favorites usually have a negative number and underdogs a positive number. Each team is listed with the line and the American odds in parentheses.
             </div>
           </div>
 
@@ -218,7 +226,23 @@
             <span class="hover-guide-term">Moneyline</span>
             <div class="hover-guide-tooltip">
               <strong>Moneyline</strong><br>
-              The sportsbook's weighted analysis on which team will win the game outright.
+              The outright-winner box. Each team is listed with American odds in parentheses. A ranked moneyline side is labeled ML.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Implied</span>
+            <div class="hover-guide-tooltip">
+              <strong>Implied</strong><br>
+              The Implied line under Moneyline. Each team's chance from the listed moneyline before the sportsbook margin is removed.
+            </div>
+          </div>
+
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">Vig-Free</span>
+            <div class="hover-guide-tooltip">
+              <strong>Vig-Free</strong><br>
+              The Vig-Free line under Moneyline. Each team's chance after the sportsbook margin is removed.
             </div>
           </div>
 
@@ -226,23 +250,25 @@
             <span class="hover-guide-term">Total</span>
             <div class="hover-guide-tooltip">
               <strong>Total</strong><br>
-              The sportsbook's analysis on whether the combined score will go over or under a certain number.
+              The Over and Under box. Both sides use the same number, with the American odds in parentheses.
             </div>
           </div>
 
-          <span class="hover-guide-item">
-  <span class="hover-guide-term">Implied Probability</span>
-  <span class="hover-guide-tooltip">
-    The chance of an outcome based on the sportsbook’s listed odds before removing sportsbook margin.
-  </span>
-</span>
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">EV</span>
+            <div class="hover-guide-tooltip">
+              <strong>EV (Expected Value)</strong><br>
+              The EV on each ranked row. Positive EV means the model thinks that price is better than the chance it assigned. A plus sign means positive.
+            </div>
+          </div>
 
-<span class="hover-guide-item">
-  <span class="hover-guide-term">Vig-Free Probability</span>
-  <span class="hover-guide-tooltip">
-    A cleaner estimate of each team’s true market probability after removing the sportsbook’s built-in margin.
-  </span>
-</span>
+          <div class="hover-guide-item">
+            <span class="hover-guide-term">No Play</span>
+            <div class="hover-guide-tooltip">
+              <strong>No Play</strong><br>
+              Shown when that market, or the best side, does not qualify. No Play rows stay off the ranked list.
+            </div>
+          </div>
         </div>
       </div>
     </div>
