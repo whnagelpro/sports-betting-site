@@ -2143,9 +2143,13 @@ function isClosedGameStatus(status) {
   return ["final", "complete", "completed", "postponed", "cancelled", "canceled"].includes(value);
 }
 
+function isInGameClock(status) {
+  return /\b(?:qtr|quarter|half|halftime|ot|overtime|[1-4](?:st|nd|rd|th))\b/i.test(String(status || ""));
+}
+
 function isKickoffStatus(status) {
   const value = String(status || "").trim();
-  if (!value) return false;
+  if (!value || isInGameClock(value)) return false;
   if (/^\d{4}-\d{2}-\d{2}T/i.test(value)) return true;
   if (/^\d{1,2}\/\d{1,2}/.test(value)) return true;
   if (/^(mon|tue|wed|thu|fri|sat|sun)\b/i.test(value) && /\d{1,2}:\d{2}/.test(value)) return true;
