@@ -156,6 +156,8 @@
 
         </div>
 
+        <div id="player-profile-guide"></div>
+
     </div>
 
 </section>
@@ -320,100 +322,40 @@
 
             </div>
 
-            <div class="featured-prop-center">
-
-                <div class="featured-stat">
-
-                    <span class="featured-label">
-                        Line
-                    </span>
-
-                    <span
-                        id="top-prop-line"
-                        class="featured-value">
-
-                        
-
-                    </span>
-
-                </div>
-
-                <div class="featured-stat">
-
-                    <span class="featured-label">
-                        Odds
-                    </span>
-
-                    <span
-                        id="top-prop-odds"
-                        class="featured-value">
-
-                        
-
-                    </span>
-
-                </div>
-
-                <div class="featured-stat">
-
-                    <span class="featured-label">
-                        Sportsbook
-                    </span>
-
-                    <span
-                        id="top-prop-book">
-
-                        
-
-                    </span>
-
-                </div>
-
+            <div class="odds-table-wrap">
+                <table class="odds-table odds-summary-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Line</th>
+                            <td id="top-prop-line"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Odds</th>
+                            <td id="top-prop-odds"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Sportsbook</th>
+                            <td id="top-prop-book"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">EV</th>
+                            <td id="top-prop-ev"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Model Probability</th>
+                            <td id="top-prop-probability"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="featured-prop-right">
+            <button
+                class="btn btn-primary"
+                id="view-top-prop">
 
-                <div class="ev-circle">
+                View Trends
 
-                    <span
-                        id="top-prop-ev">
-
-                        
-
-                    </span>
-
-                    <small>
-                        EV
-                    </small>
-
-                </div>
-
-                <div class="probability-display">
-
-                    <span class="probability-label">
-
-                        Model Probability
-
-                    </span>
-
-                    <strong
-                        id="top-prop-probability">
-
-                        
-
-                    </strong>
-
-                </div>
-
-                <button
-                    class="btn btn-primary"
-                    id="view-top-prop">
-
-                    View Trends
-
-                </button>
-
-            </div>
+            </button>
 
         </article>
 

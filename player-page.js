@@ -52,6 +52,39 @@ document.addEventListener(
 // Initialize
 // ------------------------------------------------------
 
+function renderPlayerProfileGuide() {
+    const slot = document.getElementById("player-profile-guide");
+    if (!slot || slot.dataset.ready === "1" || typeof guideItem !== "function") return;
+    slot.dataset.ready = "1";
+    slot.innerHTML = `<div class="guide-panel profile-guide">
+        <h3 class="guide-panel-title">How to Read This Player Profile</h3>
+        <p class="guide-panel-text">Hover over any term below for a quick explanation in plain English.</p>
+        <div class="guide-panel-links">
+            ${guideItem("Sportacular Score", "The Sportacular Score row. A 0 to 100 grade for the player's best prop. The page can say a number such as 82.40, or -.")}
+            ${guideItem("Rating", "The Rating row. Up to five stars. The page can say a mix of ★, ½, and ☆, or ☆☆☆☆☆ when a rating is not available.")}
+            ${guideItem("Recommendation", "The Recommendation row. The page can say Over, Under, or -.")}
+            ${guideItem("Model Edge", "The Model Edge row. The page can say a percent such as 10.0%, or -.")}
+            ${guideItem("Confidence", "The Confidence row on the summary. The page can say Early when fewer than 3 games are available, or Elite, Strong, Solid, or Lean.")}
+            ${guideItem("Best Prop", "The Best Prop row. The name of the prop Sportacular ranks first for this player, or -.")}
+            ${guideItem("Suggested Play", "The Suggested Play row. The page can say Over or Under plus the line, such as Over 24.5, or -.")}
+            ${guideItem("Sportsbook", "The Sportsbook row. The page can say DraftKings, FanDuel, BetMGM, Caesars, BetRivers, or ESPN BET.")}
+            ${guideItem("Line", "The Line row on today's prop. The number the sportsbook set, or a blank cell when no prop is posted.")}
+            ${guideItem("Odds", "The Odds row. American odds such as -115 or +120.")}
+            ${guideItem("EV", "The EV row. The page can say a plus number such as +0.25, a minus number such as -0.10, or -.")}
+            ${guideItem("Model Probability", "The Model Probability row. The page can say a percent such as 58.0%, or -.")}
+            ${guideItem("Status", "The status above a trend card. The page can say Rising, Falling, or Stable. Fewer than 3 games stays Stable.")}
+            ${guideItem("Trend Score", "The Trend Score row. The page can say a plus number such as +12.4, a minus number such as -8.1, or -. A small sample can add (Early) on an insight card.")}
+            ${guideItem("Trend Strength", "The Trend Strength row. The page can say Early when fewer than 3 games are available, or Elite Trend, Strong Trend, Moderate Trend, Weak Trend, Cold Trend, or Unknown.")}
+            ${guideItem("Risk Tier", "The Risk Tier row. The page can say Early when fewer than 3 games are available, or Low, Medium, High, or Very High.")}
+            ${guideItem("Momentum Confidence", "The Momentum Confidence row. The page can say High, Moderate, or Low. Fewer than 3 games says Low.")}
+            ${guideItem("Sample", "The Sample row. The page can say Based on 5 games, Based on 1 game, or Sample size unavailable.")}
+            ${guideItem("Hit Rate Last 5", "The Hit Rate Last 5 row. How often the result showed up in the last five logged games. The page can say a percent such as 70%, or -.")}
+            ${guideItem("Season Snapshot", "The season table. Each row is a season stat for this player. A missing number says —.")}
+        </div>
+    </div>`;
+    if (typeof bindProfileGuide === "function") bindProfileGuide(slot);
+}
+
 async function initPlayerPage() {
 
     getUrlParameters();
@@ -61,6 +94,8 @@ async function initPlayerPage() {
     applyLeagueLabels(labels);
 
     setupBackButtons();
+
+    renderPlayerProfileGuide();
 
     try {
 
@@ -606,25 +641,12 @@ function renderQuickStats() {
         player.quickStats ??
         [];
 
-    cards.forEach(stat => {
+    const rows = cards.map((stat) => [
+        stat.label,
+        seasonDataAvailable ? formatStatValue(stat.value, stat.label) : "—"
+    ]);
 
-        grid.appendChild(
-
-            createStatCard(
-
-                stat.label,
-
-                seasonDataAvailable
-
-                                ? stat.value
-
-                                : null
-
-            )
-
-        );
-
-    });
+    grid.innerHTML = rows.length ? profileSummaryTable(rows) : "";
 
 }
 
@@ -1401,112 +1423,23 @@ function renderAnalyticsDashboard() {
     console.log("Model Edge:", analytics.modelEdge);
     console.log("Best Prop:", analytics.bestProp);
 
-    dashboard.innerHTML = `
-
-    <div class="analytics-left">
-
-        <div class="analytics-title">
-
-            SPORTACULAR SCORE
-
-        </div>
-
-        <div class="analytics-score-large">
-
-            ${
-                dashboardScore !== null &&
-                dashboardScore !== undefined &&
-                dashboardScore !== "" &&
-                Number.isFinite(Number(dashboardScore))
-                    ? Number(dashboardScore).toFixed(2)
-                    : "-"
-            }
-
-        </div>
-
-        <div class="analytics-rating">
-
-            ${formatDashboardStars(dashboardStars)}
-
-        </div>
-
-        <div class="analytics-recommendation">
-
-            ${formatDashboardLabel(
-                dashboardRecommendation
-            )}
-
-        </div>
-
-    </div>
-
-    <div class="analytics-right">
-
-        <div class="analytics-item">
-
-            <strong>Model Edge</strong>
-
-            <span class="positive-ev">
-
-                ${
-                    formatEdgePercent(modelEdgeValue)
-                }
-
-            </span>
-
-        </div>
-
-        <div class="analytics-item">
-
-            <strong>Confidence</strong>
-
-            <span>
-
-                ${dashboardConfidence}
-
-            </span>
-
-        </div>
-
-        <div class="analytics-item">
-
-            <strong>Best Prop</strong>
-
-            <span>
-
-                ${dashboardPropName}
-
-            </span>
-
-        </div>
-
-        <div class="analytics-item">
-
-            <strong>Suggested Play</strong>
-
-            <span>
-
-                ${dashboardSuggestedPlay}
-
-            </span>
-
-        </div>
-
-        <div class="analytics-item">
-
-            <strong>Sportsbook</strong>
-
-            <span>
-
-                ${dashboardSportsbook}
-
-            </span>
-
-        </div>
-
-    </div>
-
-    `;
+    dashboard.innerHTML = profileSummaryTable([
+        ["Sportacular Score", (
+            dashboardScore !== null &&
+            dashboardScore !== undefined &&
+            dashboardScore !== "" &&
+            Number.isFinite(Number(dashboardScore))
+                ? Number(dashboardScore).toFixed(2)
+                : "-"
+        )],
+        ["Rating", formatDashboardStars(dashboardStars)],
+        ["Recommendation", formatDashboardLabel(dashboardRecommendation)],
+        ["Model Edge", formatEdgePercent(modelEdgeValue)],
+        ["Confidence", dashboardConfidence],
+        ["Best Prop", dashboardPropName],
+        ["Suggested Play", dashboardSuggestedPlay],
+        ["Sportsbook", dashboardSportsbook]
+    ]);
 
 }
 
@@ -2618,84 +2551,39 @@ function renderTrendCards() {
 
     </p>
 
-    <div class="trend-metrics">
-
-        <div class="trend-metric trend-score-metric">
-
-            <span class="trend-metric-label">
-                Trend Score
-            </span>
-
-            <strong
-                class="trend-metric-value trend-score-value trend-score-${visualState.direction} trend-score-intensity-${trendScoreIntensity}"
-            >
-                ${displayTrendScore}
-            </strong>
-
-        </div>
-
-        <div class="trend-metric">
-
-            <span class="trend-metric-label">
-                Hit Rate Last 5
-            </span>
-
-            <strong class="trend-metric-value">
-                ${trendHitRates[trend.title] || "-"}
-            </strong>
-
-        </div>
-
-        <div class="trend-metric">
-
-            <span class="trend-metric-label">
-                Trend Strength
-            </span>
-
-            <strong
-                class="trend-badge trend-strength-badge trend-strength-${displayedTrendStrengthClass}"
-            >
-                ${displayedTrendStrength}
-            </strong>
-
-        </div>
-
-        <div class="trend-metric">
-
-            <span class="trend-metric-label">
-                Risk Tier
-            </span>
-
-            <strong
-                class="trend-badge trend-risk-badge ${
-                    riskSampleSize !== null &&
-                    riskSampleSize < 3
-                        ? "trend-risk-early"
-                        : `trend-risk-${visualState.riskClass}`
-                }"
-            >
-                ${displayRisk}
-            </strong>
-
-        </div>
-
-        <div class="trend-metric">
-
-            <span class="trend-metric-label">
-                Momentum Confidence
-            </span>
-
-            <strong
-                class="trend-badge momentum-confidence-badge momentum-confidence-${momentumConfidence.className}"
-            >
-                ${momentumConfidence.label}
-            </strong>
-
-        </div>
-    </div>
-
-    <div class="momentum-sample-size">
-        ${momentumSampleLabel}
+    <div class="odds-table-wrap">
+        <table class="odds-table odds-summary-table">
+            <tbody>
+                <tr>
+                    <th scope="row">Trend Score</th>
+                    <td class="trend-score-value trend-score-${visualState.direction} trend-score-intensity-${trendScoreIntensity}">${displayTrendScore}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Hit Rate Last 5</th>
+                    <td>${trendHitRates[trend.title] || "-"}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Trend Strength</th>
+                    <td><strong class="trend-badge trend-strength-badge trend-strength-${displayedTrendStrengthClass}">${displayedTrendStrength}</strong></td>
+                </tr>
+                <tr>
+                    <th scope="row">Risk Tier</th>
+                    <td><strong class="trend-badge trend-risk-badge ${
+                        riskSampleSize !== null && riskSampleSize < 3
+                            ? "trend-risk-early"
+                            : `trend-risk-${visualState.riskClass}`
+                    }">${displayRisk}</strong></td>
+                </tr>
+                <tr>
+                    <th scope="row">Momentum Confidence</th>
+                    <td><strong class="trend-badge momentum-confidence-badge momentum-confidence-${momentumConfidence.className}">${momentumConfidence.label}</strong></td>
+                </tr>
+                <tr>
+                    <th scope="row">Sample</th>
+                    <td>${momentumSampleLabel}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
 `;
@@ -3041,17 +2929,17 @@ function createSeasonPanel(panel) {
 
         return `
 
-        <div class="stat-row">
+        <tr>
 
-            <span>${stat.label}</span>
+            <th scope="row">${stat.label}</th>
 
-            <strong class="${valueClass}">
+            <td class="${valueClass}">
 
                 ${formattedValue}
 
-            </strong>
+            </td>
 
-        </div>
+        </tr>
     `;
 
     }).join("");
@@ -3064,9 +2952,17 @@ function createSeasonPanel(panel) {
 
         </h3>
 
-        <div class="stats-list">
+        <div class="odds-table-wrap">
 
-            ${rows}
+            <table class="odds-table odds-summary-table">
+
+                <tbody>
+
+                    ${rows}
+
+                </tbody>
+
+            </table>
 
         </div>
 
@@ -3181,27 +3077,14 @@ function createInsightCard(insight) {
 
         </p>
 
-        <div class="trend-footer">
-
-            <span>
-                Trend Score:
-                ${displayTrendScore}
-            </span>
-
-            <span>
-                Trend Strength:
-                ${displayTrendStrength}
-            </span>
-
-        </div>
-
-        <div class="trend-footer">
-
-            <span>
-                Risk Tier:
-                ${displayRisk}
-            </span>
-
+        <div class="odds-table-wrap">
+            <table class="odds-table odds-summary-table">
+                <tbody>
+                    <tr><th scope="row">Trend Score</th><td>${displayTrendScore}</td></tr>
+                    <tr><th scope="row">Trend Strength</th><td>${displayTrendStrength}</td></tr>
+                    <tr><th scope="row">Risk Tier</th><td>${displayRisk}</td></tr>
+                </tbody>
+            </table>
         </div>
 
     `;

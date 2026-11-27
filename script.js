@@ -4375,6 +4375,69 @@ function formatNBATrendLabel(statKey) {
 }
 
 
+function profileSummaryTable(rows) {
+  const body = rows.map(([label, value]) => {
+    const shown = value === undefined || value === null || String(value).trim() === "" ? "—" : value;
+    return `<tr><th scope="row">${label}</th><td>${shown}</td></tr>`;
+  }).join("");
+  return `<div class="odds-table-wrap"><table class="odds-table odds-summary-table"><tbody>${body}</tbody></table></div>`;
+}
+
+function bindProfileGuide(root) {
+  if (!root) return;
+  root.querySelectorAll(".hover-guide-term").forEach((term) => {
+    term.addEventListener("click", (event) => {
+      event.preventDefault();
+      const item = term.closest(".hover-guide-item");
+      if (!item) return;
+      const open = item.classList.contains("tooltip-open");
+      root.querySelectorAll(".hover-guide-item.tooltip-open").forEach((el) => el.classList.remove("tooltip-open"));
+      if (!open) item.classList.add("tooltip-open");
+    });
+  });
+}
+
+function guideItem(term, body) {
+  return `<div class="hover-guide-item"><span class="hover-guide-term">${term}</span><div class="hover-guide-tooltip"><strong>${term}</strong><br>${body}</div></div>`;
+}
+
+function renderTeamProfileGuide(league) {
+  const slot = document.getElementById("team-profile-guide");
+  if (!slot || slot.dataset.ready === "1") return;
+  const snapshots = {
+    nba: "Games Played, Points / Game, Points Allowed / Game, Rebounds / Game, Assists / Game, Threes / Game, or Turnovers / Game",
+    nhl: "Games Played, Goals / Game, Goals Allowed / Game, Shots On Goal / Game, Assists / Game, Points / Game, or Saves / Game",
+    mlb: "Games Played, Runs / Game, Runs Allowed / Game, Hits / Game, Home Runs / Game, Total Bases / Game, or Strikeouts / Game",
+    nfl: "Games Played, Points For, Points Allowed, Passing Yards, Rushing Yards, Turnovers, or Sacks"
+  };
+  const ratingName = league === "mlb" ? "Pitching Rating" : "Defensive Rating";
+  const notes = league === "mlb"
+    ? "Balanced team profile., Offense carrying the team., or a pitching note."
+    : "Balanced team profile., Offense carrying the team., or Defense carrying the team.";
+  slot.dataset.ready = "1";
+  slot.innerHTML = `<div class="guide-panel profile-guide">
+    <h3 class="guide-panel-title">How to Read This Team Profile</h3>
+    <p class="guide-panel-text">Hover over any term below for a quick explanation in plain English.</p>
+    <div class="guide-panel-links">
+      ${guideItem("League Rank", "The League Rank row in the ratings table. The page can say a place such as #4, or --.")}
+      ${guideItem("Rank Score", "The Rank Score row. A 0 to 100 number for where the team sits in the league, or --.")}
+      ${guideItem("Ratings", `The ratings table. Overall Rating and Offensive Rating are numbers. ${ratingName} is a number. A missing rating says --.`)}
+      ${guideItem("Rating Tier", "The Rating Tier row. The page can say Elite, Strong, Average, Below Average, Weak, or --.")}
+      ${guideItem("Rating Notes", `The Rating Notes row. The page can say ${notes}`)}
+      ${guideItem("Season Snapshot", `The season table under the ratings. The rows can say ${snapshots[league] || "the team season averages"}. A missing number says --.`)}
+      ${guideItem("Strength", "The Strength row on a trend card. The page can say Elite Trend, Strong Trend, Moderate Trend, Weak Trend, Cold Trend, or Unknown.")}
+      ${guideItem("Direction", "The Direction row on a trend card. The page can say Up, Down, or Flat.")}
+      ${guideItem("Trend Score", "The Trend Score row. The page can say a plus number such as +12.4 or a minus number such as -8.1.")}
+      ${guideItem("Above Season", "The Above Season row. The page can say a plus percent such as +18.2% or a minus percent such as -6.4%.")}
+      ${guideItem("Confidence", "The Confidence row on a trend card. A number from 0 to 100. It does not say Elite or Lean.")}
+      ${guideItem("Risk", "The Risk row on a trend card. The page can say Low, Medium, or High.")}
+      ${guideItem("Window", "The first column of the trend table. The page can say Last 3, Last 5, Last 10, or Season. The Season hit-rate cell says —.")}
+      ${guideItem("Hit Rate", "The Hit Rate column. The page can say a percent such as 70%, or —.")}
+    </div>
+  </div>`;
+  bindProfileGuide(slot);
+}
+
 function trendSummaryRow(label, value) {
   if (value === undefined || value === null || String(value).trim() === "") return "";
   return `<tr><th scope="row">${label}</th><td>${value}</td></tr>`;
@@ -6628,6 +6691,8 @@ async function initTeamProfilePage() {
     team
   );
 
+  renderTeamProfileGuide(league);
+
   document.getElementById("team-name").textContent =
     decodeURIComponent(team);
 
@@ -7351,63 +7416,30 @@ if (seasonStatsLoadError) {
   };
 
 
-  statsContainer.innerHTML = `
-
-    <div class="team-stat-grid">
-
-      <div class="team-stat-card">
-        <strong>Games Played</strong><br>
-        ${formatMLBSnapshotValue(
+  statsContainer.innerHTML = profileSummaryTable([
+      ["Games Played", formatMLBSnapshotValue(
           teamStats["Games Played"],
           0
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Runs / Game</strong><br>
-        ${formatMLBSnapshotValue(
+        )],
+      ["Runs / Game", formatMLBSnapshotValue(
           teamStats["Avg Runs For"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Runs Allowed / Game</strong><br>
-        ${formatMLBSnapshotValue(
+        )],
+      ["Runs Allowed / Game", formatMLBSnapshotValue(
           teamStats["Avg Runs Allowed"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Hits / Game</strong><br>
-        ${formatMLBSnapshotValue(
+        )],
+      ["Hits / Game", formatMLBSnapshotValue(
           teamStats["Avg Hits"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Home Runs / Game</strong><br>
-        ${formatMLBSnapshotValue(
+        )],
+      ["Home Runs / Game", formatMLBSnapshotValue(
           teamStats["Avg Home Runs"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Total Bases / Game</strong><br>
-        ${formatMLBSnapshotValue(
+        )],
+      ["Total Bases / Game", formatMLBSnapshotValue(
           teamStats["Avg Total Bases"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Strikeouts / Game</strong><br>
-        ${formatMLBSnapshotValue(
+        )],
+      ["Strikeouts / Game", formatMLBSnapshotValue(
           teamStats["Avg Strikeouts"]
-        )}
-      </div>
-
-    </div>
-
-  `;
+        )]
+    ])
 
   } else if (league === "nba") {
 
@@ -7430,63 +7462,30 @@ if (seasonStatsLoadError) {
 
   };
 
-  statsContainer.innerHTML = `
-
-    <div class="team-stat-grid">
-
-      <div class="team-stat-card">
-        <strong>Games Played</strong><br>
-        ${formatNBASnapshotValue(
+  statsContainer.innerHTML = profileSummaryTable([
+      ["Games Played", formatNBASnapshotValue(
           teamStats["Games Played"],
           0
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Points / Game</strong><br>
-        ${formatNBASnapshotValue(
+        )],
+      ["Points / Game", formatNBASnapshotValue(
           teamStats["Avg Points For"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Points Allowed / Game</strong><br>
-        ${formatNBASnapshotValue(
+        )],
+      ["Points Allowed / Game", formatNBASnapshotValue(
           teamStats["Avg Points Allowed"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Rebounds / Game</strong><br>
-        ${formatNBASnapshotValue(
+        )],
+      ["Rebounds / Game", formatNBASnapshotValue(
           teamStats["Avg Rebounds"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Assists / Game</strong><br>
-        ${formatNBASnapshotValue(
+        )],
+      ["Assists / Game", formatNBASnapshotValue(
           teamStats["Avg Assists"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Threes / Game</strong><br>
-        ${formatNBASnapshotValue(
+        )],
+      ["Threes / Game", formatNBASnapshotValue(
           teamStats["Avg Threes"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Turnovers / Game</strong><br>
-        ${formatNBASnapshotValue(
+        )],
+      ["Turnovers / Game", formatNBASnapshotValue(
           teamStats["Avg Turnovers"]
-        )}
-      </div>
-
-    </div>
-
-  `;
+        )]
+    ])
 
 } else if (league === "nhl") {
 
@@ -7509,108 +7508,42 @@ if (seasonStatsLoadError) {
 
   };
 
-  statsContainer.innerHTML = `
-
-    <div class="team-stat-grid">
-
-      <div class="team-stat-card">
-        <strong>Games Played</strong><br>
-        ${formatNHLSnapshotValue(
+  statsContainer.innerHTML = profileSummaryTable([
+      ["Games Played", formatNHLSnapshotValue(
           teamStats["Games Played"],
           0
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Goals / Game</strong><br>
-        ${formatNHLSnapshotValue(
+        )],
+      ["Goals / Game", formatNHLSnapshotValue(
           teamStats["Avg Goals For"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Goals Allowed / Game</strong><br>
-        ${formatNHLSnapshotValue(
+        )],
+      ["Goals Allowed / Game", formatNHLSnapshotValue(
           teamStats["Avg Goals Allowed"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Shots On Goal / Game</strong><br>
-        ${formatNHLSnapshotValue(
+        )],
+      ["Shots On Goal / Game", formatNHLSnapshotValue(
           teamStats["Avg Shots On Goal"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Assists / Game</strong><br>
-        ${formatNHLSnapshotValue(
+        )],
+      ["Assists / Game", formatNHLSnapshotValue(
           teamStats["Avg Assists"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Points / Game</strong><br>
-        ${formatNHLSnapshotValue(
+        )],
+      ["Points / Game", formatNHLSnapshotValue(
           teamStats["Avg Points"]
-        )}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Saves / Game</strong><br>
-        ${formatNHLSnapshotValue(
+        )],
+      ["Saves / Game", formatNHLSnapshotValue(
           teamStats["Avg Saves"]
-        )}
-      </div>
-
-    </div>
-
-  `;
+        )]
+    ])
 
 } else {
 
-  statsContainer.innerHTML = `
-
-    <div class="team-stat-grid">
-
-      <div class="team-stat-card">
-        <strong>Games Played</strong><br>
-        ${teamStats["Games Played"]}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Points For</strong><br>
-        ${teamStats["Points For"]}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Points Allowed</strong><br>
-        ${teamStats["Points Allowed"]}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Passing Yards</strong><br>
-        ${teamStats["Passing Yards"]}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Rushing Yards</strong><br>
-        ${teamStats["Rushing Yards"]}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Turnovers</strong><br>
-        ${teamStats["Turnovers"]}
-      </div>
-
-      <div class="team-stat-card">
-        <strong>Sacks</strong><br>
-        ${teamStats["Sacks"]}
-      </div>
-
-    </div>
-
-  `;
+  statsContainer.innerHTML = profileSummaryTable([
+      ["Games Played", teamStats["Games Played"]],
+      ["Points For", teamStats["Points For"]],
+      ["Points Allowed", teamStats["Points Allowed"]],
+      ["Passing Yards", teamStats["Passing Yards"]],
+      ["Rushing Yards", teamStats["Rushing Yards"]],
+      ["Turnovers", teamStats["Turnovers"]],
+      ["Sacks", teamStats["Sacks"]]
+    ])
 
 }
 
@@ -7634,7 +7567,11 @@ if (teamTrendsLoadError) {
   );
 
   trendsContainer.innerHTML =
-    rankedTeamTrends.map(createTeamTrendCard).join("");
+    rankedTeamTrends.map((row) => trendCardShell(
+      row["Metric"] || "Trend",
+      row["Team"] || "",
+      row
+    )).join("");
 
     document
       .querySelectorAll(".team-trend-card")
