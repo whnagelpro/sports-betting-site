@@ -8141,6 +8141,90 @@ async function initPlayerProfileDirectory(league) {
 
 
 /* ==========================================================
+   TEAM PROFILE DIRECTORY
+========================================================== */
+
+function directoryRating(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(1) : "—";
+}
+
+async function initTeamProfileDirectory() {
+  const directory = document.querySelector(".team-directory");
+  const firstLink = directory?.querySelector("a");
+  if (!directory || !firstLink) return;
+
+  const league = new URL(firstLink.href, window.location.href).searchParams.get("league");
+  if (!league || !TEAM_PROFILE_CONFIG[league]) return;
+
+  let trends = [];
+  try {
+    trends = await fetchTeamTrends(league);
+  } catch (error) {
+    console.error("Team directory ratings failed:", error);
+    return;
+  }
+
+  const sideKey = league === "mlb" ? "Pitching Rating" : "Defensive Rating";
+  const sideLabel = league === "mlb" ? "Pitching" : "Defense";
+  const byTeam = new Map();
+  trends.forEach((row) => {
+    const name = String(row["Team"] || "").trim();
+    if (name && !byTeam.has(name)) byTeam.set(name, row);
+  });
+
+  const teams = [...directory.querySelectorAll("a")].map((link) => {
+    const name = link.textContent.trim();
+    const row = byTeam.get(name) || {};
+    const overall = Number(row["Overall Rating"]);
+    return {
+      name,
+      href: link.getAttribute("href"),
+      overall: Number.isFinite(overall) ? overall : null,
+      offense: row["Offensive Rating"],
+      side: row[sideKey],
+      tier: String(row["Rating Tier"] || "").trim()
+    };
+  });
+
+  const rated = teams.filter((team) => team.overall !== null).sort((a, b) => b.overall - a.overall);
+  const unrated = teams.filter((team) => team.overall === null).sort((a, b) => a.name.localeCompare(b.name));
+  const ordered = [...rated, ...unrated];
+
+  const rows = ordered.map((team, index) => {
+    const rank = team.overall === null ? "—" : index + 1;
+    const safeName = team.name.replaceAll("&", "&").replaceAll("<", "<");
+    return `<tr>
+      <td>${rank}</td>
+      <td><a href="${team.href}">${safeName}</a></td>
+      <td>${directoryRating(team.overall)}</td>
+      <td>${directoryRating(team.offense)}</td>
+      <td>${directoryRating(team.side)}</td>
+      <td>${team.tier || "—"}</td>
+    </tr>`;
+  }).join("");
+
+  directory.innerHTML = `
+    <div class="odds-table-wrap">
+      <table class="odds-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Team</th>
+            <th>Overall</th>
+            <th>Offense</th>
+            <th>${sideLabel}</th>
+            <th>Tier</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <p class="player-directory-message">Ordered by Overall Rating. # is the league rank. A missing rating says —.</p>
+  `;
+}
+
+/* ==========================================================
    PLAYER PROFILE DIRECTORY INITIALIZATION
 ========================================================== */
 
@@ -8152,6 +8236,7 @@ document.addEventListener(
     initPlayerProfileDirectory("nba");
     initPlayerProfileDirectory("nhl");
     initPlayerProfileDirectory("mlb");
+    initTeamProfileDirectory();
 
   }
 );
