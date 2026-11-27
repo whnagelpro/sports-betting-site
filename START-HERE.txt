@@ -1,0 +1,5 @@
+GUIDE UPDATE
+
+Replace these files in the props-site folder.
+
+Each How to Read term now lists the words that field can show on the card.
