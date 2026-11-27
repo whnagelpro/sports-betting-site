@@ -70,8 +70,8 @@ function renderPlayerProfileGuide() {
             ${guideItem("Sportsbook", "The Sportsbook row. The page can say DraftKings, FanDuel, BetMGM, Caesars, BetRivers, or ESPN BET.")}
             ${guideItem("Line", "The Line row on today's prop. The number the sportsbook set, or a blank cell when no prop is posted.")}
             ${guideItem("Odds", "The Odds row. American odds such as -115 or +120.")}
-            ${guideItem("EV", "The EV row. The page can say a plus number such as +0.25, a minus number such as -0.10, or -.")}
             ${guideItem("Model Probability", "The Model Probability row. The page can say a percent such as 58.0%, or -.")}
+            ${guideItem("Hit Rate", "The Hit Rate row on a prop card. The page can say a percent such as 70%, or -.")}
             ${guideItem("Status", "The status above a trend card. The page can say Rising, Falling, or Stable. Fewer than 3 games stays Stable.")}
             ${guideItem("Trend Score", "The Trend Score row. The page can say a plus number such as +12.4, a minus number such as -8.1, or -. A small sample can add (Early) on an insight card.")}
             ${guideItem("Trend Strength", "The Trend Strength row. The page can say Early when fewer than 3 games are available, or Elite Trend, Strong Trend, Moderate Trend, Weak Trend, Cold Trend, or Unknown.")}
@@ -1624,6 +1624,9 @@ function renderProps() {
             "top-prop-name":
                 "No Recommended Play",
 
+            "top-prop-score":
+                "-",
+
             "top-prop-line":
                 "-",
 
@@ -1637,6 +1640,9 @@ function renderProps() {
                 "-",
 
             "top-prop-probability":
+                "-",
+
+            "top-prop-hit-rate":
                 "-",
 
             "top-prop-confidence":
@@ -1745,6 +1751,11 @@ function renderProps() {
 
         topProp.displayName,
 
+    "top-prop-score":
+        Number.isFinite(Number(topProp.sportacularScore ?? analytics?.sportacularScore ?? analytics?.score ?? topProp.score))
+            ? Number(topProp.sportacularScore ?? analytics?.sportacularScore ?? analytics?.score ?? topProp.score).toFixed(2)
+            : "-",
+
     "top-prop-line":
 
         topProp.line,
@@ -1762,6 +1773,9 @@ function renderProps() {
 
     "top-prop-probability":
         formatProbability(topPropProbability),
+
+    "top-prop-hit-rate":
+        propHitRateFor(topProp),
 
     "top-prop-confidence":
         analytics?.confidence ??
