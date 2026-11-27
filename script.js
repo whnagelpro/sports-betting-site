@@ -48,6 +48,7 @@ const NFL_TEAM_TRENDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-
 
 const NBA_PROPS_PREMIUM_URL = "/.netlify/functions/nba-props-premium";
 const NBA_PROPS_TEASER_URL = "/.netlify/functions/nba-props-teaser";
+const NBA_PROPS_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV5XcArDjbKFyuONKov27C10JpN63ZcNiVKMnz5G4OEbM4tGToyslSZw9anHPAQfCE0IQupDMg8Cay/pub?gid=590324617&single=true&output=csv";
 const NHL_PROPS_PREMIUM_URL = "/.netlify/functions/nhl-props-premium";
 const NHL_PROPS_TEASER_URL = "/.netlify/functions/nhl-props-teaser";
 const MLB_PROPS_PREMIUM_URL = "/.netlify/functions/mlb-props-premium";
@@ -191,7 +192,7 @@ const ODDS_PAGE_CONFIG = {
 
 const PROPS_PAGE_CONFIG = {
   nba: {
-    csvUrl: NBA_PROPS_PREMIUM_URL,
+    csvUrl: NBA_PROPS_SHEET_URL,
     teaserUrl: NBA_PROPS_TEASER_URL,
     containerId: "nba-props-container",
     leaderboardId: "nba-props-leaderboard",
