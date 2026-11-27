@@ -1,7 +1,4 @@
-PROFILE UPDATE
+PROFILE PROPS UPDATE
 
-Replace these files in the props-site folder.
-
-Player and team profiles now use the same summary tables as the other pages.
-Each profile has a How to Read guide.
-This zip includes player-page.js. Replace that file too.
+Replace player-page.js and player.css in the props-site folder.
+The rest of the profile tables are already in this zip.

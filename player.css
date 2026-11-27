@@ -301,17 +301,11 @@
 
     display:grid;
 
-    grid-template-columns:
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
 
-        2fr
+    gap:28px;
 
-        1fr
-
-        1fr;
-
-    gap:35px;
-
-    align-items:center;
+    align-items:start;
 
     box-shadow:
 
@@ -329,6 +323,11 @@
 
         0 18px 35px rgba(0,0,0,.12);
 
+}
+
+.featured-prop-card .btn{
+    grid-column: 1 / -1;
+    justify-self: start;
 }
 
 .featured-badge{

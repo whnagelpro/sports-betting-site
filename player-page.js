@@ -1905,13 +1905,20 @@ function renderProps() {
         card.className =
             "prop-card";
 
+        const propTitle = prop.displayName || prop.propType || "Prop";
+        const propLine = (
+            prop.line !== null &&
+            prop.line !== undefined &&
+            prop.line !== ""
+        ) ? prop.line : "-";
+
         card.innerHTML = `
 
         <div class="prop-card-header">
 
             <div>
 
-                <h3>${prop.displayName}</h3>
+                <h3>${propTitle}</h3>
 
                 <div class="prop-subtitle">
 
@@ -1921,81 +1928,18 @@ function renderProps() {
 
             </div>
 
-            <div class="prop-score">
-
-                ${displayScore}
-
-            </div>
-
         </div>
 
-        <div class="prop-grid">
-
-            <div>
-
-                <span>Line</span>
-
-                <strong>
-                    ${
-                        prop.line !== null &&
-                        prop.line !== undefined &&
-                        prop.line !== ""
-                            ? prop.line
-                            : "-"
-                    }
-                </strong>
-
-            </div>
-
-            <div>
-
-                <span>Odds</span>
-
-                <strong>${displayOdds}</strong>
-
-            </div>
-
-            <div>
-
-                <span>Model Edge</span>
-
-                <strong>${displayModelEdge}</strong>
-
-            </div>
-
-            <div>
-
-                <span>Confidence</span>
-
-                <strong>${displayConfidence}</strong>
-
-            </div>
-
-            <div>
-
-                <span>Recommendation</span>
-
-                <strong>${recommendation}</strong>
-
-            </div>
-
-            <div>
-
-                <span>Hit Rate</span>
-
-                <strong>${propHitRateFor(prop)}</strong>
-
-            </div>
-
-            <div>
-
-                <span>Probability</span>
-
-                <strong>${displayProbability}</strong>
-
-            </div>
-
-        </div>
+        ${profileSummaryTable([
+            ["Sportacular Score", displayScore],
+            ["Recommendation", recommendation],
+            ["Line", propLine],
+            ["Odds", displayOdds],
+            ["Model Edge", displayModelEdge],
+            ["Confidence", displayConfidence],
+            ["Hit Rate", propHitRateFor(prop)],
+            ["Model Probability", displayProbability]
+        ])}
 
         ${playerGameHasStarted ? "" : `<a class="card-link" href="parlay.html?league=${encodeURIComponent(currentLeague)}&board=props&q=${encodeURIComponent(`${player.hero?.name || ""} ${prop.propType || prop.displayName || ""} ${prop.line ?? ""} ${recommendation}`.trim())}">Add to parlay</a>`}
 
