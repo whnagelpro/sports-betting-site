@@ -1087,16 +1087,34 @@ function renderLeaderboard(containerId, games, tierName = "Rookie", league = "nb
   const addGroup = (title, items) => {
     if (!items.length) return;
     rows.push(`<div class="leaderboard-group">${title}</div>`);
-    items.forEach((item, index) => {
-      rows.push(`
-      <div class="leaderboard-item">
-        <strong>#${index + 1} ${item.bet}</strong>
-        <div>Score: ${formatSportacularScore(item.sportacularScore)}</div>
-        <div class="${getEVClass(item.ev)}">EV: ${formatEV(item.ev)}</div>
-        <div>${item.gameLabel} | ${item.vendor}</div>
+    rows.push(`
+      <div class="odds-table-wrap">
+        <table class="odds-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Game</th>
+              <th>Bet</th>
+              <th>Score</th>
+              <th>EV</th>
+              <th>Book</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((item, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${item.gameLabel}</td>
+                <td>${item.bet || "—"}</td>
+                <td>${formatSportacularScore(item.sportacularScore)}</td>
+                <td class="${getEVClass(item.ev)}">${formatEV(item.ev)}</td>
+                <td>${displayBook(item.vendor)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
       </div>
     `);
-    });
   };
   addGroup("Live", limited.live);
   addGroup("Upcoming", limited.upcoming);
