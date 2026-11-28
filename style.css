@@ -2110,7 +2110,8 @@ select:disabled {
 
 .ranking-explainer {
   width: min(100%, 860px);
-  margin: 18px 0 8px;
+  margin: 18px auto 8px;
+  text-align: center;
 }
 
 .ranking-explainer p,
@@ -2124,8 +2125,9 @@ select:disabled {
 }
 
 .ranking-explainer ol {
-  margin: 0;
-  padding-left: 1.25em;
+  margin: 0 auto;
+  padding-left: 0;
+  list-style-position: inside;
 }
 
 .ranking-explainer li + li {
