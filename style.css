@@ -3017,7 +3017,10 @@ transition:.2s;
     margin-top: 30px;
 }
 
-.team-directory a {
+.team-directory a,
+.team-directory a:visited,
+.team-directory a:active {
+    color: #4ea3ff;
     font-size: 1.15rem;
     font-weight: 600;
     text-decoration: none;

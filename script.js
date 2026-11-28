@@ -7819,6 +7819,33 @@ async function initPlayerProfileDirectory(league) {
           */
           if (config.type === "nhl") {
 
+            const standardTeam =
+              String(row["Team Name"] || "").trim();
+
+            if (standardTeam || row["Status"]) {
+
+              return {
+
+                id,
+
+                name,
+
+                team: standardTeam,
+
+                position:
+                  String(
+                    row["Position"] ||
+                    row["Position Code"] ||
+                    ""
+                  ).trim(),
+
+                status:
+                  String(row["Status"] || "active").trim()
+
+              };
+
+            }
+
             return {
 
               id,
@@ -7835,10 +7862,6 @@ async function initPlayerProfileDirectory(league) {
                   row["Position Code"] || ""
                 ).trim(),
 
-              /*
-                NHL Players does not use the same
-                Status field as NFL/NBA.
-              */
               status: "active"
 
             };
