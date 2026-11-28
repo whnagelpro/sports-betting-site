@@ -8186,7 +8186,6 @@ function teamRankingExplainerHtml(league) {
   if (!copy) return "";
   return `<div id="team-ranking-explainer" class="guide-panel ranking-explainer">
     <h3 class="guide-panel-title">How Sportacular Ranks These Teams</h3>
-    <p>Sportacular still starts with where each team stands against the rest of the league. The record is then added, so a team that scores but does not win is not treated like a top team.</p>
     <ol>
       <li>Every stat becomes a rank score from 0 to 100. The best team in that stat gets 100. The last team gets 0. Everyone else is spaced evenly between them. ${copy.lower}</li>
       <li>Offense is the average of the rank scores for ${copy.offense}. ${copy.side} is the average of the rank scores for ${copy.other}.</li>
