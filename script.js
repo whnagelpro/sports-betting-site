@@ -4415,7 +4415,8 @@ function renderTeamProfileGuide(league) {
     <div class="guide-panel-links">
       ${guideItem("League Rank", "The League Rank row in the ratings table. The page can say a place such as #4, or --.")}
       ${guideItem("Rank Score", "The Rank Score row. A 0 to 100 number for where the team sits in the league, or --.")}
-      ${guideItem("Ratings", `The ratings table. Overall Rating and Offensive Rating are numbers. ${ratingName} is a number. A missing rating says --.`)}
+      ${guideItem("Ratings", `The ratings table. Overall Rating is 45% offense, 30% ${ratingName.toLowerCase()}, and 25% record. Offensive Rating is a number. ${ratingName} is a number. A missing rating says --.`)}
+      ${guideItem("Record", "The Record row and the Record column. Wins, losses, and ties from this season's game log, such as 12-6 or 10-8-1. A missing record says --.")}
       ${guideItem("Rating Tier", "The Rating Tier row. The page can say Elite, Strong, Average, Below Average, Weak, or --.")}
       ${guideItem("Rating Notes", `The Rating Notes row. The page can say ${notes}`)}
       ${guideItem("Season Snapshot", "The season table under the ratings. Team is what the team produced. Opponents is what the other team did in those same games. Use the View menu for Season totals or Per game. Open either section to see its table. A missing number says --.")}
@@ -7329,6 +7330,33 @@ async function initTeamProfilePage() {
 
   }
 
+  const power = teamPowerByName(league, trends, teamGameLogs);
+  const selectedPower = power.get(decodeURIComponent(team));
+  if (selectedPower && Number.isFinite(selectedPower.overall)) {
+    const ranked = [...power.values()]
+      .filter((item) => Number.isFinite(item.overall))
+      .sort((a, b) => b.overall - a.overall);
+    const place = ranked.findIndex((item) => item === selectedPower);
+    const rankScore = place >= 0 && ranked.length > 1
+      ? (100 * (1 - place / (ranked.length - 1))).toFixed(1)
+      : "--";
+    const setPowerValue = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    };
+    setPowerValue("league-rank", place >= 0 ? `#${place + 1}` : "--");
+    setPowerValue("rank-score", rankScore);
+    setPowerValue("overall-rating", selectedPower.overall.toFixed(1));
+    setPowerValue("rating-tier", selectedPower.tier || "--");
+    const ratingsBody = document.querySelector(".mlb-team-right tbody");
+    if (ratingsBody && !document.getElementById("team-record")) {
+      const recordRow = document.createElement("tr");
+      recordRow.innerHTML = `<th scope="row">Record</th><td id="team-record">${selectedPower.record || "--"}</td>`;
+      const rankRow = document.getElementById("league-rank")?.closest("tr");
+      if (rankRow) rankRow.insertAdjacentElement("afterend", recordRow);
+    }
+  }
+
   console.log("First Team Trend:", teamTrends[0]);
 
   console.log("All Trends:", trends);
@@ -8154,11 +8182,12 @@ function teamRankingExplainerHtml(league) {
   if (!copy) return "";
   return `<div id="team-ranking-explainer" class="guide-panel ranking-explainer">
     <h3 class="guide-panel-title">How Sportacular ranks these teams</h3>
-    <p>This is not a win-loss list and it is not point differential. Sportacular first asks where each team stands against the rest of the league in each stat, then blends those ranks into one power rating.</p>
+    <p>Sportacular still starts with where each team stands against the rest of the league. The record is then added, so a team that scores but does not win is not treated like a top team.</p>
     <ol>
       <li>Every stat becomes a rank score from 0 to 100. The best team in that stat gets 100. The last team gets 0. Everyone else is spaced evenly between them. ${copy.lower}</li>
       <li>Offense is the average of the rank scores for ${copy.offense}. ${copy.side} is the average of the rank scores for ${copy.other}.</li>
-      <li>Overall Rating is 60% Offense and 40% ${copy.side}. It is not a straight average of the two numbers. Offense carries more weight, so a team that only scores is not treated the same as a team that scores and gets stops.</li>
+      <li>Record is the win percentage from the game log, including a tie as half a win. That percentage is turned into the same 0 to 100 rank score. The best record gets 100.</li>
+      <li>Overall Rating is 45% Offense, 30% ${copy.side}, and 25% Record. Offense and ${copy.side.toLowerCase()} stay in the same 60/40 relationship. The record is the extra piece.</li>
       <li>The list is ordered by that Overall Rating. The same number is the Overall Rating on the team page, so the place in this list matches the profile.</li>
       <li>Rating Tier comes from Overall Rating. Elite is 90 or higher. Strong is 75 to 89.9. Average is 55 to 74.9. Below Average is 40 to 54.9. Weak is under 40.</li>
     </ol>
@@ -8177,6 +8206,88 @@ function directoryRating(value) {
   return Number.isFinite(number) ? number.toFixed(1) : "—";
 }
 
+function teamResultColumns(league) {
+  if (league === "nhl") return ["Goals For", "Goals Allowed"];
+  if (league === "mlb") return ["Runs For", "Runs Allowed"];
+  return ["Points For", "Points Allowed"];
+}
+
+function teamRecordsFromLogs(league, logs) {
+  const [forKey, allowedKey] = teamResultColumns(league);
+  const records = new Map();
+  (logs || []).forEach((row) => {
+    const name = String(row.Team || "").trim();
+    const scored = Number(row[forKey]);
+    const allowed = Number(row[allowedKey]);
+    if (!name || !Number.isFinite(scored) || !Number.isFinite(allowed)) return;
+    if (!records.has(name)) records.set(name, { wins: 0, losses: 0, ties: 0 });
+    const record = records.get(name);
+    if (scored > allowed) record.wins += 1;
+    else if (scored < allowed) record.losses += 1;
+    else record.ties += 1;
+  });
+  records.forEach((record) => {
+    const games = record.wins + record.losses + record.ties;
+    record.winPct = games ? (record.wins + record.ties * 0.5) / games : null;
+    record.label = record.ties
+      ? `${record.wins}-${record.losses}-${record.ties}`
+      : `${record.wins}-${record.losses}`;
+  });
+  return records;
+}
+
+function percentileRank(value, values) {
+  const nums = values.filter(Number.isFinite);
+  if (!Number.isFinite(value) || nums.length < 2) return null;
+  const below = nums.filter((number) => number < value).length;
+  const same = nums.filter((number) => number === value).length;
+  return ((below + (same - 1) / 2) / (nums.length - 1)) * 100;
+}
+
+function blendedTeamOverall(offense, defense, recordScore) {
+  const off = Number(offense);
+  const def = Number(defense);
+  if (!Number.isFinite(off) || !Number.isFinite(def)) return null;
+  if (!Number.isFinite(recordScore)) return off * 0.6 + def * 0.4;
+  return off * 0.45 + def * 0.3 + recordScore * 0.25;
+}
+
+function ratingTierFromOverall(overall) {
+  if (!Number.isFinite(overall)) return "";
+  if (overall >= 90) return "Elite";
+  if (overall >= 75) return "Strong";
+  if (overall >= 55) return "Average";
+  if (overall >= 40) return "Below Average";
+  return "Weak";
+}
+
+function teamPowerByName(league, trends, logs) {
+  const sideKey = league === "mlb" ? "Pitching Rating" : "Defensive Rating";
+  const records = teamRecordsFromLogs(league, logs);
+  const byTeam = new Map();
+  (trends || []).forEach((row) => {
+    const name = String(row.Team || "").trim();
+    if (name && !byTeam.has(name)) byTeam.set(name, row);
+  });
+  const names = [...byTeam.keys()];
+  const winPcts = names.map((name) => records.get(name)?.winPct).filter(Number.isFinite);
+  const power = new Map();
+  names.forEach((name) => {
+    const row = byTeam.get(name);
+    const record = records.get(name);
+    const recordScore = record ? percentileRank(record.winPct, winPcts) : null;
+    const overall = blendedTeamOverall(row["Offensive Rating"], row[sideKey], recordScore);
+    power.set(name, {
+      overall,
+      offense: row["Offensive Rating"],
+      side: row[sideKey],
+      record: record?.label || "",
+      tier: ratingTierFromOverall(overall)
+    });
+  });
+  return power;
+}
+
 async function initTeamProfileDirectory() {
   const directory = document.querySelector(".team-directory");
   const firstLink = directory?.querySelector("a");
@@ -8188,32 +8299,32 @@ async function initTeamProfileDirectory() {
   showTeamRankingExplainer(league, document.querySelector(".league-description"));
 
   let trends = [];
+  let logs = [];
   try {
-    trends = await fetchTeamTrends(league);
+    [trends, logs] = await Promise.all([
+      fetchTeamTrends(league),
+      fetchTeamGameLogs(league).catch(() => [])
+    ]);
   } catch (error) {
     console.error("Team directory ratings failed:", error);
     return;
   }
 
-  const sideKey = league === "mlb" ? "Pitching Rating" : "Defensive Rating";
   const sideLabel = league === "mlb" ? "Pitching" : "Defense";
-  const byTeam = new Map();
-  trends.forEach((row) => {
-    const name = String(row["Team"] || "").trim();
-    if (name && !byTeam.has(name)) byTeam.set(name, row);
-  });
+  const power = teamPowerByName(league, trends, logs);
 
   const teams = [...directory.querySelectorAll("a")].map((link) => {
     const name = link.textContent.trim();
-    const row = byTeam.get(name) || {};
-    const overall = Number(row["Overall Rating"]);
+    const rating = power.get(name) || {};
+    const overall = Number(rating.overall);
     return {
       name,
       href: link.getAttribute("href"),
       overall: Number.isFinite(overall) ? overall : null,
-      offense: row["Offensive Rating"],
-      side: row[sideKey],
-      tier: String(row["Rating Tier"] || "").trim()
+      offense: rating.offense,
+      side: rating.side,
+      record: rating.record || "",
+      tier: rating.tier || ""
     };
   });
 
@@ -8228,6 +8339,7 @@ async function initTeamProfileDirectory() {
       <td>${rank}</td>
       <td><a href="${team.href}">${safeName}</a></td>
       <td>${directoryRating(team.overall)}</td>
+      <td>${team.record || "—"}</td>
       <td>${directoryRating(team.offense)}</td>
       <td>${directoryRating(team.side)}</td>
       <td>${team.tier || "—"}</td>
@@ -8242,6 +8354,7 @@ async function initTeamProfileDirectory() {
             <th>#</th>
             <th>Team</th>
             <th>Overall</th>
+            <th>Record</th>
             <th>Offense</th>
             <th>${sideLabel}</th>
             <th>Tier</th>
@@ -8250,7 +8363,7 @@ async function initTeamProfileDirectory() {
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <p class="player-directory-message">Ordered by Overall Rating. # is the league rank. A missing rating says —.</p>
+    <p class="player-directory-message">Ordered by Overall Rating. Record is wins and losses from the game log. # is the league rank. A missing rating says —.</p>
   `;
 }
 
