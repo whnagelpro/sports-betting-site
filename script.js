@@ -4418,7 +4418,7 @@ function renderTeamProfileGuide(league) {
       ${guideItem("Ratings", `The ratings table. Overall Rating and Offensive Rating are numbers. ${ratingName} is a number. A missing rating says --.`)}
       ${guideItem("Rating Tier", "The Rating Tier row. The page can say Elite, Strong, Average, Below Average, Weak, or --.")}
       ${guideItem("Rating Notes", `The Rating Notes row. The page can say ${notes}`)}
-      ${guideItem("Season Snapshot", "The season table under the ratings. Use the View menu for Season totals or Per game. Season totals are the counting stats for the season. Per game divides those totals by games played. A missing number says --.")}
+      ${guideItem("Season Snapshot", "The season table under the ratings. These are the against numbers: what opponents have done to this team, not what this team has produced. Use the View menu for Season totals or Per game. A missing number says --.")}
       ${guideItem("Strength", "The Strength row on a trend card. The page can say Elite Trend, Strong Trend, Moderate Trend, Weak Trend, Cold Trend, or Unknown.")}
       ${guideItem("Direction", "The Direction row on a trend card. The page can say Up, Down, or Flat.")}
       ${guideItem("Trend Score", "The Trend Score row. The page can say a plus number such as +12.4 or a minus number such as -8.1.")}
@@ -7390,69 +7390,81 @@ if (seasonStatsLoadError) {
 
 } else {
 
-  const gamesPlayed = Number(teamStats["Games Played"]);
+  const againstFields = league === "mlb"
+    ? [
+        ["Runs Against", "Runs Against / Game", "Runs For"],
+        ["Hits Against", "Hits Against / Game", "Hits"],
+        ["Home Runs Against", "Home Runs Against / Game", "Home Runs"],
+        ["Total Bases Against", "Total Bases Against / Game", "Total Bases"],
+        ["Strikeouts Against", "Strikeouts Against / Game", "Strikeouts"]
+      ]
+    : league === "nba"
+      ? [
+          ["Points Against", "Points Against / Game", "Points For"],
+          ["Rebounds Against", "Rebounds Against / Game", "Rebounds"],
+          ["Assists Against", "Assists Against / Game", "Assists"],
+          ["Threes Against", "Threes Against / Game", "Threes"],
+          ["Turnovers Against", "Turnovers Against / Game", "Turnovers"]
+        ]
+      : league === "nhl"
+        ? [
+            ["Goals Against", "Goals Against / Game", "Goals For"],
+            ["Shots Against", "Shots Against / Game", "Shots On Goal"],
+            ["Assists Against", "Assists Against / Game", "Assists"],
+            ["Points Against", "Points Against / Game", "Points"],
+            ["Saves Against", "Saves Against / Game", "Saves"]
+          ]
+        : [
+            ["Points Against", "Points Against / Game", "Points For"],
+            ["Passing Yards Against", "Passing Yards Against / Game", "Passing Yards"],
+            ["Rushing Yards Against", "Rushing Yards Against / Game", "Rushing Yards"],
+            ["Turnovers Against", "Turnovers Against / Game", "Turnovers"],
+            ["Sacks Against", "Sacks Against / Game", "Sacks"]
+          ];
 
-  const averageStats = (pairs) => pairs.map(([totalLabel, perLabel, raw]) => {
-    const perGame = Number(raw);
-    return {
-      totalLabel,
-      perLabel,
-      perGame,
-      total: Number.isFinite(perGame) && Number.isFinite(gamesPlayed) ? perGame * gamesPlayed : NaN
-    };
+  const gamesById = new Map();
+  teamGameLogs.forEach((row) => {
+    const id = String(row["Game ID"] || "").trim();
+    if (!id) return;
+    if (!gamesById.has(id)) gamesById.set(id, []);
+    gamesById.get(id).push(row);
   });
 
-  const seasonStats = league === "mlb"
-    ? averageStats([
-        ["Runs", "Runs / Game", teamStats["Avg Runs For"]],
-        ["Runs Allowed", "Runs Allowed / Game", teamStats["Avg Runs Allowed"]],
-        ["Hits", "Hits / Game", teamStats["Avg Hits"]],
-        ["Home Runs", "Home Runs / Game", teamStats["Avg Home Runs"]],
-        ["Total Bases", "Total Bases / Game", teamStats["Avg Total Bases"]],
-        ["Strikeouts", "Strikeouts / Game", teamStats["Avg Strikeouts"]]
-      ])
-    : league === "nba"
-      ? averageStats([
-          ["Points", "Points / Game", teamStats["Avg Points For"]],
-          ["Points Allowed", "Points Allowed / Game", teamStats["Avg Points Allowed"]],
-          ["Rebounds", "Rebounds / Game", teamStats["Avg Rebounds"]],
-          ["Assists", "Assists / Game", teamStats["Avg Assists"]],
-          ["Threes", "Threes / Game", teamStats["Avg Threes"]],
-          ["Turnovers", "Turnovers / Game", teamStats["Avg Turnovers"]]
-        ])
-      : league === "nhl"
-        ? averageStats([
-            ["Goals", "Goals / Game", teamStats["Avg Goals For"]],
-            ["Goals Allowed", "Goals Allowed / Game", teamStats["Avg Goals Allowed"]],
-            ["Shots On Goal", "Shots On Goal / Game", teamStats["Avg Shots On Goal"]],
-            ["Assists", "Assists / Game", teamStats["Avg Assists"]],
-            ["Points", "Points / Game", teamStats["Avg Points"]],
-            ["Saves", "Saves / Game", teamStats["Avg Saves"]]
-          ])
-        : averageStats([
-            ["Points", "Points / Game", teamStats["Points For"]],
-            ["Points Allowed", "Points Allowed / Game", teamStats["Points Allowed"]],
-            ["Passing Yards", "Passing Yards / Game", teamStats["Passing Yards"]],
-            ["Rushing Yards", "Rushing Yards / Game", teamStats["Rushing Yards"]],
-            ["Turnovers", "Turnovers / Game", teamStats["Turnovers"]],
-            ["Sacks", "Sacks / Game", teamStats["Sacks"]]
-          ]);
+  const totals = Object.fromEntries(againstFields.map(([, , field]) => [field, 0]));
+  let gamesPlayed = 0;
+  teamGames.forEach((game) => {
+    const id = String(game["Game ID"] || "").trim();
+    const opponent = (gamesById.get(id) || []).find((row) => String(row["Team"] || "").trim() !== selectedTeam);
+    if (!opponent) return;
+    gamesPlayed += 1;
+    againstFields.forEach(([, , field]) => {
+      const value = Number(opponent[field]);
+      totals[field] += Number.isFinite(value) ? value : 0;
+    });
+  });
 
-  const gamesText = Number.isFinite(gamesPlayed) ? String(Math.round(gamesPlayed)) : "--";
+  if (!gamesPlayed) {
+    statsContainer.innerHTML = "<p>No season statistics found.</p>";
+  } else {
+
   const seasonNumber = (value, decimals) => {
     const num = Number(value);
     if (!Number.isFinite(num)) return "--";
     return decimals === 0 ? String(Math.round(num)) : num.toFixed(1);
   };
   const seasonRows = (mode) => [
-    ["Games Played", gamesText],
-    ...seasonStats.map((stat) => [
-      mode === "totals" ? stat.totalLabel : stat.perLabel,
-      seasonNumber(mode === "totals" ? stat.total : stat.perGame, mode === "totals" ? 0 : 1)
+    ["Games Played", String(gamesPlayed)],
+    ...againstFields.map(([totalLabel, perLabel, field]) => [
+      mode === "totals" ? totalLabel : perLabel,
+      seasonNumber(
+        mode === "totals" ? totals[field] : totals[field] / gamesPlayed,
+        mode === "totals" ? 0 : 1
+      )
     ])
   ];
 
   statsContainer.innerHTML = `
+    <p class="player-directory-message">What opponents have done against this team.</p>
     <div class="season-view-head">
       <label class="season-view-toggle">
         <span>View</span>
@@ -7473,6 +7485,8 @@ if (seasonStatsLoadError) {
   };
   if (seasonSelect) seasonSelect.onchange = drawSeason;
   drawSeason();
+
+  }
 
 }
 
