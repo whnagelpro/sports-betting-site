@@ -2108,6 +2108,30 @@ select:disabled {
   margin: 18px 0 8px;
 }
 
+.ranking-explainer {
+  width: min(100%, 860px);
+  margin: 18px 0 8px;
+}
+
+.ranking-explainer p,
+.ranking-explainer li {
+  color: #d5e2f5;
+  line-height: 1.5;
+}
+
+.ranking-explainer p {
+  margin: 0 0 12px;
+}
+
+.ranking-explainer ol {
+  margin: 0;
+  padding-left: 1.25em;
+}
+
+.ranking-explainer li + li {
+  margin-top: 8px;
+}
+
 .guide-panel-title {
   margin: 0 0 10px 0;
   font-size: 22px;

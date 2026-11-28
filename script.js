@@ -6692,6 +6692,7 @@ async function initTeamProfilePage() {
   );
 
   renderTeamProfileGuide(league);
+  showTeamRankingExplainer(league, document.getElementById("team-header"));
 
   document.getElementById("team-name").textContent =
     decodeURIComponent(team);
@@ -8144,6 +8145,54 @@ async function initPlayerProfileDirectory(league) {
    TEAM PROFILE DIRECTORY
 ========================================================== */
 
+function teamRankingExplainerHtml(league) {
+  const copy = {
+    nba: {
+      side: "Defense",
+      offense: "Points For, Assists, and Threes",
+      other: "Points Allowed, Rebounds, and Turnovers",
+      lower: "Points Allowed and Turnovers are flipped, so the smaller number ranks higher."
+    },
+    nhl: {
+      side: "Defense",
+      offense: "Goals For, Shots on Goal, Assists, and Points",
+      other: "Goals Allowed and Saves",
+      lower: "Goals Allowed is flipped, so the smaller number ranks higher."
+    },
+    nfl: {
+      side: "Defense",
+      offense: "Points For, Passing Yards, Rushing Yards, and Turnovers",
+      other: "Points Allowed and Sacks",
+      lower: "Points Allowed and Turnovers are flipped, so the smaller number ranks higher."
+    },
+    mlb: {
+      side: "Pitching",
+      offense: "Hits, Home Runs, Runs For, and Total Bases",
+      other: "Runs Allowed and Strikeouts",
+      lower: "Runs Allowed is flipped, so the smaller number ranks higher."
+    }
+  }[league];
+  if (!copy) return "";
+  return `<div id="team-ranking-explainer" class="guide-panel ranking-explainer">
+    <h3 class="guide-panel-title">How Sportacular ranks these teams</h3>
+    <p>This is not a win-loss list and it is not point differential. Sportacular first asks where each team stands against the rest of the league in each stat, then blends those ranks into one power rating.</p>
+    <ol>
+      <li>Every stat becomes a rank score from 0 to 100. The best team in that stat gets 100. The last team gets 0. Everyone else is spaced evenly between them. ${copy.lower}</li>
+      <li>Offense is the average of the rank scores for ${copy.offense}. ${copy.side} is the average of the rank scores for ${copy.other}.</li>
+      <li>Overall Rating is 60% Offense and 40% ${copy.side}. It is not a straight average of the two numbers. Offense carries more weight, so a team that only scores is not treated the same as a team that scores and gets stops.</li>
+      <li>The list is ordered by that Overall Rating. The same number is the Overall Rating on the team page, so the place in this list matches the profile.</li>
+      <li>Rating Tier comes from Overall Rating. Elite is 90 or higher. Strong is 75 to 89.9. Average is 55 to 74.9. Below Average is 40 to 54.9. Weak is under 40.</li>
+    </ol>
+  </div>`;
+}
+
+function showTeamRankingExplainer(league, anchor) {
+  if (!anchor || document.getElementById("team-ranking-explainer")) return;
+  const html = teamRankingExplainerHtml(league);
+  if (!html) return;
+  anchor.insertAdjacentHTML("afterend", html);
+}
+
 function directoryRating(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number.toFixed(1) : "—";
@@ -8156,6 +8205,8 @@ async function initTeamProfileDirectory() {
 
   const league = new URL(firstLink.href, window.location.href).searchParams.get("league");
   if (!league || !TEAM_PROFILE_CONFIG[league]) return;
+
+  showTeamRankingExplainer(league, document.querySelector(".league-description"));
 
   let trends = [];
   try {
