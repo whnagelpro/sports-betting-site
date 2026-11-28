@@ -8158,37 +8158,41 @@ function teamRankingExplainerHtml(league) {
       side: "Defense",
       offense: "Points For, Assists, and Threes",
       other: "Points Allowed, Rebounds, and Turnovers",
-      lower: "Points Allowed and Turnovers are flipped, so the smaller number ranks higher."
+      lower: "Points Allowed and Turnovers are flipped, so the smaller number ranks higher.",
+      record: "Record is the win percentage from the game log."
     },
     nhl: {
       side: "Defense",
       offense: "Goals For, Shots on Goal, Assists, and Points",
       other: "Goals Allowed and Saves",
-      lower: "Goals Allowed is flipped, so the smaller number ranks higher."
+      lower: "Goals Allowed is flipped, so the smaller number ranks higher.",
+      record: "Record is the win percentage from the game log, including an overtime or shootout loss as half a win."
     },
     nfl: {
       side: "Defense",
       offense: "Points For, Passing Yards, Rushing Yards, and Turnovers",
       other: "Points Allowed and Sacks",
-      lower: "Points Allowed and Turnovers are flipped, so the smaller number ranks higher."
+      lower: "Points Allowed and Turnovers are flipped, so the smaller number ranks higher.",
+      record: "Record is the win percentage from the game log, including a tie as half a win."
     },
     mlb: {
       side: "Pitching",
       offense: "Hits, Home Runs, Runs For, and Total Bases",
       other: "Runs Allowed and Strikeouts",
-      lower: "Runs Allowed is flipped, so the smaller number ranks higher."
+      lower: "Runs Allowed is flipped, so the smaller number ranks higher.",
+      record: "Record is the win percentage from the game log."
     }
   }[league];
   if (!copy) return "";
   return `<div id="team-ranking-explainer" class="guide-panel ranking-explainer">
-    <h3 class="guide-panel-title">How Sportacular ranks these teams</h3>
+    <h3 class="guide-panel-title">How Sportacular Ranks These Teams</h3>
     <p>Sportacular still starts with where each team stands against the rest of the league. The record is then added, so a team that scores but does not win is not treated like a top team.</p>
     <ol>
       <li>Every stat becomes a rank score from 0 to 100. The best team in that stat gets 100. The last team gets 0. Everyone else is spaced evenly between them. ${copy.lower}</li>
       <li>Offense is the average of the rank scores for ${copy.offense}. ${copy.side} is the average of the rank scores for ${copy.other}.</li>
-      <li>Record is the win percentage from the game log, including a tie as half a win. That percentage is turned into the same 0 to 100 rank score. The best record gets 100.</li>
-      <li>Overall Rating is 15% Offense, 10% ${copy.side}, and 75% Record. Offense and ${copy.side.toLowerCase()} stay at 3 to 2. Record decides the order. The stat ratings separate teams with a similar record.</li>
-      <li>The list is ordered by that Overall Rating. The same number is the Overall Rating on the team page, so the place in this list matches the profile.</li>
+      <li>${copy.record} That percentage is turned into the same 0 to 100 rank score. The best record gets 100.</li>
+      <li>Overall Rating is 15% Offense, 10% ${copy.side}, and 75% Record.</li>
+      <li>The list is ordered by the Overall Rating. The same number is the Overall Rating on the team page, so the place in this list matches the profile.</li>
       <li>Rating Tier comes from Overall Rating. Elite is 90 or higher. Strong is 75 to 89.9. Average is 55 to 74.9. Below Average is 40 to 54.9. Weak is under 40.</li>
     </ol>
   </div>`;
