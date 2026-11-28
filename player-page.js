@@ -761,8 +761,8 @@ console.log(player.seasonPanels);
 
     const visiblePanels = (player.seasonPanels || []).filter((panel) => {
         const title = String(panel?.title || "").trim().toLowerCase();
-        if (!title) return false;
-        if (heroIsShowing && !title.includes("trend")) return false;
+        if (!title || title.includes("trend")) return false;
+        if (heroIsShowing) return false;
         return true;
     });
 
