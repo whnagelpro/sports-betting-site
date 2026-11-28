@@ -4415,7 +4415,7 @@ function renderTeamProfileGuide(league) {
     <div class="guide-panel-links">
       ${guideItem("League Rank", "The League Rank row in the ratings table. The page can say a place such as #4, or --.")}
       ${guideItem("Rank Score", "The Rank Score row. A 0 to 100 number for where the team sits in the league, or --.")}
-      ${guideItem("Ratings", `The ratings table. Overall Rating is 18% offense, 12% ${ratingName.toLowerCase()}, and 70% record. Offense stays ahead of ${ratingName.toLowerCase()} by 3 to 2. A missing rating says --.`)}
+      ${guideItem("Ratings", `The ratings table. Overall Rating is 15% offense, 10% ${ratingName.toLowerCase()}, and 75% record. Offense stays ahead of ${ratingName.toLowerCase()} by 3 to 2. A missing rating says --.`)}
       ${guideItem("Record", "The Record row and the Record column. Wins, losses, and ties from this season's game log, such as 12-6 or 10-8-1. A missing record says --.")}
       ${guideItem("Rating Tier", "The Rating Tier row. The page can say Elite, Strong, Average, Below Average, Weak, or --.")}
       ${guideItem("Rating Notes", `The Rating Notes row. The page can say ${notes}`)}
@@ -8187,7 +8187,7 @@ function teamRankingExplainerHtml(league) {
       <li>Every stat becomes a rank score from 0 to 100. The best team in that stat gets 100. The last team gets 0. Everyone else is spaced evenly between them. ${copy.lower}</li>
       <li>Offense is the average of the rank scores for ${copy.offense}. ${copy.side} is the average of the rank scores for ${copy.other}.</li>
       <li>Record is the win percentage from the game log, including a tie as half a win. That percentage is turned into the same 0 to 100 rank score. The best record gets 100.</li>
-      <li>Overall Rating is 18% Offense, 12% ${copy.side}, and 70% Record. Offense and ${copy.side.toLowerCase()} stay at 3 to 2. Record decides most of the order. The stat ratings separate teams with a similar record.</li>
+      <li>Overall Rating is 15% Offense, 10% ${copy.side}, and 75% Record. Offense and ${copy.side.toLowerCase()} stay at 3 to 2. Record decides the order. The stat ratings separate teams with a similar record.</li>
       <li>The list is ordered by that Overall Rating. The same number is the Overall Rating on the team page, so the place in this list matches the profile.</li>
       <li>Rating Tier comes from Overall Rating. Elite is 90 or higher. Strong is 75 to 89.9. Average is 55 to 74.9. Below Average is 40 to 54.9. Weak is under 40.</li>
     </ol>
@@ -8249,7 +8249,7 @@ function blendedTeamOverall(offense, defense, recordScore) {
   const def = Number(defense);
   if (!Number.isFinite(off) || !Number.isFinite(def)) return null;
   if (!Number.isFinite(recordScore)) return off * 0.6 + def * 0.4;
-  return off * 0.18 + def * 0.12 + recordScore * 0.70;
+  return off * 0.15 + def * 0.10 + recordScore * 0.75;
 }
 
 function ratingTierFromOverall(overall) {
