@@ -6686,7 +6686,6 @@ async function initTeamProfilePage() {
   );
 
   renderTeamProfileGuide(league);
-  showTeamRankingExplainer(league, document.getElementById("team-header"));
 
   document.getElementById("team-name").textContent =
     decodeURIComponent(team);
@@ -7403,16 +7402,6 @@ if (seasonStatsLoadError) {
     };
   });
 
-  const totalStats = (pairs) => pairs.map(([totalLabel, perLabel, raw]) => {
-    const total = Number(raw);
-    return {
-      totalLabel,
-      perLabel,
-      total,
-      perGame: Number.isFinite(total) && Number.isFinite(gamesPlayed) && gamesPlayed > 0 ? total / gamesPlayed : NaN
-    };
-  });
-
   const seasonStats = league === "mlb"
     ? averageStats([
         ["Runs", "Runs / Game", teamStats["Avg Runs For"]],
@@ -7440,8 +7429,8 @@ if (seasonStatsLoadError) {
             ["Points", "Points / Game", teamStats["Avg Points"]],
             ["Saves", "Saves / Game", teamStats["Avg Saves"]]
           ])
-        : totalStats([
-            ["Points For", "Points / Game", teamStats["Points For"]],
+        : averageStats([
+            ["Points", "Points / Game", teamStats["Points For"]],
             ["Points Allowed", "Points Allowed / Game", teamStats["Points Allowed"]],
             ["Passing Yards", "Passing Yards / Game", teamStats["Passing Yards"]],
             ["Rushing Yards", "Rushing Yards / Game", teamStats["Rushing Yards"]],

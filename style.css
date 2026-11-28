@@ -3065,9 +3065,9 @@ transition:.2s;
 
     justify-content:space-between;
 
-    align-items:center;
+    align-items:flex-start;
 
-    gap:40px;
+    gap:28px;
 
     flex-wrap:wrap;
 
@@ -3081,20 +3081,23 @@ transition:.2s;
 
     gap:22px;
 
+    flex:0 1 320px;
+
 }
 
 .mlb-team-right{
 
-    flex:1;
+    flex:1 1 640px;
 
-    min-width:520px;
+    min-width:min(100%, 640px);
 
-    display:grid;
+    display:block;
 
-    grid-template-columns:repeat(2,minmax(180px,1fr));
+}
 
-    gap:14px;
-
+.mlb-team-right .odds-table th,
+.mlb-team-right .odds-table td {
+    white-space: normal;
 }
 
 .hero-stat-card{
