@@ -154,6 +154,26 @@
 
             </div>
 
+            <div class="player-season-card" id="player-season-card" hidden>
+
+                <div class="player-season-head">
+
+                    <h2>Season production</h2>
+
+                    <label class="player-season-toggle">
+                        <span>View</span>
+                        <select id="player-season-mode" aria-label="Season production view">
+                            <option value="totals">Season totals</option>
+                            <option value="per-game">Per game</option>
+                        </select>
+                    </label>
+
+                </div>
+
+                <div id="player-season-table"></div>
+
+            </div>
+
         </div>
 
         <div id="player-profile-guide"></div>
@@ -255,7 +275,7 @@
 
         <!-- Quick Stats -->
 
-        <section class="quick-stats-section">
+        <section class="quick-stats-section" id="quick-stats-section">
 
     <div class="container">
 

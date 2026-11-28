@@ -79,7 +79,7 @@ function renderPlayerProfileGuide() {
             ${guideItem("Momentum Confidence", "The Momentum Confidence row. The page can say High, Moderate, or Low. Fewer than 3 games says Low.")}
             ${guideItem("Sample", "The Sample row. The page can say Based on 5 games, Based on 1 game, or Sample size unavailable.")}
             ${guideItem("Hit Rate Last 5", "The Hit Rate Last 5 row. How often the result showed up in the last five logged games. The page can say a percent such as 70%, or -.")}
-            ${guideItem("Season Snapshot", "The season table. Each row is a season stat for this player. A missing number says —.")}
+            ${guideItem("Season production", "The table on the right side of the player card. Season totals are the counting stats for the season, such as 394 points. Per game divides those totals by games played, such as 24.6 points per game. Use the View menu to switch. A missing number says —.")}
         </div>
     </div>`;
     if (typeof bindProfileGuide === "function") bindProfileGuide(slot);
@@ -580,6 +580,81 @@ function renderHero() {
 
     });
 
+    renderHeroSeason();
+
+}
+
+function seasonStatRows(stats) {
+    return (stats || []).map((stat) => [
+        stat.label,
+        formatStatValue(stat.value, stat.label)
+    ]);
+}
+
+function heroSeasonViews() {
+    const panels = (player?.seasonPanels || []).filter((panel) => {
+        const title = String(panel?.title || "").trim().toLowerCase();
+        return title && !title.includes("trend");
+    });
+    const named = Object.fromEntries(
+        panels.map((panel) => [String(panel.title).trim().toLowerCase(), panel])
+    );
+
+    if (named["season production"] && named["per game"]) {
+        return [
+            { id: "totals", label: "Season totals", rows: seasonStatRows(named["season production"].stats) },
+            { id: "per-game", label: "Per game", rows: seasonStatRows(named["per game"].stats) }
+        ];
+    }
+
+    const stats = panels.flatMap((panel) => panel.stats || []);
+    const gamesStat = stats.find((stat) => String(stat.label || "").trim().toLowerCase() === "games");
+    const games = Number(gamesStat?.value);
+    const perGame = [];
+    const totals = [];
+
+    if (Number.isFinite(games)) {
+        const gamesLabel = formatStatValue(games, "Games");
+        totals.push(["Games", gamesLabel]);
+        perGame.push(["Games", gamesLabel]);
+    }
+
+    stats.forEach((stat) => {
+        const label = String(stat.label || "").trim();
+        if (!label || label.toLowerCase() === "games") return;
+        const number = Number(stat.value);
+        perGame.push([label, formatStatValue(stat.value, label)]);
+        if (Number.isFinite(number) && Number.isFinite(games) && games > 0 && !/\/\s*game/i.test(label)) {
+            const totalLabel = label.replace(/\s*\/\s*game/i, "");
+            totals.push([totalLabel, formatStatValue(number * games, totalLabel)]);
+        }
+    });
+
+    if (!totals.length && !perGame.length) return [];
+    return [
+        { id: "totals", label: "Season totals", rows: totals },
+        { id: "per-game", label: "Per game", rows: perGame }
+    ];
+}
+
+function renderHeroSeason() {
+    const card = document.getElementById("player-season-card");
+    const table = document.getElementById("player-season-table");
+    const select = document.getElementById("player-season-mode");
+    const views = heroSeasonViews();
+    if (!card || !table || !select || !views.length) return;
+
+    const draw = () => {
+        const view = views.find((item) => item.id === select.value) || views[0];
+        table.innerHTML = profileSummaryTable(view.rows);
+    };
+
+    select.onchange = draw;
+    card.hidden = false;
+    draw();
+
+    const snapshot = document.getElementById("quick-stats-section");
+    if (snapshot) snapshot.hidden = true;
 }
 
 function profileGameHasStarted(status) {
@@ -681,7 +756,22 @@ console.log(player.seasonPanels);
 
     dashboard.innerHTML = "";
 
-    (player.seasonPanels || []).forEach(panel => {
+    const heroIsShowing = document.getElementById("player-season-card") &&
+        !document.getElementById("player-season-card").hidden;
+
+    const visiblePanels = (player.seasonPanels || []).filter((panel) => {
+        const title = String(panel?.title || "").trim().toLowerCase();
+        if (!title) return false;
+        if (heroIsShowing && !title.includes("trend")) return false;
+        return true;
+    });
+
+    if (!visiblePanels.length) {
+        section.hidden = true;
+        return;
+    }
+
+    visiblePanels.forEach(panel => {
 
         console.log("Appending panel:", panel.title);
 
