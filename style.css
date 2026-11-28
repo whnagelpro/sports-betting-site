@@ -2109,8 +2109,28 @@ select:disabled {
   text-align: center;
 }
 
-.profile-guide .guide-panel-links {
-  justify-content: center;
+.season-view-head {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 12px;
+}
+
+.season-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9fb0cc;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.season-view-toggle select {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-weight: 700;
 }
 
 .ranking-explainer {

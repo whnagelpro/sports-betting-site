@@ -4404,12 +4404,6 @@ function guideItem(term, body) {
 function renderTeamProfileGuide(league) {
   const slot = document.getElementById("team-profile-guide");
   if (!slot || slot.dataset.ready === "1") return;
-  const snapshots = {
-    nba: "Games Played, Points / Game, Points Allowed / Game, Rebounds / Game, Assists / Game, Threes / Game, or Turnovers / Game",
-    nhl: "Games Played, Goals / Game, Goals Allowed / Game, Shots On Goal / Game, Assists / Game, Points / Game, or Saves / Game",
-    mlb: "Games Played, Runs / Game, Runs Allowed / Game, Hits / Game, Home Runs / Game, Total Bases / Game, or Strikeouts / Game",
-    nfl: "Games Played, Points For, Points Allowed, Passing Yards, Rushing Yards, Turnovers, or Sacks"
-  };
   const ratingName = league === "mlb" ? "Pitching Rating" : "Defensive Rating";
   const notes = league === "mlb"
     ? "Balanced team profile., Offense carrying the team., or a pitching note."
@@ -4424,7 +4418,7 @@ function renderTeamProfileGuide(league) {
       ${guideItem("Ratings", `The ratings table. Overall Rating and Offensive Rating are numbers. ${ratingName} is a number. A missing rating says --.`)}
       ${guideItem("Rating Tier", "The Rating Tier row. The page can say Elite, Strong, Average, Below Average, Weak, or --.")}
       ${guideItem("Rating Notes", `The Rating Notes row. The page can say ${notes}`)}
-      ${guideItem("Season Snapshot", `The season table under the ratings. The rows can say ${snapshots[league] || "the team season averages"}. A missing number says --.`)}
+      ${guideItem("Season Snapshot", "The season table under the ratings. Use the View menu for Season totals or Per game. Season totals are the counting stats for the season. Per game divides those totals by games played. A missing number says --.")}
       ${guideItem("Strength", "The Strength row on a trend card. The page can say Elite Trend, Strong Trend, Moderate Trend, Weak Trend, Cold Trend, or Unknown.")}
       ${guideItem("Direction", "The Direction row on a trend card. The page can say Up, Down, or Flat.")}
       ${guideItem("Trend Score", "The Trend Score row. The page can say a plus number such as +12.4 or a minus number such as -8.1.")}
@@ -7395,156 +7389,101 @@ if (seasonStatsLoadError) {
   statsContainer.innerHTML =
     "<p>No season statistics found.</p>";
 
-} else if (league === "mlb") {
-
-  const formatMLBSnapshotValue = (value, decimals = 1) => {
-
-    const num = Number(value);
-
-    if (
-      value === undefined ||
-      value === null ||
-      value === "" ||
-      Number.isNaN(num)
-    ) {
-      return "--";
-    }
-
-    return decimals === 0
-      ? Math.round(num)
-      : num.toFixed(decimals);
-
-  };
-
-
-  statsContainer.innerHTML = profileSummaryTable([
-      ["Games Played", formatMLBSnapshotValue(
-          teamStats["Games Played"],
-          0
-        )],
-      ["Runs / Game", formatMLBSnapshotValue(
-          teamStats["Avg Runs For"]
-        )],
-      ["Runs Allowed / Game", formatMLBSnapshotValue(
-          teamStats["Avg Runs Allowed"]
-        )],
-      ["Hits / Game", formatMLBSnapshotValue(
-          teamStats["Avg Hits"]
-        )],
-      ["Home Runs / Game", formatMLBSnapshotValue(
-          teamStats["Avg Home Runs"]
-        )],
-      ["Total Bases / Game", formatMLBSnapshotValue(
-          teamStats["Avg Total Bases"]
-        )],
-      ["Strikeouts / Game", formatMLBSnapshotValue(
-          teamStats["Avg Strikeouts"]
-        )]
-    ])
-
-  } else if (league === "nba") {
-
-  const formatNBASnapshotValue = (value, decimals = 1) => {
-
-    const num = Number(value);
-
-    if (
-      value === undefined ||
-      value === null ||
-      value === "" ||
-      Number.isNaN(num)
-    ) {
-      return "--";
-    }
-
-    return decimals === 0
-      ? Math.round(num)
-      : num.toFixed(decimals);
-
-  };
-
-  statsContainer.innerHTML = profileSummaryTable([
-      ["Games Played", formatNBASnapshotValue(
-          teamStats["Games Played"],
-          0
-        )],
-      ["Points / Game", formatNBASnapshotValue(
-          teamStats["Avg Points For"]
-        )],
-      ["Points Allowed / Game", formatNBASnapshotValue(
-          teamStats["Avg Points Allowed"]
-        )],
-      ["Rebounds / Game", formatNBASnapshotValue(
-          teamStats["Avg Rebounds"]
-        )],
-      ["Assists / Game", formatNBASnapshotValue(
-          teamStats["Avg Assists"]
-        )],
-      ["Threes / Game", formatNBASnapshotValue(
-          teamStats["Avg Threes"]
-        )],
-      ["Turnovers / Game", formatNBASnapshotValue(
-          teamStats["Avg Turnovers"]
-        )]
-    ])
-
-} else if (league === "nhl") {
-
-  const formatNHLSnapshotValue = (value, decimals = 1) => {
-
-    const num = Number(value);
-
-    if (
-      value === undefined ||
-      value === null ||
-      value === "" ||
-      Number.isNaN(num)
-    ) {
-      return "--";
-    }
-
-    return decimals === 0
-      ? Math.round(num)
-      : num.toFixed(decimals);
-
-  };
-
-  statsContainer.innerHTML = profileSummaryTable([
-      ["Games Played", formatNHLSnapshotValue(
-          teamStats["Games Played"],
-          0
-        )],
-      ["Goals / Game", formatNHLSnapshotValue(
-          teamStats["Avg Goals For"]
-        )],
-      ["Goals Allowed / Game", formatNHLSnapshotValue(
-          teamStats["Avg Goals Allowed"]
-        )],
-      ["Shots On Goal / Game", formatNHLSnapshotValue(
-          teamStats["Avg Shots On Goal"]
-        )],
-      ["Assists / Game", formatNHLSnapshotValue(
-          teamStats["Avg Assists"]
-        )],
-      ["Points / Game", formatNHLSnapshotValue(
-          teamStats["Avg Points"]
-        )],
-      ["Saves / Game", formatNHLSnapshotValue(
-          teamStats["Avg Saves"]
-        )]
-    ])
-
 } else {
 
-  statsContainer.innerHTML = profileSummaryTable([
-      ["Games Played", teamStats["Games Played"]],
-      ["Points For", teamStats["Points For"]],
-      ["Points Allowed", teamStats["Points Allowed"]],
-      ["Passing Yards", teamStats["Passing Yards"]],
-      ["Rushing Yards", teamStats["Rushing Yards"]],
-      ["Turnovers", teamStats["Turnovers"]],
-      ["Sacks", teamStats["Sacks"]]
+  const gamesPlayed = Number(teamStats["Games Played"]);
+
+  const averageStats = (pairs) => pairs.map(([totalLabel, perLabel, raw]) => {
+    const perGame = Number(raw);
+    return {
+      totalLabel,
+      perLabel,
+      perGame,
+      total: Number.isFinite(perGame) && Number.isFinite(gamesPlayed) ? perGame * gamesPlayed : NaN
+    };
+  });
+
+  const totalStats = (pairs) => pairs.map(([totalLabel, perLabel, raw]) => {
+    const total = Number(raw);
+    return {
+      totalLabel,
+      perLabel,
+      total,
+      perGame: Number.isFinite(total) && Number.isFinite(gamesPlayed) && gamesPlayed > 0 ? total / gamesPlayed : NaN
+    };
+  });
+
+  const seasonStats = league === "mlb"
+    ? averageStats([
+        ["Runs", "Runs / Game", teamStats["Avg Runs For"]],
+        ["Runs Allowed", "Runs Allowed / Game", teamStats["Avg Runs Allowed"]],
+        ["Hits", "Hits / Game", teamStats["Avg Hits"]],
+        ["Home Runs", "Home Runs / Game", teamStats["Avg Home Runs"]],
+        ["Total Bases", "Total Bases / Game", teamStats["Avg Total Bases"]],
+        ["Strikeouts", "Strikeouts / Game", teamStats["Avg Strikeouts"]]
+      ])
+    : league === "nba"
+      ? averageStats([
+          ["Points", "Points / Game", teamStats["Avg Points For"]],
+          ["Points Allowed", "Points Allowed / Game", teamStats["Avg Points Allowed"]],
+          ["Rebounds", "Rebounds / Game", teamStats["Avg Rebounds"]],
+          ["Assists", "Assists / Game", teamStats["Avg Assists"]],
+          ["Threes", "Threes / Game", teamStats["Avg Threes"]],
+          ["Turnovers", "Turnovers / Game", teamStats["Avg Turnovers"]]
+        ])
+      : league === "nhl"
+        ? averageStats([
+            ["Goals", "Goals / Game", teamStats["Avg Goals For"]],
+            ["Goals Allowed", "Goals Allowed / Game", teamStats["Avg Goals Allowed"]],
+            ["Shots On Goal", "Shots On Goal / Game", teamStats["Avg Shots On Goal"]],
+            ["Assists", "Assists / Game", teamStats["Avg Assists"]],
+            ["Points", "Points / Game", teamStats["Avg Points"]],
+            ["Saves", "Saves / Game", teamStats["Avg Saves"]]
+          ])
+        : totalStats([
+            ["Points For", "Points / Game", teamStats["Points For"]],
+            ["Points Allowed", "Points Allowed / Game", teamStats["Points Allowed"]],
+            ["Passing Yards", "Passing Yards / Game", teamStats["Passing Yards"]],
+            ["Rushing Yards", "Rushing Yards / Game", teamStats["Rushing Yards"]],
+            ["Turnovers", "Turnovers / Game", teamStats["Turnovers"]],
+            ["Sacks", "Sacks / Game", teamStats["Sacks"]]
+          ]);
+
+  const gamesText = Number.isFinite(gamesPlayed) ? String(Math.round(gamesPlayed)) : "--";
+  const seasonNumber = (value, decimals) => {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return "--";
+    return decimals === 0 ? String(Math.round(num)) : num.toFixed(1);
+  };
+  const seasonRows = (mode) => [
+    ["Games Played", gamesText],
+    ...seasonStats.map((stat) => [
+      mode === "totals" ? stat.totalLabel : stat.perLabel,
+      seasonNumber(mode === "totals" ? stat.total : stat.perGame, mode === "totals" ? 0 : 1)
     ])
+  ];
+
+  statsContainer.innerHTML = `
+    <div class="season-view-head">
+      <label class="season-view-toggle">
+        <span>View</span>
+        <select id="team-season-mode" aria-label="Season snapshot view">
+          <option value="totals">Season totals</option>
+          <option value="per-game">Per game</option>
+        </select>
+      </label>
+    </div>
+    <div id="team-season-table"></div>
+  `;
+
+  const seasonSelect = document.getElementById("team-season-mode");
+  const seasonTable = document.getElementById("team-season-table");
+  const drawSeason = () => {
+    if (!seasonTable || !seasonSelect) return;
+    seasonTable.innerHTML = profileSummaryTable(seasonRows(seasonSelect.value));
+  };
+  if (seasonSelect) seasonSelect.onchange = drawSeason;
+  drawSeason();
 
 }
 
