@@ -4418,7 +4418,7 @@ function renderTeamProfileGuide(league) {
       ${guideItem("Ratings", `The ratings table. Overall Rating and Offensive Rating are numbers. ${ratingName} is a number. A missing rating says --.`)}
       ${guideItem("Rating Tier", "The Rating Tier row. The page can say Elite, Strong, Average, Below Average, Weak, or --.")}
       ${guideItem("Rating Notes", `The Rating Notes row. The page can say ${notes}`)}
-      ${guideItem("Season Snapshot", "The season table under the ratings. This team is what the team produced. Opponents is what the other team did in those same games. Use the View menu for Season totals or Per game. Open either section to see its table. A missing number says --.")}
+      ${guideItem("Season Snapshot", "The season table under the ratings. Team is what the team produced. Opponents is what the other team did in those same games. Use the View menu for Season totals or Per game. Open either section to see its table. A missing number says --.")}
       ${guideItem("Strength", "The Strength row on a trend card. The page can say Elite Trend, Strong Trend, Moderate Trend, Weak Trend, Cold Trend, or Unknown.")}
       ${guideItem("Direction", "The Direction row on a trend card. The page can say Up, Down, or Flat.")}
       ${guideItem("Trend Score", "The Trend Score row. The page can say a plus number such as +12.4 or a minus number such as -8.1.")}
@@ -7480,7 +7480,7 @@ if (seasonStatsLoadError) {
       </label>
     </div>
     <details class="home-accordion season-accordion" open>
-      <summary>This team</summary>
+      <summary>Team</summary>
       <div class="home-accordion-body" id="team-season-own"></div>
     </details>
     <details class="home-accordion season-accordion" open>
