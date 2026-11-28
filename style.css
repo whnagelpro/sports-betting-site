@@ -2115,6 +2115,10 @@ select:disabled {
   margin: 0 0 12px;
 }
 
+.season-accordion {
+  margin-top: 12px;
+}
+
 .season-view-toggle {
   display: flex;
   align-items: center;

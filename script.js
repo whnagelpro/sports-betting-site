@@ -4418,7 +4418,7 @@ function renderTeamProfileGuide(league) {
       ${guideItem("Ratings", `The ratings table. Overall Rating and Offensive Rating are numbers. ${ratingName} is a number. A missing rating says --.`)}
       ${guideItem("Rating Tier", "The Rating Tier row. The page can say Elite, Strong, Average, Below Average, Weak, or --.")}
       ${guideItem("Rating Notes", `The Rating Notes row. The page can say ${notes}`)}
-      ${guideItem("Season Snapshot", "The season table under the ratings. These are the against numbers: what opponents have done to this team, not what this team has produced. Use the View menu for Season totals or Per game. A missing number says --.")}
+      ${guideItem("Season Snapshot", "The season table under the ratings. This team is what the team produced. Opponents is what the other team did in those same games. Use the View menu for Season totals or Per game. Open either section to see its table. A missing number says --.")}
       ${guideItem("Strength", "The Strength row on a trend card. The page can say Elite Trend, Strong Trend, Moderate Trend, Weak Trend, Cold Trend, or Unknown.")}
       ${guideItem("Direction", "The Direction row on a trend card. The page can say Up, Down, or Flat.")}
       ${guideItem("Trend Score", "The Trend Score row. The page can say a plus number such as +12.4 or a minus number such as -8.1.")}
@@ -7390,36 +7390,36 @@ if (seasonStatsLoadError) {
 
 } else {
 
-  const againstFields = league === "mlb"
+  const statFields = league === "mlb"
     ? [
-        ["Runs Against", "Runs Against / Game", "Runs For"],
-        ["Hits Against", "Hits Against / Game", "Hits"],
-        ["Home Runs Against", "Home Runs Against / Game", "Home Runs"],
-        ["Total Bases Against", "Total Bases Against / Game", "Total Bases"],
-        ["Strikeouts Against", "Strikeouts Against / Game", "Strikeouts"]
+        ["Runs", "Runs / Game", "Runs Against", "Runs Against / Game", "Runs For"],
+        ["Hits", "Hits / Game", "Hits Against", "Hits Against / Game", "Hits"],
+        ["Home Runs", "Home Runs / Game", "Home Runs Against", "Home Runs Against / Game", "Home Runs"],
+        ["Total Bases", "Total Bases / Game", "Total Bases Against", "Total Bases Against / Game", "Total Bases"],
+        ["Strikeouts", "Strikeouts / Game", "Strikeouts Against", "Strikeouts Against / Game", "Strikeouts"]
       ]
     : league === "nba"
       ? [
-          ["Points Against", "Points Against / Game", "Points For"],
-          ["Rebounds Against", "Rebounds Against / Game", "Rebounds"],
-          ["Assists Against", "Assists Against / Game", "Assists"],
-          ["Threes Against", "Threes Against / Game", "Threes"],
-          ["Turnovers Against", "Turnovers Against / Game", "Turnovers"]
+          ["Points", "Points / Game", "Points Against", "Points Against / Game", "Points For"],
+          ["Rebounds", "Rebounds / Game", "Rebounds Against", "Rebounds Against / Game", "Rebounds"],
+          ["Assists", "Assists / Game", "Assists Against", "Assists Against / Game", "Assists"],
+          ["Threes", "Threes / Game", "Threes Against", "Threes Against / Game", "Threes"],
+          ["Turnovers", "Turnovers / Game", "Turnovers Against", "Turnovers Against / Game", "Turnovers"]
         ]
       : league === "nhl"
         ? [
-            ["Goals Against", "Goals Against / Game", "Goals For"],
-            ["Shots Against", "Shots Against / Game", "Shots On Goal"],
-            ["Assists Against", "Assists Against / Game", "Assists"],
-            ["Points Against", "Points Against / Game", "Points"],
-            ["Saves Against", "Saves Against / Game", "Saves"]
+            ["Goals", "Goals / Game", "Goals Against", "Goals Against / Game", "Goals For"],
+            ["Shots on Goal", "Shots on Goal / Game", "Shots Against", "Shots Against / Game", "Shots On Goal"],
+            ["Assists", "Assists / Game", "Assists Against", "Assists Against / Game", "Assists"],
+            ["Points", "Points / Game", "Points Against", "Points Against / Game", "Points"],
+            ["Saves", "Saves / Game", "Saves Against", "Saves Against / Game", "Saves"]
           ]
         : [
-            ["Points Against", "Points Against / Game", "Points For"],
-            ["Passing Yards Against", "Passing Yards Against / Game", "Passing Yards"],
-            ["Rushing Yards Against", "Rushing Yards Against / Game", "Rushing Yards"],
-            ["Turnovers Against", "Turnovers Against / Game", "Turnovers"],
-            ["Sacks Against", "Sacks Against / Game", "Sacks"]
+            ["Points", "Points / Game", "Points Against", "Points Against / Game", "Points For"],
+            ["Passing Yards", "Passing Yards / Game", "Passing Yards Against", "Passing Yards Against / Game", "Passing Yards"],
+            ["Rushing Yards", "Rushing Yards / Game", "Rushing Yards Against", "Rushing Yards Against / Game", "Rushing Yards"],
+            ["Turnovers", "Turnovers / Game", "Turnovers Against", "Turnovers Against / Game", "Turnovers"],
+            ["Sacks", "Sacks / Game", "Sacks Against", "Sacks Against / Game", "Sacks"]
           ];
 
   const gamesById = new Map();
@@ -7430,16 +7430,20 @@ if (seasonStatsLoadError) {
     gamesById.get(id).push(row);
   });
 
-  const totals = Object.fromEntries(againstFields.map(([, , field]) => [field, 0]));
+  const ownTotals = Object.fromEntries(statFields.map((field) => [field[4], 0]));
+  const againstTotals = Object.fromEntries(statFields.map((field) => [field[4], 0]));
   let gamesPlayed = 0;
   teamGames.forEach((game) => {
     const id = String(game["Game ID"] || "").trim();
     const opponent = (gamesById.get(id) || []).find((row) => String(row["Team"] || "").trim() !== selectedTeam);
     if (!opponent) return;
     gamesPlayed += 1;
-    againstFields.forEach(([, , field]) => {
-      const value = Number(opponent[field]);
-      totals[field] += Number.isFinite(value) ? value : 0;
+    statFields.forEach((field) => {
+      const key = field[4];
+      const ownValue = Number(game[key]);
+      const againstValue = Number(opponent[key]);
+      ownTotals[key] += Number.isFinite(ownValue) ? ownValue : 0;
+      againstTotals[key] += Number.isFinite(againstValue) ? againstValue : 0;
     });
   });
 
@@ -7452,19 +7456,20 @@ if (seasonStatsLoadError) {
     if (!Number.isFinite(num)) return "--";
     return decimals === 0 ? String(Math.round(num)) : num.toFixed(1);
   };
-  const seasonRows = (mode) => [
+  const seasonRows = (mode, side) => [
     ["Games Played", String(gamesPlayed)],
-    ...againstFields.map(([totalLabel, perLabel, field]) => [
-      mode === "totals" ? totalLabel : perLabel,
-      seasonNumber(
-        mode === "totals" ? totals[field] : totals[field] / gamesPlayed,
-        mode === "totals" ? 0 : 1
-      )
-    ])
+    ...statFields.map(([ownTotal, ownPer, againstTotal, againstPer, field]) => {
+      const total = side === "own" ? ownTotals[field] : againstTotals[field];
+      return [
+        mode === "totals"
+          ? (side === "own" ? ownTotal : againstTotal)
+          : (side === "own" ? ownPer : againstPer),
+        seasonNumber(mode === "totals" ? total : total / gamesPlayed, mode === "totals" ? 0 : 1)
+      ];
+    })
   ];
 
   statsContainer.innerHTML = `
-    <p class="player-directory-message">What opponents have done against this team.</p>
     <div class="season-view-head">
       <label class="season-view-toggle">
         <span>View</span>
@@ -7474,14 +7479,23 @@ if (seasonStatsLoadError) {
         </select>
       </label>
     </div>
-    <div id="team-season-table"></div>
+    <details class="home-accordion season-accordion" open>
+      <summary>This team</summary>
+      <div class="home-accordion-body" id="team-season-own"></div>
+    </details>
+    <details class="home-accordion season-accordion" open>
+      <summary>Opponents</summary>
+      <div class="home-accordion-body" id="team-season-against"></div>
+    </details>
   `;
 
   const seasonSelect = document.getElementById("team-season-mode");
-  const seasonTable = document.getElementById("team-season-table");
+  const ownTable = document.getElementById("team-season-own");
+  const againstTable = document.getElementById("team-season-against");
   const drawSeason = () => {
-    if (!seasonTable || !seasonSelect) return;
-    seasonTable.innerHTML = profileSummaryTable(seasonRows(seasonSelect.value));
+    const mode = seasonSelect ? seasonSelect.value : "totals";
+    if (ownTable) ownTable.innerHTML = profileSummaryTable(seasonRows(mode, "own"));
+    if (againstTable) againstTable.innerHTML = profileSummaryTable(seasonRows(mode, "against"));
   };
   if (seasonSelect) seasonSelect.onchange = drawSeason;
   drawSeason();
